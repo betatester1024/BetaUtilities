@@ -6,3 +6,4 @@ BetaUtilities for euphoria.io using WebSocket.
 - Telephone-style help-menu for most of the bot's features
 - Pausability / some data contained within instances in each room 
 - Pauses, restores, responds to all required and optional bot requirements
+- Wordle!

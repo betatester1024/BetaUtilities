@@ -1,8 +1,8 @@
 // CopyRight (c) 2023 BetaOS
 ///<reference path="messageHandler.js"/>
 console.log("Loading.")
-import { replyMessage } from './messageHandler.js';
-const WebSocket = require('ws');
+import { replyMessage } from './messageHandler.mjs';
+import WebSocket from 'ws';
 const serviceKey = process.env['serviceKey'];
 const serviceResponse = process.env['serviceResponse']
 let DATE = new Date();
@@ -16,7 +16,7 @@ let PAUSER = [null, null, null];
 let STARTTIME = [-1, -1, -1];
 let RUNCOUNT = 0;
 let PINGCOUNT = 0;
-const Database = require("@replit/database");
+import Database from "@replit/database";
 const db = new Database();
 let CALLSTATUS = [-1, -1, -1];
 let CALLRESET = [-1, -1, -1];
@@ -275,7 +275,7 @@ function loopy() {
 
 loopy()
 
-const fs = require('fs')
+import fs from 'fs';
 let todayWordID = 0;
 let allWords = [];
 let validWords = [];
@@ -283,9 +283,9 @@ fs.readFile('wordfile.txt', (err, data) => {
     if (err) throw err;
  
   validWords = data.toString().split("\n");
-  const str = DATE.toLocaleDateString();
+  const str = DATE.getHours()+"/"+DATE.toLocaleDateString();
   todayWordID = str.hashCode()%validWords.length;
-  console.log(validWords[todayWordID])
+  console.log(str, validWords[todayWordID])
 })
 
 fs.readFile('allwords.txt', (err, data) => {

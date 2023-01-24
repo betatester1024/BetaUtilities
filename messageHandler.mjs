@@ -1,4 +1,4 @@
-export function  replyMessage(content, sender, data, i) {
+export function replyMessage(content, sender, data, i) {
   content = content.toLowerCase();
   if (content.match ("@"+SYSTEMNICK.toLowerCase())) {
     db.get("PINGCOUNT").then((value) => { db.set("PINGCOUNT", value + 1) });

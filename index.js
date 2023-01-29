@@ -1,27 +1,31 @@
 // CopyRight (c) 2023 BetaOS
-///<reference path="messageHandler.js"/>
+////<reference path="messageHandler.js"/>
 console.log("Loading.")
 const WebSocket = require('ws');
 const serviceKey = process.env['serviceKey'];
 const serviceResponse = process.env['serviceResponse']
 let DATE = new Date();
-let VERSION = "ServiceVersion Latest 0.6471 | Build-time: "+DATE.toLocaleTimeString()+", "+DATE.toLocaleDateString();
+let VERSION = "ServiceVersion STABLE 1.5271 | Build-time: "+DATE.toLocaleTimeString()+", "+DATE.toLocaleDateString();
 let setNickQ = [];
-let sockets = [null, null, null];
-let rooms = ["bots", "test", "xkcd", ""]
-let SYSTEMNICK = "BetaUtilities";
-let PAUSEDQ = [false, false, false];
-let PAUSER = [null, null, null];
-let STARTTIME = [-1, -1, -1];
+let sockets = [];
+let rooms = ["xkcd", "test", "bots", "r"]
+let SYSTEMNICK = ["BetaUtilities", "BETAUTILITIES_TEST", "BetaUtilities_BOTS", "BetaUtilities"];
+let CONFIRMCODE = 0;
+const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! Press :three: to toggle ANTISPAM.`;
+let BYPASS = [];
+let PAUSEDQ = [];
+let PAUSER = [];
+let STARTTIME = [];
 let RUNCOUNT = 0;
 let PINGCOUNT = 0;
 const Database = require("@replit/database");
 const db = new Database();
-let CALLSTATUS = [-1, -1, -1];
-let CALLRESET = [-1, -1, -1];
-let FAILEDQ = [false, false, false];
+let CALLSTATUS = [];
+let CALLRESET = [];
+let FAILEDQ = [];
 let CALLTIMES = [];
 const CALLTIMEOUT = 30000;
+let leetleCt = 1, wordleCt = 1;
 console.log("BetaOS services loading.");
 
 function startSocket(i) {
@@ -47,7 +51,7 @@ function startSocket(i) {
       let nickreply =
         `
       {"type": "nick", "data": {"name": "` +
-        SYSTEMNICK +
+        SYSTEMNICK[i] +
         `"},"id": "1"}`;
       sockets[i].send(nickreply);
       db.get("RUNCOUNT").then((value) => { db.set("RUNCOUNT", value + 1) });
@@ -59,7 +63,7 @@ function startSocket(i) {
       let msg = data["data"]["content"].toLowerCase().trim();
       let snd = data["data"]["sender"]["name"];
       // Required methods
-      if (msg == "!kill @" + SYSTEMNICK.toLowerCase()) {
+      if (msg == "!kill @" + SYSTEMNICK[i].toLowerCase()) {
         let reply =
           `{"type":"send", "data":{"content":"/me crashes",
         "parent":"` +
@@ -68,7 +72,7 @@ function startSocket(i) {
         sockets[i].send(reply);
         db.get("RUNCOUNT").then((value) => { db.set("RUNCOUNT", value + 1) });
         sockets[i].close(1000, "!killed by user.");
-      } else if (PAUSEDQ[i] && msg == "!restore @" + SYSTEMNICK.toLowerCase()) {
+      } else if (PAUSEDQ[i] && msg == "!restore @" + SYSTEMNICK[i].toLowerCase()) {
         let reply =
           `{"type":"send", "data":{"content":"/me has been unpaused",
         "parent":"` +
@@ -77,8 +81,9 @@ function startSocket(i) {
         sockets[i].send(reply);
         db.get("RUNCOUNT").then((value) => { db.set("RUNCOUNT", value + 1) });
         PAUSER[i] = null;
+        CALLTIMES[i] = [];
         PAUSEDQ[i] = false;
-      } else if (msg == "!pause @" + SYSTEMNICK.toLowerCase()) {
+      } else if (msg == "!pause @" + SYSTEMNICK[i].toLowerCase()) {
         let reply =
           `{"type":"send", "data":{"content":"/me has been paused",
         "parent":"` +
@@ -91,9 +96,9 @@ function startSocket(i) {
           `{"type":"send", "data":
           {"content":
             "Enter !kill @` +
-          SYSTEMNICK.toLowerCase() +
+          SYSTEMNICK[i]+
           ` to kill this bot, or enter !restore @` +
-          SYSTEMNICK.toLowerCase() +
+          SYSTEMNICK[i]+
           ` to restore it."
           ,"parent":"` +
           data["data"]["id"] +
@@ -104,8 +109,8 @@ function startSocket(i) {
         PAUSEDQ[i] = true;
       } else if (
         PAUSEDQ[i] &&
-        (msg.match("!ping @" + SYSTEMNICK.toLowerCase(), "gmiu") ||
-          msg.match("!help @" + SYSTEMNICK.toLowerCase(), "gmiu"))
+        (msg.match("!ping @" + SYSTEMNICK[i].toLowerCase(), "gmiu") ||
+          msg.match("!help @" + SYSTEMNICK[i].toLowerCase(), "gmiu"))
       ) {
         let reply =
           `{"type":"send", "data":{"content":"/me has been paused by @` +
@@ -136,7 +141,7 @@ function startSocket(i) {
         setTimeout(()=>{sockets[i].send(reply3)}, 1500);
         db.get("RUNCOUNT").then((value) => { db.set("RUNCOUNT", value + 1) });
         db.get("PINGCOUNT").then((value) => { db.set("PINGCOUNT", value + 1) });
-      } else if (msg.match("!ping @" + SYSTEMNICK.toLowerCase() + "$")) {
+      } else if (msg.match("!ping @" + SYSTEMNICK[i].toLowerCase() + "$")) {
         let reply3 =
           `{"type":"send", "data":{"content":"` +
           ":white_check_mark: BetaOS services ONLINE" +
@@ -147,7 +152,7 @@ function startSocket(i) {
         sockets[i].send(reply3);
       }else if (msg == "!help"){
           let reply =
-          `{"type":"send", "data":{"content":"Enter !help @`+SYSTEMNICK+` for help!",
+          `{"type":"send", "data":{"content":"Enter !help @`+SYSTEMNICK[i]+` for help!",
         "parent":"` +
           data["data"]["id"] +
           `"}}`;
@@ -157,17 +162,17 @@ function startSocket(i) {
         let outStr = replyMessage(msg.trim(), snd, data, i);
         if (FAILEDQ[i] && outStr != "") outStr = "/me is rebooting."
         if (outStr == "") return;
-        if (true) {
-          CALLTIMES.push(Date.now());
-          setTimeout(() => { CALLTIMES.shift(); console.log("CLEAR"); }, 60*5*1000)
+        if (!BYPASS[i]) {
+          CALLTIMES[i].push(Date.now());
+          setTimeout(() => { CALLTIMES[i].shift(); console.log("CLEAR"); }, 60*5*1000)
         }
-        if ((CALLTIMES.length >= 5 && CALLSTATUS[i] == -1) || CALLTIMES.length >= 7) {
+        if (!BYPASS[i] && ((CALLTIMES[i].length >= 5 && CALLSTATUS[i] == -1) || CALLTIMES[i].length >= 7)) {
           // if (i == 2)
-            if (CALLTIMES.length < 10) {
-              outStr = i==2?"[ANTISPAM] Consider moving to &bots or &test for large-scale testing. Thank you for your understanding.\\n" + outStr
-                : "[ANTISPAM] SpamWarn";
+            if (CALLTIMES[i].length < 10) {
+              outStr = i==0?outStr+"\\n[ANTISPAM] Consider moving to &bots or &test for large-scale testing. Thank you for your understanding."
+                : outStr+" [ANTISPAM WARNING]";
             } else {
-              outStr = "[ANTISPAM] You have reached a hard rate-limit. Please calm down!"
+              outStr = outStr+"\\n[ANTISPAM] Automatically paused @"+SYSTEMNICK[i];
               PAUSEDQ[i] = true;
               PAUSER[i] = "ANTISPAM_INTERNAL";
               CALLSTATUS[i] = -1;
@@ -236,7 +241,7 @@ function resetCall(data, i, messageQ = true) {
     let reply =
       `{"type":"send", "data":
         {"content":
-          "[Support has hung up the phone.]"
+          "[CALLEND] Disconnected from BetaOS Services"
         ,"parent":"` +
       data["data"]["id"] +
       `"}}`; 
@@ -253,7 +258,7 @@ function socketclose(i) {
   let nickreply =
     `
   {"type": "nick", "data": {"name": "` +
-    SYSTEMNICK +
+    SYSTEMNICK[i] +
     "[Error]" +
     `"},"id": "1"}`;
   sockets[i].send(nickreply);
@@ -264,7 +269,7 @@ function socketclose(i) {
     let nickreply =
       `
     {"type": "nick", "data": {"name": "` +
-      SYSTEMNICK +
+      SYSTEMNICK[i] +
       `"},"id": "1"}`;
     sockets[i].send(nickreply);
     db.get("RUNCOUNT").then((value) => { db.set("RUNCOUNT", value + 1) });
@@ -272,28 +277,44 @@ function socketclose(i) {
   }, 5000);
 }
 
-for (let i = 0; i < sockets.length; i++) {
+for (let i = 0; i < rooms.length; i++) {
+  sockets[i] = null;
   startSocket(i);
   db.list().then(keys => { console.log(keys) })
+  BYPASS[i] = false;
+  PAUSEDQ[i] = false;
+  PAUSER[i] = null;
+  STARTTIME[i] = -1;
+  CALLSTATUS[i] = -1;
+  CALLRESET[i] = -1;
+  FAILEDQ[i] = false;
+  CALLTIMES[i] = [];
+  setNickQ[i] = false;
 }
-function loopy() {
+function updateTime() {
   console.log(Date.now());
-  setTimeout(loopy, 10000);
+  setTimeout(updateTime, 10000);
 }
 
-loopy()
+updateTime()
 
 const fs = require('fs')
 let todayWordID = 0;
+let todayLeetCODE = [];
+let charSet = "0123456789abcdefghijklmnopqrstuvwxyz";
 let allWords = [];
 let validWords = [];
 fs.readFile('wordfile.txt', (err, data) => {
     if (err) throw err;
- 
+  // console.log(data.toString())
   validWords = data.toString().split("\n");
-  const str = DATE.toLocaleDateString();
-  todayWordID = str.hashCode()%validWords.length;
-  console.log(validWords[todayWordID])
+  const str = DATE.getHours()+"/"+DATE.toLocaleDateString();
+  todayWordID = Math.abs(str.hashCode())%validWords.length;
+  console.log(str.hashCode(), validWords[todayWordID])
+  for (let i=0; i<5; i++) {
+    todayLeetCODE[i] = charSet[Math.floor((str.hashCode()%Math.pow(10, 5))/Math.pow(10, i))%charSet.length];
+  } // for(i)
+  console.log(todayLeetCODE);
 })
 
 fs.readFile('allwords.txt', (err, data) => {
@@ -320,20 +341,20 @@ String.prototype.hashCode = function() {
 
 function replyMessage(content, sender, data, i) {
   content = content.toLowerCase();
-  if (content.match ("@"+SYSTEMNICK.toLowerCase())) {
+  if (content.match ("@"+SYSTEMNICK[i].toLowerCase())) {
     db.get("PINGCOUNT").then((value) => { db.set("PINGCOUNT", value + 1) });
   }
   console.log(content);
-  if (content == "!conjure @" + SYSTEMNICK.toLowerCase()) {
+  if (content == "!conjure @" + SYSTEMNICK[i].toLowerCase()) {
     setTimeout(()=>{sockets[i].close()}, 120);
     return "/me rölls bÿ and spontaneously combusts";
   }
-  if (content == "!reboot @" + SYSTEMNICK.toLowerCase()) {
+  if (content == "!reboot @" + SYSTEMNICK[i].toLowerCase()) {
     setTimeout(()=>{sockets[i].close()}, 120);
     return "/me is rebooting";
   }
   if (content.match(/^!testfeature$/gimu)) return "@" + sender;
-  if (content.match("^!uptime @" + SYSTEMNICK.toLowerCase() + "$", "gmiu")) {
+  if (content.match("^!uptime @" + SYSTEMNICK[i].toLowerCase() + "$", "gmiu")) {
     let timeElapsed = Date.now() - STARTTIME[i];
     let date = new Date(Date.now());
     return (
@@ -348,18 +369,18 @@ function replyMessage(content, sender, data, i) {
       ")"
     );
   }
-  if (content.match("!version[ ]+@"+SYSTEMNICK.toLowerCase())) {
+  if (content.match("!version[ ]+@"+SYSTEMNICK[i].toLowerCase())) {
     console.log("AAAAA")
     return VERSION;
   }
-  if (content.match("(!help[ ]+@" + SYSTEMNICK.toLowerCase() + "$|^[ ]+!help[ ]+$)|!contact", "gmiu") != null) {
+  if (content.match("(!help[ ]+@" + SYSTEMNICK[i].toLowerCase() + "$|^[ ]+!help[ ]+$)|!contact", "gmiu") != null) {
     if (CALLSTATUS[i] == 6) return "You're currently on hold! A moment, please."
     CALLSTATUS[i] = 0;
     clearTimeout(CALLRESET[i]);
     CALLRESET[i] = setTimeout(() => {
       resetCall(data, i);
     }, CALLTIMEOUT);
-    return "Welcome to BetaOS support! Press :one: to connect! Press :zero: to end call at any time.";
+    return "Welcome to BetaOS Services! Press :one: to connect! Press :zero: to end call at any time.";
   }
   if (CALLSTATUS[i] == 0 && (content == "2" || content == ":two:" || content == "two")) {
     clearTimeout(CALLRESET[i]);
@@ -376,7 +397,7 @@ function replyMessage(content, sender, data, i) {
     console.log(encr);
     return encr;
   }
-  if (content.match("^!runstats [ ]*@" + SYSTEMNICK.toLowerCase(), "gimu")) {
+  if (content.match("^!runstats [ ]*@" + SYSTEMNICK[i].toLowerCase(), "gimu")) {
     console.log("match")
     db.get("RUNCOUNT").then((value) => {
       RUNCOUNT = value;
@@ -396,7 +417,7 @@ function replyMessage(content, sender, data, i) {
   }
   if (content.match(/^!potato$/)) return "potato.io";
 
-  if (content.match("^!src @" + SYSTEMNICK.toLowerCase() + "$", "guim"))
+  if (content.match("^!src @" + SYSTEMNICK[i].toLowerCase() + "$", "guim"))
     return (
       "!tell @betatester1024 user @" +
       data["data"]["sender"]["name"] +
@@ -416,10 +437,10 @@ function replyMessage(content, sender, data, i) {
         "\\n[NEW] The FIREFOX-ON-REPLIT may provide more reliable unblocking! > https://replit.com/@betatester1024/firefox#main.py";
 
   }
-  if (content == "!rating @" + SYSTEMNICK.toLowerCase()) {
+  if (content == "!rating @" + SYSTEMNICK[i].toLowerCase()) {
     db.get("SUM").then((value) => {
       db.get("CT").then((value2) => {
-        let r = "Current @" + SYSTEMNICK + " rating - " + (value / value2).toFixed(2);
+        let r = "Current @" + SYSTEMNICK[i] + " rating - " + (value / value2).toFixed(2);
         let reply =
           `{"type":"send", "data":{"content":"` + r + `",
         "parent":"` +
@@ -434,13 +455,13 @@ function replyMessage(content, sender, data, i) {
     setTimeout(()=>{sockets[i].close()}, 120);
     return "aaaaghhh! death! blood! i'm dying!";
   }
-  if (content == "!activerooms @"+SYSTEMNICK.toLowerCase()) {
+  if (content == "!activerooms @"+SYSTEMNICK[i].toLowerCase()) {
     let str = "/me is in: ";
-    for (let j = 0; j < sockets.length - 1; j++) { str += "&" + rooms[j] + ", "; }
-    str += "and &" + rooms[sockets.length - 1] + "!";
+    for (let j = 0; j < rooms.length - 1; j++) { str += "&" + rooms[j] + ", "; }
+    str += "and &" + rooms[rooms.length - 1] + "!";
     return str;
   }
-  if (content == "!pong"||content=="!pong @"+SYSTEMNICK.toLowerCase()) {
+  if (content == "!pong"||content=="!pong @"+SYSTEMNICK[i].toLowerCase()) {
     let reply =
       `{"type":"send", "data":{"content":"` +
       "FUCK" +
@@ -460,7 +481,7 @@ function replyMessage(content, sender, data, i) {
       resetCall(data, i);
     }, CALLTIMEOUT);
     CALLSTATUS[i] = 1;
-    return "Welcome to the BetaOS Call services! Enter :one: to inquire about our services. " +
+    return "Welcome to BetaOS Services! Enter :one: to inquire about our services. " +
       "Enter :two: to speak to a manager. " +
       "Composez le :three: pour service en français. " +
       "Press :four: for direct access to the code. " +
@@ -480,8 +501,8 @@ function replyMessage(content, sender, data, i) {
     return (
       "Important commands: !ping, !help, !pause, !restore, !kill, !pong, !uptime, !uuid. \\n " +
       "Bot-specific commands: !unblock <LINK>; !potato, !src @" +
-      SYSTEMNICK.toLowerCase() +
-      "; !runStats !testfeature, !creatorinfo, !version, !activeRooms, !die "
+      SYSTEMNICK[i].toLowerCase() +
+      "; !runStats !testfeature, !creatorinfo, !version, !activeRooms, !die, !contact, !antispam, !rating, !wordle"
     );
   }
   if (
@@ -568,20 +589,34 @@ function replyMessage(content, sender, data, i) {
       "parent":"` +
         data["data"]["id"] +
         `"}}`;
-      sockets[i].send(reply);
+      if (Math.random() > 0.9) sockets[i].send(reply);
       CALLRESET[i] = setTimeout(() => {
-        let r = `Press :one: to reboot services. Press :two: to play wordle!`;
         let reply =
-          `{"type":"send", "data":{"content":"` + r + `",
+          `{"type":"send", "data":{"content":"` + HELPTEXT2 + `",
         "parent":"` +
           data["data"]["id"] +
           `"}}`;
         console.log(reply);
         sockets[i].send(reply);
+        clearTimeout(CALLRESET[i]);
+        CALLRESET[i] = setTimeout(() => {
+          resetCall(data, i);
+        }, CALLTIMEOUT);
         CALLSTATUS[i] = 5;
       }, Math.random() * 5000 + 2000);
     }, Math.random() * 15000 + 5000);
-    return "You've been put on hold. Press :zero: to exit support at any time.";
+    return "You've been put on hold. Press :one: to scream into the phone. Press :zero: to exit support at any time.";
+  }
+  if (CALLSTATUS[i] == 6 && (content == ":one:"||content=="one"||content=="1")) {
+    CALLSTATUS[i] = 5;
+    clearTimeout(CALLRESET[i]);
+    CALLRESET[i] = setTimeout(() => {
+      resetCall(data, i);
+    }, CALLTIMEOUT);
+    let r = "Alright, alright. Give me a second."
+    let reply =`{"type":"send", "data":{"content":"`+r+`","parent":"`+data["data"]["id"]+`"}}`;
+    sockets[i].send(reply);
+    return HELPTEXT2;
   }
   if (CALLSTATUS[i] == 1 && (content == ":eight:" || content == "eight" || content == "8")) {
     CALLSTATUS[i] = 4;
@@ -606,7 +641,7 @@ function replyMessage(content, sender, data, i) {
       })
     });
     CALLSTATUS[i] = -1;
-    return "Thank you for providing a rating! ";
+    return "Thank you for providing a rating! Enter !rating @"+SYSTEMNICK[i]+" to get current rating.";
   }
   if (CALLSTATUS[i] == 5 && (content == "one" || content == "1" || content == ":one:")) {
     clearTimeout(CALLRESET[i]);
@@ -616,28 +651,84 @@ function replyMessage(content, sender, data, i) {
   if (content == "!wordle"||CALLSTATUS[i] == 5 && (content == "two" || content == "2" || content == ":two:")) {
     clearTimeout(CALLRESET[i]);
     CALLSTATUS[i] = 8;
-    return "Enter any 5-letter word. Press :zero: to exit.";
+    return "Enter any 5-letter word. Press :one: for help on the game itself. Press :two: to try leetle! Press :zero: to exit.";
+  }
+  if (content == "!leetle" || CALLSTATUS[i] == 8 && (content == "two" || content == "2" || content == ":two:")) {
+    CALLSTATUS[i] = 10;
+    return "Enter any 5-letter sequence of characters. Based on leet.nu/leetle.";
+  }
+  if (content == "!antispam"||CALLSTATUS[i] == 5 && (content == "three" || content == "3" || content == ":three:")) {
+    clearTimeout(CALLRESET[i]);
+    CALLRESET[i] = setTimeout(() => {
+      resetCall(data, i, false);
+    }, CALLTIMEOUT);
+    CALLSTATUS[i] = 9;
+    CONFIRMCODE =Math.floor(Math.random()*10000);
+    return "[SYSWARN] Are you sure? Enter "+ CONFIRMCODE+" to confirm."; 
+  }
+  if (CALLSTATUS[i] == 9 && content == CONFIRMCODE) {
+    BYPASS[i] = !BYPASS[i];
+    CALLTIMES[i] = [];
+    resetCall(data, i, false);
+    if (BYPASS[i]) setTimeout(()=> {
+      BYPASS[i] = false;
+      CALLTIMES[i] = [];
+      let reply =
+        `{"type":"send", "data":{"content":"/me has automatically re-enabled ANTISPAM",
+      "parent":"` +
+        data["data"]["id"] +
+        `"}}`;
+      sockets[i].send(reply);
+    }, 5*60*1000)
+    return "ANTISPAM is currently: "+(BYPASS[i]?"OFF":"ON");
   }
   if (CALLSTATUS[i] == 8 && content.match("^[a-z]{5}$")) {
     if (allWords.indexOf(content)>=0) {
       let correctWord = validWords[todayWordID].split("");
       let out = "";
-      if (content == validWords[todayWordID]) return "Correct word!"
+      if (content == validWords[todayWordID]) {
+        setTimeout(()=>{resetCall(data, i, true)}, 200);
+        setTimeout(()=>{wordleCt = 1;}, 200);
+        return "Correct word! You won in: "+wordleCt+" moves!";
+      }
       for (let i=0; i<5; i++) {
         if (content.charAt(i) == correctWord[i]) out += "🟩";
         else if (correctWord.indexOf(content.charAt(i))>=0) out += "🟨";
         else out += "🟥"
       }
+      wordleCt++;
       return out;
     }
     else return "That's not a word!";
+  }
+  if (CALLSTATUS[i] == 10 && content.match("^[a-z0-9]{5}$")) {
+    // if (allWords.indexOf(content)>=0) {
+      let correctWord = validWords[todayWordID].split("");
+      let out = "";
+      if (content == todayLeetCODE.join("")) {
+        setTimeout(()=>{resetCall(data, i, true)}, 200);
+        setTimeout(()=>{leetleCt = 1;}, 200);
+        return "Correct uh- character sequence! You won in: "+leetleCt+" moves!";
+      }
+      for (let i=0; i<5; i++) {
+        if (content.charAt(i) == todayLeetCODE[i]) out += "🟩";
+        else if (todayLeetCODE.indexOf(content.charAt(i))>=0) out += "🟨";
+        else out += "🟥"
+      }
+      leetleCt++;
+      return out;
+    // }
+    // else return "Something went terribly wrong.";
+  }
+  if (CALLSTATUS[i] == 8 && (content == "one" || content == "1" || content == ":one:")) {
+    return "Enter any 5-letter word. Green tiles mean the letter is positionned in the correct location, yellow tiles mean the letter is positionned incorrectly but the letter exists in the word at least once, and red means that the letter does not exist in the word. You currently have infinite guesses."
   }
   if (CALLSTATUS[i] != -1 && (content == "zero" || content == "0" || content == ":zero:")) {
     clearTimeout(CALLRESET[i]);
     CALLSTATUS[i] = -1;
     return "[CALLEND] Thank you for calling BetaOS services!"
   }
-  if (content.match("@" + SYSTEMNICK.toLowerCase() + "$", "gmiu")) {
+  if (content.match("@" + SYSTEMNICK[i].toLowerCase() + "$", "gmiu")) {
     return "Yes?";
   }
 

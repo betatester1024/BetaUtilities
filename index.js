@@ -5,6 +5,7 @@ const WebSocket = require('ws');
 const serviceKey = process.env['serviceKey'];
 const serviceResponse = process.env['serviceResponse']
 let DATE = new Date();
+let FILEDATA;
 let VERSION = "ServiceVersion STABLE 1.5271 | Build-time: "+DATE.toLocaleTimeString()+", "+DATE.toLocaleDateString();
 let setNickQ = [];
 let sockets = [];
@@ -25,8 +26,17 @@ let CALLRESET = [];
 let FAILEDQ = [];
 let CALLTIMES = [];
 const CALLTIMEOUT = 30000;
-let leetleCt = 1, wordleCt = 1;
+let leetlentCt = 1, wordleCt = 1;
 console.log("BetaOS services loading.");
+
+// right, so we have a front-end.
+const express = require('express');
+const app = express();
+const port = 4000;
+app.get('/', (req, res) => {res.send("ONLINE!")})
+app.listen(port, () => {
+  console.log(`Success! Your application is running on port ${port}.`);
+});
 
 function startSocket(i) {
   sockets[i] = new WebSocket("wss://euphoria.io/room/" + rooms[i] + "/ws");
@@ -39,7 +49,7 @@ function startSocket(i) {
   sockets[i].onmessage = function(event) {
     // console.log(`[message] Data received from server: ${event.data}`);
     let data = JSON.parse(event.data);
-    console.log(data["type"]);
+    // console.log(data["type"]);
     if (data["type"] == "ping-event") {
       let reply =
         `{"type": "ping-reply","data": {"time":` +
@@ -47,6 +57,7 @@ function startSocket(i) {
         `},"id":"0"}`;
       sockets[i].send(reply);
     }
+    else console.log(data["type"]);
     if (!setNickQ[i]) {
       let nickreply =
         `
@@ -291,12 +302,13 @@ for (let i = 0; i < rooms.length; i++) {
   CALLTIMES[i] = [];
   setNickQ[i] = false;
 }
-function updateTime() {
-  console.log(Date.now());
-  setTimeout(updateTime, 10000);
-}
+function loopy() {
+  // console.log(Date.now());
+  setTimeout(loopy, 10000);
+  if (FILEDATA) refreshCodes()
+} 
 
-updateTime()
+loopy()
 
 const fs = require('fs')
 let todayWordID = 0;
@@ -305,17 +317,23 @@ let charSet = "0123456789abcdefghijklmnopqrstuvwxyz";
 let allWords = [];
 let validWords = [];
 fs.readFile('wordfile.txt', (err, data) => {
-    if (err) throw err;
+  if (err) throw err;
+  FILEDATA = data;
+  refreshCodes()
+})
+
+function refreshCodes() {
+  
   // console.log(data.toString())
-  validWords = data.toString().split("\n");
+  validWords = FILEDATA.toString().split("\n");
   const str = DATE.getHours()+"/"+DATE.toLocaleDateString();
   todayWordID = Math.abs(str.hashCode())%validWords.length;
   console.log(str.hashCode(), validWords[todayWordID])
   for (let i=0; i<5; i++) {
-    todayLeetCODE[i] = charSet[Math.floor((str.hashCode()%Math.pow(10, 5))/Math.pow(10, i))%charSet.length];
+    todayLeetCODE[i] = charSet[Math.floor((Math.abs(str.hashCode())%Math.pow(10, 5))/Math.pow(10, i))%charSet.length];
   } // for(i)
   console.log(todayLeetCODE);
-})
+}
 
 fs.readFile('allwords.txt', (err, data) => {
     if (err) throw err;
@@ -417,7 +435,7 @@ function replyMessage(content, sender, data, i) {
   }
   if (content.match(/^!potato$/)) return "potato.io";
 
-  if (content.match("^!src @" + SYSTEMNICK[i].toLowerCase() + "$", "guim"))
+  if (false && content.match("^!src @" + SYSTEMNICK[i].toLowerCase() + "$", "guim"))
     return (
       "!tell @betatester1024 user @" +
       data["data"]["sender"]["name"] +
@@ -502,7 +520,7 @@ function replyMessage(content, sender, data, i) {
       "Important commands: !ping, !help, !pause, !restore, !kill, !pong, !uptime, !uuid. \\n " +
       "Bot-specific commands: !unblock <LINK>; !potato, !src @" +
       SYSTEMNICK[i].toLowerCase() +
-      "; !runStats !testfeature, !creatorinfo, !version, !activeRooms, !die, !contact, !antispam, !rating, !wordle"
+      "; !runStats !testfeature, !creatorinfo, !version, !activeRooms, !die, !contact, !antispam, !rating, !wordle, !leetlent"
     );
   }
   if (
@@ -542,13 +560,13 @@ function replyMessage(content, sender, data, i) {
     CALLSTATUS[i] = 99;
     return "Bienvenue aux systèmes BétaOS. Téléchargement en cours des commandes disponibles, un moment SVP.";
   }
-  if (
+  if (content == "!src @"+SYSTEMNICK[i].toLowerCase() || 
     CALLSTATUS[i] == 1 &&
     (content == ":four:" || content == "four" || content == "4")
   ) {
     clearTimeout(CALLRESET[i]);
     CALLSTATUS[i] = -1;
-    return "> Source code: https://replit.com/@betatester1024/BetaUtilities#index.js"
+    return "> Source code: https://replit.com/@betatester1024/BetaUtils#index.js"
   }
   if (CALLSTATUS[i] == 1 && (content == ":five:" || content == "five" || content == "5")) {
     clearTimeout(CALLRESET[i]);
@@ -651,9 +669,9 @@ function replyMessage(content, sender, data, i) {
   if (content == "!wordle"||CALLSTATUS[i] == 5 && (content == "two" || content == "2" || content == ":two:")) {
     clearTimeout(CALLRESET[i]);
     CALLSTATUS[i] = 8;
-    return "Enter any 5-letter word. Press :one: for help on the game itself. Press :two: to try leetle! Press :zero: to exit.";
+    return "Enter any 5-letter word. Press :one: for help on the game itself. Press :two: to try leetlen't! Press :zero: to exit.";
   }
-  if (content == "!leetle" || CALLSTATUS[i] == 8 && (content == "two" || content == "2" || content == ":two:")) {
+  if (content == "!leetlent" ||content == "!leetlen't"|| CALLSTATUS[i] == 8 && (content == "two" || content == "2" || content == ":two:")) {
     CALLSTATUS[i] = 10;
     return "Enter any 5-letter sequence of characters. Based on leet.nu/leetle.";
   }
@@ -707,15 +725,15 @@ function replyMessage(content, sender, data, i) {
       let out = "";
       if (content == todayLeetCODE.join("")) {
         setTimeout(()=>{resetCall(data, i, true)}, 200);
-        setTimeout(()=>{leetleCt = 1;}, 200);
-        return "Correct uh- character sequence! You won in: "+leetleCt+" moves!";
+        setTimeout(()=>{leetlentCt = 1;}, 200);
+        return "Correct uh- character sequence! You won in: "+leetlentCt+" moves!";
       }
       for (let i=0; i<5; i++) {
         if (content.charAt(i) == todayLeetCODE[i]) out += "🟩";
         else if (todayLeetCODE.indexOf(content.charAt(i))>=0) out += "🟨";
         else out += "🟥"
       }
-      leetleCt++;
+      leetlentCt++;
       return out;
     // }
     // else return "Something went terribly wrong.";

@@ -16,7 +16,7 @@ const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! P
 let BYPASS = [];
 let PAUSEDQ = [];
 let PAUSER = [];
-let STARTTIME = [];
+let STARTTIME;
 let RUNCOUNT = 0;
 let PINGCOUNT = 0;
 const Database = require("@replit/database");
@@ -43,7 +43,6 @@ function startSocket(i) {
   setNickQ[i] = false;
   sockets[i].onopen = function(e) {
     console.log("[open] Connection established");
-    STARTTIME[i] = Date.now();
   };
 
   sockets[i].onmessage = function(event) {
@@ -216,6 +215,7 @@ function startSocket(i) {
   sockets[i].onerror = function(error) {
     console.log(error);
   };
+  
 }
 
 function formatTime(ms) {
@@ -290,12 +290,15 @@ function socketclose(i) {
 
 for (let i = 0; i < rooms.length; i++) {
   sockets[i] = null;
+  console.log(Date.now())
+  STARTTIME= Date.now();
   startSocket(i);
+  
   db.list().then(keys => { console.log(keys) })
   BYPASS[i] = false;
   PAUSEDQ[i] = false;
   PAUSER[i] = null;
-  STARTTIME[i] = -1;
+  // STARTTIME[i] = -1;
   CALLSTATUS[i] = -1;
   CALLRESET[i] = -1;
   FAILEDQ[i] = false;
@@ -328,11 +331,11 @@ function refreshCodes() {
   validWords = FILEDATA.toString().split("\n");
   const str = DATE.getHours()+"/"+DATE.toLocaleDateString();
   todayWordID = Math.abs(str.hashCode())%validWords.length;
-  console.log(str.hashCode(), validWords[todayWordID])
+  
   for (let i=0; i<5; i++) {
     todayLeetCODE[i] = charSet[Math.floor((Math.abs(str.hashCode())%Math.pow(10, 5))/Math.pow(10, i))%charSet.length];
   } // for(i)
-  console.log(todayLeetCODE);
+  console.log(str.hashCode(), validWords[todayWordID], todayLeetCODE.join(""));
 }
 
 fs.readFile('allwords.txt', (err, data) => {
@@ -373,7 +376,7 @@ function replyMessage(content, sender, data, i) {
   }
   if (content.match(/^!testfeature$/gimu)) return "@" + sender;
   if (content.match("^!uptime @" + SYSTEMNICK[i].toLowerCase() + "$", "gmiu")) {
-    let timeElapsed = Date.now() - STARTTIME[i];
+    let timeElapsed = Date.now() - STARTTIME;
     let date = new Date(Date.now());
     return (
       "/me has been up since " +
@@ -435,14 +438,14 @@ function replyMessage(content, sender, data, i) {
   }
   if (content.match(/^!potato$/)) return "potato.io";
 
-  if (false && content.match("^!src @" + SYSTEMNICK[i].toLowerCase() + "$", "guim"))
-    return (
-      "!tell @betatester1024 user @" +
-      data["data"]["sender"]["name"] +
-      " requests source-code access."
-    );
+  // if (false && content.match("^!src @" + SYSTEMNICK[i].toLowerCase() + "$", "guim"))
+  //   return (
+  //     "!tell @betatester1024 user @" +
+  //     data["data"]["sender"]["name"] +
+  //     " requests source-code access."
+  //   );
   let exp = /^((?:(?:(?:https?|ftp):)?\/\/)?(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?)$/
-  let exp2 = /^!unblock [ ]+((?:(?:(?:https?|ftp):)?\/\/)?(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?)$/
+  let exp2 = /^!unblock[ ]+((?:(?:(?:https?|ftp):)?\/\/)?(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?)$/
   let match = CALLSTATUS[i] == 2 ? content.match(exp, "i") : content.match(exp2, "i");
   if (match) {
     CALLSTATUS[i] = -1;

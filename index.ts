@@ -1,0 +1,235 @@
+// Copyright (c) 2023 BetaOS
+import {WebSocket} from 'ws';
+import {init} from './initialiser'
+import {replyMessage} from './messageHandle';
+const Database = require("@replit/database")
+
+// we have a front-end!
+const express = require('express');
+const app = express();
+const port = 4000;
+app.get('/', (req:any, res:any) => {
+  res.send("ONLINE!")
+  console.log("Accessed.")
+})
+app.listen(port, () => {
+  console.log(`Success! Your application is running on port ${port}.`);
+});
+ 
+export class WS 
+{
+  static CALLTIMEOUT = 5000;
+  url:string
+  nick:string;
+  socket: WebSocket;
+  pausedQ=false;
+  pauser:string|null = null;
+  failedQ = false;
+  callTimes:number[]=[];
+  callReset:NodeJS.Timeout|null = null;
+  callStatus=-1;
+  transferOutQ = false; // is a room that one should recommend transferring out?
+  bypass = false;
+  confirmcode = -1;
+  static db = new Database();
+  static toSendInfo(msg: string, data:any=null) {
+    if (data) return `{"type":"send", "data":{"content":"${msg}","parent":"${data["data"]["id"]}"}}`;
+    else return `{"type":"send", "data":{"content":"${msg}"}`;
+  }
+
+  incrRunCt() {
+    WS.db.get("RUNCOUNT").then((value:number) => { WS.db.set("RUNCOUNT", value + 1) });
+  }
+  incrPingCt() {
+    WS.db.get("PINGCOUNT").then((value:number) => { WS.db.set("PINGCOUNT", value + 1) });
+  }
+
+  displayStats(data:any) {
+    WS.db.get("RUNCOUNT").then((value:number) => {
+      let RUNCOUNT = value;
+      WS.db.get("PINGCOUNT").then((value2:number) => {
+        let PINGCOUNT = value2;
+        this.delaySendMsg("Run count: "+RUNCOUNT+"\\nPing count: "+PINGCOUNT, data, 0);
+      })
+    });
+  }
+
+  bumpCallReset(data:any)
+  {
+    if (this.callReset) 
+      clearTimeout(this.callReset);
+    this.callReset = setTimeout(() => {
+      this.resetCall(data); 
+    }, WS.CALLTIMEOUT);
+  }
+
+  clearCallReset() {
+    if (this.callReset) clearTimeout(this.callReset);
+    this.callStatus=-1;
+  }
+
+  resetCall(this:WS, data:any) {
+    if (this.callStatus >= 0) {
+      this.delaySendMsg("[CALLEND] Disconnected from BetaOS Services", data, 0);
+    }
+    this.callStatus= -1;
+  }
+
+  replyMessage(msg:string, sender:string, data:any):string
+  {
+    return ""
+  };
+
+  delaySendMsg(msg:string, data:any, delay:number) {
+    if (delay == 0) this.sendMsg(msg, data) // instant send
+    else {
+      setTimeout(()=>{
+      this.sendMsg(msg, data)}, delay);
+    }
+    this.incrRunCt();
+  }
+
+  sendMsg(msg:string, data:any) {
+    this.socket.send(WS.toSendInfo(msg, data))
+  }
+  
+  onOpen() {
+    console.log("Open in "+this.socket.url);
+  }
+
+  initNick() {
+    this.changeNick(this.nick)
+  }
+
+  changeNick(nick:string) {
+    this.socket.send(`{"type": "nick", "data": {"name": "${nick}"},"id": "1"}`);
+  }
+
+  onMessage(dat:string) {
+    let data = JSON.parse(dat);
+    if (data["type"] == "ping-event") {
+      let reply = `{"type": "ping-reply","data": {"time":${data["data"]["time"]}},"id":"0"}`;
+      this.socket.send(reply);
+      setTimeout(this.initNick.bind(this), 3000);
+    }
+    if (data["type"] == "send-event") {
+      // check whether the message contents match the pattern
+
+      let msg = data["data"]["content"].toLowerCase().trim();
+      let snd = data["data"]["sender"]["name"];
+      console.log(`[${snd}] ${msg}`);
+      // Required methods
+      // !kill
+      if (msg == "!kill @" + this.nick.toLowerCase()) {
+        this.delaySendMsg("/me crashes", data, 0);
+        setTimeout(()=>{this.socket.close(1000, "!killed by user.");}, 100);
+      }
+        
+      // !restore
+      else if (this.pausedQ && msg == "!restore @" + this.nick.toLowerCase()) {
+        this.sendMsg("/me has been unpaused", data);        
+        this.pauser = null;
+        this.callTimes = [];
+        this.pausedQ = false;
+      } 
+        
+      // !pause
+      else if (msg == "!pause @" + this.nick.toLowerCase()) {
+        this.delaySendMsg("/me has been paused", data, 0)
+        
+
+        let reply = "Enter !kill @"+this.nick+" to kill this bot, "+
+          "or enter !restore @"+this.nick+" to restore it.";
+        this.delaySendMsg(reply, data, 0);
+        this.pauser = snd;
+        this.pausedQ = true;
+      } 
+      // check paused and pings
+      else if (this.pausedQ &&
+        (msg.match("!ping @" + this.nick.toLowerCase(), "gmiu") ||
+         msg.match("!help @" + this.nick.toLowerCase(), "gmiu"))) 
+      {
+        this.delaySendMsg("/me has been paused by @"+this.pauser, data, 0);
+        return;
+      } 
+      // general unpaused ping
+      else if (msg == "!ping") {
+        this.sendMsg("Pong!", data)
+        this.incrPingCt();
+      } 
+
+      // self-specific unpaused ping
+      else if (msg.match("!ping @" + this.nick.toLowerCase() + "$")) {
+        this.sendMsg(":white_check_mark: BetaOS services ONLINE", data)
+        this.incrPingCt();
+      }
+        
+      // general unpaused help
+      else if (msg == "!help"){
+        this.sendMsg("Enter !help @"+this.nick+" for help!", data);
+      } 
+      
+      // send to messageHandle to process messages.
+      else if (!this.pausedQ) {
+        let outStr = this.replyMessage(msg.trim(), snd, data);
+        if (this.failedQ && outStr != "") outStr = "/me is rebooting."
+        if (outStr == "") return;
+        if (!this.bypass) {
+          this.callTimes.push(Date.now());
+          setTimeout(() => {this.callTimes.shift();}, 60*5*1000) // five minutes.
+        }
+        if (!this.bypass && this.callTimes.length >= 5) {
+          // if (i == 2)
+            if (this.callTimes.length < 10) {
+              outStr = this.transferOutQ?outStr+"\\n[ANTISPAM] Consider moving to &bots or &test for large-scale testing. Thank you for your understanding."
+                : outStr+" [ANTISPAM WARNING]";
+            } else {
+              outStr = outStr+"\\n[ANTISPAM] Automatically paused @"+this.nick;
+              this.pausedQ = true;
+              this.pauser = "BetaOS_ANTISPAM";
+              this.resetCall(data);
+            }
+        }
+        this.sendMsg(outStr, data);
+      }
+    }
+  }
+
+  errorSocket() {
+    this.pausedQ = false;
+    this.pauser = null;
+    this.changeNick(this.nick + "[Error]")
+    this.incrRunCt();
+    this.failedQ = true;
+    setTimeout(() => {
+      this.changeNick(this.nick)
+      this.incrRunCt();
+      this.failedQ = false;
+    }, 5000);
+  } // socketclose
+
+  onClose(event:CloseEvent) {
+    if (event.code != 1000) {
+      setTimeout(() => {new WS(this.url, this.nick, this.transferOutQ)}, 1000);
+    } else {
+      // e.g. server process killed or network down
+      // event.code is usually 1006 in this case
+      console.log("[close] Connection at "+this.url+" died");
+    }
+  }
+
+  
+  constructor(url:string, nick:string, transferQ:boolean) {
+    this.nick = nick;
+    this.url=url;
+    this.socket = new WebSocket(url);
+    this.transferOutQ=transferQ;
+    this.socket.on('open', this.onOpen.bind(this));
+    this.socket.on('message', this.onMessage.bind(this));
+    this.socket.on('close', this.onClose.bind(this));
+    this.replyMessage = replyMessage
+  }
+}
+
+
+init();

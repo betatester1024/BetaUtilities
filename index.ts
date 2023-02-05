@@ -2,14 +2,22 @@
 import {WebSocket} from 'ws';
 import {init} from './initialiser'
 import {replyMessage} from './messageHandle';
+import { updateActive } from './messageHandle';
 const Database = require("@replit/database")
 
 // we have a front-end!
 const express = require('express');
 const app = express();
 const port = 4000;
+import {rooms} from './messageHandle';
+
 app.get('/', (req:any, res:any) => {
-  res.send("ONLINE!")
+  let str = "BetaUtilities is is in: ";
+  for (let j = 0; j < rooms.length - 1; j++) { 
+    str += `<a href="https://euphoria.io/room/${rooms[j]}"> &${rooms[j]}</a>,` ; 
+  }
+  str += "and &" + rooms[rooms.length - 1] + "!";
+  res.send(str);
   console.log("Accessed.")
 })
 app.listen(port, () => {
@@ -23,6 +31,7 @@ export class WS
   nick:string;
   socket: WebSocket;
   pausedQ=false;
+  roomName:string;
   pauser:string|null = null;
   failedQ = false;
   callTimes:number[]=[];
@@ -95,6 +104,9 @@ export class WS
   
   onOpen() {
     console.log("Open in "+this.socket.url);
+    app.get('/', (req:any, res:any) => {
+    res.send("Open in "+this.socket.url)
+    })
   }
 
   initNick() {
@@ -121,7 +133,7 @@ export class WS
       // Required methods
       // !kill
       if (msg == "!kill @" + this.nick.toLowerCase()) {
-        this.delaySendMsg("/me crashes", data, 0);
+        this.sendMsg("/me crashes", data);
         setTimeout(()=>{this.socket.close(1000, "!killed by user.");}, 100);
       }
         
@@ -135,7 +147,7 @@ export class WS
         
       // !pause
       else if (msg == "!pause @" + this.nick.toLowerCase()) {
-        this.delaySendMsg("/me has been paused", data, 0)
+        this.sendMsg("/me has been paused", data)
         
 
         let reply = "Enter !kill @"+this.nick+" to kill this bot, "+
@@ -204,24 +216,31 @@ export class WS
     setTimeout(() => {
       this.changeNick(this.nick)
       this.incrRunCt();
+      updateActive(this.roomName, true);
       this.failedQ = false;
     }, 5000);
+    updateActive(this.roomName, false);
   } // socketclose
 
-  onClose(event:CloseEvent) {
-    if (event.code != 1000) {
-      setTimeout(() => {new WS(this.url, this.nick, this.transferOutQ)}, 1000);
+  onClose(event:number) {
+    console.log(event)
+    if (event != 1000) {
+      updateActive(this.roomName, false);
+      setTimeout(() => {
+        new WS(this.url, this.nick, this.roomName, this.transferOutQ)
+        updateActive(this.roomName, true);
+      }, 1000);
     } else {
-      // e.g. server process killed or network down
-      // event.code is usually 1006 in this case
-      console.log("[close] Connection at "+this.url+" died");
+      updateActive(this.roomName, false);
+      console.log("[close] Connection at "+this.url+" was killed");
     }
   }
 
   
-  constructor(url:string, nick:string, transferQ:boolean) {
+  constructor(url:string, nick:string, roomName:string, transferQ:boolean) {
     this.nick = nick;
     this.url=url;
+    this.roomName = roomName;
     this.socket = new WebSocket(url);
     this.transferOutQ=transferQ;
     this.socket.on('open', this.onOpen.bind(this));

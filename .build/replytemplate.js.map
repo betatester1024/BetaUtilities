@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../replytemplate.js"],
+  "sourcesContent": ["let reply =`{\"type\":\"send\", \"data\":{\"content\":\"`+r+`\",\"parent\":\"`+data[\"data\"][\"id\"]+`\"}}`;\nsockets[i].send(reply);"],
+  "mappings": ";AAAA,IAAI,QAAO,wCAAsC,IAAE,iBAAe,KAAK,QAAQ,QAAM;AACrF,QAAQ,GAAG,KAAK,KAAK;",
+  "names": []
+}

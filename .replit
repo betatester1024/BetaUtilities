@@ -1,4 +1,6 @@
-compile = "./.config/build.sh"
+
+# e0e0e0
+compile = "./.config/build2.sh"
 run = "node --enable-source-maps .build/index.js"
 entrypoint = "index.ts"
 hidden = [".build", ".config"]

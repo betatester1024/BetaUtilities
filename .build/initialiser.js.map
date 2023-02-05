@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../initialiser.ts"],
+  "sourcesContent": ["import {loopy} from './wordListHandle';\nimport {WS} from './index';\nimport { updateActive } from './messageHandle';\nlet rooms = [\"xkcd\", \"test\", \"bots\", \"ai\"];\nlet nicks = [\"BetaUtilities\", \"BetaUtilities_TEST\", \n             \"BetaUtilities_BOTS\", \"BetaUtilities_AI\"]\nexport function init() {\n  \n  let sockets = [];\n  for (let i=0; i<rooms.length; i++) {\n    sockets.push(new WS(\"wss://euphoria.io/room/\" + rooms[i] + \"/ws\", nicks[i], rooms[i], i==0));\n    updateActive(rooms[i], true);\n  }\n  loopy();\n}"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,4BAAoB;AACpB,mBAAiB;AACjB,2BAA6B;AAC7B,IAAI,QAAQ,CAAC,QAAQ,QAAQ,QAAQ,IAAI;AACzC,IAAI,QAAQ;AAAA,EAAC;AAAA,EAAiB;AAAA,EACjB;AAAA,EAAsB;AAAkB;AAC9C,SAAS,OAAO;AAErB,MAAI,UAAU,CAAC;AACf,WAAS,IAAE,GAAG,IAAE,MAAM,QAAQ,KAAK;AACjC,YAAQ,KAAK,IAAI,gBAAG,4BAA4B,MAAM,KAAK,OAAO,MAAM,IAAI,MAAM,IAAI,KAAG,CAAC,CAAC;AAC3F,2CAAa,MAAM,IAAI,IAAI;AAAA,EAC7B;AACA,mCAAM;AACR;",
+  "names": []
+}

@@ -1,5 +1,5 @@
 import {WS} from './index';
-import {rooms} from './initialiser'
+//import {rooms} from './initialiser'
 import {getUptimeStr} from './misc';
 import {allWords, validWords, todayLeetCODE, todayWordID} from './wordListHandle';
 const serviceKey = process.env['serviceKey'];
@@ -12,9 +12,13 @@ const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! P
 
 let leetlentCt= 1;
 let wordleCt = 1;
-let STARTTIME = -1;
-
-
+let STARTTIME = Date.now();
+export let rooms:string[] = [];
+export function updateActive(roomID:string, activeQ:boolean) {
+  let idx = rooms.indexOf(roomID);
+  if (idx<0 && activeQ) rooms.push(roomID);
+  else if (idx>=0 && !activeQ) rooms.splice(idx, 1); // remove at idx. (supposedly.)
+}
 
 export function replyMessage(this:WS, msg:string, sender:string, data:any):string {
   msg = msg.toLowerCase();

@@ -8,4 +8,4 @@ BetaUtilities for euphoria.io using WebSocket.
 - Pauses, restores, responds to all required and optional bot requirements
 - Hourly-updating Wordle and Leetle!
 # Hosting
-- Currently hosted on repl.it. 
+- Currently hosted on repl.it(https://repl.it). 

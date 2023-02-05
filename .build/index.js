@@ -26,17 +26,29 @@ var import_initialiser = require("./initialiser");
 var import_messageHandle = require("./messageHandle");
 var import_messageHandle2 = require("./messageHandle");
 var import_messageHandle3 = require("./messageHandle");
+const fs = require("fs");
 const Database = require("@replit/database");
 const express = require("express");
+const path = require("path");
 const app = express();
 const port = 4e3;
 app.get("/", (req, res) => {
-  let str = "BetaUtilities is is in: ";
+  let str = "BetaUtilities is in: ";
   for (let j = 0; j < import_messageHandle3.rooms.length - 1; j++) {
     str += `<a href="https://euphoria.io/room/${import_messageHandle3.rooms[j]}"> &${import_messageHandle3.rooms[j]}</a>,`;
   }
-  str += "and &" + import_messageHandle3.rooms[import_messageHandle3.rooms.length - 1] + "!";
-  res.send(str);
+  str += ` and <a href="https://euphoria.io/room/${import_messageHandle3.rooms[import_messageHandle3.rooms.length - 1]}"> &${import_messageHandle3.rooms[import_messageHandle3.rooms.length - 1]}</a>!  `;
+  fs.writeFileSync(
+    "frontend/index.html",
+    `<html>
+      <head>
+        <title>BetaUtilities Status</title>
+        <script>setTimeout(()=>{location.reload()}, 1000);<\/script>
+      </head>
+      <body>${str}</body>
+     </html>`
+  );
+  res.sendFile(path.join(__dirname, "../frontend", "index.html"));
   console.log("Accessed.");
 });
 app.listen(port, () => {

@@ -2,7 +2,7 @@ export function getUptimeStr(STARTTIME:number) {
   let timeElapsed = Date.now() - STARTTIME;
   let date = new Date(Date.now());
   return (
-    `/me has been up since ${date.getFullYear()}-${format(date.getMonth() + 1)}-${format(date.getDate())}(It's been ${formatTime(timeElapsed)})`
+    `/me has been up since ${date.getFullYear()}-${format(date.getMonth() + 1)}-${format(date.getDate())} (It's been ${formatTime(timeElapsed)})`
   );
 }
 
@@ -21,7 +21,7 @@ function formatTime(ms:number) {
   seconds = seconds % 60;
   return (
     days +
-    " day(s), " +
+    " day"+(days==1?"":"s")+", " +
     hours +
     ":" +
     (minutes < 10 ? "0" + minutes : minutes) +

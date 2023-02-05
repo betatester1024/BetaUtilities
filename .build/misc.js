@@ -24,18 +24,18 @@ module.exports = __toCommonJS(misc_exports);
 function getUptimeStr(STARTTIME) {
   let timeElapsed = Date.now() - STARTTIME;
   let date = new Date(Date.now());
-  return `/me has been up since ${date.getFullYear()}-${format(date.getMonth() + 1)}-${format(date.getDate())}(It's been ${formatTime(timeElapsed)})`;
+  return `/me has been up since ${date.getFullYear()}-${format(date.getMonth() + 1)}-${format(date.getDate())} (It's been ${formatTime(timeElapsed)})`;
 }
 function formatTime(ms) {
   let seconds = ms / 1e3;
-  const days = Math.floor(seconds / 3600 / 24);
+  const days = Math.floor(seconds / 3600 / 24) + 1;
   seconds = seconds % (3600 * 24);
   const hours = Math.floor(seconds / 3600);
   seconds = seconds % 3600;
   const minutes = Math.floor(seconds / 60);
   seconds = Math.floor(seconds);
   seconds = seconds % 60;
-  return days + " day(s), " + hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+  return days + " day" + (days == 1 ? "" : "s") + ", " + hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
 }
 function format(n) {
   return n < 10 ? "0" + n : n;

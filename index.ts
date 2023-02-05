@@ -1,23 +1,35 @@
+
 // Copyright (c) 2023 BetaOS
 import {WebSocket} from 'ws';
 import {init} from './initialiser'
 import {replyMessage} from './messageHandle';
 import { updateActive } from './messageHandle';
+const fs = require('fs');
+// const { getUserInfo } = require("@replit/repl-auth")
 const Database = require("@replit/database")
 
 // we have a front-end!
 const express = require('express');
+const path = require('path');
 const app = express();
 const port = 4000;
 import {rooms} from './messageHandle';
 
 app.get('/', (req:any, res:any) => {
-  let str = "BetaUtilities is is in: ";
+  let str = "BetaUtilities is in: ";
   for (let j = 0; j < rooms.length - 1; j++) { 
     str += `<a href="https://euphoria.io/room/${rooms[j]}"> &${rooms[j]}</a>,` ; 
   }
-  str += `and <a href="https://euphoria.io/room/${rooms[rooms.length-1]}"> &${rooms[rooms.length-1]}</a>!`;
-  res.send(str);
+  str += ` and <a href="https://euphoria.io/room/${rooms[rooms.length-1]}"> &${rooms[rooms.length-1]}</a>!  `;
+  fs.writeFileSync("frontend/index.html",
+    `<html>
+      <head>
+        <title>BetaUtilities Status</title>
+        <script>setTimeout(()=>{location.reload()}, 1000);</script>
+      </head>
+      <body>${str}</body>
+     </html>`);
+  res.sendFile(path.join( __dirname, '../frontend', 'index.html' ));
   console.log("Accessed.")
 })
 app.listen(port, () => {

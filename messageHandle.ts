@@ -7,7 +7,7 @@ const serviceResponse = process.env['serviceResponse'];
 let DATE = new Date();
 
 let VERSION = "ServiceVersion STABLE 1.5271 | Build-time: "+
-  DATE.toLocaleTimeString()+", "+DATE.toLocaleDateString();
+  DATE.toLocaleTimeString("EST")+", "+DATE.toLocaleDateString();
 const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! Press :three: to toggle ANTISPAM.\\n\\n Press :zero: to exit support at any time.`;
 
 let leetlentCt= 1;
@@ -25,7 +25,7 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   if (msg.match ("@"+this.nick.toLowerCase())) {
     this.incrPingCt();
   }
-  if (msg == "!debugWordle") {
+  if (msg == "!debugwordle") {
     console.log(validWords[todayWordID], todayLeetCODE.join(""));
     return "> See console <"
   }

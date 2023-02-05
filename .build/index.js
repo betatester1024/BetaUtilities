@@ -33,7 +33,7 @@ const port = 4e3;
 app.get("/", (req, res) => {
   let str = "BetaUtilities is is in: ";
   for (let j = 0; j < import_messageHandle3.rooms.length - 1; j++) {
-    str += `<a href="test"> & ${import_messageHandle3.rooms[j]},`;
+    str += `<a href="https://euphoria.io/room/${import_messageHandle3.rooms[j]}"> &${import_messageHandle3.rooms[j]}</a>,`;
   }
   str += "and &" + import_messageHandle3.rooms[import_messageHandle3.rooms.length - 1] + "!";
   res.send(str);
@@ -97,7 +97,7 @@ class WS {
   }
   resetCall(data) {
     if (this.callStatus >= 0) {
-      this.delaySendMsg("[CALLEND] Disconnected from BetaOS Services", data, 0);
+      this.sendMsg("[CALLEND] Disconnected from BetaOS Services", data);
     }
     this.callStatus = -1;
   }
@@ -139,7 +139,7 @@ class WS {
     if (data["type"] == "send-event") {
       let msg = data["data"]["content"].toLowerCase().trim();
       let snd = data["data"]["sender"]["name"];
-      console.log(`[${snd}] ${msg}`);
+      console.log(`[${this.roomName}][${snd}] ${msg}`);
       if (msg == "!kill @" + this.nick.toLowerCase()) {
         this.sendMsg("/me crashes", data);
         setTimeout(() => {

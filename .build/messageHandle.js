@@ -29,7 +29,7 @@ var import_wordListHandle = require("./wordListHandle");
 const serviceKey = process.env["serviceKey"];
 const serviceResponse = process.env["serviceResponse"];
 let DATE = new Date();
-let VERSION = "ServiceVersion STABLE 1.5271 | Build-time: " + DATE.toLocaleTimeString() + ", " + DATE.toLocaleDateString();
+let VERSION = "ServiceVersion STABLE 1.5271 | Build-time: " + DATE.toLocaleTimeString("EST") + ", " + DATE.toLocaleDateString();
 const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! Press :three: to toggle ANTISPAM.\\n\\n Press :zero: to exit support at any time.`;
 let leetlentCt = 1;
 let wordleCt = 1;
@@ -47,7 +47,7 @@ function replyMessage(msg, sender, data) {
   if (msg.match("@" + this.nick.toLowerCase())) {
     this.incrPingCt();
   }
-  if (msg == "!debugWordle") {
+  if (msg == "!debugwordle") {
     console.log(import_wordListHandle.validWords[import_wordListHandle.todayWordID], import_wordListHandle.todayLeetCODE.join(""));
     return "> See console <";
   }

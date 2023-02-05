@@ -16,7 +16,7 @@ app.get('/', (req:any, res:any) => {
   for (let j = 0; j < rooms.length - 1; j++) { 
     str += `<a href="https://euphoria.io/room/${rooms[j]}"> &${rooms[j]}</a>,` ; 
   }
-  str += "and &" + rooms[rooms.length - 1] + "!";
+  str += `and <a href="https://euphoria.io/room/${rooms[rooms.length-1]}"> &${rooms[rooms.length-1]}</a>!`;
   res.send(str);
   console.log("Accessed.")
 })
@@ -79,7 +79,7 @@ export class WS
 
   resetCall(this:WS, data:any) {
     if (this.callStatus >= 0) {
-      this.delaySendMsg("[CALLEND] Disconnected from BetaOS Services", data, 0);
+      this.sendMsg("[CALLEND] Disconnected from BetaOS Services", data);
     }
     this.callStatus= -1;
   }
@@ -129,7 +129,7 @@ export class WS
 
       let msg = data["data"]["content"].toLowerCase().trim();
       let snd = data["data"]["sender"]["name"];
-      console.log(`[${snd}] ${msg}`);
+      console.log(`[${this.roomName}][${snd}] ${msg}`);
       // Required methods
       // !kill
       if (msg == "!kill @" + this.nick.toLowerCase()) {

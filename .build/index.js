@@ -26,6 +26,7 @@ var import_initialiser = require("./initialiser");
 var import_messageHandle = require("./messageHandle");
 var import_messageHandle2 = require("./messageHandle");
 var import_messageHandle3 = require("./messageHandle");
+const DATALOGGING = false;
 const fs = require("fs");
 const Database = require("@replit/database");
 const express = require("express");
@@ -35,27 +36,29 @@ const port = 4e3;
 app.get("/", (req, res) => {
   let str = "BetaUtilities is in: ";
   for (let j = 0; j < import_messageHandle3.rooms.length - 1; j++) {
-    str += `<a href="https://euphoria.io/room/${import_messageHandle3.rooms[j]}"> &${import_messageHandle3.rooms[j]}</a>,`;
+    str += ` <a href="https://euphoria.io/room/${import_messageHandle3.rooms[j]}">&${import_messageHandle3.rooms[j]}</a>,`;
   }
-  str += ` and <a href="https://euphoria.io/room/${import_messageHandle3.rooms[import_messageHandle3.rooms.length - 1]}"> &${import_messageHandle3.rooms[import_messageHandle3.rooms.length - 1]}</a>!  `;
-  fs.writeFileSync(
-    "frontend/index.html",
-    `<html>
-      <head>
-        <title>BetaUtilities Status</title>
-        <script>setTimeout(()=>{location.reload()}, 1000);<\/script>
-      </head>
-      <body>${str}</body>
-     </html>`
-  );
+  str += ` ${import_messageHandle3.rooms.length > 1 ? "and " : ""}<a href="https://euphoria.io/room/${import_messageHandle3.rooms[import_messageHandle3.rooms.length - 1]}">&${import_messageHandle3.rooms[import_messageHandle3.rooms.length - 1]}</a>!  `;
+  if (import_messageHandle3.rooms.length == 0) {
+    str = "ERROR";
+  }
+  fs.writeFileSync("frontend/status.html", str);
   res.sendFile(path.join(__dirname, "../frontend", "index.html"));
-  console.log("Accessed.");
+});
+app.get("/favicon.ico", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend", "favicon.ico"));
+});
+app.get("/NotoSansDisplay-Variable.ttf", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend", "NotoSansDisplay-Variable.ttf"));
+});
+app.get("/status.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend", "status.html"));
 });
 app.listen(port, () => {
-  console.log(`Success! Your application is running on port ${port}.`);
+  console.log(`Front-end is running on ${port}.`);
 });
 class WS {
-  static CALLTIMEOUT = 5e3;
+  static CALLTIMEOUT = 3e4;
   url;
   nick;
   socket;
@@ -130,10 +133,8 @@ class WS {
     this.socket.send(WS.toSendInfo(msg, data));
   }
   onOpen() {
-    console.log("Open in " + this.socket.url);
-    app.get("/", (req, res) => {
-      res.send("Open in " + this.socket.url);
-    });
+    console.log("BetaUtilities open in " + this.socket.url);
+    WS.resetTime = 1e3;
   }
   initNick() {
     this.changeNick(this.nick);
@@ -151,7 +152,8 @@ class WS {
     if (data["type"] == "send-event") {
       let msg = data["data"]["content"].toLowerCase().trim();
       let snd = data["data"]["sender"]["name"];
-      console.log(`[${this.roomName}][${snd}] ${msg}`);
+      if (DATALOGGING)
+        console.log(`(${this.roomName})[${snd}] ${msg}`);
       if (msg == "!kill @" + this.nick.toLowerCase()) {
         this.sendMsg("/me crashes", data);
         setTimeout(() => {
@@ -159,17 +161,19 @@ class WS {
         }, 100);
       } else if (this.pausedQ && msg == "!restore @" + this.nick.toLowerCase()) {
         this.sendMsg("/me has been unpaused", data);
+        (0, import_messageHandle2.updateActive)(this.roomName, true);
         this.pauser = null;
         this.callTimes = [];
         this.pausedQ = false;
       } else if (msg == "!pause @" + this.nick.toLowerCase()) {
         this.sendMsg("/me has been paused", data);
+        (0, import_messageHandle2.updateActive)(this.roomName, false);
         let reply = "Enter !kill @" + this.nick + " to kill this bot, or enter !restore @" + this.nick + " to restore it.";
-        this.delaySendMsg(reply, data, 0);
+        this.sendMsg(reply, data);
         this.pauser = snd;
         this.pausedQ = true;
       } else if (this.pausedQ && (msg.match("!ping @" + this.nick.toLowerCase(), "gmiu") || msg.match("!help @" + this.nick.toLowerCase(), "gmiu"))) {
-        this.delaySendMsg("/me has been paused by @" + this.pauser, data, 0);
+        this.sendMsg("/me has been paused by @" + this.pauser, dat);
         return;
       } else if (msg == "!ping") {
         this.sendMsg("Pong!", data);
@@ -219,9 +223,10 @@ class WS {
     }, 5e3);
     (0, import_messageHandle2.updateActive)(this.roomName, false);
   }
+  static resetTime = 1e3;
   onClose(event) {
-    console.log(event);
-    if (event != 1e3) {
+    console.log("Perished in:" + this.roomName);
+    if (event != 1e3 && event != 1006) {
       (0, import_messageHandle2.updateActive)(this.roomName, false);
       setTimeout(() => {
         new WS(this.url, this.nick, this.roomName, this.transferOutQ);
@@ -229,7 +234,20 @@ class WS {
       }, 1e3);
     } else {
       (0, import_messageHandle2.updateActive)(this.roomName, false);
-      console.log("[close] Connection at " + this.url + " was killed");
+      if (event == 1e3)
+        return;
+      WS.resetTime *= 1.5;
+      if (WS.resetTime > 3e4) {
+        WS.resetTime = 3e4;
+        return;
+      }
+      setTimeout(() => {
+        new WS(this.url, this.nick, this.roomName, this.transferOutQ);
+        (0, import_messageHandle2.updateActive)(this.roomName, true);
+      }, WS.resetTime);
+      console.log("Retrying in: " + Math.round(WS.resetTime / 1e3) + " seconds");
+      let dateStr = new Date().toLocaleDateString("en-US", { timeZone: "EST" }) + "/" + new Date().toLocaleTimeString("en-US", { timeZone: "EST" });
+      console.log("[close] Connection at " + this.url + " was killed at " + dateStr);
     }
   }
   constructor(url, nick, roomName, transferQ) {
@@ -241,6 +259,11 @@ class WS {
     this.socket.on("open", this.onOpen.bind(this));
     this.socket.on("message", this.onMessage.bind(this));
     this.socket.on("close", this.onClose.bind(this));
+    this.socket.on("error", (e) => {
+      this.socket.close(1e3, "");
+      console.log("ERROR for room-ID: " + this.roomName);
+      (0, import_messageHandle2.updateActive)(this.roomName, false);
+    });
     this.replyMessage = import_messageHandle.replyMessage;
   }
 }

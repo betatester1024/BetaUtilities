@@ -7,7 +7,7 @@ const serviceResponse = process.env['serviceResponse'];
 let DATE = new Date();
 
 let VERSION = "ServiceVersion STABLE 1.5271 | Build-time: "+
-  DATE.toLocaleTimeString("EST")+", "+DATE.toLocaleDateString();
+  DATE.toUTCString();
 const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! Press :three: to toggle ANTISPAM.\\n\\n Press :zero: to exit support at any time.`;
 
 let leetlentCt= 1;
@@ -40,10 +40,20 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   if (msg.match(/!testfeature/gimu)) return "@" + sender;
   if (msg.match("^!uptime @" + this.nick.toLowerCase() + "$")) {
     this.clearCallReset();
-    return getUptimeStr(STARTTIME);
+    return getUptimeStr(STARTTIME)+" (Total uptime: "+getUptimeStr()+")";
   }
-  if (msg.match("!version[ ]+@"+this.nick.toLowerCase())) {return VERSION;}
 
+  if (msg.match("!version[ ]+@"+this.nick.toLowerCase())) {return VERSION;}
+  let match2  = msg.match("@"+this.nick.toLowerCase()+" !mitoseto &([a-z0-9]+) as @(.+)");
+  if (match2) {
+    console.log(match2);
+    let newNick = match2[2]==null?"BetaUtilities":match2[2];
+    if (rooms.indexOf(match2[1])>=0) return "We're already in this room!";
+    try  {new WS("wss://euphoria.io/room/" + match2[1] + "/ws", newNick, match2[1], false);}
+    catch (e) {console.log(e)}
+    updateActive(match2[1], true);
+    return "Sent @"+newNick+" to &"+match2[1];
+  }
   if (msg.match("^!runstats [ ]*@" + this.nick.toLowerCase())) {
     this.displayStats(data);
     return "Loading..."
@@ -57,6 +67,9 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
       })
     }); return "";
   }
+  if (msg == "!status @"+this.nick.toLowerCase()) {
+    return "Status-tracker: https://BetaUtils.betatester1024.repl.co";
+  }
   if (msg.match("^!die$")) {
     setTimeout(()=>{this.socket.close()}, 120);
     this.delaySendMsg("/me crashes", data, 100)
@@ -65,7 +78,7 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   if (msg == "!activerooms @"+this.nick.toLowerCase()) {
     let str = "/me is in: ";
     for (let j = 0; j < rooms.length - 1; j++) { str += "&" + rooms[j] + ", "; }
-    str += "and &" + rooms[rooms.length - 1] + "!";
+    str += (rooms.length>1?"and ":"")+"&" + rooms[rooms.length - 1] + "!";
     return str;
   }
   if (msg == "!pong"||msg=="!pong @"+this.nick.toLowerCase()) {
@@ -130,8 +143,9 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
     return (
       "Important commands: !ping, !help, !pause, !restore, !kill, !pong, !uptime, !uuid. \\n " +
       "Bot-specific commands: !unblock <LINK>; !potato, !src @" +
-      this.nick.toLowerCase() +
-      "; !runStats !testfeature, !creatorinfo, !version, !activeRooms, !die, !contact, !antispam, !rating, !wordle, !leetlent"
+      this.nick +
+      " !runStats !testfeature, !creatorinfo, !version, !activeRooms, !die, !contact, !antispam, !rating, !wordle, !leetlent. \\n"+
+      " @"+this.nick+" !mitoseTo &ROOMNAME as @NICK to send BetaUtilities to any room. !status @"+this.nick+" to get the system status."
     );
   }
   if (this.callStatus == 1 && (msg == ":two:" || msg == "two" || msg == "2")) {
@@ -151,7 +165,7 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   if (msg == "!src @"+this.nick.toLowerCase() || this.callStatus == 1 && (msg == ":four:" || msg == "four" || msg == "4")) {
     this.clearCallReset();
     this.callStatus = -1;
-    return "> Source code: https://replit.com/@betatester1024/BetaUtils-TS#index.js"
+    return "> Source code: https://replit.com/@betatester1024/BetaUtils#index.ts"
   }
   if (this.callStatus == 1 && (msg == ":five:" || msg == "five" || msg == "5")) {
     this.bumpCallReset(data);

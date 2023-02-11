@@ -1,8 +1,14 @@
-export function getUptimeStr(STARTTIME:number) {
+const fs = require('fs');
+
+export function getUptimeStr(STARTTIME:number=-1) {
+  if (STARTTIME < 0) {
+    let time = Number(fs.readFileSync('./runtime.txt'));
+    return formatTime(time);
+  }
   let timeElapsed = Date.now() - STARTTIME;
   let date = new Date(Date.now());
   return (
-    `/me has been up since ${date.getFullYear()}-${format(date.getMonth() + 1)}-${format(date.getDate())} (It's been ${formatTime(timeElapsed)})`
+    `/me has been up since ${date.toUTCString()} (It's been ${formatTime(timeElapsed)})`
   );
 }
 
@@ -20,13 +26,12 @@ function formatTime(ms:number) {
   seconds = Math.floor(seconds);
   seconds = seconds % 60;
   return (
-    days +
-    " day"+(days==1?"":"s")+", " +
-    hours +
+    (days == 0 ? "" : days + " day"+(days==1?"":"s")+", ") +
+    format(hours) +
     ":" +
-    (minutes < 10 ? "0" + minutes : minutes) +
+    format(minutes) +
     ":" +
-    (seconds < 10 ? "0" + seconds : seconds)
+    format(seconds)
   );
 }
 

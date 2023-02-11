@@ -1,4 +1,4 @@
-
+const DATALOGGING = false;
 // Copyright (c) 2023 BetaOS
 import {WebSocket} from 'ws';
 import {init} from './initialiser'
@@ -18,27 +18,31 @@ import {rooms} from './messageHandle';
 app.get('/', (req:any, res:any) => {
   let str = "BetaUtilities is in: ";
   for (let j = 0; j < rooms.length - 1; j++) { 
-    str += `<a href="https://euphoria.io/room/${rooms[j]}"> &${rooms[j]}</a>,` ; 
+    str += ` <a href="https://euphoria.io/room/${rooms[j]}">&${rooms[j]}</a>,` ; 
   }
-  str += ` and <a href="https://euphoria.io/room/${rooms[rooms.length-1]}"> &${rooms[rooms.length-1]}</a>!  `;
-  fs.writeFileSync("frontend/index.html",
-    `<html>
-      <head>
-        <title>BetaUtilities Status</title>
-        <script>setTimeout(()=>{location.reload()}, 1000);</script>
-      </head>
-      <body>${str}</body>
-     </html>`);
+  str += ` ${rooms.length>1?"and ":""}<a href="https://euphoria.io/room/${rooms[rooms.length-1]}">&${rooms[rooms.length-1]}</a>!  `;
+  if (rooms.length == 0) {
+    str = "ERROR";
+  } // rooms failed
+  fs.writeFileSync("frontend/status.html",str);
   res.sendFile(path.join( __dirname, '../frontend', 'index.html' ));
-  console.log("Accessed.")
-})
+});
+app.get('/favicon.ico', (req:any, res:any) => {
+  res.sendFile(path.join( __dirname, '../frontend', 'favicon.ico' ));
+});
+app.get('/NotoSansDisplay-Variable.ttf', (req:any, res:any) => {
+  res.sendFile(path.join( __dirname, '../frontend', 'NotoSansDisplay-Variable.ttf' ));
+});
+app.get('/status.html', (req:any, res:any) => {
+  res.sendFile(path.join( __dirname, '../frontend', 'status.html' ));
+});
 app.listen(port, () => {
-  console.log(`Success! Your application is running on port ${port}.`);
+  console.log(`Front-end is running on ${port}.`);
 });
  
 export class WS 
 {
-  static CALLTIMEOUT = 5000;
+  static CALLTIMEOUT = 30000;
   url:string
   nick:string;
   socket: WebSocket;
@@ -115,10 +119,8 @@ export class WS
   }
   
   onOpen() {
-    console.log("Open in "+this.socket.url);
-    app.get('/', (req:any, res:any) => {
-    res.send("Open in "+this.socket.url)
-    })
+    console.log("BetaUtilities open in "+this.socket.url);
+    WS.resetTime =1000;
   }
 
   initNick() {
@@ -130,6 +132,7 @@ export class WS
   }
 
   onMessage(dat:string) {
+    
     let data = JSON.parse(dat);
     if (data["type"] == "ping-event") {
       let reply = `{"type": "ping-reply","data": {"time":${data["data"]["time"]}},"id":"0"}`;
@@ -141,17 +144,20 @@ export class WS
 
       let msg = data["data"]["content"].toLowerCase().trim();
       let snd = data["data"]["sender"]["name"];
-      console.log(`[${this.roomName}][${snd}] ${msg}`);
+      if (DATALOGGING) console.log(`(${this.roomName})[${snd}] ${msg}`);
       // Required methods
       // !kill
       if (msg == "!kill @" + this.nick.toLowerCase()) {
         this.sendMsg("/me crashes", data);
-        setTimeout(()=>{this.socket.close(1000, "!killed by user.");}, 100);
+        setTimeout(()=>{
+          this.socket.close(1000, "!killed by user.");
+        }, 100);
       }
         
       // !restore
       else if (this.pausedQ && msg == "!restore @" + this.nick.toLowerCase()) {
-        this.sendMsg("/me has been unpaused", data);        
+        this.sendMsg("/me has been unpaused", data);   
+        updateActive(this.roomName, true);
         this.pauser = null;
         this.callTimes = [];
         this.pausedQ = false;
@@ -160,11 +166,10 @@ export class WS
       // !pause
       else if (msg == "!pause @" + this.nick.toLowerCase()) {
         this.sendMsg("/me has been paused", data)
-        
-
+        updateActive(this.roomName, false);
         let reply = "Enter !kill @"+this.nick+" to kill this bot, "+
           "or enter !restore @"+this.nick+" to restore it.";
-        this.delaySendMsg(reply, data, 0);
+        this.sendMsg(reply, data);
         this.pauser = snd;
         this.pausedQ = true;
       } 
@@ -173,7 +178,7 @@ export class WS
         (msg.match("!ping @" + this.nick.toLowerCase(), "gmiu") ||
          msg.match("!help @" + this.nick.toLowerCase(), "gmiu"))) 
       {
-        this.delaySendMsg("/me has been paused by @"+this.pauser, data, 0);
+        this.sendMsg("/me has been paused by @"+this.pauser, dat);
         return;
       } 
       // general unpaused ping
@@ -192,7 +197,7 @@ export class WS
       else if (msg == "!help"){
         this.sendMsg("Enter !help @"+this.nick+" for help!", data);
       } 
-      
+
       // send to messageHandle to process messages.
       else if (!this.pausedQ) {
         let outStr = this.replyMessage(msg.trim(), snd, data);
@@ -234,9 +239,10 @@ export class WS
     updateActive(this.roomName, false);
   } // socketclose
 
-  onClose(event:number) {
-    console.log(event)
-    if (event != 1000) {
+  static resetTime = 1000;
+  onClose(event:any) {
+    console.log("Perished in:"+this.roomName);
+    if (event != 1000 && event!=1006) {
       updateActive(this.roomName, false);
       setTimeout(() => {
         new WS(this.url, this.nick, this.roomName, this.transferOutQ)
@@ -244,7 +250,20 @@ export class WS
       }, 1000);
     } else {
       updateActive(this.roomName, false);
-      console.log("[close] Connection at "+this.url+" was killed");
+      if (event==1000) return;
+      WS.resetTime*=1.5;
+      if (WS.resetTime > 30000) {
+        WS.resetTime = 30000;
+        return;
+      }
+      setTimeout(()=>{
+        new WS(this.url, this.nick, this.roomName, this.transferOutQ)
+        updateActive(this.roomName, true);
+      }, WS.resetTime);
+      
+      console.log("Retrying in: "+Math.round(WS.resetTime/1000)+" seconds");
+      let dateStr = (new Date()).toLocaleDateString("en-US", {timeZone:"EST"})+"/"+(new Date()).toLocaleTimeString("en-US", {timeZone:"EST"});
+      console.log("[close] Connection at "+this.url+" was killed at "+dateStr);
     }
   }
 
@@ -258,7 +277,13 @@ export class WS
     this.socket.on('open', this.onOpen.bind(this));
     this.socket.on('message', this.onMessage.bind(this));
     this.socket.on('close', this.onClose.bind(this));
-    this.replyMessage = replyMessage
+    this.socket.on('error', (e)=>{
+      this.socket.close(1000, "");
+      console.log("ERROR for room-ID: "+this.roomName)
+      updateActive(this.roomName, false);
+    })
+    this.replyMessage = replyMessage;
+    
   }
 }
 

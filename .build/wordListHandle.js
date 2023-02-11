@@ -63,10 +63,14 @@ function hashCode(s) {
   }
   return hash;
 }
+let STARTTIME = Date.now();
 function loopy() {
-  setTimeout(loopy, 1e4);
+  setTimeout(loopy, 100);
   if (FILEDATA)
     refreshCodes();
+  let offsetTime = Date.now() - STARTTIME;
+  STARTTIME = Date.now();
+  fs.writeFileSync("./runtime.txt", (Number(fs.readFileSync("./runtime.txt")) + offsetTime).toString());
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

@@ -21,21 +21,26 @@ __export(misc_exports, {
   getUptimeStr: () => getUptimeStr
 });
 module.exports = __toCommonJS(misc_exports);
-function getUptimeStr(STARTTIME) {
+const fs = require("fs");
+function getUptimeStr(STARTTIME = -1) {
+  if (STARTTIME < 0) {
+    let time = Number(fs.readFileSync("./runtime.txt"));
+    return formatTime(time);
+  }
   let timeElapsed = Date.now() - STARTTIME;
   let date = new Date(Date.now());
-  return `/me has been up since ${date.getFullYear()}-${format(date.getMonth() + 1)}-${format(date.getDate())} (It's been ${formatTime(timeElapsed)})`;
+  return `/me has been up since ${date.toUTCString()} (It's been ${formatTime(timeElapsed)})`;
 }
 function formatTime(ms) {
   let seconds = ms / 1e3;
-  const days = Math.floor(seconds / 3600 / 24) + 1;
+  const days = Math.floor(seconds / 3600 / 24);
   seconds = seconds % (3600 * 24);
   const hours = Math.floor(seconds / 3600);
   seconds = seconds % 3600;
   const minutes = Math.floor(seconds / 60);
   seconds = Math.floor(seconds);
   seconds = seconds % 60;
-  return days + " day" + (days == 1 ? "" : "s") + ", " + hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+  return (days == 0 ? "" : days + " day" + (days == 1 ? "" : "s") + ", ") + format(hours) + ":" + format(minutes) + ":" + format(seconds);
 }
 function format(n) {
   return n < 10 ? "0" + n : n;

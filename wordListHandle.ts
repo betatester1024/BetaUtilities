@@ -44,7 +44,11 @@ function hashCode(s:string) {
   return hash;
 }
 
+let STARTTIME = Date.now();
 export function loopy() {
-  setTimeout(loopy, 10000);
+  setTimeout(loopy, 100);
   if (FILEDATA) refreshCodes()
-} 
+  let offsetTime = Date.now()-STARTTIME;
+  STARTTIME = Date.now();
+  fs.writeFileSync('./runtime.txt', (Number(fs.readFileSync('./runtime.txt')) + offsetTime).toString());
+}

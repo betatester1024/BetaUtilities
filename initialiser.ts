@@ -1,9 +1,13 @@
 import {loopy} from './wordListHandle';
 import {WS} from './index';
 import { updateActive } from './messageHandle';
-let rooms = ["xkcd", "test", "bots", "ai"];
+let rooms = ["xkcd", "test", "bots", "ai", "err", "room", "srs", "rpg", "a", "b", "memes"];
 let nicks = ["BetaUtilities", "BetaUtilities_TEST", 
-             "BetaUtilities_BOTS", "BetaUtilities_AI"]
+             "BetaUtilities", "BetaUtilities", 
+             "BetaUtilities", "BetaUtilities", 
+             "BetaUtilities", "BetaUtilities", 
+             "BetaUtilities", "BetaUtilities",
+             "BetaUtilities"]
 export function init() {
   
   let sockets = [];

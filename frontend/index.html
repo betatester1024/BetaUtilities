@@ -1,7 +1,155 @@
+<!DOCTYPE html>
 <html>
-      <head>
-        <title>BetaUtilities Status</title>
-        <script>setTimeout(()=>{location.reload()}, 1000);</script>
-      </head>
-      <body>BetaUtilities is in: <a href="https://euphoria.io/room/xkcd"> &xkcd</a>,<a href="https://euphoria.io/room/test"> &test</a>,<a href="https://euphoria.io/room/bots"> &bots</a>, and <a href="https://euphoria.io/room/ai"> &ai</a>!  </body>
-     </html>
+  <head>
+    <title>BetaUtilities Status</title>
+    <script>
+      function reset() {clearTimeout(TIMEOUT)}
+      function restart() {onLoad()}
+      async function loadFile(filePath) {
+        var result = null;
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("GET", filePath, false);
+        xmlhttp.send();
+        if (xmlhttp.status==200) {
+          result = xmlhttp.responseText;
+        }
+        return result;
+      } // loadFile
+      function onLoad() {
+        loadFile("./status.html").then((data)=>{
+          let statusele = document.getElementById("statStr");
+          statusele.innerHTML = data;
+          // console.log(data);
+          if (data.match("ERROR")) 
+          {
+            statusele.innerHTML="<br><br>";
+            let thing = document.getElementById("h_one");
+            thing.innerHTML = "ERROR";
+            thing.style.color="#ee0000";
+            document.getElementById("mainDiv").className="modified";
+          }
+        });
+        let TIMEOUT;
+        let match = document.URL.match("\\?REFRESH(=)?([0-9]+)");
+        if (match) {
+          TIMEOUT = setTimeout(()=>{location.reload()}, match[2]?match[2]:10000);
+          let ele = document.getElementById("disableBtn");
+          ele.hidden=false;
+          ele.style.display="inline-flex";
+        }
+        else {
+          let ele = document.getElementById("enableBtn");
+          ele.hidden = false;
+          ele.style.display = "inline";
+        }
+        document.getElementById("noscript").hidden = true;
+      } // onLoad()
+     let t=-1;
+      function toggleHidden() {
+        let ele = document.getElementById('c+1'); 
+        // clearTimeout(t);
+        clearTimeout(t);
+        if (!ele.hidden) {t=setTimeout(()=>{if (!ele.hidden && ele.style.height=='1vh') ele.hidden = true;}, 500);}
+        else ele.hidden = false;
+        ele.style.height = ele.style.height=='50vh'?'1vh':'50vh'; 
+      }
+    </script>
+    <style>
+      html {
+        background-color: rgb(220, 220, 220);
+      } 
+      div#mainDiv {
+/*         position:absolute; */
+        width: 90vw;
+/*         height: 90vh; */
+        margin-left: 5vw;
+        margin-top: 5vh;
+/*         border-radius: 50px 50px 0px 0px; */
+      }
+      div#mainDiv::before {
+          content: "";
+          float: left;
+          height: 190px;
+          margin-right: 4px;
+          border-left: 7px solid #00C300;
+          border-radius: 6px;
+      }
+      div#mainDiv.modified::before {
+        border-left: 7px solid #cc0000;
+      }
+      p{
+        width: 80%;
+        margin-left: 30px;
+        font-family: NotoSansDisplay;
+      }
+      h1 {
+        font-family: NotoSansDisplay
+      }
+      #disableBtn, #enableBtn {
+        margin-left: 18px;
+        display: none;
+        width: auto;
+        white-space: nowrap;
+/*         height: 30px; */
+        content-align: center;
+/*         vertical-align:  */
+        border: 2px solid #000000;
+        padding: none;
+        border-radius: 50px;
+      }
+      button, select, option {
+        background: none;
+        border: none;
+        border-radius: 10px; 
+        transition: all 0.2s ease-in-out;
+      }
+      select:hover, button:hover {
+        background: #aaaaaa;
+        opacity:0.7;
+/*         scale: 1.05; */
+      }
+      hr.rounded {
+        border: 3px solid #bbb;
+        border-radius: 5px;
+      }
+      @font-face { font-family: NotoSansDisplay; src: url('NotoSansDisplay-Variable.ttf'); } 
+    </style>
+  </head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap" rel="stylesheet"> 
+  <body onload = "onLoad()">
+    <div id = "mainDiv">
+      <h1 style="display:inline; margin-left: 18px;">BetaUtilities Status: </h1><h1 style="color:#00C300; display:inline" id="h_one">Online!</h1>
+      <p id = "statStr" style="font-family:'Noto Sans Mono', monospace" ></p>
+      <p id="noscript">You did not enable scripts. AutoRefresh is disabled.</p>
+      <div id="disableBtn" hidden="hidden"> 
+        <button onclick="window.open('./', '_self');">Disable AutoRefresh</button>
+      </div>
+      <div id="enableBtn" hidden="hidden">
+        <button onclick="window.open('./?REFRESH='+document.getElementById('Sel').value, '_self');">Enable AutoRefresh: </button>
+        <select id="Sel">
+          <option value="1000">1 sec</option>
+          <option value="1001">1001 ms</option>
+          <option value="2000">2 sec</option>
+          <option value="3000" selected >3 sec</option>
+          <option value="5000">5 sec</option>
+          <option value="10000">10 sec</option>
+          <option value="30000">30 sec</option>
+          <option value="60000">1 min</option>
+          <option value="300000">5 min</option>
+        </select>
+      </div> 
+      <br><br>
+      <button style="border:2px solid black; border-radius: 10px; margin-left: 18px;" 
+               onclick = "toggleHidden()">
+        Toggle c+1's stuff</button>
+    </div>
+    <div id="c+1" style="height:1vh; transition: all 0.5s ease-in-out;" hidden="hidden">
+      
+      <hr class="rounded"></hr>
+      <br>
+      <iframe src="https://nest.place" style="width:100%; height:100%"> </iframe>
+    </div>
+  </body>
+ </html>

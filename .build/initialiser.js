@@ -24,12 +24,19 @@ module.exports = __toCommonJS(initialiser_exports);
 var import_wordListHandle = require("./wordListHandle");
 var import_index = require("./index");
 var import_messageHandle = require("./messageHandle");
-let rooms = ["xkcd", "test", "bots", "ai"];
+let rooms = ["xkcd", "test", "bots", "ai", "err", "room", "srs", "rpg", "a", "b", "memes"];
 let nicks = [
   "BetaUtilities",
   "BetaUtilities_TEST",
-  "BetaUtilities_BOTS",
-  "BetaUtilities_AI"
+  "BetaUtilities",
+  "BetaUtilities",
+  "BetaUtilities",
+  "BetaUtilities",
+  "BetaUtilities",
+  "BetaUtilities",
+  "BetaUtilities",
+  "BetaUtilities",
+  "BetaUtilities"
 ];
 function init() {
   let sockets = [];

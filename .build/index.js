@@ -25,38 +25,8 @@ var import_ws = require("ws");
 var import_initialiser = require("./initialiser");
 var import_messageHandle = require("./messageHandle");
 var import_messageHandle2 = require("./messageHandle");
-var import_messageHandle3 = require("./messageHandle");
 const DATALOGGING = false;
-const fs = require("fs");
 const Database = require("@replit/database");
-const express = require("express");
-const path = require("path");
-const app = express();
-const port = 4e3;
-app.get("/", (req, res) => {
-  let str = "BetaUtilities is in: ";
-  for (let j = 0; j < import_messageHandle3.rooms.length - 1; j++) {
-    str += ` <a href="https://euphoria.io/room/${import_messageHandle3.rooms[j]}">&${import_messageHandle3.rooms[j]}</a>,`;
-  }
-  str += ` ${import_messageHandle3.rooms.length > 1 ? "and " : ""}<a href="https://euphoria.io/room/${import_messageHandle3.rooms[import_messageHandle3.rooms.length - 1]}">&${import_messageHandle3.rooms[import_messageHandle3.rooms.length - 1]}</a>!  `;
-  if (import_messageHandle3.rooms.length == 0) {
-    str = "ERROR";
-  }
-  fs.writeFileSync("frontend/status.html", str);
-  res.sendFile(path.join(__dirname, "../frontend", "index.html"));
-});
-app.get("/favicon.ico", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend", "favicon.ico"));
-});
-app.get("/NotoSansDisplay-Variable.ttf", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend", "NotoSansDisplay-Variable.ttf"));
-});
-app.get("/status.html", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend", "status.html"));
-});
-app.listen(port, () => {
-  console.log(`Front-end is running on ${port}.`);
-});
 class WS {
   static CALLTIMEOUT = 3e4;
   url;
@@ -225,7 +195,6 @@ class WS {
   }
   static resetTime = 1e3;
   onClose(event) {
-    console.log("Perished in:" + this.roomName);
     if (event != 1e3 && event != 1006) {
       (0, import_messageHandle2.updateActive)(this.roomName, false);
       setTimeout(() => {
@@ -261,7 +230,6 @@ class WS {
     this.socket.on("close", this.onClose.bind(this));
     this.socket.on("error", (e) => {
       this.socket.close(1e3, "");
-      console.log("ERROR for room-ID: " + this.roomName);
       (0, import_messageHandle2.updateActive)(this.roomName, false);
     });
     this.replyMessage = import_messageHandle.replyMessage;

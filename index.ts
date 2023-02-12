@@ -4,42 +4,11 @@ import {WebSocket} from 'ws';
 import {init} from './initialiser'
 import {replyMessage} from './messageHandle';
 import { updateActive } from './messageHandle';
-const fs = require('fs');
+
 // const { getUserInfo } = require("@replit/repl-auth")
 const Database = require("@replit/database")
 
-// we have a front-end!
-const express = require('express');
-const path = require('path');
-const app = express();
-const port = 4000;
-import {rooms} from './messageHandle';
 
-app.get('/', (req:any, res:any) => {
-  let str = "BetaUtilities is in: ";
-  for (let j = 0; j < rooms.length - 1; j++) { 
-    str += ` <a href="https://euphoria.io/room/${rooms[j]}">&${rooms[j]}</a>,` ; 
-  }
-  str += ` ${rooms.length>1?"and ":""}<a href="https://euphoria.io/room/${rooms[rooms.length-1]}">&${rooms[rooms.length-1]}</a>!  `;
-  if (rooms.length == 0) {
-    str = "ERROR";
-  } // rooms failed
-  fs.writeFileSync("frontend/status.html",str);
-  res.sendFile(path.join( __dirname, '../frontend', 'index.html' ));
-});
-app.get('/favicon.ico', (req:any, res:any) => {
-  res.sendFile(path.join( __dirname, '../frontend', 'favicon.ico' ));
-});
-app.get('/NotoSansDisplay-Variable.ttf', (req:any, res:any) => {
-  res.sendFile(path.join( __dirname, '../frontend', 'NotoSansDisplay-Variable.ttf' ));
-});
-app.get('/status.html', (req:any, res:any) => {
-  res.sendFile(path.join( __dirname, '../frontend', 'status.html' ));
-});
-app.listen(port, () => {
-  console.log(`Front-end is running on ${port}.`);
-});
- 
 export class WS 
 {
   static CALLTIMEOUT = 30000;
@@ -241,7 +210,7 @@ export class WS
 
   static resetTime = 1000;
   onClose(event:any) {
-    console.log("Perished in:"+this.roomName);
+    // console.log("Perished in:"+this.roomName);
     if (event != 1000 && event!=1006) {
       updateActive(this.roomName, false);
       setTimeout(() => {
@@ -279,7 +248,7 @@ export class WS
     this.socket.on('close', this.onClose.bind(this));
     this.socket.on('error', (e)=>{
       this.socket.close(1000, "");
-      console.log("ERROR for room-ID: "+this.roomName)
+      // console.log("ERROR for room-ID: "+this.roomName)
       updateActive(this.roomName, false);
     })
     this.replyMessage = replyMessage;

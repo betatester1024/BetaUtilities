@@ -2,57 +2,7 @@
 <html>
   <head>
     <title>BetaUtilities Status</title>
-    <script>
-      function reset() {clearTimeout(TIMEOUT)}
-      function restart() {onLoad()}
-      async function loadFile(filePath) {
-        var result = null;
-        var xmlhttp = new XMLHttpRequest();
-        xmlhttp.open("GET", filePath, false);
-        xmlhttp.send();
-        if (xmlhttp.status==200) {
-          result = xmlhttp.responseText;
-        }
-        return result;
-      } // loadFile
-      function onLoad() {
-        loadFile("./status.html").then((data)=>{
-          let statusele = document.getElementById("statStr");
-          statusele.innerHTML = data;
-          // console.log(data);
-          if (data.match("ERROR")) 
-          {
-            statusele.innerHTML="<br><br>";
-            let thing = document.getElementById("h_one");
-            thing.innerHTML = "ERROR";
-            thing.style.color="#ee0000";
-            document.getElementById("mainDiv").className="modified";
-          }
-        });
-        let TIMEOUT;
-        let match = document.URL.match("\\?REFRESH(=)?([0-9]+)");
-        if (match) {
-          TIMEOUT = setTimeout(()=>{location.reload()}, match[2]?match[2]:10000);
-          let ele = document.getElementById("disableBtn");
-          ele.hidden=false;
-          ele.style.display="inline-flex";
-        }
-        else {
-          let ele = document.getElementById("enableBtn");
-          ele.hidden = false;
-          ele.style.display = "inline";
-        }
-        document.getElementById("noscript").hidden = true;
-      } // onLoad()
-     let t=-1;
-      function toggleHidden() {
-        let ele = document.getElementById('c+1'); 
-        // clearTimeout(t);
-        clearTimeout(t);
-        if (!ele.hidden) {t=setTimeout(()=>{if (!ele.hidden && ele.style.height=='1vh') ele.hidden = true;}, 500);}
-        else ele.hidden = false;
-        ele.style.height = ele.style.height=='50vh'?'1vh':'50vh'; 
-      }
+    <script src = "frontend.js">
     </script>
     <style>
       html {
@@ -69,7 +19,7 @@
       div#mainDiv::before {
           content: "";
           float: left;
-          height: 190px;
+          height: 90vh;
           margin-right: 4px;
           border-left: 7px solid #00C300;
           border-radius: 6px;
@@ -85,17 +35,29 @@
       h1 {
         font-family: NotoSansDisplay
       }
-      #disableBtn, #enableBtn {
+      input {
+        border: none;
+        width: 50%
+      }
+      #disableBtn, #enableBtn, #login {
         margin-left: 18px;
         display: none;
         width: auto;
         white-space: nowrap;
-/*         height: 30px; */
-        content-align: center;
-/*         vertical-align:  */
         border: 2px solid #000000;
-        padding: none;
+        padding: 0px;
         border-radius: 50px;
+      }
+      #login {
+        
+        display: block;
+        border: none;
+        width: 300px;
+        
+      }
+      #loginBTN {
+        position: relative;
+        right: 0px;
       }
       button, select, option {
         background: none;
@@ -140,11 +102,17 @@
           <option value="300000">5 min</option>
         </select>
       </div> 
+      <div id="login">
+        <p style="text-align: right;">Username: <input type="text" id="user"/></p>
+        <p style="text-align:right;" id="pwd" onchange="document.getElementById('loginBTN').click()">Password: <input type="password" id="pass"/></p>
+        <button id="loginBTN" onclick="validateLogin()">Log into BetaUtilities ADMIN</button>
+      </div>
       <br><br>
-      <button style="border:2px solid black; border-radius: 10px; margin-left: 18px;" 
+      
+    </div>
+    <button style="border:2px solid black; border-radius: 10px; margin-left: 18px;" 
                onclick = "toggleHidden()">
         Toggle c+1's stuff</button>
-    </div>
     <div id="c+1" style="height:1vh; transition: all 0.5s ease-in-out;" hidden="hidden">
       
       <hr class="rounded"></hr>

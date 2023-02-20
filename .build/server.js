@@ -22,7 +22,7 @@ __export(server_exports, {
 });
 module.exports = __toCommonJS(server_exports);
 var import_messageHandle = require("./messageHandle");
-var import_HASHTHEDAMNTHING = require("./HASHTHEDAMNTHING");
+var import_accessControl = require("./accessControl");
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
@@ -32,15 +32,6 @@ const app = express();
 const port = 4e3;
 function updateServer() {
   app.get("/", (req, res) => {
-    let str = "BetaUtilities is in: ";
-    for (let j = 0; j < import_messageHandle.rooms.length - 1; j++) {
-      str += ` <a href="https://euphoria.io/room/${import_messageHandle.rooms[j]}">&${import_messageHandle.rooms[j]}</a>,`;
-    }
-    str += ` ${import_messageHandle.rooms.length > 1 ? "and " : ""}<a href="https://euphoria.io/room/${import_messageHandle.rooms[import_messageHandle.rooms.length - 1]}">&${import_messageHandle.rooms[import_messageHandle.rooms.length - 1]}</a>!  `;
-    if (import_messageHandle.rooms.length == 0) {
-      str = "ERROR";
-    }
-    fs.writeFileSync("frontend/status.html", str);
     res.sendFile(path.join(__dirname, "../frontend", "index.html"));
   });
   app.get("/favicon.ico", (req, res) => {
@@ -49,14 +40,45 @@ function updateServer() {
   app.get("/NotoSansDisplay-Variable.ttf", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "NotoSansDisplay-Variable.ttf"));
   });
-  app.get("/status.html", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "status.html"));
+  app.get("/status/status_raw.html", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "status_raw.html"));
   });
   app.get("/frontend.js", (req, res) => {
     res.sendFile(path.join(__dirname, "../.build/frontend", "frontend.js"));
   });
+  app.get("/login.js", (req, res) => {
+    res.sendFile(path.join(__dirname, "../.build/frontend", "login.js"));
+  });
+  app.get("/login", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "login.html"));
+  });
+  app.get("/admin", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "admin.html"));
+  });
+  app.get("/logout", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "logout.html"));
+  });
   app.post("/login", urlencodedParser, function(req, res) {
-    (0, import_HASHTHEDAMNTHING.requestHash)(req.user, req.pwd, res);
+    console.log("Logging in as " + req.body.action + "+" + req.body.token);
+    (0, import_accessControl.validate)(req.body.user, req.body.pass, req.body.action, req.body.access, res, req.body.token);
+  });
+  app.get("/status", (req, res) => {
+    let str = "BetaUtilities is in: ";
+    for (let j = 0; j < import_messageHandle.rooms.length - 1; j++) {
+      str += ` <a href="https://euphoria.io/room/${import_messageHandle.rooms[j]}">&${import_messageHandle.rooms[j]}</a>,`;
+    }
+    str += ` ${import_messageHandle.rooms.length > 1 ? "and " : ""}<a href="https://euphoria.io/room/${import_messageHandle.rooms[import_messageHandle.rooms.length - 1]}">&${import_messageHandle.rooms[import_messageHandle.rooms.length - 1]}</a>!  `;
+    if (import_messageHandle.rooms.length == 0) {
+      str = "ERROR";
+    }
+    fs.writeFileSync("frontend/status_raw.html", str);
+    res.sendFile(path.join(__dirname, "../frontend", "status.html"));
+  });
+  app.get("/loader.css", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "loader.css"));
+  });
+  app.get("/*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "404.html"));
   });
   app.listen(port, () => {
     console.log(`Front-end is running on ${port}.`);

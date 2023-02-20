@@ -1,123 +1,116 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>BetaUtilities Status</title>
-    <script src = "frontend.js">
+    <title>Welcome to BetaOS Services!</title>
+    <script> function onLoad() {
+      // alert(document.cookie);
+      if (document.cookie.match("session=[0-9.]+")) {
+        let ele = document.getElementById("loginbtn");
+        ele.innerHTML = "Logout<br><hr class=\"btnHr\"></hr>";
+        ele.onclick= ()=> {window.open('/logout', '_self');}
+      }
+    }
     </script>
+    <meta name="viewport" content="width=device-width">
     <style>
       html {
-        background-color: rgb(220, 220, 220);
+        background-color: #eee;
       } 
-      div#mainDiv {
-/*         position:absolute; */
-        width: 90vw;
-/*         height: 90vh; */
-        margin-left: 5vw;
-        margin-top: 5vh;
-/*         border-radius: 50px 50px 0px 0px; */
-      }
-      div#mainDiv::before {
-          content: "";
-          float: left;
-          height: 90vh;
-          margin-right: 4px;
-          border-left: 7px solid #00C300;
-          border-radius: 6px;
-      }
-      div#mainDiv.modified::before {
-        border-left: 7px solid #cc0000;
-      }
-      p{
-        width: 80%;
-        margin-left: 30px;
-        font-family: NotoSansDisplay;
-      }
       h1 {
-        font-family: NotoSansDisplay
-      }
-      input {
-        border: none;
-        width: 50%
-      }
-      #disableBtn, #enableBtn, #login {
-        margin-left: 18px;
-        display: none;
-        width: auto;
-        white-space: nowrap;
-        border: 2px solid #000000;
-        padding: 0px;
-        border-radius: 50px;
-      }
-      #login {
+        font-family: NotoSansDisplay;
         
-        display: block;
-        border: none;
-        width: 300px;
-        
+/*         display: inline-block; */
+        left: auto;
+/*         margin: 0px; */
+        font-size: 4em;
+        color: #0a84ff;
       }
-      #loginBTN {
+      body {
+        text-align: center;
+        overflow: hidden; /* Hide scrollbars */
+      }
+      #mainDiv{
+/*         text-align: center; */
+        display: inline-block;
+        animation-name: mainanim;
         position: relative;
-        right: 0px;
+        top: 10vh;
+        animation-duration: 0.4s;
+        width: 90vw;
       }
-      button, select, option {
-        background: none;
-        border: none;
-        border-radius: 10px; 
-        transition: all 0.2s ease-in-out;
-      }
-      select:hover, button:hover {
-        background: #aaaaaa;
-        opacity:0.7;
-/*         scale: 1.05; */
+      @keyframes mainanim {
+        0%   {top:80vh; opacity: 0;}
+/*         3% {opacity: 0.02} */
+        50% {opacity: 0.4}
+        100% {top:10vh; opacity: 1}
       }
       hr.rounded {
-        border: 3px solid #bbb;
+        border: 3px solid #0e0;
+        width: 90vw;
         border-radius: 5px;
       }
-      @font-face { font-family: NotoSansDisplay; src: url('NotoSansDisplay-Variable.ttf'); } 
+      hr {
+        border: 2px solid #000;
+        border-radius: 4px;
+      }
+      button {
+        width: 5em;
+        height: 2.5em;
+        border: none;
+        border-radius: 0.3em;
+        font-size: 2.5em;
+        background-color: #eee; 
+        color: #0a84ff;
+      }
+      hr.btnHr {
+        opacity: 0;
+        position: relative;
+        margin: 2px;
+        display: inline-block;
+        right: auto;
+        transition: opacity, width 0.5s ease-in-out;
+      }
+      button {
+        transition: background-color 0.5s ease-in-out;
+        background-color: #eee;
+        text-align: center;
+/*         display: flex; */
+/*         justify-content: center; */
+      }
+      button:hover > hr.btnHr{
+        position: relative;
+        right: auto;
+        display: inline-block;
+        opacity: 1;
+        animation-name: buttonHover;
+        animation-duration: 0.5s;
+        width: 90%;
+      }
+      button:hover {
+        background-color: #fff;
+      }
+      @keyframes buttonHover {
+        0% {width: 0%;}
+        100% {width: 90%} 
+      }
+
+      @font-face { 
+        font-family: NotoSansDisplay; 
+        src: url('../NotoSansDisplay-Variable.ttf'), local('Courier New'); 
+        font-display: swap;
+      }
     </style>
   </head>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap" rel="stylesheet"> 
+  <link rel="preload" href="https://fonts.googleapis.com">
+  <link rel="preload" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
   <body onload = "onLoad()">
     <div id = "mainDiv">
-      <h1 style="display:inline; margin-left: 18px;">BetaUtilities Status: </h1><h1 style="color:#00C300; display:inline" id="h_one">Online!</h1>
-      <p id = "statStr" style="font-family:'Noto Sans Mono', monospace" ></p>
-      <p id="noscript">You did not enable scripts. AutoRefresh is disabled.</p>
-      <div id="disableBtn" hidden="hidden"> 
-        <button onclick="window.open('./', '_self');">Disable AutoRefresh</button>
-      </div>
-      <div id="enableBtn" hidden="hidden">
-        <button onclick="window.open('./?REFRESH='+document.getElementById('Sel').value, '_self');">Enable AutoRefresh: </button>
-        <select id="Sel">
-          <option value="1000">1 sec</option>
-          <option value="1001">1001 ms</option>
-          <option value="2000">2 sec</option>
-          <option value="3000" selected >3 sec</option>
-          <option value="5000">5 sec</option>
-          <option value="10000">10 sec</option>
-          <option value="30000">30 sec</option>
-          <option value="60000">1 min</option>
-          <option value="300000">5 min</option>
-        </select>
-      </div> 
-      <div id="login">
-        <p style="text-align: right;">Username: <input type="text" id="user"/></p>
-        <p style="text-align:right;" id="pwd" onchange="document.getElementById('loginBTN').click()">Password: <input type="password" id="pass"/></p>
-        <button id="loginBTN" onclick="validateLogin()">Log into BetaUtilities ADMIN</button>
-      </div>
-      <br><br>
-      
-    </div>
-    <button style="border:2px solid black; border-radius: 10px; margin-left: 18px;" 
-               onclick = "toggleHidden()">
-        Toggle c+1's stuff</button>
-    <div id="c+1" style="height:1vh; transition: all 0.5s ease-in-out;" hidden="hidden">
-      
+      <h1>Welcome to BetaOS Services!</h1>
       <hr class="rounded"></hr>
-      <br>
-      <iframe src="https://nest.place" style="width:100%; height:100%"> </iframe>
+      <button onclick="window.open('./status', '_self');">Status<br><hr class="btnHr"></hr></button>
+      <button onclick="window.open('./login', '_self');" id="loginbtn">Login<br><hr class="btnHr"></hr></button>
+      <button onclick="window.open('./admin', '_self');">Admin<br><hr class="btnHr"></hr></button>
     </div>
   </body>
  </html>

@@ -255,6 +255,3 @@ export class WS
     
   }
 }
-
-
-init();

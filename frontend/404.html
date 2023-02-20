@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Page not found</title>
+    <script> 
+    let t=-1;
+    function onLoad() {
+      t = setTimeout(()=>{window.open('./', '_self')}, 1500);
+      document.addEventListener('keydown', keyDown)
+    }
+    function keyDown(e) {
+      clearTimeout(t)
+    }
+    </script>
+    <style>
+      html {
+        background-color: #eee;
+      } 
+      h1 {
+        font-family: NotoSansDisplay;
+        
+/*         display: inline-block; */
+        left: auto;
+        font-size: 5em;
+        color: #0a84ff;
+      }
+      body {
+        text-align: center;
+        overflow: hidden; /* Hide scrollbars */
+      }
+      #mainDiv{
+/*         text-align: center; */
+        display: inline-block;
+        animation-name: mainanim;
+        position: relative;
+        top: -600vh;
+        animation-duration: 2s;
+        width: 90vw;
+      }
+      .overload {
+        animation-name: overloadAnim;
+        top: 20vh;
+        position: absolute;
+        animation-duration: 6s;
+      }
+      @keyframes mainanim {
+        0%   {top:100vh; opacity: 0;}
+        30% {top: 0vh; opacity: 1;}
+        90% {top: 0vh;}
+        100% {top:-600vh; opacity: 1;}
+      }
+      @keyframes overloadAnim {
+        0% {top: 100vh; opacity: 0;}
+        70% {top: 100vh; opacity: 0;}
+        100% {top: 20vh; opacity: 1;}
+      }
+      hr.rounded {
+        border: 3px solid #0e0;
+        width: 90vw;
+        border-radius: 5px;
+      }
+      a {
+        font-size: 0.8em;
+      }
+      div#overlay {
+        width: 100vw;
+        z-index: -1;
+        height: 100vh;
+        animation-name: overlayAnim;
+        animation-duration: 6s;
+        position: absolute;
+        top: 0px;
+        left:0px;
+        background-color: #ccc;
+      }
+      @keyframes overlayAnim {
+        0% {width: 0vw;}
+        50% {width: 0vw;}
+        70% {width: 100vw;}
+        100% {width: 100vw;}
+      }
+
+      @font-face { 
+        font-family: NotoSansDisplay; 
+        src: url('../NotoSansDisplay-Variable.ttf'), local('Courier New'); 
+        font-display: swap;
+      }
+    </style>
+  </head>
+  <link rel="preload" href="https://fonts.googleapis.com">
+  <link rel="preload" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
+  <body onload = "onLoad()">
+    <div id = "mainDiv">
+      <h1>Page not found!</h1>
+      <hr class="rounded"></hr>
+      <h1>Redirecting to home-page...</h1>
+    </div>
+    <h1 class="overload">Sorry, this is taking longer than expected. 
+      <br>
+      <a href = './'> Return to home</a>
+    </h1>
+    <div id="overlay"></div>
+  </body>
+ </html>

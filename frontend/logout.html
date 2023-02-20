@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Logout</title>
+    
+    <script src="/login.js"></script>
+    <script> 
+    function onLoad() {
+      console.log("Logging user out");
+      setTimeout(()=>{validateLogin("logout")}, 1000);
+    }
+    </script>
+    <style>
+      html {
+        background-color: #eee;
+      } 
+      h1 {
+        font-family: NotoSansDisplay;
+        
+/*         display: inline-block; */
+        left: auto;
+        font-size: 3em;
+        color: #0a84ff;
+      }
+      body {
+        text-align: center;
+        overflow: hidden; /* Hide scrollbars */
+      }
+      #mainDiv{
+/*         text-align: center; */
+        display: inline-block;
+        animation-name: mainanim;
+        position: relative;
+        top: -600vh;
+        animation-duration: 2s;
+        width: 90vw;
+      }
+      .overload {
+        animation-name: overloadAnim;
+        top: 20vh;
+        position: absolute;
+        width: 100%;
+        animation-duration: 6s;
+      }
+      @keyframes mainanim {
+        0%   {top:100vh; opacity: 0;}
+        30% {top: 0vh; opacity: 1;}
+        90% {top: 0vh;}
+        100% {top:-600vh; opacity: 1;}
+      }
+      @keyframes overloadAnim {
+        0% {top: 100vh; opacity: 0;}
+        70% {top: 100vh; opacity: 0;}
+        100% {top: 20vh; opacity: 1;}
+      }
+      hr.rounded {
+        border: 3px solid #0e0;
+        width: 90vw;
+        border-radius: 5px;
+      }
+      a {
+        font-size: 0.6em;
+      }
+      div#overlay {
+        width: 100vw;
+        z-index: -1;
+        height: 100vh;
+        animation-name: overlayAnim;
+        animation-duration: 6s;
+        position: absolute;
+        top: 0px;
+        left:0px;
+        background-color: #ccc;
+      }
+      @keyframes overlayAnim {
+        0% {width: 0vw;}
+        50% {width: 0vw;}
+        70% {width: 100vw;}
+        100% {width: 100vw;}
+      }
+
+      button:hover > hr.btnHr{
+        position: relative;
+        left:5%;
+        display: block;
+        opacity: 1;
+        animation-name: buttonHover2;
+        animation-duration: 0.5s;
+        width: 90%;
+        top: 10%;
+      }
+      button:hover {
+        background-color: #fff;
+      }
+      
+      #alert {
+        position:absolute;
+        top: 100vh;
+        left: 0px;
+        width: 100vw;
+        height: 100vh;
+        animation-duration:0.5s; 
+        background-color: #eee;
+      }
+      @keyframes incoming {
+        0% {top: 100vh }
+        100% { top: 0vh}
+      }
+
+      @keyframes outgoing {
+        0% {top: 0vh }
+        100% { top: 100vh}
+      }
+
+      #alerttxt {
+        width:100%;
+        height: 2.25em;
+        text-align: center;
+        position: relative;
+        left: auto;
+        top: calc( (100vh - 2.25em) / 2 );
+      }
+
+      p {
+        margin-bottom: 0px;
+        margin-top: 0px;
+        text-align: left;
+        display: inline-block;
+        font-family: NotoSansDisplay;
+        color: #0a84ff;
+        font-size: 2.25em;
+        width: calc(2.25em*2.2);
+      }
+
+      button {
+        width: 89vw;
+        height: 110%;
+        border: none;
+        border-radius: 3vh;
+        font-size: 2em;
+        background-color: #eee; 
+        color: #0a84ff;
+        transition: background-color 0.5s ease-in-out;
+        background-color: #eee;
+        text-align: center;
+      }
+
+      @font-face { 
+        font-family: NotoSansDisplay; 
+        src: url('../NotoSansDisplay-Variable.ttf'), local('Courier New'); 
+        font-display: swap;
+      }
+    </style>
+  </head>
+  <link rel="preload" href="https://fonts.googleapis.com">
+  <link rel="preload" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
+  <body onload = "onLoad()">
+    <div id = "mainDiv">
+      <h1>Logging you out now.</h1>
+      <hr class="rounded"></hr>
+      <h1>Redirecting to home-page...</h1>
+    </div>
+    <h1 class="overload">Sorry, this is taking longer than expected. 
+      <br>
+      <a href = './'> Return to home</a>
+    </h1>
+    <div id="alert" onclick = "clearalert()" onkeydown="clearalert()"><p id="alerttxt" style="width: 90%"></p><button style="position: relative; top: calc( ( 50vh - 2.25em ) / 2 + 7em); height: 4em;"><u>> Continue <</u></button></div>
+    <div id="overlay"></div>
+  </body>
+ </html>

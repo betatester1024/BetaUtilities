@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../updateuser.ts"],
+  "sourcesContent": ["import { WS } from \"./wsHandler\";\nexport function updateuser() {\n  WS.db.set(\"betatester1024\", \"ADMIN\");\n  WS.db.set(\"betatester1024^PERM\", \"2\");\n  WS.db.set(\"user\", \"pass\");\n  WS.db.set(\"user^PERM\", \"1\");\n}"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,uBAAmB;AACZ,SAAS,aAAa;AAC3B,sBAAG,GAAG,IAAI,kBAAkB,OAAO;AACnC,sBAAG,GAAG,IAAI,uBAAuB,GAAG;AACpC,sBAAG,GAAG,IAAI,QAAQ,MAAM;AACxB,sBAAG,GAAG,IAAI,aAAa,GAAG;AAC5B;",
+  "names": []
+}

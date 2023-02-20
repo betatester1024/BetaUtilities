@@ -23,7 +23,7 @@ __export(messageHandle_exports, {
   updateActive: () => updateActive
 });
 module.exports = __toCommonJS(messageHandle_exports);
-var import_index = require("./index");
+var import_wsHandler = require("./wsHandler");
 var import_misc = require("./misc");
 var import_wordListHandle = require("./wordListHandle");
 const serviceKey = process.env["serviceKey"];
@@ -79,7 +79,7 @@ function replyMessage(msg, sender, data) {
     if (rooms.indexOf(match2[1]) >= 0)
       return "We're already in this room!";
     try {
-      new import_index.WS("wss://euphoria.io/room/" + match2[1] + "/ws", newNick, match2[1], false);
+      new import_wsHandler.WS("wss://euphoria.io/room/" + match2[1] + "/ws", newNick, match2[1], false);
     } catch (e) {
       console.log(e);
     }
@@ -93,8 +93,8 @@ function replyMessage(msg, sender, data) {
   if (msg.match(/^!potato$/))
     return "potato.io";
   if (msg == "!rating @" + this.nick.toLowerCase()) {
-    import_index.WS.db.get("SUM").then((value) => {
-      import_index.WS.db.get("CT").then((value2) => {
+    import_wsHandler.WS.db.get("SUM").then((value) => {
+      import_wsHandler.WS.db.get("CT").then((value2) => {
         let r = "Current @" + this.nick + " rating - " + (value / value2).toFixed(2);
         this.delaySendMsg(r, data, 0);
       });
@@ -258,10 +258,10 @@ function replyMessage(msg, sender, data) {
     else {
       return "I don't think you entered that right.";
     }
-    import_index.WS.db.get("SUM").then((value) => {
-      import_index.WS.db.get("CT").then((value2) => {
-        import_index.WS.db.set("SUM", value + dv);
-        import_index.WS.db.set("CT", value2 + 1);
+    import_wsHandler.WS.db.get("SUM").then((value) => {
+      import_wsHandler.WS.db.get("CT").then((value2) => {
+        import_wsHandler.WS.db.set("SUM", value + dv);
+        import_wsHandler.WS.db.set("CT", value2 + 1);
       });
     });
     this.callStatus = -1;

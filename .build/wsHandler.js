@@ -16,13 +16,12 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var BetaUtils_exports = {};
-__export(BetaUtils_exports, {
+var wsHandler_exports = {};
+__export(wsHandler_exports, {
   WS: () => WS
 });
-module.exports = __toCommonJS(BetaUtils_exports);
+module.exports = __toCommonJS(wsHandler_exports);
 var import_ws = require("ws");
-var import_initialiser = require("./initialiser");
 var import_messageHandle = require("./messageHandle");
 var import_messageHandle2 = require("./messageHandle");
 const DATALOGGING = false;
@@ -235,9 +234,8 @@ class WS {
     this.replyMessage = import_messageHandle.replyMessage;
   }
 }
-(0, import_initialiser.init)();
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   WS
 });
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=wsHandler.js.map

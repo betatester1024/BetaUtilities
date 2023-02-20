@@ -1,4 +1,4 @@
-import {WS} from './index';
+import {WS} from './wsHandler';
 //import {rooms} from './initialiser'
 import {getUptimeStr} from './misc';
 import {allWords, validWords, todayLeetCODE, todayWordID} from './wordListHandle';

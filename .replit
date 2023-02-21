@@ -3,7 +3,7 @@
 compile = "./.config/build2.sh"
 run = "node --enable-source-maps .build/initialiser.js"
 entrypoint = "initialiser.ts"
-hidden = [".build", ".config"]
+# hidden = [".build", ".config"]
 
 [packager]
 language = "nodejs"

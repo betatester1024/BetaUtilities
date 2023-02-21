@@ -1,5 +1,12 @@
 "use strict";
 function onLoad() {
+  let match = document.cookie.match("__Secure-session=[0-9.]+");
+  console.log("Current session: " + match);
+  if (!match && document.URL.match("admin")) {
+    alertDialog("You're not logged in!", () => {
+      window.open("/", "_self");
+    });
+  }
 }
 function newUser(e, accessclass) {
   let id = e.target.id;
@@ -12,14 +19,15 @@ function validateLogin(action = "login", access) {
   let user = document.getElementById("userINP");
   let pass = document.getElementById("passINP");
   if (action != "login" && action != "add" || user.value.match("^[a-zA-Z0-9_]+$") && pass.value.length !== 0) {
-    let sessionID = Math.random();
+    let arr = new BigUint64Array(1);
     let match = document.cookie.match("__Secure-session=([0-9.]+)");
+    let sessionID = match ? match[1] : window.crypto.getRandomValues(arr);
     console.log(match);
     let params;
     if (action != "logout")
-      params = "user=" + user.value + "&pass=" + pass.value + "&action=" + action + "&access=" + access + "&token=" + (match ? match[1] : sessionID);
+      params = "user=" + user.value + "&pass=" + pass.value + "&action=" + action + "&access=" + access + "&token=" + sessionID;
     else
-      params = "user=&pass=&action=logout&token=" + (match ? match[1] : sessionID);
+      params = "user=&pass=&action=logout&token=" + sessionID;
     if (pass)
       pass.value = "";
     console.log("SENDING " + params);
@@ -42,14 +50,18 @@ function validateLogin(action = "login", access) {
           if (res == "ACCESS") {
             alertDialog("Error: You do not have permissions!", () => {
             });
-          } else if (res == "EXPIRE" || res == "NOACTIVE")
+          } else if (res == "EXPIRE")
             alertDialog("Error: Your login session has expired!", () => {
               validateLogin("logout", "");
             });
-          else if (action == "logout") {
-            document.cookie = "__Secure-session=";
+          else if (res == "NOACTIVE") {
+            alertDialog("Error: You are not logged in!", () => {
+              window.open("/", "_self");
+            });
+          } else if (action == "logout") {
+            document.cookie = "__Secure-session=; Secure;";
             alertDialog("You've been logged out", () => {
-              window.open("https://betautils.betatester1024.repl.co", "_self");
+              window.open("/", "_self");
             });
           } else
             alertDialog("Action complete!", () => {
@@ -58,20 +70,19 @@ function validateLogin(action = "login", access) {
         }
         if (res == "2") {
           alertDialog("Welcome, " + user.value + "! | Administrative access granted.", () => {
-            window.open("https://betautils.betatester1024.repl.co/admin", "_self");
+            window.open("/admin", "_self");
           });
           if (!match && action == "login")
             document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure";
         } else if (res == "1") {
           alertDialog("Welcome, " + user.value + "!", () => {
-            window.open("https://betautils.betatester1024.repl.co", "_self");
+            window.open("/", "_self");
           });
-          let sessionID2 = Math.random();
           if (!match && action == "login")
-            document.cookie = "__Secure-session=" + sessionID2 + "; SameSite=None; Secure";
+            document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure";
         } else {
           alertDialog("Error: Invalid login credentials", () => {
-            window.open("https://betautils.betatester1024.repl.co/login", "_self");
+            window.open("/login", "_self");
           });
         }
       }

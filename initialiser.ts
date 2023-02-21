@@ -3,7 +3,7 @@ import {WS} from './wsHandler';
 import { updateServer } from './server';
 import { updateActive } from './messageHandle';
 import { updateuser} from './updateuser';
-let rooms = ["xkcd", "test", "bots", "ai", "err", "room", "srs", "rpg", "a", "b", "memes"];
+let rooms = ["xkcd", "test", "bots", "ai", "room", "srs", "rpg", "a", "b", "memes"];
 let nicks = ["BetaUtilities", "BetaUtilities_TEST", 
              "BetaUtilities", "BetaUtilities", 
              "BetaUtilities", "BetaUtilities", 

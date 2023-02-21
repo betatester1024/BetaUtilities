@@ -16,8 +16,8 @@ async function loadFile(filePath) {
   }
   return result;
 }
-function onLoad() {
-  loadFile("https://betautils.betatester1024.repl.co/status/status_raw.html").then((data) => {
+function onLoad(e) {
+  loadFile("/status/status_raw.html").then((data) => {
     let statusele = document.getElementById("statStr");
     if (data)
       statusele.innerHTML = data;

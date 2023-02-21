@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Administrative panel</title>
+    <title>System configuration</title>
     <meta name="viewport" content="width=device-width">
     <script src="/login.js">
     </script>
@@ -254,7 +254,7 @@
   <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
   <body onload = "onLoad()">
     <div id = "mainDiv">
-      <h1>Administrative panel</h1>
+      <h1>Configuration</h1>
       <hr class="rounded"></hr>
       <div id="login">
         <div id="userDiv" onclick="document.getElementById('userINP').focus();" onchange="document.getElementById('passINP').focus();">
@@ -270,7 +270,7 @@
         <div id="loginDIV" onclick="newUser(event, document.getElementById('sel').value)">
           <button id="loginBTN" onclick="newUser(event, document.getElementById('sel').value)">Create/Update user as:</button>
           <select id='sel' >
-            <option value="1">BASIC ACCESS</option>
+            <option value="1">BASIC USER</option>
             <option value="2">ADMINISTRATOR</option>
           </select><br>
           <hr class="btnHr"></hr>

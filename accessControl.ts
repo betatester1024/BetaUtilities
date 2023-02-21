@@ -1,78 +1,70 @@
 import { WS } from "./wsHandler";
 
+// import { hashSync, compareSync} from 
+var bcrypt = require("bcrypt");
 
-// export function requestHash(user:string, pwd:string, callback:any) {
-//   bcrypt.hash(pwd, saltRounds, function(err:any, hash:string) {
-    
-//     const db2 = require("@replit/database")
-//     console.log(err, hash)
-//     db2.set("hashed", hash as string).then(()=>{});
-    
-//     returnedHash(user, hash, callback);
-//       // Store hash in your password DB.
-//   });
-// }
 export function validate(user:string, pwd:string, action:string, access:string, callback:any, token:string="") {
-  console.log("Validating as "+user+" with password "+pwd+" with action"+action+" - token "+token);
+  console.log("Validating as "+user+" with action "+action +" (token "+token+")");
   if (action=="logout") {
     console.log("Logging out "+token)
     WS.db.delete(token);
-    callback.end(JSON.stringify(0));
+    callback.end(JSON.stringify("SUCCESS"));
     return;
   }
-  // if (action=="server") { // 
-    // console.log("Logging token with user "+user+" with expiry"+Date.now()+1000*60*60*24*30);
-  // }?
   if (action=="add") {
-    console.log(token);
     WS.db.get(token).then((data:string)=>{
-      console.log("Data: "+data);
       if (data == null) {
         console.log("No active session");
         callback.end(JSON.stringify("NOACTIVE"));
         return;
       }
-      let expiryTime = Number(data.match("[0-9]+$")[0]);
-      console.log("This token expiring in: "+(expiryTime-Date.now()) + " ms");
+      let expiryTime = Number(data.split(" ")[1]);
+      let tokenUser = data.split(" ")[0];
+      console.log("Logged in as "+tokenUser+" | Expiring in: "+(expiryTime-Date.now()) + " ms");
       if (expiryTime<Date.now()) {
-        console.log("Token expired.")
+        console.log("Token expired. Logged out user.")
         WS.db.delete(token);
         callback.end(JSON.stringify("EXPIRE"));
         return;
       }
-      WS.db.get(data.split(" ")[0]+"^PERM").then((perms:string)=> {
+      WS.db.get(tokenUser+"^PERM").then((perms:string)=> {
         if (perms!="2"){
+          if (user == tokenUser && access == "1") {
+            console.log("Updating password");
+            WS.db.set(user, bcrypt.hashSync(pwd, 8));
+            callback.end(JSON.stringify("SUCCESS"))
+          }
           console.log("Permissions insufficient.")
           callback.end(JSON.stringify("ACCESS"));
         }
         else {
           console.log("Access granted; Token not expired. Adding "+user+" with permissions"+access);
-          WS.db.set(user, pwd);
+          WS.db.set(user, bcrypt.hashSync(pwd, 8));
           WS.db.set(user+"^PERM", access);
-          let response = 0;
-          callback.end(JSON.stringify(response));
+          callback.end(JSON.stringify("SUCCESS"));
         }
       }); // check permissions of token
     });
    return; 
   }
+  // check password permissions
   WS.db.get(user).then((value:any)=>{
-    if (value == pwd) {// pwd validated. 
-      console.log("Password OK")
+    console.log("Logged password hash:" + value)
+    if (bcrypt.compareSync(pwd, value)) {// pwd validated. 
+      
       WS.db.get(user+"^PERM").then((perm:any)=>{
-        console.log(perm);
+        console.log("Password OK for user "+user+" | Perms: "+perm)
         callback.end(JSON.stringify(perm));  
-      })
-    } // validate pwd
+        let exp = (Date.now()+1000*60*60);
+        console.log("Logging user "+user+" with expiry "+exp+" (in "+(exp-Date.now())+" ms)");
+       WS.db.set(token, user+" "+exp);
+      })  
+    } // password/user not found
     else {
-      if (action == "login") {
-        let response = 0;
-        callback.end(JSON.stringify(response));
-      }
+      console.log("Invalid credentials.")
+      let response = 0;
+      callback.end(JSON.stringify(response));
     };
     
-    let exp = (Date.now()+1000*30);
-    console.log("Logging token with user "+user+" with expiry"+exp+" Current time:"+Date.now());
-    WS.db.set(token, user+" "+exp);
-  })
-}
+  }) // login
+} // account handler

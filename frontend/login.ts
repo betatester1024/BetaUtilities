@@ -1,10 +1,9 @@
 function onLoad() {
-  // let match = document.cookie.match("__Secure-session=[0-9.]+");
-  // console.log("Current __Secure-session: "+match);
-  // if (!match) {
-  //   document.cookie = "__Secure-session="+Math.random()+"; SameSite=None; Secure";
-  //   console.log("Current __Secure-session: "+document.cookie);
-  // }
+  let match = document.cookie.match("__Secure-session=[0-9.]+");
+  console.log("Current session: "+match);
+  if (!match && document.URL.match("admin")) {
+    alertDialog("You're not logged in!", ()=>{window.open("/", "_self");}); 
+  }
 }
 
 function newUser(e:Event, accessclass:string) {
@@ -19,15 +18,17 @@ function validateLogin(action:string="login", access:string) {
   let pass = document.getElementById("passINP") as HTMLInputElement;
   
   if ((action !="login" && action !="add") || (user.value.match("^[a-zA-Z0-9_]+$") && pass.value.length!==0)) {
-    let sessionID = Math.random();
-    // ONLY USE THE sessionID WHEN ADDING A NEW session
+    let arr = new BigUint64Array(1);
     let match = document.cookie.match("__Secure-session=([0-9.]+)");
+    let sessionID = match?match[1]:window.crypto.getRandomValues(arr);
+    // ONLY USE THE sessionID WHEN ADDING A NEW session
+    
     console.log(match);
     
     // alert/(document.cookie);
     let params;
-    if (action!="logout") params= "user="+user.value+"&pass="+pass.value+"&action="+action+"&access="+access+"&token="+(match?match[1]:sessionID);
-    else params="user=&pass=&action=logout&token="+(match?match[1]:sessionID);
+    if (action!="logout") params= "user="+user.value+"&pass="+pass.value+"&action="+action+"&access="+access+"&token="+sessionID;
+    else params="user=&pass=&action=logout&token="+sessionID;
     if (pass) pass.value="";
     console.log("SENDING "+params);
     var xhr = new XMLHttpRequest();
@@ -46,28 +47,30 @@ function validateLogin(action:string="login", access:string) {
           if (res == "ACCESS") {
             alertDialog("Error: You do not have permissions!", ()=>{});
           }
-          else if (res == "EXPIRE" || res == "NOACTIVE")
+          else if (res == "EXPIRE")
             alertDialog("Error: Your login session has expired!", ()=>{validateLogin("logout", "")});
+          else if (res == "NOACTIVE") {
+            alertDialog("Error: You are not logged in!", ()=>{window.open("/", "_self")});
+          }
           else if (action=="logout") {
             // alert("Logging out");
-            document.cookie = "__Secure-session=";
-            alertDialog("You've been logged out", ()=>{window.open("https://betautils.betatester1024.repl.co", "_self")});
+            document.cookie = "__Secure-session=; Secure;";
+            alertDialog("You've been logged out", ()=>{window.open("/", "_self")});
           }
           else 
             alertDialog("Action complete!", ()=>{});
           return;
         }
         if (res == "2") {
-          alertDialog("Welcome, "+user.value+"! | Administrative access granted.", ()=>{ window.open("https://betautils.betatester1024.repl.co/admin", "_self");})
+          alertDialog("Welcome, "+user.value+"! | Administrative access granted.", ()=>{ window.open("/admin", "_self");})
           if (!match && action =="login") document.cookie = "__Secure-session="+sessionID+"; SameSite=None; Secure";
         }
         else if (res == "1") {
-          alertDialog("Welcome, "+user.value+"!", ()=> {window.open("https://betautils.betatester1024.repl.co", "_self");});
-          let sessionID = Math.random();
+          alertDialog("Welcome, "+user.value+"!", ()=> {window.open("/", "_self");});
           if (!match && action =="login") document.cookie = "__Secure-session="+sessionID+"; SameSite=None; Secure";
         }
         else {
-          alertDialog("Error: Invalid login credentials", ()=>{window.open("https://betautils.betatester1024.repl.co/login", "_self");});
+          alertDialog("Error: Invalid login credentials", ()=>{window.open("/login", "_self");});
           
         }
       }
@@ -84,6 +87,7 @@ function validateLogin(action:string="login", access:string) {
 
 function logout() {
   // document.cookie = "__Secure-session=";
+  // console.log("Cookie should be removed.")
   validateLogin("logout","");
 }
 

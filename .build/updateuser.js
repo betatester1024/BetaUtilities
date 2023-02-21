@@ -22,10 +22,11 @@ __export(updateuser_exports, {
 });
 module.exports = __toCommonJS(updateuser_exports);
 var import_wsHandler = require("./wsHandler");
+var bcrypt = require("bcrypt");
 function updateuser() {
-  import_wsHandler.WS.db.set("betatester1024", "ADMIN");
+  import_wsHandler.WS.db.set("betatester1024", bcrypt.hashSync(process.env["betatester1024"], 8));
   import_wsHandler.WS.db.set("betatester1024^PERM", "2");
-  import_wsHandler.WS.db.set("user", "pass");
+  import_wsHandler.WS.db.set("user", bcrypt.hashSync("pass", 8));
   import_wsHandler.WS.db.set("user^PERM", "1");
 }
 // Annotate the CommonJS export names for ESM import in node:

@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Service Login</title>
+    <title>Sign up</title>
     <meta name="viewport" content="width=device-width">
-    <script src="../login.js">
+    <script src="/login.js">
     </script>
     <style>
       html {
         background-color: #eee;
-        transition: all 0.5s ease-in-out;
       } 
       h1 {
         font-family: NotoSansDisplay;
@@ -46,7 +45,7 @@
         width: 90vw;
         border-radius: 5px;
       }
-      button {
+      button, select, #loginDIV {
         width: 89vw;
         height: 110%;
         border: none;
@@ -57,6 +56,13 @@
         transition: background-color 0.5s ease-in-out;
         background-color: #eee;
         text-align: center;
+      }
+      select {
+        width: 8.5em;
+        height: 70%;
+        font-size: 1.95em;
+        border: 1px solid #eee;
+        border-radius: 10px;
       }
       hr.btnHr, hr.inpHr {
         opacity: 0;
@@ -71,6 +77,7 @@
       }
       #userDiv:hover > hr.inpHr,
       #pwdDiv:hover > hr.inpHr,
+      #pwdDiv2:hover > hr.inpHr,
       input:focus + hr{
         position: relative;
 /*         right: auto; */
@@ -83,7 +90,7 @@
         cursor: text;
       }
 
-      #userDiv, #pwdDiv, p, input {
+      #userDiv, #pwdDiv, #pwdDiv2, p, input {
         text-align: left;
       }
 
@@ -93,7 +100,7 @@
         display: inline-block;
         height: 4vh;
         font-size: 2em;
-        width: calc(100% - 0.5em);
+        width: calc(100%);
       }
       p {
         margin-bottom: 0px;
@@ -109,7 +116,7 @@
       #userP, #passP {
         margin-top: 20px;
       }
-      button:hover > hr.btnHr{
+      #loginDIV:hover > hr.btnHr, button:hover > hr.btnHr {
         position: relative;
         left:5%;
         display: block;
@@ -119,12 +126,28 @@
         width: 90%;
         top: 10%;
       }
+      #loginDIV:hover {
+        background-color: #f8f8f8;
+      }
+      #loginDIV:hover > button  {
+        background-color: #fff;
+        
+      }
+      #loginDIV{
+        font-size: 1em;
+        height: 120%;
+        white-space: nowrap;
+      }
+      #loginDIV:hover > select {
+        background-color: #fff;
+        height: 100%;
+      }
       button:hover {
         background-color: #fff;
       }
       @keyframes buttonHover {
         0% {width: 0%;}
-        100% {width: calc(100%);} 
+        100% {width: calc(100% );} 
       }
       @keyframes buttonHover2 {
         0% {width: 0%;}
@@ -151,6 +174,16 @@
         top: 100vh;
         left: 0px;
       }
+      #loginBTN {
+        display: inline-block;
+        text-align: center;
+        width: 10.8em;
+        border: 1px solid #eee;
+        border-radius: 10px;
+      }
+      #loginBTN:hover, select:hover {
+        border: 1px solid #000;
+      }
       @keyframes overlayAnim {
         0% {width: 0vw;}
         60% {width: 0vw;}
@@ -171,15 +204,21 @@
       }
       .beforeoverload {
         position: absolute;
-        width: 100%;
         top: 100vh;
+        width: 100%;
       }
+      
       @keyframes overloadAnim {
         0% {top: 100vh; opacity: 0;}
         70% {top: 100vh; opacity: 0;}
         100% {top: 20vh; opacity: 1;}
       }
-
+      
+      @font-face { 
+        font-family: NotoSansDisplay; 
+        src: url('../NotoSansDisplay-Variable.ttf'), local('Courier New'); 
+        font-display: swap;
+      }
       #alert {
         position:absolute;
         top: 100vh;
@@ -208,11 +247,6 @@
         top: calc( (100vh - 2.25em) / 2 );
       }
       
-      @font-face { 
-        font-family: NotoSansDisplay; 
-        src: url('../NotoSansDisplay-Variable.ttf'), local('Courier New'); 
-        font-display: swap;
-      }
     </style>
     <link rel="stylesheet" href="/loader.css">
   </head>
@@ -221,27 +255,32 @@
   <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
   <body onload = "onLoad(); setTimeout(()=>{document.getElementById('userINP').focus();}, 500);">
     <div id = "mainDiv">
-      <h1>Login</h1>
+      <h1>Sign-up
+      </h1>
       <hr class="rounded"></hr>
       <div id="login">
-        <div id="userDiv" onclick="document.getElementById('userINP').focus();"  onchange="document.getElementById('passINP').focus();">
+        <div id="userDiv" onclick="document.getElementById('userINP').focus();" onchange="document.getElementById('passINP').focus();">
 <!--           <p id="userP">Username:</p> -->
           <input type="text" placeholder="Username" id="userINP"/>
           <hr class="inpHr" id="userhr"></hr>
         </div><div id="pwdDiv" onclick="document.getElementById('passINP').focus();">
 <!--           <p id="passP"> -->
 <!--             Password:</p> -->
-          <input type="password" id="passINP" placeholder="Password" onchange="validateLogin()"/>
+          <input type="password" id="passINP" placeholder="Password" onchange="document.getElementById('passINPCONF').focus();"/>
+          <hr class="inpHr"></hr>
+         
+        </div> <div id="pwdDiv2" onclick="document.getElementById('passINPCONF').focus();">
+          <input type="password" id="passINPCONF" placeholder="Confirm password" onchange="newUser(event)"/>
           <hr class="inpHr"></hr>
         </div>
-        <button id="loginBTN" onclick="validateLogin()">Log into BetaUtilities ADMIN<br><hr class="btnHr"></hr></button>
+        <button id="loginBTN" onclick="validateLogin()">Sign up<br><hr class="btnHr"></hr></button>
       </div>
       
       <button class="HOME" onclick="window.open('../', '_self');">&#x00AB Return to home<br><hr class="btnHr"></hr></button>
     </div>
     <h1 class="beforeoverload" id="h1">Sorry, this is taking longer than expected. 
       <br>
-      <a href = './'> Return to home</a>
+      <a href = '/'> Return to home</a>
     </h1>
     <div id="alert" onclick = "clearalert()" onkeydown="clearalert()"><p id="alerttxt" style="width: 90%"></p><button style="position: relative; top: calc( ( 50vh - 2.25em ) / 2 + 7em); height: 4em;"><u>> Continue <</u></button></div>
     <div id="overlay"></div>

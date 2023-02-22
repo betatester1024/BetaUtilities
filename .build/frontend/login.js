@@ -4,7 +4,7 @@ function onLoad() {
   console.log("Current session: " + match);
   if (!match && document.URL.match("admin")) {
     alertDialog("You're not logged in!", () => {
-      window.open("/", "_self");
+      window.open("/signup", "_self");
     });
   }
 }
@@ -18,7 +18,14 @@ function newUser(e, accessclass) {
 function validateLogin(action = "login", access) {
   let user = document.getElementById("userINP");
   let pass = document.getElementById("passINP");
+  let confirm = document.getElementById("passINPCONF");
   if (action != "login" && action != "add" || user.value.match("^[a-zA-Z0-9_]+$") && pass.value.length !== 0) {
+    if (confirm && action == "add" && confirm.value != pass.value) {
+      alertDialog("Error: Your passwords do not match", () => window.open("/admin", "_self"));
+      return;
+    }
+    if (confirm)
+      confirm.value = "";
     let arr = new BigUint64Array(1);
     let match = document.cookie.match("__Secure-session=([0-9.]+)");
     let sessionID = match ? match[1] : window.crypto.getRandomValues(arr);
@@ -70,6 +77,12 @@ function validateLogin(action = "login", access) {
         }
         if (res == "2") {
           alertDialog("Welcome, " + user.value + "! | Administrative access granted.", () => {
+            window.open("/admin", "_self");
+          });
+          if (!match && action == "login")
+            document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure";
+        } else if (res == "3") {
+          alertDialog("Welcome, betatester1024.", () => {
             window.open("/admin", "_self");
           });
           if (!match && action == "login")

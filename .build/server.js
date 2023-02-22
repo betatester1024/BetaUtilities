@@ -58,6 +58,9 @@ function updateServer() {
   app.get("/logout", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "logout.html"));
   });
+  app.get("/signup", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "signup.html"));
+  });
   app.post("/login", urlencodedParser, function(req, res) {
     console.log("Logging in as " + req.body.action + "+" + req.body.token);
     (0, import_accessControl.validate)(req.body.user, req.body.pass, req.body.action, req.body.access, res, req.body.token);

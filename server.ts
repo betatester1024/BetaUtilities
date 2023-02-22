@@ -44,7 +44,7 @@ export function updateServer() {
     res.sendFile(path.join( __dirname, '../frontend', 'logout.html' ));
   });
 
-  app.get('./signup', (req:any, res:any) => {
+  app.get('/signup', (req:any, res:any) => {
     res.sendFile(path.join( __dirname, '../frontend', 'signup.html' ));
   });
   

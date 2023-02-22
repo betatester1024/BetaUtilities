@@ -43,6 +43,10 @@ export function updateServer() {
   app.get('/logout', (req:any, res:any) => {
     res.sendFile(path.join( __dirname, '../frontend', 'logout.html' ));
   });
+
+  app.get('./signup', (req:any, res:any) => {
+    res.sendFile(path.join( __dirname, '../frontend', 'signup.html' ));
+  });
   
   app.post('/login', urlencodedParser, function (req:any, res:any) {  
    // Prepare output in JSON format  

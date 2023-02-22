@@ -2,7 +2,7 @@ function onLoad() {
   let match = document.cookie.match("__Secure-session=[0-9.]+");
   console.log("Current session: "+match);
   if (!match && document.URL.match("admin")) {
-    alertDialog("You're not logged in!", ()=>{window.open("/", "_self");}); 
+    alertDialog("You're not logged in!", ()=>{window.open("/signup", "_self");}); 
   }
 }
 

@@ -68,7 +68,7 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
     }); return "";
   }
   if (msg == "!status @"+this.nick.toLowerCase()) {
-    return "Status-tracker: https://BetaUtils.betatester1024.repl.co";
+    return "Status-tracker: https://betatester1024.repl.co";
   }
   if (msg.match("^!die$")) {
     setTimeout(()=>{this.socket.close()}, 120);
@@ -165,7 +165,7 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   if (msg == "!src @"+this.nick.toLowerCase() || this.callStatus == 1 && (msg == ":four:" || msg == "four" || msg == "4")) {
     this.clearCallReset();
     this.callStatus = -1;
-    return "> Source code: https://replit.com/@betatester1024/BetaUtils#index.ts"
+    return "> Source code: https://replit.com/@betatester1024/betatester1024/"
   }
   if (this.callStatus == 1 && (msg == ":five:" || msg == "five" || msg == "5")) {
     this.bumpCallReset(data);

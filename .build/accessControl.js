@@ -68,7 +68,7 @@ function validate(user, pwd, action, access, callback, token = "") {
   }
   import_wsHandler.WS.db.get(user).then((value) => {
     console.log("Logged password hash:" + value);
-    if (bcrypt.compareSync(pwd, value)) {
+    if (value && bcrypt.compareSync(pwd, value)) {
       import_wsHandler.WS.db.get(user + "^PERM").then((perm) => {
         console.log("Password OK for user " + user + " | Perms: " + perm);
         callback.end(JSON.stringify(perm));

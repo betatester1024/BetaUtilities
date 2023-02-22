@@ -8,6 +8,7 @@
     <style>
       html {
         background-color: #eee;
+        transition: all 0.5s ease-in-out;
       } 
       h1 {
         font-family: NotoSansDisplay;
@@ -75,10 +76,10 @@
 /*         right: auto; */
         display: block;
         opacity: 1;
-        left: 11em;
+        left: -0.5em;
         animation-name: buttonHover;
         animation-duration: 0.5s;
-        width: calc(100% - 11em );
+        width: calc(100%);
         cursor: text;
       }
 
@@ -92,7 +93,7 @@
         display: inline-block;
         height: 4vh;
         font-size: 2em;
-        width: calc(100% - 6em);
+        width: calc(100% - 0.5em);
       }
       p {
         margin-bottom: 0px;
@@ -123,7 +124,7 @@
       }
       @keyframes buttonHover {
         0% {width: 0%;}
-        100% {width: calc(100% - 11em );} 
+        100% {width: calc(100%);} 
       }
       @keyframes buttonHover2 {
         0% {width: 0%;}
@@ -218,19 +219,19 @@
  <link rel="preload" href="https://fonts.googleapis.com">
   <link rel="preload" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
-  <body onload = "onLoad()">
+  <body onload = "onLoad(); setTimeout(()=>{document.getElementById('userINP').focus();}, 1000);">
     <div id = "mainDiv">
       <h1>Login</h1>
       <hr class="rounded"></hr>
       <div id="login">
-        <div id="userDiv" onclick="document.getElementById('userINP').focus();" onchange="document.getElementById('passINP').focus();">
-          <p id="userP">Username:</p>
-          <input type="text" id="userINP"/>
+        <div id="userDiv" onclick="document.getElementById('userINP').focus();"  onchange="document.getElementById('passINP').focus();">
+<!--           <p id="userP">Username:</p> -->
+          <input type="text" placeholder="Username" id="userINP"/>
           <hr class="inpHr" id="userhr"></hr>
         </div><div id="pwdDiv" onclick="document.getElementById('passINP').focus();">
-          <p id="passP">
-            Password:</p>
-          <input type="password" id="passINP" onchange="validateLogin()"/>
+<!--           <p id="passP"> -->
+<!--             Password:</p> -->
+          <input type="password" id="passINP" placeholder="Password" onchange="validateLogin()"/>
           <hr class="inpHr"></hr>
         </div>
         <button id="loginBTN" onclick="validateLogin()">Log into BetaUtilities ADMIN<br><hr class="btnHr"></hr></button>

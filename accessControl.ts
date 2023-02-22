@@ -50,7 +50,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
   // check password permissions
   WS.db.get(user).then((value:any)=>{
     console.log("Logged password hash:" + value)
-    if (bcrypt.compareSync(pwd, value)) {// pwd validated. 
+    if (value && bcrypt.compareSync(pwd, value)) {// pwd validated. 
       
       WS.db.get(user+"^PERM").then((perm:any)=>{
         console.log("Password OK for user "+user+" | Perms: "+perm)

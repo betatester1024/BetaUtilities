@@ -10,4 +10,4 @@ BetaUtilities for euphoria.io using WebSocket.
 # Hosting
 - Currently hosted on [repl.it](https://repl.it). 
 # BetaUtilities ONLINE
-- See https://betatester1024.repl.co!
+- See [here!](https://betatester1024.repl.co)

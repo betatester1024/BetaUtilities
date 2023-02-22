@@ -1,4 +1,4 @@
-# BetaUtils
+# BetaUtilities
 BetaUtilities for euphoria.io using WebSocket.
 
 # Features
@@ -9,3 +9,5 @@ BetaUtilities for euphoria.io using WebSocket.
 - Hourly-updating Wordle and Leetle!
 # Hosting
 - Currently hosted on repl.it(https://repl.it). 
+# BetaUtilities ONLINE
+- See https://betatester1024.repl.co!

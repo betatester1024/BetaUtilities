@@ -16,90 +16,13 @@
     }
     </script>
     <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="/globalformat.css">
     <style>
-      html {
-        background-color: #eee;
-      } 
-      h1 {
-        font-family: NotoSansDisplay;
-        
-/*         display: inline-block; */
-        left: auto;
-/*         margin: 0px; */
-        font-size: 4em;
-        color: #0a84ff;
-      }
-      body {
-        text-align: center;
-        overflow: hidden; /* Hide scrollbars */
-      }
-      #mainDiv{
-/*         text-align: center; */
-        display: inline-block;
-        animation-name: mainanim;
-        position: relative;
-        top: 10vh;
-        animation-duration: 0.4s;
-        width: 90vw;
-      }
-      @keyframes mainanim {
-        0%   {top:80vh; opacity: 0;}
-/*         3% {opacity: 0.02} */
-        50% {opacity: 0.4}
-        100% {top:10vh; opacity: 1}
-      }
-      hr.rounded {
-        border: 3px solid #0e0;
-        width: 90vw;
-        border-radius: 5px;
-      }
-      hr {
-        border: 2px solid #000;
-        border-radius: 4px;
-      }
       button {
         width: 5em;
         height: 2.5em;
-        border: none;
         border-radius: 0.3em;
         font-size: 2.5em;
-        background-color: #eee; 
-        color: #0a84ff;
-      }
-      hr.btnHr {
-        opacity: 0;
-        position: relative;
-        margin: 2px;
-        display: inline-block;
-        right: auto;
-        transition: opacity, width 0.5s ease-in-out;
-      }
-      button {
-        transition: background-color 0.5s ease-in-out;
-        background-color: #eee;
-        text-align: center;
-      }
-      button:hover > hr.btnHr{
-        position: relative;
-        right: auto;
-        display: inline-block;
-        opacity: 1;
-        animation-name: buttonHover;
-        animation-duration: 0.5s;
-        width: 90%;
-      }
-      button:hover {
-        background-color: #fff;
-      }
-      @keyframes buttonHover {
-        0% {width: 0%;}
-        100% {width: 90%} 
-      }
-
-      @font-face { 
-        font-family: NotoSansDisplay; 
-        src: url('../NotoSansDisplay-Variable.ttf'), local('Courier New'); 
-        font-display: swap;
       }
       span {
         font-size: 5em;

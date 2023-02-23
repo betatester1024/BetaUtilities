@@ -17,16 +17,18 @@ function validateLogin(action:string="login", access:string) {
   let user = document.getElementById("userINP") as HTMLInputElement;
   let pass = document.getElementById("passINP") as HTMLInputElement;
   let confirm = document.getElementById("passINPCONF") as HTMLInputElement;
+  // console.log(confirm.value);
+  let CMD = document.getElementById("command") as HTMLInputElement;
   
   
   
-  if ((action !="login" && action !="add") || (user.value.match("^[a-zA-Z0-9_]+$") && pass.value.length!==0)) {
-    if (confirm && action=="add" && confirm.value != pass.value) {
-      // console.log("Nomatch");
-      alertDialog("Error: Your passwords do not match", ()=> window.open("/admin", "_self"));
+  if ((action !="login" && action !="add" && action !="signup") || (user.value.match("^[a-zA-Z0-9_]+$") && pass.value.length!==0)) {
+    if (confirm && (action=="add" || action=="signup") && confirm.value != pass.value) {
+      console.log("Nomatch");
+      alertDialog("Error: Your passwords do not match", ()=>{location.reload();});
       return;
     }
-  if (confirm) confirm.value = "";
+    if (confirm) confirm.value = "";
     let arr = new BigUint64Array(1);
     let match = document.cookie.match("__Secure-session=([0-9.]+)");
     let sessionID = match?match[1]:window.crypto.getRandomValues(arr);
@@ -36,7 +38,11 @@ function validateLogin(action:string="login", access:string) {
     
     // alert/(document.cookie);
     let params;
-    if (action!="logout") params= "user="+user.value+"&pass="+pass.value+"&action="+action+"&access="+access+"&token="+sessionID;
+    if (action!="logout" && action != "CMD") params= "user="+user.value+"&pass="+pass.value+"&action="+action+"&access="+access+"&token="+sessionID;
+    else if (action=="CMD") {
+      params="user="+CMD.value+"&action=CMD&token="+sessionID;
+      CMD.value="";
+    }
     else params="user=&pass=&action=logout&token="+sessionID;
     if (pass) pass.value="";
     console.log("SENDING "+params);
@@ -66,10 +72,18 @@ function validateLogin(action:string="login", access:string) {
             document.cookie = "__Secure-session=; Secure;";
             alertDialog("You've been logged out", ()=>{window.open("/", "_self")});
           }
-          else 
-            alertDialog("Action complete!", ()=>{});
+          else if (res == "ERROR") {
+            alertDialog("Unknown error!", ()=>{});
+          }
+          else if (res == "TAKEN") {
+            alertDialog("This username is already taken!", ()=>{});
+          }
+          else {
+            alertDialog("Action complete!", ()=>{if (action=="signup") window.open("/", "_self")});
+            if (!match && action =="signup") document.cookie = "__Secure-session="+sessionID+"; SameSite=None; Secure";
+          }
           return;
-        }
+        } // not login
         if (res == "2") {
           alertDialog("Welcome, "+user.value+"! | Administrative access granted.", ()=>{ window.open("/admin", "_self");})
           if (!match && action =="login") document.cookie = "__Secure-session="+sessionID+"; SameSite=None; Secure";
@@ -84,7 +98,6 @@ function validateLogin(action:string="login", access:string) {
         }
         else {
           alertDialog("Error: Invalid login credentials", ()=>{window.open("/login", "_self");});
-          
         }
       }
     }
@@ -93,9 +106,12 @@ function validateLogin(action:string="login", access:string) {
     if (ele) ele.className += "active";
     ele = document.getElementById('h1');
     if (ele) ele.className ="overload";
-  } //else {
-  //   alertDialog("Invalid credentials!");
-  // }
+  } else if(!(user.value.match("^[a-zA-Z0-9_]+$"))) 
+  {
+    alertDialog("Please enter a username with only alphanumeric characters, or underscores.", ()=>{});
+  } else if( pass.value.length==0) {
+    alertDialog("Please enter a password.", ()=>{})
+  }
 }
 
 function logout() {

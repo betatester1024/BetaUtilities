@@ -77,8 +77,8 @@ function updateServer() {
     fs.writeFileSync("frontend/status_raw.html", str);
     res.sendFile(path.join(__dirname, "../frontend", "status.html"));
   });
-  app.get("/loader.css", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "loader.css"));
+  app.get("/globalformat.css", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "globalformat.css"));
   });
   app.get("/*", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "404.html"));

@@ -70,8 +70,8 @@ export function updateServer() {
     res.sendFile(path.join( __dirname, '../frontend', 'status.html' ));
   });
 
-  app.get("/loader.css", (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'loader.css' ));
+  app.get("/globalformat.css", (req:any, res:any) => {
+    res.sendFile(path.join( __dirname, '../frontend', 'globalformat.css' ));
   }); 
 
   app.get('/*', (req:any, res:any) => {

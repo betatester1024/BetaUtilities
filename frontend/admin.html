@@ -78,6 +78,7 @@
       #userDiv:hover > hr.inpHr,
       #pwdDiv:hover > hr.inpHr,
       #pwdDiv2:hover > hr.inpHr,
+      #danger:hover > hr.inpHr,
       input:focus + hr{
         position: relative;
 /*         right: auto; */
@@ -279,6 +280,10 @@
             <option value="2">ADMINISTRATOR</option>
           </select><br>
           <hr class="btnHr"></hr>
+        </div>
+        <div id="danger" onclick="document.getElementById('command').focus();">
+          <input type="input" id="command" placeholder="Enter commands here..." onchange="validateLogin('CMD')"/>
+          <hr class="inpHr"></hr>
         </div>
       </div>
       

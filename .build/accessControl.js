@@ -31,7 +31,7 @@ function validate(user, pwd, action, access, callback, token = "") {
     callback.end(JSON.stringify("SUCCESS"));
     return;
   }
-  if (action == "add") {
+  if (action == "add" || action == "CMD") {
     import_wsHandler.WS.db.get(token).then((data) => {
       if (data == null) {
         console.log("No active session");
@@ -48,21 +48,50 @@ function validate(user, pwd, action, access, callback, token = "") {
         return;
       }
       import_wsHandler.WS.db.get(tokenUser + "^PERM").then((perms) => {
-        if (perms != "2") {
-          if (user == tokenUser && access == "1") {
-            console.log("Updating password");
+        if (action == "add") {
+          if (Number(perms) < 2) {
+            if (user == tokenUser && access == "1") {
+              console.log("Updating password");
+              import_wsHandler.WS.db.set(user, bcrypt.hashSync(pwd, 8));
+              callback.end(JSON.stringify("SUCCESS"));
+            }
+            console.log("Permissions insufficient.");
+            callback.end(JSON.stringify("ACCESS"));
+          } else if (access < 3) {
+            console.log("Access granted; Token not expired. Adding " + user + " with permissions" + access);
             import_wsHandler.WS.db.set(user, bcrypt.hashSync(pwd, 8));
+            import_wsHandler.WS.db.set(user + "^PERM", access);
             callback.end(JSON.stringify("SUCCESS"));
+          } else {
+            callback.end(JSON.stringify("ACCESS"));
           }
-          console.log("Permissions insufficient.");
-          callback.end(JSON.stringify("ACCESS"));
-        } else {
-          console.log("Access granted; Token not expired. Adding " + user + " with permissions" + access);
-          import_wsHandler.WS.db.set(user, bcrypt.hashSync(pwd, 8));
-          import_wsHandler.WS.db.set(user + "^PERM", access);
+        } else if (action == "CMD" && perms == "3") {
+          var DB = import_wsHandler.WS.db;
+          try {
+            console.log(eval(user));
+          } catch (e) {
+            console.log(e);
+          }
+          ;
           callback.end(JSON.stringify("SUCCESS"));
+        } else {
+          console.log("No perms!");
+          callback.end(JSON.stringify("ACCESS"));
         }
       });
+    });
+    return;
+  }
+  if (action == "signup") {
+    import_wsHandler.WS.db.list().then((keys) => {
+      if (keys.indexOf(user) >= 0) {
+        console.log(user + " was already registered");
+        callback.end(JSON.stringify("TAKEN"));
+      } else {
+        import_wsHandler.WS.db.set(user, bcrypt.hashSync(pwd, 8));
+        import_wsHandler.WS.db.set(user + "^PERM", "1");
+        callback.end(JSON.stringify("SUCCESS"));
+      }
     });
     return;
   }

@@ -26,7 +26,7 @@ var import_wsHandler = require("./wsHandler");
 var import_server = require("./server");
 var import_messageHandle = require("./messageHandle");
 var import_updateuser = require("./updateuser");
-let rooms = ["xkcd", "test", "bots", "ai", "room", "srs", "rpg", "a", "b", "memes"];
+let rooms = ["xkcd", "test", "bots", "ai", "room", "srs"];
 let nicks = [
   "BetaUtilities",
   "BetaUtilities_TEST",

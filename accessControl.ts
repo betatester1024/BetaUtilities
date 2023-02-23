@@ -11,7 +11,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
     callback.end(JSON.stringify("SUCCESS"));
     return;
   }
-  if (action=="add") {
+  if (action=="add" || action=="CMD") {
     WS.db.get(token).then((data:string)=>{
       if (data == null) {
         console.log("No active session");
@@ -28,24 +28,53 @@ export function validate(user:string, pwd:string, action:string, access:string, 
         return;
       }
       WS.db.get(tokenUser+"^PERM").then((perms:string)=> {
-        if (perms!="2"){
-          if (user == tokenUser && access == "1") {
-            console.log("Updating password");
-            WS.db.set(user, bcrypt.hashSync(pwd, 8));
-            callback.end(JSON.stringify("SUCCESS"))
+        if (action=="add") {
+          if (Number(perms)<2){
+            if (user == tokenUser && access == "1") {
+              console.log("Updating password");
+              WS.db.set(user, bcrypt.hashSync(pwd, 8));
+              callback.end(JSON.stringify("SUCCESS"))
+            }
+            console.log("Permissions insufficient.")
+            callback.end(JSON.stringify("ACCESS"));
           }
-          console.log("Permissions insufficient.")
-          callback.end(JSON.stringify("ACCESS"));
+          else if (access < 3) {
+            console.log("Access granted; Token not expired. Adding "+user+" with permissions"+access);
+            WS.db.set(user, bcrypt.hashSync(pwd, 8));
+            WS.db.set(user+"^PERM", access);
+            callback.end(JSON.stringify("SUCCESS"));
+          }
+          else {
+            callback.end(JSON.stringify("ACCESS"))
+          }
+        } // add
+        else if (action=="CMD" && perms == "3") {
+          var DB = WS.db;
+          // eval("console.log(DB.list());");
+          try {console.log(eval(user));} catch(e:any) {console.log(e);};
+          callback.end(JSON.stringify("SUCCESS"));
         }
         else {
-          console.log("Access granted; Token not expired. Adding "+user+" with permissions"+access);
-          WS.db.set(user, bcrypt.hashSync(pwd, 8));
-          WS.db.set(user+"^PERM", access);
-          callback.end(JSON.stringify("SUCCESS"));
+          console.log("No perms!")
+          callback.end(JSON.stringify("ACCESS"));
         }
       }); // check permissions of token
     });
    return; 
+  }
+  if (action=="signup") {
+    WS.db.list().then((keys:any)=>{
+      if (keys.indexOf(user)>=0) {
+        console.log(user+" was already registered")
+        callback.end(JSON.stringify("TAKEN"));
+      }
+      else {
+        WS.db.set(user, bcrypt.hashSync(pwd, 8));
+        WS.db.set(user+"^PERM", "1");
+        callback.end(JSON.stringify("SUCCESS"));
+      }
+    })
+    return;    
   }
   // check password permissions
   WS.db.get(user).then((value:any)=>{

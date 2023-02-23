@@ -19,9 +19,13 @@ function validateLogin(action = "login", access) {
   let user = document.getElementById("userINP");
   let pass = document.getElementById("passINP");
   let confirm = document.getElementById("passINPCONF");
-  if (action != "login" && action != "add" || user.value.match("^[a-zA-Z0-9_]+$") && pass.value.length !== 0) {
-    if (confirm && action == "add" && confirm.value != pass.value) {
-      alertDialog("Error: Your passwords do not match", () => window.open("/admin", "_self"));
+  let CMD = document.getElementById("command");
+  if (action != "login" && action != "add" && action != "signup" || user.value.match("^[a-zA-Z0-9_]+$") && pass.value.length !== 0) {
+    if (confirm && (action == "add" || action == "signup") && confirm.value != pass.value) {
+      console.log("Nomatch");
+      alertDialog("Error: Your passwords do not match", () => {
+        location.reload();
+      });
       return;
     }
     if (confirm)
@@ -31,9 +35,12 @@ function validateLogin(action = "login", access) {
     let sessionID = match ? match[1] : window.crypto.getRandomValues(arr);
     console.log(match);
     let params;
-    if (action != "logout")
+    if (action != "logout" && action != "CMD")
       params = "user=" + user.value + "&pass=" + pass.value + "&action=" + action + "&access=" + access + "&token=" + sessionID;
-    else
+    else if (action == "CMD") {
+      params = "user=" + CMD.value + "&action=CMD&token=" + sessionID;
+      CMD.value = "";
+    } else
       params = "user=&pass=&action=logout&token=" + sessionID;
     if (pass)
       pass.value = "";
@@ -70,9 +77,20 @@ function validateLogin(action = "login", access) {
             alertDialog("You've been logged out", () => {
               window.open("/", "_self");
             });
-          } else
-            alertDialog("Action complete!", () => {
+          } else if (res == "ERROR") {
+            alertDialog("Unknown error!", () => {
             });
+          } else if (res == "TAKEN") {
+            alertDialog("This username is already taken!", () => {
+            });
+          } else {
+            alertDialog("Action complete!", () => {
+              if (action == "signup")
+                window.open("/", "_self");
+            });
+            if (!match && action == "signup")
+              document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure";
+          }
           return;
         }
         if (res == "2") {
@@ -107,6 +125,12 @@ function validateLogin(action = "login", access) {
     ele = document.getElementById("h1");
     if (ele)
       ele.className = "overload";
+  } else if (!user.value.match("^[a-zA-Z0-9_]+$")) {
+    alertDialog("Please enter a username with only alphanumeric characters, or underscores.", () => {
+    });
+  } else if (pass.value.length == 0) {
+    alertDialog("Please enter a password.", () => {
+    });
   }
 }
 function logout() {

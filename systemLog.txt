@@ -1,0 +1,44 @@
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+Logging in as logout+470884769932806838
+Validating as  with action logout (token 470884769932806838)
+Unknown error
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+Logging in as login+6142708960277242755
+Validating as betatester1024 with action login (token 6142708960277242755)
+Logged password hash:$2b$08$wB7t0TObAa5VlObyNIsULebfRvp5Usr1dhwJeL.AWp241jNOraN0C
+Invalid credentials.
+Logging in as login+18005330115760735615
+Validating as betatester1024 with action login (token 18005330115760735615)
+Logged password hash:$2b$08$wB7t0TObAa5VlObyNIsULebfRvp5Usr1dhwJeL.AWp241jNOraN0C
+Password OK for user betatester1024 | Perms: 3
+Logging user betatester1024 with expiry 1677253583623 (in 3600000 ms)
+Logging in as CMD+18005330115760735615
+Validating as ABCDEFG with action CMD (token 18005330115760735615)
+Logged in as betatester1024 | Expiring in: 3568691 ms
+Evaluating ABCDEFG
+ReferenceError: ABCDEFG is not defined
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws

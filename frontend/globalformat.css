@@ -79,6 +79,7 @@ hr.btnHr {
 #userDiv:hover > hr.inpHr,
 #pwdDiv:hover > hr.inpHr,
 #pwdDiv2:hover > hr.inpHr,
+#danger:hover > hr.inpHr,
 input:focus + hr{
   position: relative;
 /*         right: auto; */
@@ -101,7 +102,7 @@ input {
   outline: none;
   display: inline-block;
   height: 4vh;
-  font-size: 2em;
+  font-size: 1.8em;
   width: calc(100%);
 }
 p {
@@ -253,6 +254,7 @@ div#overlay {
   width: 100vw;
   height: 200vh;
   animation-duration:0.5s; 
+  z-index: 4;
   background-color: #eee;
 }
 @keyframes incoming {

@@ -23,6 +23,7 @@ __export(server_exports, {
 module.exports = __toCommonJS(server_exports);
 var import_messageHandle = require("./messageHandle");
 var import_accessControl = require("./accessControl");
+var import_misc = require("./misc");
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
@@ -31,6 +32,8 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
 const app = express();
 const port = 4e3;
 function updateServer() {
+  (0, import_misc.systemLog)("");
+  (0, import_misc.systemLog)("Server active!");
   app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "index.html"));
   });
@@ -62,8 +65,8 @@ function updateServer() {
     res.sendFile(path.join(__dirname, "../frontend", "signup.html"));
   });
   app.post("/login", urlencodedParser, function(req, res) {
-    console.log("Logging in as " + req.body.action + "+" + req.body.token);
-    (0, import_accessControl.validate)(req.body.user, req.body.pass, req.body.action, req.body.access, res, req.body.token);
+    (0, import_misc.systemLog)("Logging in as " + req.body.action + "+" + req.body.token);
+    (0, import_accessControl.validate)(decodeURIComponent(req.body.user), decodeURIComponent(req.body.pass), req.body.action, req.body.access, res, req.body.token);
   });
   app.get("/status", (req, res) => {
     let str = "BetaUtilities is in: ";
@@ -80,11 +83,14 @@ function updateServer() {
   app.get("/globalformat.css", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "globalformat.css"));
   });
+  app.get("/support", (req, res) => {
+    (0, import_accessControl.validate)("", "", "checkAccess", "", res, req.query.token);
+  });
   app.get("/*", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "404.html"));
   });
   app.listen(port, () => {
-    console.log(`Front-end is running on ${port}.`);
+    (0, import_misc.systemLog)(`Front-end is running on ${port}.`);
   });
 }
 // Annotate the CommonJS export names for ESM import in node:

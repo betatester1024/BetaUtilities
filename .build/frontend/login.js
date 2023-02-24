@@ -36,9 +36,9 @@ function validateLogin(action = "login", access) {
     console.log(match);
     let params;
     if (action != "logout" && action != "CMD")
-      params = "user=" + user.value + "&pass=" + pass.value + "&action=" + action + "&access=" + access + "&token=" + sessionID;
+      params = "user=" + encodeURIComponent(user.value) + "&pass=" + encodeURIComponent(pass.value) + "&action=" + action + "&access=" + access + "&token=" + sessionID;
     else if (action == "CMD") {
-      params = "user=" + CMD.value + "&action=CMD&token=" + sessionID;
+      params = "user=" + encodeURIComponent(CMD.value) + "&action=CMD&token=" + sessionID;
       CMD.value = "";
     } else
       params = "user=&pass=&action=logout&token=" + sessionID;

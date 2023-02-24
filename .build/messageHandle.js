@@ -48,7 +48,7 @@ function replyMessage(msg, sender, data) {
     this.incrPingCt();
   }
   if (msg == "!debugwordle") {
-    console.log(import_wordListHandle.validWords[import_wordListHandle.todayWordID], import_wordListHandle.todayLeetCODE.join(""));
+    (0, import_misc.systemLog)(import_wordListHandle.validWords[import_wordListHandle.todayWordID], import_wordListHandle.todayLeetCODE.join(""));
     return "> See console <";
   }
   if (msg == "!conjure @" + this.nick.toLowerCase()) {
@@ -74,14 +74,14 @@ function replyMessage(msg, sender, data) {
   }
   let match2 = msg.match("@" + this.nick.toLowerCase() + " !mitoseto &([a-z0-9]+) as @(.+)");
   if (match2) {
-    console.log(match2);
+    (0, import_misc.systemLog)(match2);
     let newNick = match2[2] == null ? "BetaUtilities" : match2[2];
     if (rooms.indexOf(match2[1]) >= 0)
       return "We're already in this room!";
     try {
       new import_wsHandler.WS("wss://euphoria.io/room/" + match2[1] + "/ws", newNick, match2[1], false);
     } catch (e) {
-      console.log(e);
+      (0, import_misc.systemLog)(e);
     }
     updateActive(match2[1], true);
     return "Sent @" + newNick + " to &" + match2[1];

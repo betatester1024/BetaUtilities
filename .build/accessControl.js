@@ -22,60 +22,80 @@ __export(accessControl_exports, {
 });
 module.exports = __toCommonJS(accessControl_exports);
 var import_wsHandler = require("./wsHandler");
+var import_misc = require("./misc");
 var bcrypt = require("bcrypt");
+const path = require("path");
 function validate(user, pwd, action, access, callback, token = "") {
-  console.log("Validating as " + user + " with action " + action + " (token " + token + ")");
+  (0, import_misc.systemLog)("Validating as " + user + " with action " + action + " (token " + token + ")");
+  if (!token || !token.match("[0-9]+") || (!user || user && action != "CMD" && !user.match("[a-zA-Z0-9_]+")) || (!pwd || action != "CMD" && pwd.length <= 0)) {
+    if (action != "checkAccess" && action != "logout") {
+      (0, import_misc.systemLog)("Unknown error");
+      callback.end(JSON.stringify("ERROR"));
+      return;
+    }
+  }
   if (action == "logout") {
-    console.log("Logging out " + token);
+    (0, import_misc.systemLog)("Logging out " + token);
     import_wsHandler.WS.db.delete(token);
     callback.end(JSON.stringify("SUCCESS"));
     return;
   }
-  if (action == "add" || action == "CMD") {
-    import_wsHandler.WS.db.get(token).then((data) => {
+  if (action == "add" || action == "CMD" || action == "checkAccess") {
+    import_wsHandler.WS.db.get("T=" + token).then((data) => {
       if (data == null) {
-        console.log("No active session");
-        callback.end(JSON.stringify("NOACTIVE"));
+        (0, import_misc.systemLog)("No active session");
+        if (action == "checkAccess")
+          callback.sendFile(path.join(__dirname, "../frontend", "403.html"));
+        else
+          callback.end(JSON.stringify("NOACTIVE"));
         return;
       }
       let expiryTime = Number(data.split(" ")[1]);
       let tokenUser = data.split(" ")[0];
-      console.log("Logged in as " + tokenUser + " | Expiring in: " + (expiryTime - Date.now()) + " ms");
+      (0, import_misc.systemLog)("Logged in as " + tokenUser + " | Expiring in: " + (expiryTime - Date.now()) + " ms");
       if (expiryTime < Date.now()) {
-        console.log("Token expired. Logged out user.");
-        import_wsHandler.WS.db.delete(token);
-        callback.end(JSON.stringify("EXPIRE"));
+        (0, import_misc.systemLog)("Token expired. Logged out user.");
+        import_wsHandler.WS.db.delete("T=" + token);
+        if (action == "checkAccess")
+          callback.sendFile(path.join(__dirname, "../frontend", "403.html"));
+        else
+          callback.end(JSON.stringify("EXPIRE"));
         return;
       }
       import_wsHandler.WS.db.get(tokenUser + "^PERM").then((perms) => {
         if (action == "add") {
           if (Number(perms) < 2) {
             if (user == tokenUser && access == "1") {
-              console.log("Updating password");
+              (0, import_misc.systemLog)("Updating password");
               import_wsHandler.WS.db.set(user, bcrypt.hashSync(pwd, 8));
               callback.end(JSON.stringify("SUCCESS"));
             }
-            console.log("Permissions insufficient.");
+            (0, import_misc.systemLog)("Permissions insufficient.");
             callback.end(JSON.stringify("ACCESS"));
-          } else if (access < 3) {
-            console.log("Access granted; Token not expired. Adding " + user + " with permissions" + access);
+          } else if (Number(access) < 3) {
+            (0, import_misc.systemLog)("Access granted; Token not expired. Adding " + user + " with permissions" + access);
             import_wsHandler.WS.db.set(user, bcrypt.hashSync(pwd, 8));
             import_wsHandler.WS.db.set(user + "^PERM", access);
             callback.end(JSON.stringify("SUCCESS"));
           } else {
+            (0, import_misc.systemLog)("Invalid access-level granting:");
             callback.end(JSON.stringify("ACCESS"));
           }
         } else if (action == "CMD" && perms == "3") {
           var DB = import_wsHandler.WS.db;
+          (0, import_misc.systemLog)("Evaluating " + user);
           try {
-            console.log(eval(user));
+            (0, import_misc.systemLog)(eval(user));
           } catch (e) {
-            console.log(e);
+            (0, import_misc.systemLog)(e);
           }
           ;
           callback.end(JSON.stringify("SUCCESS"));
+        } else if (action == "checkAccess") {
+          (0, import_misc.systemLog)("Support access granted!");
+          callback.sendFile(path.join(__dirname, "../frontend", "support.html"));
         } else {
-          console.log("No perms!");
+          (0, import_misc.systemLog)("No perms!");
           callback.end(JSON.stringify("ACCESS"));
         }
       });
@@ -85,9 +105,10 @@ function validate(user, pwd, action, access, callback, token = "") {
   if (action == "signup") {
     import_wsHandler.WS.db.list().then((keys) => {
       if (keys.indexOf(user) >= 0) {
-        console.log(user + " was already registered");
+        (0, import_misc.systemLog)(user + " was already registered");
         callback.end(JSON.stringify("TAKEN"));
       } else {
+        (0, import_misc.systemLog)("Registered user " + user);
         import_wsHandler.WS.db.set(user, bcrypt.hashSync(pwd, 8));
         import_wsHandler.WS.db.set(user + "^PERM", "1");
         callback.end(JSON.stringify("SUCCESS"));
@@ -96,17 +117,16 @@ function validate(user, pwd, action, access, callback, token = "") {
     return;
   }
   import_wsHandler.WS.db.get(user).then((value) => {
-    console.log("Logged password hash:" + value);
     if (value && bcrypt.compareSync(pwd, value)) {
       import_wsHandler.WS.db.get(user + "^PERM").then((perm) => {
-        console.log("Password OK for user " + user + " | Perms: " + perm);
+        (0, import_misc.systemLog)("Password OK for user " + user + " | Perms: " + perm);
         callback.end(JSON.stringify(perm));
-        let exp = Date.now() + 1e3 * 60 * 60;
-        console.log("Logging user " + user + " with expiry " + exp + " (in " + (exp - Date.now()) + " ms)");
-        import_wsHandler.WS.db.set(token, user + " " + exp);
+        let exp = perm < 3 ? Date.now() + 1e3 * 60 * 60 : Date.now() + 1e3 * 60;
+        (0, import_misc.systemLog)("Logging user " + user + " with expiry " + exp + " (in " + (exp - Date.now()) + " ms)");
+        import_wsHandler.WS.db.set("T=" + token, user + " " + exp);
       });
     } else {
-      console.log("Invalid credentials.");
+      (0, import_misc.systemLog)("Invalid credentials.");
       let response = 0;
       callback.end(JSON.stringify(response));
     }

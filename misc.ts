@@ -38,3 +38,8 @@ function formatTime(ms:number) {
 function format(n:number) {
   return n < 10 ? "0" + n : n;
 }
+
+export function systemLog(thing:any) {
+  // console.log(thing);
+  fs.writeFileSync('./systemLog.txt', fs.readFileSync("./systemLog.txt")+thing+"\n");
+}

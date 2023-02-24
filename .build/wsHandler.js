@@ -24,12 +24,14 @@ module.exports = __toCommonJS(wsHandler_exports);
 var import_ws = require("ws");
 var import_messageHandle = require("./messageHandle");
 var import_messageHandle2 = require("./messageHandle");
+var import_misc = require("./misc");
 const DATALOGGING = false;
 const Database = require("@replit/database");
 class WS {
   static CALLTIMEOUT = 3e4;
   url;
   nick;
+  setNickQ = false;
   socket;
   pausedQ = false;
   roomName;
@@ -102,11 +104,13 @@ class WS {
     this.socket.send(WS.toSendInfo(msg, data));
   }
   onOpen() {
-    console.log("BetaUtilities open in " + this.socket.url);
+    (0, import_misc.systemLog)("BetaUtilities open in " + this.socket.url);
     WS.resetTime = 1e3;
   }
   initNick() {
-    this.changeNick(this.nick);
+    if (!this.setNickQ)
+      this.changeNick(this.nick);
+    this.setNickQ = true;
   }
   changeNick(nick) {
     this.socket.send(`{"type": "nick", "data": {"name": "${nick}"},"id": "1"}`);
@@ -122,7 +126,7 @@ class WS {
       let msg = data["data"]["content"].toLowerCase().trim();
       let snd = data["data"]["sender"]["name"];
       if (DATALOGGING)
-        console.log(`(${this.roomName})[${snd}] ${msg}`);
+        (0, import_misc.systemLog)(`(${this.roomName})[${snd}] ${msg}`);
       if (msg == "!kill @" + this.nick.toLowerCase()) {
         this.sendMsg("/me crashes", data);
         setTimeout(() => {
@@ -213,9 +217,9 @@ class WS {
         new WS(this.url, this.nick, this.roomName, this.transferOutQ);
         (0, import_messageHandle2.updateActive)(this.roomName, true);
       }, WS.resetTime);
-      console.log("Retrying in: " + Math.round(WS.resetTime / 1e3) + " seconds");
+      (0, import_misc.systemLog)("Retrying in: " + Math.round(WS.resetTime / 1e3) + " seconds");
       let dateStr = new Date().toLocaleDateString("en-US", { timeZone: "EST" }) + "/" + new Date().toLocaleTimeString("en-US", { timeZone: "EST" });
-      console.log("[close] Connection at " + this.url + " was killed at " + dateStr);
+      (0, import_misc.systemLog)("[close] Connection at " + this.url + " was killed at " + dateStr);
     }
   }
   constructor(url, nick, roomName, transferQ) {

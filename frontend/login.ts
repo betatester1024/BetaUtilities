@@ -38,9 +38,9 @@ function validateLogin(action:string="login", access:string) {
     
     // alert/(document.cookie);
     let params;
-    if (action!="logout" && action != "CMD") params= "user="+user.value+"&pass="+pass.value+"&action="+action+"&access="+access+"&token="+sessionID;
+    if (action!="logout" && action != "CMD") params= "user="+encodeURIComponent(user.value)+"&pass="+encodeURIComponent(pass.value)+"&action="+action+"&access="+access+"&token="+sessionID;
     else if (action=="CMD") {
-      params="user="+CMD.value+"&action=CMD&token="+sessionID;
+      params="user="+encodeURIComponent(CMD.value)+"&action=CMD&token="+sessionID;
       CMD.value="";
     }
     else params="user=&pass=&action=logout&token="+sessionID;
@@ -101,7 +101,7 @@ function validateLogin(action:string="login", access:string) {
         }
       }
     }
-    xhr.send(params as string);
+    xhr.send(params);
     let ele = document.getElementById('overlay');
     if (ele) ele.className += "active";
     ele = document.getElementById('h1');

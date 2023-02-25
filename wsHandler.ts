@@ -1,7 +1,7 @@
 const DATALOGGING = false;
 // Copyright (c) 2023 BetaOS
 import {WebSocket} from 'ws';
-import {init} from './initialiser'
+import {DB} from './database';
 import {replyMessage} from './messageHandle';
 import { updateActive } from './messageHandle';
 import {systemLog} from './misc';
@@ -27,26 +27,37 @@ export class WS
   transferOutQ = false; // is a room that one should recommend transferring out?
   bypass = false;
   confirmcode = -1;
-  static db = new Database();
+  // static db = new Database();
   static toSendInfo(msg: string, data:any=null) {
     if (data) return `{"type":"send", "data":{"content":"${msg}","parent":"${data["data"]["id"]}"}}`;
     else return `{"type":"send", "data":{"content":"${msg}"}`;
   }
 
   incrRunCt() {
-    WS.db.get("RUNCOUNT").then((value:number) => { WS.db.set("RUNCOUNT", value + 1) });
+    DB.findOne({fieldName: "COUNTERS"}).then(
+    (obj: {runCt:number})=>{
+      DB.updateOne({fieldName:"COUNTERS"}, 
+        {
+          $set: {'runCt': obj.runCt+1},
+          $currentDate: { lastModified: true }
+        })
+    });
   }
   incrPingCt() {
-    WS.db.get("PINGCOUNT").then((value:number) => { WS.db.set("PINGCOUNT", value + 1) });
+    DB.findOne({fieldName: "COUNTERS"}).then(
+    (obj: {pingCt:number})=>{
+      DB.updateOne({fieldName:"COUNTERS"}, 
+        {
+          $set: {'pingCt': obj.pingCt+1},
+          $currentDate: { lastModified: true }
+        })
+    });
   }
 
   displayStats(data:any) {
-    WS.db.get("RUNCOUNT").then((value:number) => {
-      let RUNCOUNT = value;
-      WS.db.get("PINGCOUNT").then((value2:number) => {
-        let PINGCOUNT = value2;
-        this.delaySendMsg("Run count: "+RUNCOUNT+"\\nPing count: "+PINGCOUNT, data, 0);
-      })
+    DB.findOne({fieldName: "COUNTERS"}).then(
+      (obj: {runCt:number, pingCt: number}) => {
+        this.delaySendMsg("Run count: "+obj.runCt+"\\nPing count: "+obj.pingCt, data, 0);
     });
   }
 
@@ -87,6 +98,7 @@ export class WS
 
   sendMsg(msg:string, data:any) {
     this.socket.send(WS.toSendInfo(msg, data))
+    this.incrRunCt();
   }
   
   onOpen() {

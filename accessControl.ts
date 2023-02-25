@@ -3,7 +3,10 @@ import { WS } from "./wsHandler";
 // import { hashSync, compareSync} from 
 var bcrypt = require("bcrypt");
 const path = require('path');
+import { updateUser } from "./updateuser";
 import {systemLog} from './misc';
+import {database} from './database';
+const DB = database.collection('SystemAUTH');
 
 export function validate(user:string, pwd:string, action:string, access:string, callback:any, token:string="") {
   systemLog("Validating as "+user+" with action "+action +" (token "+token+")");
@@ -21,54 +24,60 @@ export function validate(user:string, pwd:string, action:string, access:string, 
    // data validation complete
   if (action=="logout") {
     systemLog("Logging out "+token)
-    WS.db.delete(token);
+    DB.deleteOne({fieldName:"TOKEN", token:token});
     callback.end(JSON.stringify("SUCCESS"));
     return;
   }
 
   // attempt to add user or run commands or access support (REQUIRE PERMLEVELS)
   if (action=="add" || action=="CMD" || action == "checkAccess") {
-    WS.db.get("T="+token).then((data:string)=>{
-      if (data == null) {
+    DB.findOne({fieldName: "TOKEN", token:token}).then(
+    (obj:{associatedUser:string, expiry:number})=>{
+      if (obj == null) {
         systemLog("No active session");
         if (action == "checkAccess") callback.sendFile(path.join( __dirname, '../frontend', '403.html' ));
         else callback.end(JSON.stringify("NOACTIVE"));
         return;
       }
-      let expiryTime = Number(data.split(" ")[1]);
-      let tokenUser = data.split(" ")[0];
+      let expiryTime = obj.expiry;
+      let tokenUser = obj.associatedUser;
       systemLog("Logged in as "+tokenUser+" | Expiring in: "+(expiryTime-Date.now()) + " ms");
       if (expiryTime<Date.now()) {
         systemLog("Token expired. Logged out user.")
-        WS.db.delete("T="+token);
+        DB.deleteOne({fieldName:"TOKEN", token:token});
         if (action == "checkAccess") callback.sendFile(path.join( __dirname, '../frontend', '403.html' ));
         else callback.end(JSON.stringify("EXPIRE"));
         return;
       }
-      WS.db.get(tokenUser+"^PERM").then((perms:string)=> {
+      DB.findOne({fieldName:"UserData", user:obj.associatedUser}).then(
+      (obj2:{permLevel:number})=>{
+        let perms = obj2.permLevel;
         if (action=="add") {
           if (Number(perms)<2){
             if (user == tokenUser && access == "1") {
               systemLog("Updating password");
-              WS.db.set(user, bcrypt.hashSync(pwd, 8));
+              updateUser(user, pwd);
               callback.end(JSON.stringify("SUCCESS"))
+              return;
             }
             systemLog("Permissions insufficient.")
             callback.end(JSON.stringify("ACCESS"));
+            return;
           }
           else if (Number(access) < 3) {
             systemLog("Access granted; Token not expired. Adding "+user+" with permissions"+access);
-            WS.db.set(user, bcrypt.hashSync(pwd, 8));
-            WS.db.set(user+"^PERM", access);
+            updateUser(user, pwd, Number(access));
             callback.end(JSON.stringify("SUCCESS"));
+            return;
           }
           else { // attempting to add a full site administrator user - forbidden!
             systemLog("Invalid access-level granting:")
             callback.end(JSON.stringify("ACCESS"))
+            return;
           }
         } // add
-        else if (action=="CMD" && perms == "3") {
-          var DB = WS.db;
+        else if (action=="CMD" && perms == 3) {
+          // var DB = ;
           systemLog("Evaluating "+user);
           try {systemLog(eval(user));} catch(e:any) {systemLog(e);};
           callback.end(JSON.stringify("SUCCESS"));
@@ -76,42 +85,51 @@ export function validate(user:string, pwd:string, action:string, access:string, 
         else if (action == "checkAccess") {
           systemLog("Support access granted!")
           callback.sendFile(path.join( __dirname, '../frontend', 'support.html' ));
+          return;
         }
         else {
           systemLog("No perms!")
           callback.end(JSON.stringify("ACCESS"));
+          return;
         }
       }); // check permissions of token
     });
    return; 
   }
   if (action=="signup") {
-    WS.db.list().then((keys:any)=>{
-      if (keys.indexOf(user)>=0) {
+    DB.findOne({fieldName:"UserData", user:user}).then((obj:any)=>{
+      if (obj != null) {
         systemLog(user+" was already registered")
         callback.end(JSON.stringify("TAKEN"));
+        return;
       }
       else {
         systemLog("Registered user "+user)
-        WS.db.set(user, bcrypt.hashSync(pwd, 8));
-        WS.db.set(user+"^PERM", "1");
+        updateUser(user, pwd, 1);
         callback.end(JSON.stringify("SUCCESS"));
+        return;
       }
     })
     return;    
   }
   // check password permissions
-  WS.db.get(user).then((value:any)=>{
+  DB.findOne({fieldName:"UserData", user:user}).then(
+    (obj:{passHash:string, permLevel:number})=>{
     // systemLog("Logged password hash:" + value)
-    if (value && bcrypt.compareSync(pwd, value)) {// pwd validated. 
-      
-      WS.db.get(user+"^PERM").then((perm:any)=>{
-        systemLog("Password OK for user "+user+" | Perms: "+perm)
-        callback.end(JSON.stringify(perm));  
-        let exp = perm<3?(Date.now()+1000*60*60):(Date.now()+1000*60);
-        systemLog("Logging user "+user+" with expiry "+exp+" (in "+(exp-Date.now())+" ms)");
-       WS.db.set("T="+token, user+" "+exp);
-      })  
+    if (obj && bcrypt.compareSync(pwd, obj.passHash)) {// pwd validated. 
+      let perm = obj.permLevel
+      systemLog("Password OK for user "+user+" | Perms: "+perm)
+      callback.end(JSON.stringify(perm));  
+      let exp = perm<3?(Date.now()+1000*60*60):(Date.now()+1000*60);
+      systemLog("Logging user "+user+" with expiry "+exp+" (in "+(exp-Date.now())+" ms)");
+      DB.updateOne({fieldName:"TOKEN", token:token}, 
+      {
+        $set: {
+          associatedUser:user,
+          expiry: exp
+        },
+        $currentDate: { lastModified: true }
+      }, {upsert: true});
     } // password/user not found
     else {
       systemLog("Invalid credentials.")

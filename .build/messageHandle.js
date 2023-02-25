@@ -26,11 +26,13 @@ module.exports = __toCommonJS(messageHandle_exports);
 var import_wsHandler = require("./wsHandler");
 var import_misc = require("./misc");
 var import_wordListHandle = require("./wordListHandle");
+var import_database = require("./database");
 const serviceKey = process.env["serviceKey"];
 const serviceResponse = process.env["serviceResponse"];
 let DATE = new Date();
 let VERSION = "ServiceVersion STABLE 1.5271 | Build-time: " + DATE.toUTCString();
 const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! Press :three: to toggle ANTISPAM.\\n\\n Press :zero: to exit support at any time.`;
+let workingUsers = [];
 let leetlentCt = 1;
 let wordleCt = 1;
 let STARTTIME = Date.now();
@@ -48,7 +50,7 @@ function replyMessage(msg, sender, data) {
     this.incrPingCt();
   }
   if (msg == "!debugwordle") {
-    (0, import_misc.systemLog)(import_wordListHandle.validWords[import_wordListHandle.todayWordID], import_wordListHandle.todayLeetCODE.join(""));
+    (0, import_misc.systemLog)(import_wordListHandle.validWords[import_wordListHandle.todayWordID] + " " + import_wordListHandle.todayLeetCODE.join(""));
     return "> See console <";
   }
   if (msg == "!conjure @" + this.nick.toLowerCase()) {
@@ -68,6 +70,44 @@ function replyMessage(msg, sender, data) {
   if (msg.match("^!uptime @" + this.nick.toLowerCase() + "$")) {
     this.clearCallReset();
     return (0, import_misc.getUptimeStr)(STARTTIME) + " (Total uptime: " + (0, import_misc.getUptimeStr)() + ")";
+  }
+  let match3 = msg.match("^!work @(.*)$");
+  if (match3 || msg == "!work") {
+    (0, import_misc.systemLog)(workingUsers);
+    if (match3 && workingUsers.indexOf(match3[1].toLowerCase()) >= 0) {
+      return "This user is already supposed to be working!";
+    } else if (match3) {
+      workingUsers.push(match3[1].toLowerCase());
+      return "Will scream at @" + match3[1];
+    } else {
+      workingUsers.push(sender.toLowerCase());
+      this.changeNick("WorkBot V2");
+      setTimeout(() => this.changeNick(this.nick), 10);
+      return "GET TO WORK.";
+    }
+  }
+  match3 = msg.match("^!play @(.*)$");
+  if (match3 || msg == "!play") {
+    (0, import_misc.systemLog)(workingUsers);
+    if (match3 && workingUsers.indexOf(match3[1].toLowerCase()) < 0) {
+      return "This user was not working in the first place.";
+    } else if (match3) {
+      workingUsers.splice(workingUsers.indexOf(match3[1].toLowerCase()), 1);
+      return "They're off the hook... for now.";
+    } else {
+      workingUsers.splice(workingUsers.indexOf(sender.toLowerCase()), 1);
+      return "You're off the hook... for now.";
+    }
+  }
+  if (workingUsers.indexOf(sender.toLowerCase()) >= 0) {
+    this.changeNick("WorkBot V2");
+    this.delaySendMsg("GET TO WORK.", data, 0);
+    this.changeNick(this.nick);
+  }
+  ;
+  if (msg == "!renick") {
+    this.changeNick(this.nick);
+    return ":white_check_mark:";
   }
   if (msg.match("!version[ ]+@" + this.nick.toLowerCase())) {
     return VERSION;
@@ -93,13 +133,12 @@ function replyMessage(msg, sender, data) {
   if (msg.match(/^!potato$/))
     return "potato.io";
   if (msg == "!rating @" + this.nick.toLowerCase()) {
-    import_wsHandler.WS.db.get("SUM").then((value) => {
-      import_wsHandler.WS.db.get("CT").then((value2) => {
-        let r = "Current @" + this.nick + " rating - " + (value / value2).toFixed(2);
+    import_database.DB.findOne({ fieldName: "RATING" }).then(
+      (obj) => {
+        let r = "Current @" + this.nick + " rating - " + (obj.SUM / obj.COUNT).toFixed(2);
         this.delaySendMsg(r, data, 0);
-      });
-    });
-    return "";
+      }
+    );
   }
   if (msg == "!status @" + this.nick.toLowerCase()) {
     return "Status-tracker: https://betatester1024.repl.co";
@@ -258,10 +297,13 @@ function replyMessage(msg, sender, data) {
     else {
       return "I don't think you entered that right.";
     }
-    import_wsHandler.WS.db.get("SUM").then((value) => {
-      import_wsHandler.WS.db.get("CT").then((value2) => {
-        import_wsHandler.WS.db.set("SUM", value + dv);
-        import_wsHandler.WS.db.set("CT", value2 + 1);
+    import_database.DB.findOne({ fieldName: "RATING" }).then((obj) => {
+      import_database.DB.updateOne({ fieldName: "RATING" }, {
+        $set: {
+          SUM: obj.SUM + dv,
+          COUNT: obj.COUNT + 1
+        },
+        $currentDate: { lastModified: true }
       });
     });
     this.callStatus = -1;
@@ -298,7 +340,7 @@ function replyMessage(msg, sender, data) {
         this.bypass = false;
         this.callTimes = [];
         this.sendMsg("/me has automatically re-enabled ANTISPAM", data);
-      }, 5 * 60 * 1e3);
+      }, 30 * 60 * 1e3);
     return "ANTISPAM is currently: " + (this.bypass ? "OFF" : "ON");
   }
   if (this.callStatus == 8 && msg.match("^[a-z]{5}$")) {

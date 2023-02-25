@@ -22,6 +22,7 @@ __export(wsHandler_exports, {
 });
 module.exports = __toCommonJS(wsHandler_exports);
 var import_ws = require("ws");
+var import_database = require("./database");
 var import_messageHandle = require("./messageHandle");
 var import_messageHandle2 = require("./messageHandle");
 var import_misc = require("./misc");
@@ -43,7 +44,6 @@ class WS {
   transferOutQ = false;
   bypass = false;
   confirmcode = -1;
-  static db = new Database();
   static toSendInfo(msg, data = null) {
     if (data)
       return `{"type":"send", "data":{"content":"${msg}","parent":"${data["data"]["id"]}"}}`;
@@ -51,23 +51,37 @@ class WS {
       return `{"type":"send", "data":{"content":"${msg}"}`;
   }
   incrRunCt() {
-    WS.db.get("RUNCOUNT").then((value) => {
-      WS.db.set("RUNCOUNT", value + 1);
-    });
+    import_database.DB.findOne({ fieldName: "COUNTERS" }).then(
+      (obj) => {
+        import_database.DB.updateOne(
+          { fieldName: "COUNTERS" },
+          {
+            $set: { "runCt": obj.runCt + 1 },
+            $currentDate: { lastModified: true }
+          }
+        );
+      }
+    );
   }
   incrPingCt() {
-    WS.db.get("PINGCOUNT").then((value) => {
-      WS.db.set("PINGCOUNT", value + 1);
-    });
+    import_database.DB.findOne({ fieldName: "COUNTERS" }).then(
+      (obj) => {
+        import_database.DB.updateOne(
+          { fieldName: "COUNTERS" },
+          {
+            $set: { "pingCt": obj.pingCt + 1 },
+            $currentDate: { lastModified: true }
+          }
+        );
+      }
+    );
   }
   displayStats(data) {
-    WS.db.get("RUNCOUNT").then((value) => {
-      let RUNCOUNT = value;
-      WS.db.get("PINGCOUNT").then((value2) => {
-        let PINGCOUNT = value2;
-        this.delaySendMsg("Run count: " + RUNCOUNT + "\\nPing count: " + PINGCOUNT, data, 0);
-      });
-    });
+    import_database.DB.findOne({ fieldName: "COUNTERS" }).then(
+      (obj) => {
+        this.delaySendMsg("Run count: " + obj.runCt + "\\nPing count: " + obj.pingCt, data, 0);
+      }
+    );
   }
   bumpCallReset(data) {
     if (this.callReset)
@@ -102,6 +116,7 @@ class WS {
   }
   sendMsg(msg, data) {
     this.socket.send(WS.toSendInfo(msg, data));
+    this.incrRunCt();
   }
   onOpen() {
     (0, import_misc.systemLog)("BetaUtilities open in " + this.socket.url);

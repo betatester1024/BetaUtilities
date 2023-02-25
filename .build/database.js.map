@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../database.ts"],
+  "sourcesContent": ["const { MongoClient } = require(\"mongodb\");\n\n// Replace the uri string with your connection string.\nconst uri =\n  \"mongodb+srv://SystemLogin:\"+process.env['dbPwd']+\"@betaos-datacluster00.d8o7x8n.mongodb.net/?retryWrites=true&w=majority\";\n\nconst client = new MongoClient(uri);\nexport const database = client.db('BetaOS-Database01');\nexport const DB = database.collection('BetaUtilities');"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,MAAM,EAAE,YAAY,IAAI,QAAQ,SAAS;AAGzC,MAAM,MACJ,+BAA6B,QAAQ,IAAI,WAAS;AAEpD,MAAM,SAAS,IAAI,YAAY,GAAG;AAC3B,MAAM,WAAW,OAAO,GAAG,mBAAmB;AAC9C,MAAM,KAAK,SAAS,WAAW,eAAe;",
+  "names": []
+}

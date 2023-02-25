@@ -1,38 +1,75 @@
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-Logging in as logout+470884769932806838
-Validating as  with action logout (token 470884769932806838)
-Unknown error
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-Logging in as login+6142708960277242755
-Validating as betatester1024 with action login (token 6142708960277242755)
-Logged password hash:$2b$08$wB7t0TObAa5VlObyNIsULebfRvp5Usr1dhwJeL.AWp241jNOraN0C
-Invalid credentials.
-Logging in as login+18005330115760735615
-Validating as betatester1024 with action login (token 18005330115760735615)
-Logged password hash:$2b$08$wB7t0TObAa5VlObyNIsULebfRvp5Usr1dhwJeL.AWp241jNOraN0C
+Logging in as login+2939375724317208736
+Validating as betatester1024 with action login (token 2939375724317208736)
 Password OK for user betatester1024 | Perms: 3
-Logging user betatester1024 with expiry 1677253583623 (in 3600000 ms)
-Logging in as CMD+18005330115760735615
-Validating as ABCDEFG with action CMD (token 18005330115760735615)
-Logged in as betatester1024 | Expiring in: 3568691 ms
-Evaluating ABCDEFG
-ReferenceError: ABCDEFG is not defined
+Logging user betatester1024 with expiry 1677349180439 (in 60000 ms)
+Logging in as add+2939375724317208736
+Validating as abcde with action add (token 2939375724317208736)
+Logged in as betatester1024 | Expiring in: 40187 ms
+Access granted; Token not expired. Adding abcde with permissions1
+Logging in as add+2939375724317208736
+Validating as abcde with action add (token 2939375724317208736)
+Logged in as betatester1024 | Expiring in: 23712 ms
+Access granted; Token not expired. Adding abcde with permissions1
+Logging in as add+2939375724317208736
+Validating as TWENTY with action add (token 2939375724317208736)
+Logged in as betatester1024 | Expiring in: 7196 ms
+Access granted; Token not expired. Adding TWENTY with permissions2
+Logging in as CMD+2939375724317208736
+Validating as DB.log with action CMD (token 2939375724317208736)
+Logged in as betatester1024 | Expiring in: 2449 ms
+Evaluating DB.log
+TypeError: Cannot read properties of undefined (reading 'toString')
+Logging in as add+2939375724317208736
+Validating as TWENTY with action add (token 2939375724317208736)
+Logged in as betatester1024 | Expiring in: -10403 ms
+Token expired. Logged out user.
+Logging in as logout+2939375724317208736
+Validating as  with action logout (token 2939375724317208736)
+Logging out 2939375724317208736
+Logging in as signup+13332827555735158435
+Validating as TWENTY with action signup (token 13332827555735158435)
+TWENTY was already registered
+Logging in as signup+7414535773970675934
+Validating as TWENTYFOUR with action signup (token 7414535773970675934)
+Registered user TWENTYFOUR
+Logging in as logout+7414535773970675934
+Validating as  with action logout (token 7414535773970675934)
+Logging out 7414535773970675934
+Logging in as login+6537822992583285802
+Validating as TWENTYFOUR with action login (token 6537822992583285802)
+Password OK for user TWENTYFOUR | Perms: 1
+Logging user TWENTYFOUR with expiry 1677352839306 (in 3600000 ms)
+Logging in as add+6537822992583285802
+Validating as ABCDE with action add (token 6537822992583285802)
+Logged in as TWENTYFOUR | Expiring in: 3590605 ms
+Permissions insufficient.
+Logging in as add+6537822992583285802
+Validating as TWENTYFOUR with action add (token 6537822992583285802)
+Logged in as TWENTYFOUR | Expiring in: 3581023 ms
+Updating password
+Permissions insufficient.
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+Logging in as add+6537822992583285802
+Validating as TWENTYFOUR with action add (token 6537822992583285802)
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Logged in as TWENTYFOUR | Expiring in: 3571129 ms
+Permissions insufficient.
+Logging in as add+6537822992583285802
+Validating as TWENTYFOUR with action add (token 6537822992583285802)
+Logged in as TWENTYFOUR | Expiring in: 3530401 ms
+Permissions insufficient.
+Logging in as add+6537822992583285802
+Validating as TWENTYFOUR with action add (token 6537822992583285802)
+Logged in as TWENTYFOUR | Expiring in: 3496089 ms
+Updating password
+Permissions insufficient.
 
 Server active!
 Front-end is running on 4000.
@@ -42,3 +79,34 @@ BetaUtilities open in wss://euphoria.io/room/bots/ws
 BetaUtilities open in wss://euphoria.io/room/room/ws
 BetaUtilities open in wss://euphoria.io/room/srs/ws
 BetaUtilities open in wss://euphoria.io/room/ai/ws
+Logging in as add+6537822992583285802
+Validating as TWENTYFOUR with action add (token 6537822992583285802)
+Logged in as TWENTYFOUR | Expiring in: 3424679 ms
+Updating password
+Permissions insufficient.
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Logging in as add+6537822992583285802
+Validating as TWENTYFOUR with action add (token 6537822992583285802)
+Logged in as TWENTYFOUR | Expiring in: 3390813 ms
+Updating password
+Logging in as add+6537822992583285802
+Validating as TWENTYFOUR with action add (token 6537822992583285802)
+Logged in as TWENTYFOUR | Expiring in: 3365342 ms
+Permissions insufficient.

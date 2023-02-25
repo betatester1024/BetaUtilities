@@ -41,5 +41,5 @@ function format(n:number) {
 
 export function systemLog(thing:any) {
   // console.log(thing);
-  fs.writeFileSync('./systemLog.txt', fs.readFileSync("./systemLog.txt")+thing+"\n");
+  fs.writeFileSync('./systemLog.txt', fs.readFileSync("./systemLog.txt")+thing.toString()+"\n");
 }

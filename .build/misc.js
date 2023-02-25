@@ -47,7 +47,7 @@ function format(n) {
   return n < 10 ? "0" + n : n;
 }
 function systemLog(thing) {
-  fs.writeFileSync("./systemLog.txt", fs.readFileSync("./systemLog.txt") + thing + "\n");
+  fs.writeFileSync("./systemLog.txt", fs.readFileSync("./systemLog.txt") + thing.toString() + "\n");
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

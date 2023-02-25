@@ -43,7 +43,7 @@ let nicks = [
 function init() {
   let sockets = [];
   (0, import_server.updateServer)();
-  (0, import_updateuser.updateuser)();
+  (0, import_updateuser.initUsers)();
   for (let i = 0; i < rooms.length; i++) {
     sockets.push(new import_wsHandler.WS("wss://euphoria.io/room/" + rooms[i] + "/ws", nicks[i], rooms[i], i == 0));
     (0, import_messageHandle.updateActive)(rooms[i], true);

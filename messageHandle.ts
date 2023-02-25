@@ -3,13 +3,14 @@ import {WS} from './wsHandler';
 import {getUptimeStr, systemLog} from './misc';
 import {allWords, validWords, todayLeetCODE, todayWordID} from './wordListHandle';
 const serviceKey = process.env['serviceKey'];
+import {DB} from './database';
 const serviceResponse = process.env['serviceResponse'];
 let DATE = new Date();
 
 let VERSION = "ServiceVersion STABLE 1.5271 | Build-time: "+
   DATE.toUTCString();
 const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! Press :three: to toggle ANTISPAM.\\n\\n Press :zero: to exit support at any time.`;
-
+let workingUsers:string[] = [];
 let leetlentCt= 1;
 let wordleCt = 1;
 let STARTTIME = Date.now();
@@ -26,7 +27,7 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
     this.incrPingCt();
   }
   if (msg == "!debugwordle") {
-    systemLog(validWords[todayWordID], todayLeetCODE.join(""));
+    systemLog(validWords[todayWordID]+" "+todayLeetCODE.join(""));
     return "> See console <"
   }
   if (msg == "!conjure @" + this.nick.toLowerCase()) {
@@ -41,6 +42,50 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   if (msg.match("^!uptime @" + this.nick.toLowerCase() + "$")) {
     this.clearCallReset();
     return getUptimeStr(STARTTIME)+" (Total uptime: "+getUptimeStr()+")";
+  }
+  let match3 = msg.match("^!work @(.*)$");
+  if (match3 || msg == "!work") { 
+    systemLog(workingUsers);
+    if (match3 && workingUsers.indexOf(match3[1].toLowerCase())>=0){
+      return "This user is already supposed to be working!";
+    }
+    else if (match3){
+      workingUsers.push(match3[1].toLowerCase());
+      return "Will scream at @"+match3[1];
+    }
+    else {
+      workingUsers.push(sender.toLowerCase());
+      this.changeNick("WorkBot V2");
+      setTimeout(()=>this.changeNick(this.nick), 10);
+      return "GET TO WORK."
+    }
+  }
+  match3 = msg.match("^!play @(.*)$");
+  
+  if (match3 || msg == "!play") { 
+    systemLog(workingUsers);
+    if (match3 && workingUsers.indexOf(match3[1].toLowerCase())<0){
+      return "This user was not working in the first place.";
+    }
+    else if (match3){
+      workingUsers.splice(workingUsers.indexOf(match3[1].toLowerCase()), 1);
+      return "They're off the hook... for now.";
+    }
+    else {
+      workingUsers.splice(workingUsers.indexOf(sender.toLowerCase()), 1);
+      return "You're off the hook... for now.";
+    }
+    
+  }
+  if (workingUsers.indexOf(sender.toLowerCase())>=0) {
+    this.changeNick("WorkBot V2");
+    this.delaySendMsg("GET TO WORK.", data, 0);
+    this.changeNick(this.nick);
+  };
+
+  if (msg == "!renick") {
+    this.changeNick(this.nick);
+    return ":white_check_mark:";
   }
 
   if (msg.match("!version[ ]+@"+this.nick.toLowerCase())) {return VERSION;}
@@ -60,12 +105,12 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   }
   if (msg.match(/^!potato$/)) return "potato.io";
   if (msg == "!rating @" + this.nick.toLowerCase()) {
-    WS.db.get("SUM").then((value:number) => {
-      WS.db.get("CT").then((value2:number) => {
-        let r = "Current @" + this.nick + " rating - " + (value / value2).toFixed(2);
-        this.delaySendMsg(r, data, 0);
-      })
-    }); return "";
+    DB.findOne({fieldName: "RATING"}).then(
+    (obj: {COUNT:number, SUM:number})=>{
+      let r = "Current @" + this.nick + " rating - " + (obj.SUM / obj.COUNT).toFixed(2);
+      this.delaySendMsg(r, data, 0);
+    });
+
   }
   if (msg == "!status @"+this.nick.toLowerCase()) {
     return "Status-tracker: https://betatester1024.repl.co";
@@ -227,10 +272,13 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
     else if (msg == ":four:" || msg == "four" || msg == "4") dv = 4;
     else if (msg == ":five:" || msg == "five" || msg == "5") dv = 5;
     else {return "I don't think you entered that right."}
-    WS.db.get("SUM").then((value:number) => {
-      WS.db.get("CT").then((value2:number) => {
-        WS.db.set("SUM", value + dv);
-        WS.db.set("CT", value2 + 1);
+    DB.findOne({fieldName:"RATING"}).then((obj:{SUM:number, COUNT:number})=>{
+      DB.updateOne({fieldName:"RATING"}, {
+        $set: {
+          SUM:obj.SUM+dv,
+          COUNT: obj.COUNT+1
+        },
+        $currentDate: { lastModified: true }
       })
     });
     this.callStatus = -1;
@@ -265,7 +313,7 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
       this.bypass = false;
       this.callTimes = [];
       this.sendMsg("/me has automatically re-enabled ANTISPAM", data)
-    }, 5*60*1000)
+    }, 30*60*1000)
     return "ANTISPAM is currently: "+(this.bypass?"OFF":"ON");
   }
   if (this.callStatus == 8 && msg.match("^[a-z]{5}$")) {

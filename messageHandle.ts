@@ -43,45 +43,61 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
     this.clearCallReset();
     return getUptimeStr(STARTTIME)+" (Total uptime: "+getUptimeStr()+")";
   }
-  let match3 = msg.match("^!work @(.*)$");
-  if (match3 || msg == "!work") { 
-    systemLog(workingUsers);
-    if (match3 && workingUsers.indexOf(match3[1].toLowerCase())>=0){
-      return "This user is already supposed to be working!";
+
+  DB.findOne({fieldName:"WORKINGUSERS"}).then((obj:{working:string[]})=>{
+    let match3 = msg.match("^!work @(.*)$");
+    let workingUsers = obj.working;
+    if (match3 || msg == "!work") { 
+      // systemLog(workingUsers);
+      if (match3 && workingUsers.indexOf(match3[1].toLowerCase())>=0){
+        this.delaySendMsg("This user is already supposed to be working!", data, 0);
+        return;
+      }
+      else if (match3){
+        workingUsers.push(match3[1].toLowerCase());
+        this.delaySendMsg("Will scream at @"+match3[1], data, 0);
+      }
+      else if (workingUsers.indexOf(sender.toLowerCase())<0) {
+        workingUsers.push(sender.toLowerCase());
+        this.changeNick("WorkBot V2");
+        setTimeout(()=>this.changeNick(this.nick), 10);
+      }
+      else {
+        this.delaySendMsg("Wait, you're already in the work- GET TO WORK.", data, 0);
+        return;
+      }
     }
-    else if (match3){
-      workingUsers.push(match3[1].toLowerCase());
-      return "Will scream at @"+match3[1];
-    }
-    else {
-      workingUsers.push(sender.toLowerCase());
-      this.changeNick("WorkBot V2");
-      setTimeout(()=>this.changeNick(this.nick), 10);
-      return "GET TO WORK."
-    }
-  }
-  match3 = msg.match("^!play @(.*)$");
-  
-  if (match3 || msg == "!play") { 
-    systemLog(workingUsers);
-    if (match3 && workingUsers.indexOf(match3[1].toLowerCase())<0){
-      return "This user was not working in the first place.";
-    }
-    else if (match3){
-      workingUsers.splice(workingUsers.indexOf(match3[1].toLowerCase()), 1);
-      return "They're off the hook... for now.";
-    }
-    else {
-      workingUsers.splice(workingUsers.indexOf(sender.toLowerCase()), 1);
-      return "You're off the hook... for now.";
-    }
+    match3 = msg.match("^!play @(.*)$");
     
-  }
-  if (workingUsers.indexOf(sender.toLowerCase())>=0) {
-    this.changeNick("WorkBot V2");
-    this.delaySendMsg("GET TO WORK.", data, 0);
-    this.changeNick(this.nick);
-  };
+    if (match3 || msg == "!play") { 
+      // systemLog(workingUsers);
+      if (match3 && workingUsers.indexOf(match3[1].toLowerCase())<0){
+        this.delaySendMsg("This user was not working in the first place.", data, 0);
+        return;
+      }
+      else if (match3){
+        workingUsers.splice(workingUsers.indexOf(match3[1].toLowerCase()), 1);
+        this.delaySendMsg("They're off the hook... for now.", data, 0);
+      }
+      else {
+        workingUsers.splice(workingUsers.indexOf(sender.toLowerCase()), 1);
+        this.delaySendMsg("You're off the hook... for now.", data, 0);
+      }
+      
+    }
+    if (workingUsers.indexOf(sender.toLowerCase())>=0) {
+      this.changeNick("WorkBot V2");
+      this.delaySendMsg("GET TO WORK.", data, 0);
+      this.changeNick(this.nick);
+    };
+    // systemLog(workingUsers);
+    DB.updateOne({fieldName:"WORKINGUSERS"},
+    {
+      $set: {working: workingUsers},
+      $currentDate: { lastModified: true }
+    });
+  })
+  
 
   if (msg == "!renick") {
     this.changeNick(this.nick);

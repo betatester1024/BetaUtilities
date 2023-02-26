@@ -71,40 +71,52 @@ function replyMessage(msg, sender, data) {
     this.clearCallReset();
     return (0, import_misc.getUptimeStr)(STARTTIME) + " (Total uptime: " + (0, import_misc.getUptimeStr)() + ")";
   }
-  let match3 = msg.match("^!work @(.*)$");
-  if (match3 || msg == "!work") {
-    (0, import_misc.systemLog)(workingUsers);
-    if (match3 && workingUsers.indexOf(match3[1].toLowerCase()) >= 0) {
-      return "This user is already supposed to be working!";
-    } else if (match3) {
-      workingUsers.push(match3[1].toLowerCase());
-      return "Will scream at @" + match3[1];
-    } else {
-      workingUsers.push(sender.toLowerCase());
+  import_database.DB.findOne({ fieldName: "WORKINGUSERS" }).then((obj) => {
+    let match3 = msg.match("^!work @(.*)$");
+    let workingUsers2 = obj.working;
+    if (match3 || msg == "!work") {
+      if (match3 && workingUsers2.indexOf(match3[1].toLowerCase()) >= 0) {
+        this.delaySendMsg("This user is already supposed to be working!", data, 0);
+        return;
+      } else if (match3) {
+        workingUsers2.push(match3[1].toLowerCase());
+        this.delaySendMsg("Will scream at @" + match3[1], data, 0);
+      } else if (workingUsers2.indexOf(sender.toLowerCase()) < 0) {
+        workingUsers2.push(sender.toLowerCase());
+        this.changeNick("WorkBot V2");
+        setTimeout(() => this.changeNick(this.nick), 10);
+      } else {
+        this.delaySendMsg("Wait, you're already in the work- GET TO WORK.", data, 0);
+        return;
+      }
+    }
+    match3 = msg.match("^!play @(.*)$");
+    if (match3 || msg == "!play") {
+      if (match3 && workingUsers2.indexOf(match3[1].toLowerCase()) < 0) {
+        this.delaySendMsg("This user was not working in the first place.", data, 0);
+        return;
+      } else if (match3) {
+        workingUsers2.splice(workingUsers2.indexOf(match3[1].toLowerCase()), 1);
+        this.delaySendMsg("They're off the hook... for now.", data, 0);
+      } else {
+        workingUsers2.splice(workingUsers2.indexOf(sender.toLowerCase()), 1);
+        this.delaySendMsg("You're off the hook... for now.", data, 0);
+      }
+    }
+    if (workingUsers2.indexOf(sender.toLowerCase()) >= 0) {
       this.changeNick("WorkBot V2");
-      setTimeout(() => this.changeNick(this.nick), 10);
-      return "GET TO WORK.";
+      this.delaySendMsg("GET TO WORK.", data, 0);
+      this.changeNick(this.nick);
     }
-  }
-  match3 = msg.match("^!play @(.*)$");
-  if (match3 || msg == "!play") {
-    (0, import_misc.systemLog)(workingUsers);
-    if (match3 && workingUsers.indexOf(match3[1].toLowerCase()) < 0) {
-      return "This user was not working in the first place.";
-    } else if (match3) {
-      workingUsers.splice(workingUsers.indexOf(match3[1].toLowerCase()), 1);
-      return "They're off the hook... for now.";
-    } else {
-      workingUsers.splice(workingUsers.indexOf(sender.toLowerCase()), 1);
-      return "You're off the hook... for now.";
-    }
-  }
-  if (workingUsers.indexOf(sender.toLowerCase()) >= 0) {
-    this.changeNick("WorkBot V2");
-    this.delaySendMsg("GET TO WORK.", data, 0);
-    this.changeNick(this.nick);
-  }
-  ;
+    ;
+    import_database.DB.updateOne(
+      { fieldName: "WORKINGUSERS" },
+      {
+        $set: { working: workingUsers2 },
+        $currentDate: { lastModified: true }
+      }
+    );
+  });
   if (msg == "!renick") {
     this.changeNick(this.nick);
     return ":white_check_mark:";

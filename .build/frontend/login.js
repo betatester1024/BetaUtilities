@@ -15,7 +15,10 @@ function newUser(e, accessclass) {
     return;
   validateLogin("add", accessclass);
 }
-function validateLogin(action = "login", access) {
+function sendMsg(msg) {
+  validateLogin("sendMsg", msg);
+}
+function validateLogin(action = "login", extData) {
   let user = document.getElementById("userINP");
   let pass = document.getElementById("passINP");
   let confirm = document.getElementById("passINPCONF");
@@ -35,11 +38,13 @@ function validateLogin(action = "login", access) {
     let sessionID = match ? match[1] : window.crypto.getRandomValues(arr);
     console.log(match);
     let params;
-    if (action != "logout" && action != "CMD")
-      params = "user=" + encodeURIComponent(user.value) + "&pass=" + encodeURIComponent(pass.value) + "&action=" + action + "&access=" + access + "&token=" + sessionID;
+    if (action != "logout" && action != "CMD" && action != "sendMsg")
+      params = "user=" + encodeURIComponent(user.value) + "&pass=" + encodeURIComponent(pass.value) + "&action=" + action + "&access=" + extData + "&token=" + sessionID;
     else if (action == "CMD") {
       params = "user=" + encodeURIComponent(CMD.value) + "&action=CMD&token=" + sessionID;
       CMD.value = "";
+    } else if (action == "sendMsg") {
+      params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData);
     } else
       params = "user=&pass=&action=logout&token=" + sessionID;
     if (pass)

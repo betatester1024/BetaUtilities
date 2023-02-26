@@ -145,6 +145,12 @@ p {
   height: 100%;
 }
 
+textarea{
+  width: 90vw;
+  height: 55vh;
+  outline: none;
+}
+
 button:hover {
   background-color: #fff;
 }
@@ -276,3 +282,10 @@ div#overlay {
   top: calc( (100vh - 2.25em) / 2 );
 }
 
+ .material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 500,
+  'GRAD' 0,
+  'opsz' 48
+}

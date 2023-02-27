@@ -1,5 +1,3 @@
-# WARNING
-## THIS REPOSITORY IS CURRENTLY OUT OF DATE AS REPLIT IS UNABLE TO CONNECT TO GITHUB! 
 
 # BetaUtilities
 BetaUtilities for euphoria.io using WebSocket.

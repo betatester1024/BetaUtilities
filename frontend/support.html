@@ -6,7 +6,10 @@
     <script src="/login.js">
     </script>
     <script>
-      function onLoad() {}
+      function onLoad() {
+        validateLogin("refresh", "");
+        setInterval(()=>{validateLogin("refresh", "")}, 2500);
+      }
     </script>
     <link rel="stylesheet" href="/globalformat.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -15,12 +18,16 @@
 <!--     <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap">  -->
     <style>
       h1 {
-        font-size: 5em;
+        font-size: 3.7em;
       }
       input {
         height: 1.8em;
         font-size: 1.7em;
         width: 100%;
+      }
+      p {
+        width: 100%;
+        font-size: 1em;
       }
       hr {
         margin-top: 5px !important;
@@ -42,6 +49,19 @@
         display: inline-block;
         width: 80vw;
       }
+      #msgArea {
+        overflow-y: scroll;
+        height: 60vh;
+        margin-left: 5%;
+      }
+      .beta {
+        color: #00ee00;
+/*         text-shadow: 0px 0px 1px #00ee00;  */
+      }
+      .admin {
+        color: #FBBC05; 
+/*         text-shadow: 0px 0px 1px #FBBC05; */
+      }
     </style>
   </head>
   
@@ -50,7 +70,10 @@
     <div id = "mainDiv">
       <h1>BetaOS Support</h1>
       <hr class="rounded"></hr>
-      <textarea id="msgArea" readonly onclick="document.getElementById('textINP').focus()"></textarea>
+      <div id="msgArea" onclick="document.getElementById('textINP').focus()">
+        <b>Retrieving your messages...</b>
+        <hr class="btnHr"></hr>
+      </div>
       <div>
         <div id="textDiv">
           <input id="textINP" type="text" onchange="sendMsg()">

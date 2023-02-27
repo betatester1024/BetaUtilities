@@ -24,7 +24,9 @@ body {
   position: relative;
   top: 3vh;
   animation-duration: 0.5s;
-  width: 90vw;
+  width: 95vw;
+  overflow-y:auto;
+  overflow-x:hidden;
 }
 @keyframes mainanim {
   0%   {top:80vh; opacity: 0;}

@@ -65,7 +65,6 @@ function updateServer() {
     res.sendFile(path.join(__dirname, "../frontend", "signup.html"));
   });
   app.post("/login", urlencodedParser, function(req, res) {
-    (0, import_misc.systemLog)("Logging in as " + req.body.action + "+" + req.body.token);
     (0, import_accessControl.validate)(decodeURIComponent(req.body.user), decodeURIComponent(req.body.pass), req.body.action, req.body.access, res, req.body.token);
   });
   app.get("/status", (req, res) => {

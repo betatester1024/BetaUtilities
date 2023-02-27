@@ -26,6 +26,7 @@ var import_wsHandler = require("./wsHandler");
 var import_server = require("./server");
 var import_messageHandle = require("./messageHandle");
 var import_updateuser = require("./updateuser");
+var import_accessControl = require("./accessControl");
 let rooms = ["xkcd", "test", "bots", "ai", "room", "srs"];
 let nicks = [
   "BetaUtilities",
@@ -49,6 +50,7 @@ function init() {
     (0, import_messageHandle.updateActive)(rooms[i], true);
   }
   (0, import_wordListHandle.loopy)();
+  (0, import_accessControl.DBGarbageCollect)();
 }
 init();
 // Annotate the CommonJS export names for ESM import in node:

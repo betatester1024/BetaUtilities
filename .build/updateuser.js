@@ -29,28 +29,18 @@ function initUsers() {
   updateUser("betatester1024", process.env["betatester1024"], 3);
   updateUser("user", "pass", 1);
 }
-function updateUser(username, pwd, access = -1) {
+function updateUser(username, pwd, access = 1) {
   DB.updateOne(
     { fieldName: "UserData", user: username },
     {
       $set: {
+        permLevel: access,
         passHash: bcrypt.hashSync(pwd, 8)
       },
       $currentDate: { lastModified: true }
     },
     { upsert: true }
   );
-  if (access >= 0)
-    DB.updateOne(
-      { fieldName: "UserData", user: username },
-      {
-        $set: {
-          permLevel: access
-        },
-        $currentDate: { lastModified: true }
-      },
-      { upsert: true }
-    );
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

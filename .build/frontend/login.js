@@ -15,7 +15,10 @@ function newUser(e, accessclass) {
     return;
   validateLogin("add", accessclass);
 }
-function sendMsg(msg) {
+function sendMsg() {
+  let inp = document.getElementById("textINP");
+  let msg = inp.value;
+  inp.value = "";
   validateLogin("sendMsg", msg);
 }
 function validateLogin(action = "login", extData) {
@@ -36,10 +39,9 @@ function validateLogin(action = "login", extData) {
     let arr = new BigUint64Array(1);
     let match = document.cookie.match("__Secure-session=([0-9.]+)");
     let sessionID = match ? match[1] : window.crypto.getRandomValues(arr);
-    console.log(match);
     let params;
     if (action != "logout" && action != "CMD" && action != "sendMsg")
-      params = "user=" + encodeURIComponent(user.value) + "&pass=" + encodeURIComponent(pass.value) + "&action=" + action + "&access=" + extData + "&token=" + sessionID;
+      params = "user=" + encodeURIComponent(user ? user.value : "") + "&pass=" + encodeURIComponent(pass ? pass.value : "") + "&action=" + action + "&access=" + extData + "&token=" + sessionID;
     else if (action == "CMD") {
       params = "user=" + encodeURIComponent(CMD.value) + "&action=CMD&token=" + sessionID;
       CMD.value = "";
@@ -49,7 +51,8 @@ function validateLogin(action = "login", extData) {
       params = "user=&pass=&action=logout&token=" + sessionID;
     if (pass)
       pass.value = "";
-    console.log("SENDING " + params);
+    if (action != "refresh")
+      console.log("SENDING " + params);
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "login", true);
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -59,13 +62,24 @@ function validateLogin(action = "login", extData) {
           return;
         let res = xhr.responseText;
         res = JSON.parse(res);
-        let ele2 = document.getElementById("overlay");
-        if (ele2)
-          ele2.className = "";
-        ele2 = document.getElementById("h1");
-        if (ele2)
-          ele2.className = "beforeoverload";
+        let ele = document.getElementById("overlay");
+        if (ele)
+          ele.className = "";
+        ele = document.getElementById("h1");
+        if (ele)
+          ele.className = "beforeoverload";
         if (action != "login") {
+          if (action == "sendMsg") {
+            validateLogin("refresh", "");
+            return;
+          }
+          if (action == "refresh") {
+            if (res == "ACCESS" || res == "EXPIRE" || res == "NOACTIVE" || res == "ERROR") {
+              location.reload();
+            }
+            updateTextArea(res);
+            return;
+          }
           if (res == "ACCESS") {
             alertDialog("Error: You do not have permissions!", () => {
             });
@@ -124,12 +138,14 @@ function validateLogin(action = "login", extData) {
       }
     };
     xhr.send(params);
-    let ele = document.getElementById("overlay");
-    if (ele)
-      ele.className += "active";
-    ele = document.getElementById("h1");
-    if (ele)
-      ele.className = "overload";
+    if (action != "sendMsg" && action != "refresh") {
+      let ele = document.getElementById("overlay");
+      if (ele)
+        ele.className += "active";
+      ele = document.getElementById("h1");
+      if (ele)
+        ele.className = "overload";
+    }
   } else if (!user.value.match("^[a-zA-Z0-9_]+$")) {
     alertDialog("Please enter a username with only alphanumeric characters, or underscores.", () => {
     });
@@ -161,5 +177,10 @@ function clearalert() {
     cbk();
     cbk = null;
   }
+}
+function updateTextArea(msgs) {
+  let ele = document.getElementById("msgArea");
+  ele.innerHTML = msgs;
+  ele.scrollTop = ele.scrollHeight;
 }
 //# sourceMappingURL=login.js.map

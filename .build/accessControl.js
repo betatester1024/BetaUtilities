@@ -18,6 +18,7 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var accessControl_exports = {};
 __export(accessControl_exports, {
+  DBGarbageCollect: () => DBGarbageCollect,
   validate: () => validate
 });
 module.exports = __toCommonJS(accessControl_exports);
@@ -27,10 +28,12 @@ var import_database = require("./database");
 var bcrypt = require("bcrypt");
 const path = require("path");
 const DB = import_database.database.collection("SystemAUTH");
+const DB2 = import_database.database.collection("SupportMessaging");
 function validate(user, pwd, action, access, callback, token = "") {
-  (0, import_misc.systemLog)("Validating as " + user + " with action " + action + " (token " + token + ")");
-  if (!token || !token.match("[0-9]+") || (!user || user && action != "CMD" && !user.match("[a-zA-Z0-9_]+")) || (!pwd || action != "CMD" && pwd.length <= 0)) {
-    if (action != "checkAccess" && action != "logout") {
+  if (action != "refresh")
+    (0, import_misc.systemLog)("Validating as " + user + " with action " + action + " (token " + token + ")");
+  if (!token || !token.match("[0-9]+") || (!user || user && action != "CMD" && action != "sendMsg" && !user.match("^[a-zA-Z0-9_]+$")) || (!pwd || action != "CMD" && pwd.length <= 0)) {
+    if (action != "checkAccess" && action != "logout" && action != "refresh") {
       (0, import_misc.systemLog)("Unknown error");
       callback.end(JSON.stringify("ERROR"));
       return;
@@ -42,14 +45,14 @@ function validate(user, pwd, action, access, callback, token = "") {
     callback.end(JSON.stringify("SUCCESS"));
     return;
   }
-  if (action == "add" || action == "CMD" || action == "checkAccess") {
+  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh") {
     DB.findOne({ fieldName: "TOKEN", token }).then(
       (obj) => {
         if (obj == null) {
           (0, import_misc.systemLog)("No active session");
-          if (action == "checkAccess")
+          if (action == "checkAccess") {
             callback.sendFile(path.join(__dirname, "../frontend", "403.html"));
-          else
+          } else
             callback.end(JSON.stringify("NOACTIVE"));
           return;
         }
@@ -102,6 +105,46 @@ function validate(user, pwd, action, access, callback, token = "") {
               (0, import_misc.systemLog)("Support access granted!");
               callback.sendFile(path.join(__dirname, "../frontend", "support.html"));
               return;
+            } else if (action == "sendMsg") {
+              (0, import_misc.systemLog)("adding message: " + user);
+              DB2.insertOne({
+                fieldName: "MSG",
+                sender: obj.associatedUser,
+                data: user,
+                permLevel: perms,
+                expiry: Date.now() + 1e3 * 60 * 60 * 24
+              });
+              callback.end(JSON.stringify("SUCCESS"));
+              return;
+            } else if (action == "refresh") {
+              DB2.find({ fieldName: "MSG" }).toArray().then((objs) => {
+                let out = "";
+                for (let i = Math.max(0, objs.length - 100); i < objs.length; i++) {
+                  let cls = "", extraText = "";
+                  switch (objs[i].permLevel) {
+                    case 2:
+                      cls = "admin";
+                      extraText = " [ADMIN]";
+                      break;
+                    case 3:
+                      cls = "beta";
+                      extraText = " [SYSTEM]";
+                      break;
+                  }
+                  let data = objs[i].data;
+                  data = data.replaceAll("&", "&amp;");
+                  data = data.replaceAll("<", "&gt;");
+                  data = data.replaceAll(">", "&lt;");
+                  if (objs[i].sender == "betaos") {
+                    cls = "beta";
+                    extraText = " [SYSTEM]";
+                  }
+                  out += `<p><b class='${cls}''>
+              ${objs[i].sender}${extraText}:</b> ${data} </p>`;
+                }
+                callback.end(JSON.stringify(out));
+              });
+              return;
             } else {
               (0, import_misc.systemLog)("No perms!");
               callback.end(JSON.stringify("ACCESS"));
@@ -120,9 +163,9 @@ function validate(user, pwd, action, access, callback, token = "") {
         callback.end(JSON.stringify("TAKEN"));
         return;
       } else {
-        (0, import_misc.systemLog)("Registered user " + user);
+        (0, import_misc.systemLog)("Registered user " + user + "with pass: " + pwd);
         (0, import_updateuser.updateUser)(user, pwd, 1);
-        callback.end(JSON.stringify("SUCCESS"));
+        validate(user, pwd, "login", "", callback, token);
         return;
       }
     });
@@ -156,8 +199,19 @@ function validate(user, pwd, action, access, callback, token = "") {
     }
   );
 }
+async function DBGarbageCollect() {
+  DB2.find({ fieldName: "MSG" }).toArray().then(
+    (objs) => {
+      for (let i = 0; i < objs.length; i++) {
+        if (Date.now() > objs[i].expiry)
+          DB2.deleteOne({ fieldName: "MSG", expiry: objs[i].expiry });
+      }
+    }
+  );
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  DBGarbageCollect,
   validate
 });
 //# sourceMappingURL=accessControl.js.map

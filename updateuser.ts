@@ -11,19 +11,12 @@ export function initUsers() {
   // WS.db.set("user^PERM", "1");
 }
 
-export function updateUser(username: string, pwd: string, access: number=-1) {
-  DB.updateOne({fieldName:"UserData", user: username}, 
-  {
-    $set: {
-      passHash: bcrypt.hashSync(pwd, 8),
-    },
-    $currentDate: { lastModified: true }
-  }, {upsert: true});
-  if (access >= 0) 
+export function updateUser(username: string, pwd: string, access: number=1) {
     DB.updateOne({fieldName:"UserData", user: username}, 
     {
       $set: {
-        permLevel: access
+        permLevel: access,
+        passHash: bcrypt.hashSync(pwd, 8),
       },
       $currentDate: { lastModified: true }
     }, {upsert: true});

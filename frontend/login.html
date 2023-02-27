@@ -22,6 +22,7 @@
       <h1>Login</h1>
       <hr class="rounded"></hr>
       <div id="login">
+      <form action = "javascript:validateLogin()";>
         <div id="userDiv" onclick="document.getElementById('userINP').focus();"  onchange="document.getElementById('passINP').focus();">
 <!--           <p id="userP">Username:</p> -->
           <input type="text" placeholder="Username" id="userINP"/>
@@ -29,12 +30,12 @@
         </div><div id="pwdDiv" onclick="document.getElementById('passINP').focus();">
 <!--           <p id="passP"> -->
 <!--             Password:</p> -->
-          <input type="password" id="passINP" placeholder="Password" onchange="validateLogin()"/>
+          <input type="password" id="passINP" placeholder="Password"/>
           <hr class="inpHr"></hr>
         </div>
-        <button id="loginBTN" onclick="validateLogin()">Log into BetaOS Services<br><hr class="btnHr"></hr></button>
+        <button id="loginBTN" type="submit">Log into BetaOS Services<br><hr class="btnHr"></hr></button>
       </div>
-      
+    </form>
       <button class="HOME" onclick="window.open('../', '_self');">&#x00AB Return to home<br><hr class="btnHr"></hr></button>
     </div>
     <h1 class="beforeoverload" id="h1">Sorry, this is taking longer than expected. 

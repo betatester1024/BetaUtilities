@@ -6,7 +6,7 @@
       // alert(document.cookie);
       if (document.cookie.match("session=[0-9.]+")) {
         let ele = document.getElementById("loginbtn");
-        ele.innerHTML = "Logout<br><hr class=\"btnHr\"></hr>";
+        ele.innerHTML = "<span class=\"material-symbols-outlined\">logout</span> Logout<br><hr class=\"btnHr\"></hr>";
         ele.onclick= ()=> {window.open('/logout', '_self');};
       } else {
         let ele = document.getElementById("configbtn");
@@ -18,10 +18,17 @@
       let match=document.cookie.match("session=([0-9.]+)")
       window.open('./support?token='+(match?match[1]:"NONE"), '_self');
     }
+    function log() {
+      let match=document.cookie.match("session=([0-9.]+)")
+      window.open('./syslog?token='+(match?match[1]:"NONE"), '_self');
+    }
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="/globalformat.css">
     <style>
+      html {
+        overflow-y: scroll;  
+      }
       button {
         width: 5em;
         height: 2.5em;
@@ -55,13 +62,29 @@
     <div id = "mainDiv">
       <h1>Welcome to BetaOS Services!</h1>
       <hr class="rounded"></hr>
-      <button onclick="window.open('./status', '_self');">Status<br><hr class="btnHr"></hr></button>
-      <button onclick="window.open('./login', '_self');" id="loginbtn">Login<br><hr class="btnHr"></hr></button>
-      <button onclick="window.open('./admin', '_self');" id="configbtn">Config<br><hr class="btnHr"></hr></button>
+      <button onclick="window.open('./status', '_self');">
+        <span class="material-symbols-outlined">check</span>
+        Status<br><hr class="btnHr"></hr></button>
+      <button onclick="window.open('./login', '_self');" id="loginbtn">
+        <span class="material-symbols-outlined">login</span>
+        Login<br><hr class="btnHr"></hr></button>
+      <button onclick="window.open('./admin', '_self');" id="configbtn">
+        <span class="material-symbols-outlined">settings</span>
+        Config<br><hr class="btnHr"></hr></button>
       <br>
       <button onclick="support()" class="full">
         <span class="material-symbols-outlined">help</span>
         Support
+        <hr class="btnHr"></hr>
+      </button><br>
+      <button onclick="log()">
+        <span class="material-symbols-outlined">security</span>
+        SysLog
+        <hr class="btnHr"></hr>
+      </button>
+      <button onclick="window.open('./about')" >
+        <span class="material-symbols-outlined">info</span>
+        About
         <hr class="btnHr"></hr>
       </button>
     </div>

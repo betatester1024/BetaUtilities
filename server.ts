@@ -78,6 +78,10 @@ export function updateServer() {
   app.get("/support", (req:any, res:any) => {
     validate("", "", "checkAccess", "", res, req.query.token)
   })
+  
+  app.get("/syslog", (req:any, res:any) => {
+    validate("", "", "checkAccess_A", "", res, req.query.token)
+  })
 
   app.get('/*', (req:any, res:any) => {
     res.sendFile(path.join( __dirname, '../frontend', '404.html' ));

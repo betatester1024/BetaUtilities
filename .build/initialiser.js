@@ -50,7 +50,9 @@ function init() {
     (0, import_messageHandle.updateActive)(rooms[i], true);
   }
   (0, import_wordListHandle.loopy)();
-  (0, import_accessControl.DBGarbageCollect)();
+  setInterval(() => {
+    (0, import_accessControl.DBGarbageCollect)();
+  }, 1e4);
 }
 init();
 // Annotate the CommonJS export names for ESM import in node:

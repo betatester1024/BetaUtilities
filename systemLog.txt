@@ -1,3176 +1,499 @@
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2987716 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2184632 ms
-Logged in as SeaGrapes | Expiring in: 2184630 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2986715 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2985694 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2181801 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as SeaGrapes | Expiring in: 2181781 ms
-Logged in as betaos | Expiring in: 2984623 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2983660 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2982638 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2981626 ms
-Logged in as betaos | Expiring in: 2981596 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2178655 ms
-Logged in as SeaGrapes | Expiring in: 2178645 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2980594 ms
-Logged in as betaos | Expiring in: 2980579 ms
-Logging in as sendMsg+6803252811901810059
-Validating as <a href="{{myUrl}}"> with action sendMsg (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2177229 ms
-adding message: <a href="{{myUrl}}">
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2177058 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2979579 ms
-Logged in as betaos | Expiring in: 2979564 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2978610 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2175656 ms
-Logged in as SeaGrapes | Expiring in: 2175643 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2977602 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2977519 ms
-Logged in as betaos | Expiring in: 2977511 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2976594 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as SeaGrapes | Expiring in: 2173661 ms
-Logged in as betaos | Expiring in: 2976528 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2172716 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as SeaGrapes | Expiring in: 2172651 ms
-Logged in as betaos | Expiring in: 2975507 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2975448 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2974505 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2170873 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2973368 ms
-Logged in as betaos | Expiring in: 2973341 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2169987 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2169859 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2168073 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2167262 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2167080 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2968695 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2164858 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2967642 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2164528 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2163714 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2965596 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2964611 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2161625 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as betaos | Expiring in: 2963533 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2160532 ms
-Logged in as SeaGrapes | Expiring in: 2160453 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2962589 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2962232 ms
-Logged in as betaos | Expiring in: 2962219 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2961539 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
 
 Server active!
 Front-end is running on 4000.
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as sendMsg+6803252811901810059
-Validating as <a href="{{"javascript:alert(1)"}}"> with action sendMsg (token 6803252811901810059)
 BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-BetaUtilities open in wss://euphoria.io/room/bots/ws
 BetaUtilities open in wss://euphoria.io/room/test/ws
 BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
 BetaUtilities open in wss://euphoria.io/room/room/ws
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as betaos | Expiring in: 2954777 ms
-Logged in as SeaGrapes | Expiring in: 2151879 ms
-Logged in as betaos | Expiring in: 2954747 ms
-Logged in as betaos | Expiring in: 2954715 ms
-Logged in as betaos | Expiring in: 2954711 ms
-Logged in as betaos | Expiring in: 2954683 ms
-Logged in as betaos | Expiring in: 2954677 ms
-Logged in as SeaGrapes | Expiring in: 2151773 ms
-Logged in as SeaGrapes | Expiring in: 2151716 ms
-adding message: <a href="{{"javascript:alert(1)"}}">
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2151338 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2148905 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as betaos | Expiring in: 2951704 ms
-Logged in as SeaGrapes | Expiring in: 2148798 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2951590 ms
-Logged in as betaos | Expiring in: 2951583 ms
-Logged in as betaos | Expiring in: 2951581 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2951295 ms
-Logged in as betaos | Expiring in: 2951275 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2147721 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2948778 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2145625 ms
-Logged in as SeaGrapes | Expiring in: 2145617 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2947882 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2947799 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2144702 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2946864 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2945859 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2945683 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2142761 ms
-Logged in as SeaGrapes | Expiring in: 2142748 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as SeaGrapes | Expiring in: 2141968 ms
-Logged in as betaos | Expiring in: 2944811 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2943814 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2943746 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as SeaGrapes | Expiring in: 2139941 ms
-Logged in as SeaGrapes | Expiring in: 2139936 ms
-Logged in as betaos | Expiring in: 2942802 ms
-Logged in as betaos | Expiring in: 2942785 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2139217 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2941786 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2940767 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2137058 ms
-Logged in as SeaGrapes | Expiring in: 2137056 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2939741 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2136489 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2938662 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2938161 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2937711 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2937645 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2134242 ms
-Logged in as SeaGrapes | Expiring in: 2134230 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2936692 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2133755 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2935665 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2935443 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2935227 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2934541 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2934451 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2131428 ms
-Logged in as SeaGrapes | Expiring in: 2131395 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2131022 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2933727 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2932758 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2932243 ms
-Validating as  with action checkAccess (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2931853 ms
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1526812 ms
+Validating as  with action checkAccess (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1525182 ms
 Support access granted!
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2931700 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2128643 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2128571 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2128287 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2931020 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2125846 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2125799 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as betaos | Expiring in: 2928460 ms
-Logged in as SeaGrapes | Expiring in: 2125559 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2925924 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2122662 ms
-Logged in as SeaGrapes | Expiring in: 2122658 ms
-Logged in as SeaGrapes | Expiring in: 2122650 ms
-Logging in as sendMsg+11308165503613552851
-Validating as > with action sendMsg (token 11308165503613552851)
-Unknown error
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2923481 ms
-Validating as  with action checkAccess (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2252978 ms
-Support access granted!
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2252345 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2119862 ms
-Logged in as SeaGrapes | Expiring in: 2119860 ms
-Logged in as SeaGrapes | Expiring in: 2119846 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2920860 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2249781 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2117073 ms
-Logged in as SeaGrapes | Expiring in: 2117061 ms
-Logged in as SeaGrapes | Expiring in: 2117057 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2918385 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2247276 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2114282 ms
-Logged in as SeaGrapes | Expiring in: 2114279 ms
-Logged in as SeaGrapes | Expiring in: 2114277 ms
-Logging in as sendMsg+11308165503613552851
-Validating as UNKNOWN ERROR? with action sendMsg (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2916252 ms
-adding message: UNKNOWN ERROR?
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2915904 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2244775 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2111465 ms
-Logged in as SeaGrapes | Expiring in: 2111461 ms
-Logged in as SeaGrapes | Expiring in: 2111459 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2913276 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2242277 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2108660 ms
-Logged in as SeaGrapes | Expiring in: 2108658 ms
-Logged in as SeaGrapes | Expiring in: 2108655 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2910798 ms
-Logging in as sendMsg+6803252811901810059
-Validating as ? with action sendMsg (token 6803252811901810059)
-Unknown error
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2107604 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2239778 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2105873 ms
-Logged in as SeaGrapes | Expiring in: 2105861 ms
-Logged in as SeaGrapes | Expiring in: 2105848 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2908366 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as foobar | Expiring in: 2237274 ms
-Logged in as SeaGrapes | Expiring in: 2104829 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2103095 ms
-Logged in as SeaGrapes | Expiring in: 2103087 ms
-Logged in as SeaGrapes | Expiring in: 2103073 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2905876 ms
-Logging in as sendMsg+6803252811901810059
-Validating as ? with action sendMsg (token 6803252811901810059)
-Unknown error
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2102394 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2234689 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2102099 ms
-Validating as  with action checkAccess (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2101430 ms
-Support access granted!
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2101050 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2903358 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2232270 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2098435 ms
+Validating as  with action checkAccess_A (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1521682 ms
+SysLog access granted!
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1521113 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1518693 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1516196 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1513687 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1511175 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1508683 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1506180 ms
 
 Server active!
 Front-end is running on 4000.
-Validating as  with action checkAccess (token 6803252811901810059)
 BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
 BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
+Validating as  with action refresh_log (token 11772389049870489251)
+BetaUtilities open in wss://euphoria.io/room/bots/ws
 BetaUtilities open in wss://euphoria.io/room/srs/ws
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as SeaGrapes | Expiring in: 2090436 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2893278 ms
-Logged in as foobar | Expiring in: 2222833 ms
-Logged in as foobar | Expiring in: 2222801 ms
-Validating as  with action checkAccess (token 6803252811901810059)
-Support access granted!
-Logged in as betaos | Expiring in: 2893198 ms
-Logged in as SeaGrapes | Expiring in: 2090251 ms
-Logged in as foobar | Expiring in: 2222658 ms
-Support access granted!
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2893045 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2222298 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2089758 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2890743 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2219769 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2087229 ms
-Logging in as sendMsg+6803252811901810059
-Validating as ? with action sendMsg (token 6803252811901810059)
-Unknown error
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2888232 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2217270 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2084715 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2885718 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2214769 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2082222 ms
-Logging in as sendMsg+6803252811901810059
-Validating as why don't my messages send with action sendMsg (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2080349 ms
-adding message: why don't my messages send
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2883120 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2212265 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2079777 ms
-Logging in as sendMsg+6803252811901810059
-Validating as aa with action sendMsg (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2078773 ms
-adding message: aa
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2880706 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2209766 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2077217 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2878144 ms
-Logging in as sendMsg+6803252811901810059
-Validating as aa? with action sendMsg (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2075207 ms
-adding message: aa?
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2207264 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2074793 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2875658 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2204764 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2072209 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2873052 ms
-Logging in as sendMsg+6803252811901810059
-Validating as            with action sendMsg (token 6803252811901810059)
-Unknown error
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2202263 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2069771 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2870627 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2199750 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2067214 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2868132 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2197261 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2064618 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2865621 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2194703 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2062126 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2863104 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2192210 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2059515 ms
-Logging in as sendMsg+6803252811901810059
-Validating as 🗿🍷 with action sendMsg (token 6803252811901810059)
-Unknown error
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2860583 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2189700 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2057067 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2858061 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2187260 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2054459 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2855434 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2184702 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2052064 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2852945 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2182247 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2049432 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2850504 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2179760 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2047072 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2847973 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2177243 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2044712 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2845510 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2174757 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2042177 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2843002 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2172252 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2039647 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2840442 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2169701 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2036570 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2837979 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2167254 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2034696 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2835475 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2032216 ms
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+Validating as  with action checkAccess_A (token 11772389049870489251)
+Validating as  with action refresh_log (token 11772389049870489251)
+BetaUtilities open in wss://euphoria.io/room/room/ws
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1496148 ms
+Logged in as betaos | Expiring in: 1496138 ms
+Logged in as betaos | Expiring in: 1496096 ms
+SysLog access granted!
+Logged in as betaos | Expiring in: 1495841 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1495109 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1492122 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1489602 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1487102 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1484579 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1482093 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1479579 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1477076 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1474560 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1472068 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1469573 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1467042 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1464521 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1462042 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1459537 ms
 
 Server active!
 Front-end is running on 4000.
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as  with action refresh_log (token 11772389049870489251)
 BetaUtilities open in wss://euphoria.io/room/room/ws
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as betaos | Expiring in: 2827587 ms
-Logged in as SeaGrapes | Expiring in: 2024557 ms
-Logged in as foobar | Expiring in: 2156942 ms
-Logged in as foobar | Expiring in: 2156875 ms
-Logged in as SeaGrapes | Expiring in: 2024432 ms
-Logged in as betaos | Expiring in: 2827116 ms
-Logged in as SeaGrapes | Expiring in: 2024230 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2827006 ms
-Validating as  with action checkAccess (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2826297 ms
-Support access granted!
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2825557 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2022275 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2153865 ms
-Logging in as sendMsg+11308165503613552851
-Validating as > with action sendMsg (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2823816 ms
-adding message: >
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2823089 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2019788 ms
-Logging in as sendMsg+11308165503613552851
-Validating as < with action sendMsg (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2822550 ms
-adding message: <
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as sendMsg+11308165503613552851
-Validating as hmm with action sendMsg (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2820499 ms
-Logged in as betaos | Expiring in: 2820482 ms
-adding message: hmm
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2017273 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2817996 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2014658 ms
-Logging in as sendMsg+11308165503613552851
-Validating as very interesting with action sendMsg (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2817483 ms
-adding message: very interesting
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2145855 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2815475 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2012211 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2009719 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2812506 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2141954 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2810344 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2007221 ms
-Logging in as sendMsg+6803252811901810059
-Validating as beta can I try makin a chat with action sendMsg (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2004967 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-adding message: beta can I try makin a chat
-Logged in as betaos | Expiring in: 2807730 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2004631 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2805311 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 2002222 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2802808 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1999531 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2800354 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1997132 ms
-Logging in as sendMsg+6803252811901810059
-Validating as on a different  with action sendMsg (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1996946 ms
-adding message: on a different 
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2797809 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1994659 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2125943 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2795136 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1992210 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1989713 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2792338 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1987212 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2789951 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1984708 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2787449 ms
-Logging in as sendMsg+11308165503613552851
-Validating as ?? with action sendMsg (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2785496 ms
-adding message: ??
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1982169 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2784956 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1979725 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2782436 ms
-Logging in as sendMsg+6803252811901810059
-Validating as page with action sendMsg (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1977244 ms
-Logged in as SeaGrapes | Expiring in: 1977220 ms
-adding message: page
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2779779 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1974721 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2777413 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1972194 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2774859 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 2103494 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1969720 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2772333 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1967213 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2769744 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1964668 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2767245 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1962134 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2764744 ms
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Logged in as betaos | Expiring in: 1450016 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1449560 ms
+Validating as  with action checkAccess_A (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1449321 ms
+SysLog access granted!
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1448794 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1446236 ms
+Validating as  with action checkAccess_A (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1445439 ms
+SysLog access granted!
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1444684 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1442206 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1439614 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1437199 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1434707 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1432204 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1429686 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1427191 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1424689 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1422198 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1419685 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1417192 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1414691 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1412173 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1409635 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1407176 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1404684 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1402180 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1399665 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1397182 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1394671 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1392174 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1389672 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1387159 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1384649 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1382137 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1379659 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1377154 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1374643 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1372123 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1369634 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1367119 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1364532 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1362059 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1359550 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1357029 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1354542 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1352012 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1349532 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1347022 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1344525 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1342020 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1339503 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1337010 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1334496 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1331964 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1329394 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1326988 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1324379 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1321991 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1319474 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1316954 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1314446 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1311938 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1309436 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1306902 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1304425 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1301919 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1299409 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1296864 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1294402 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1291902 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1289392 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1286882 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1284306 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1281870 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1279367 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1276858 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1274345 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1271820 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1269332 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1266824 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1264302 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1261783 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1259301 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1256768 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1254260 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1251740 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1249262 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1246739 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1244214 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1241701 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1239189 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1236679 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1234183 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1231667 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1229169 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1226635 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1224158 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1221623 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1219120 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1216614 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1214098 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1211550 ms
 
 Server active!
 Front-end is running on 4000.
+Validating as  with action checkAccess_A (token 11772389049870489251)
 BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
 BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as betaos | Expiring in: 2758353 ms
-Logged in as SeaGrapes | Expiring in: 1955473 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1955140 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as SeaGrapes | Expiring in: 1954785 ms
-Logged in as betaos | Expiring in: 2757641 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2757389 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1952185 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2754784 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1949718 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2752261 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1947164 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2749789 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1944694 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2747282 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2744780 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1941626 ms
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1203464 ms
+SysLog access granted!
+Logged in as betaos | Expiring in: 1203253 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1202412 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1200327 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1197750 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1195294 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1192761 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1190211 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1187761 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1185261 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1182469 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1180023 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1177532 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1175012 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1172455 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1169978 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1167491 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1164990 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1162336 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1159861 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1157349 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1154929 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1152426 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1149904 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1147410 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1144896 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1142401 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1139896 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1137366 ms
+Validating as  with action checkAccess_A (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1135081 ms
+SysLog access granted!
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1134918 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1134242 ms
+Validating as  with action checkAccess_A (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1119192 ms
+SysLog access granted!
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1118379 ms
+Validating as  with action checkAccess_A (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1116192 ms
+SysLog access granted!
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1115448 ms
+Validating as  with action checkAccess_A (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1097944 ms
+SysLog access granted!
+Validating as  with action checkAccess_A (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1090086 ms
+SysLog access granted!
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1089521 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1069481 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1049463 ms
+Validating as  with action checkAccess_A (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1048936 ms
+SysLog access granted!
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1048029 ms
+Validating as  with action refresh_log (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1028342 ms
 
 Server active!
 Front-end is running on 4000.
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
 BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
 BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
 BetaUtilities open in wss://euphoria.io/room/room/ws
-Logged in as SeaGrapes | Expiring in: 1914836 ms
-Logged in as foobar | Expiring in: 2047235 ms
-Logged in as betaos | Expiring in: 2717673 ms
-Logged in as SeaGrapes | Expiring in: 1914757 ms
-Logged in as SeaGrapes | Expiring in: 1914754 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1914717 ms
-Logged in as SeaGrapes | Expiring in: 1914609 ms
-Logged in as SeaGrapes | Expiring in: 1914554 ms
-Logged in as SeaGrapes | Expiring in: 1914449 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2716724 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2716380 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1912308 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1911936 ms
-Validating as  with action checkAccess (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2714625 ms
-Support access granted!
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2714410 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1911328 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2713714 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1909734 ms
-Logging in as sendMsg+11308165503613552851
-Validating as cheeses with action sendMsg (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2711762 ms
-adding message: cheeses
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2711252 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1906730 ms
-Logging in as sendMsg+11308165503613552851
-Validating as agh with action sendMsg (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2709476 ms
-adding message: agh
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2708728 ms
-Logging in as sendMsg+11308165503613552851
-Validating as slow with action sendMsg (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2708539 ms
-adding message: slow
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1904754 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2706082 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1902018 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2703513 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1899804 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2701057 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1897315 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2697977 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1894813 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2695441 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1892311 ms
-Logging in as sendMsg+11308165503613552851
-Validating as dee with action sendMsg (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2695053 ms
-adding message: dee
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2692902 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1889807 ms
-Logging in as sendMsg+11308165503613552851
-Validating as > with action sendMsg (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2692118 ms
-adding message: >
-Logging in as sendMsg+11308165503613552851
-Validating as < with action sendMsg (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2691025 ms
-adding message: <
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2690443 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1887261 ms
-Logging in as sendMsg+11308165503613552851
-Validating as & with action sendMsg (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2688691 ms
-adding message: &
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2687913 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1884789 ms
-Logging in as sendMsg+11308165503613552851
-Validating as &xkcd with action sendMsg (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2687054 ms
-adding message: &xkcd
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2685415 ms
-Logging in as sendMsg+6803252811901810059
-Validating as < with action sendMsg (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1882329 ms
-Logged in as SeaGrapes | Expiring in: 1882309 ms
-adding message: <
-Logging in as sendMsg+6803252811901810059
-Validating as < with action sendMsg (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1880626 ms
-adding message: <
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2682845 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1879801 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2680374 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1877276 ms
-Logging in as sendMsg+11308165503613552851
-Validating as god enough for me with action sendMsg (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2678793 ms
-adding message: god enough for me
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2677850 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1874812 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as SeaGrapes | Expiring in: 1872303 ms
-Logged in as betaos | Expiring in: 2675148 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1869759 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2672581 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1867313 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2670138 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as SeaGrapes | Expiring in: 1864758 ms
-Logged in as betaos | Expiring in: 2667625 ms
-Logging in as sendMsg+6803252811901810059
-Validating as >script<alert('test')>/script< with action sendMsg (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1863111 ms
-adding message: >script<alert('test')>/script<
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1995040 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1862300 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2665121 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2662552 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1859487 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1857232 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2660029 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1854675 ms
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as betaos | Expiring in: 2657389 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+11308165503613552851
-Validating as  with action refresh (token 11308165503613552851)
-Logged in as SeaGrapes | Expiring in: 1852215 ms
-Logged in as betaos | Expiring in: 2655052 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1849714 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1847246 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1844778 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1842299 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1839804 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1837308 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1834754 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1832299 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1829810 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1827307 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1824697 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1821730 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1819809 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1926922 ms
-Validating as  with action checkAccess (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1772683 ms
-Support access granted!
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1772474 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1769944 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1767466 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1764959 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1762370 ms
-Logging in as login+8263402216392934246
-Validating as betaos with action login (token 8263402216392934246)
-Unknown error
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1759903 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1757400 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1754889 ms
-Logging in as login+15786196265223456624
-Validating as betaos with action login (token 15786196265223456624)
-Unknown error
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1752268 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1749845 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1747378 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1877924 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1744905 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1875419 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1742429 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1872874 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1739611 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1870416 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1736628 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1867916 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1734637 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1865413 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1731742 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1862909 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1729701 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1860411 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1726724 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1857906 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1724745 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1855401 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1721727 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1852913 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1719733 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1850370 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1716734 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1847911 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1714737 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1845136 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1712455 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1709719 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1839493 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1706739 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1704734 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1837010 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1834538 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1701733 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1699747 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1831987 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1829536 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1696678 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1694737 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1826605 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1691724 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1689722 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1687461 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1816977 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1810639 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1798295 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1794756 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1762703 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1717690 ms
-Validating as  with action checkAccess (token NONE)
+Validating as  with action checkAccess_A (token 11772389049870489251)
+Logged in as betaos | Expiring in: 1020041 ms
+SysLog access granted!
+Logged in as betaos | Expiring in: 1019408 ms
+Validating as  with action logout (token 11772389049870489251)
+Logging out 11772389049870489251
+Validating as  with action checkAccess_A (token NONE)
 No active session
-Logging in as login+15882833951123652969
-Validating as betaos with action login (token 15882833951123652969)
-Unknown error
-Logging in as login+10576980710224546854
-Validating as betaos with action login (token 10576980710224546854)
-Unknown error
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1653577 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1584777 ms
-Logging in as login+12894933450127593666
-Validating as user with action login (token 12894933450127593666)
-Unknown error
-Logging in as login+5420122382398018667
-Validating as user with action login (token 5420122382398018667)
-Unknown error
-Validating as  with action checkAccess (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1381801 ms
-Support access granted!
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1381356 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1378958 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1375731 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1373709 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1370675 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1368730 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1365732 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1363723 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1360738 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1358675 ms
-Logging in as login+13957296184914424677
-Validating as user with action login (token 13957296184914424677)
-Unknown error
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1355743 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1353732 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1350733 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1348734 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1345691 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1343737 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1340733 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1338748 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1335732 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1333707 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1330735 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1328665 ms
-
-Server active!
-Front-end is running on 4000.
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-Logged in as SeaGrapes | Expiring in: 1318945 ms
-Logged in as SeaGrapes | Expiring in: 1318930 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1318624 ms
-Logged in as foobar | Expiring in: 1450958 ms
-Logged in as SeaGrapes | Expiring in: 1318516 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1315704 ms
-Logging in as login+14051415485700802967
-Validating as user with action login (token 14051415485700802967)
-Password OK for user user | Perms: 1
-Logging user user with expiry 1677468760909 (in 3600000 ms)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1313717 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1310734 ms
-Validating as  with action checkAccess (token 14051415485700802967)
-Logged in as user | Expiring in: 3594745 ms
-Support access granted!
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1308672 ms
-Logging in as refresh+14051415485700802967
-Validating as  with action refresh (token 14051415485700802967)
-Logged in as user | Expiring in: 3593298 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1305732 ms
-Logging in as refresh+14051415485700802967
-Validating as  with action refresh (token 14051415485700802967)
-Logged in as user | Expiring in: 3590547 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1303733 ms
-Logging in as sendMsg+14051415485700802967
-Validating as right with action sendMsg (token 14051415485700802967)
-Logged in as user | Expiring in: 3588323 ms
-adding message: right
-Logging in as refresh+14051415485700802967
-Validating as  with action refresh (token 14051415485700802967)
-Logged in as user | Expiring in: 3588161 ms
-Logging in as sendMsg+14051415485700802967
-Validating as so with action sendMsg (token 14051415485700802967)
-Logged in as user | Expiring in: 3586965 ms
-adding message: so
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1300737 ms
-Logging in as refresh+14051415485700802967
-Validating as  with action refresh (token 14051415485700802967)
-Logged in as user | Expiring in: 3585633 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1298692 ms
-Logging in as sendMsg+14051415485700802967
-Validating as goddamnit with action sendMsg (token 14051415485700802967)
-Logged in as user | Expiring in: 3584127 ms
-adding message: goddamnit
-Logging in as refresh+14051415485700802967
-Validating as  with action refresh (token 14051415485700802967)
-Logged in as user | Expiring in: 3583118 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1295685 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1293742 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1290725 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1288742 ms
-Logging in as logout+14051415485700802967
-Validating as  with action logout (token 14051415485700802967)
-Logging out 14051415485700802967
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1285729 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1283677 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1280727 ms
-Logging in as login+3814952879561312276
-Validating as betaos with action login (token 3814952879561312276)
-Password OK for user betaos | Perms: 2
-Logging user betaos with expiry 1677468795743 (in 3600000 ms)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1278737 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1276512 ms
-Validating as  with action checkAccess (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1274459 ms
-Support access granted!
-Validating as  with action checkAccess (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3595082 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Support access granted!
-Logged in as SeaGrapes | Expiring in: 1274203 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3594241 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3591687 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1270669 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logging in as sendMsg+3814952879561312276
-Validating as hello with action sendMsg (token 3814952879561312276)
-Logged in as SeaGrapes | Expiring in: 1268734 ms
-Logged in as betaos | Expiring in: 3589507 ms
-adding message: hello
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3589227 ms
-Logging in as sendMsg+3814952879561312276
-Validating as system user? with action sendMsg (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3586939 ms
-adding message: system user?
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3586710 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1265706 ms
-Logging in as sendMsg+3814952879561312276
-Validating as nope with action sendMsg (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3585551 ms
-adding message: nope
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1263744 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3583162 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1260736 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3580643 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1258669 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3578137 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1255738 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3575586 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1253728 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3573107 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1250698 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3570570 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1248715 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3568009 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1245693 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3565566 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1243691 ms
-
-Server active!
-Front-end is running on 4000.
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-Logging in as sendMsg+3814952879561312276
-Validating as loading with action sendMsg (token 3814952879561312276)
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3557608 ms
-Logged in as betaos | Expiring in: 3557518 ms
-Logged in as betaos | Expiring in: 3556602 ms
-adding message: loading
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1234851 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1234739 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3555183 ms
-Logging in as sendMsg+3814952879561312276
-Validating as aha with action sendMsg (token 3814952879561312276)
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as betaos | Expiring in: 3555053 ms
-Logged in as betaos | Expiring in: 3555050 ms
-Logged in as SeaGrapes | Expiring in: 1234253 ms
-adding message: aha
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1233694 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3552965 ms
-Logging in as sendMsg+3814952879561312276
-Validating as i'm a system user with action sendMsg (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3552146 ms
-adding message: i'm a system user
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1230737 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3550045 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1228712 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3547506 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1225710 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3544923 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1223691 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3542432 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1220696 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3539864 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1218731 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3537353 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1215710 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3534869 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1213661 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3532353 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1210741 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3529853 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1208667 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3527345 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1205706 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3524826 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1203661 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3522315 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1200655 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3519682 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1198690 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3517303 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1195686 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3514713 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1193591 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3512255 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1190692 ms
-Logging in as refresh+7047372781085774592
-Validating as  with action refresh (token 7047372781085774592)
-Logged in as foobar | Expiring in: 1322263 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3509695 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1188707 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3506996 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1185547 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3504772 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1183673 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3502244 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1180713 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3499722 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1178623 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3497207 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1175700 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3494676 ms
-Logging in as refresh+6803252811901810059
-Validating as  with action refresh (token 6803252811901810059)
-Logged in as SeaGrapes | Expiring in: 1173707 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3492180 ms
-Logging in as refresh+3814952879561312276
-Validating as  with action refresh (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3489677 ms
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-Logged in as betaos | Expiring in: 3479796 ms
-Validating as a with action sendMsg (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3479338 ms
-Logged in as betaos | Expiring in: 3479287 ms
-adding message: a
-Logged in as betaos | Expiring in: 3479106 ms
-Logged in as betaos | Expiring in: 3479085 ms
-Logged in as betaos | Expiring in: 3477167 ms
-Validating as very nice with action sendMsg (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3476767 ms
-adding message: very nice
-Logged in as betaos | Expiring in: 3474618 ms
-Validating as play with action sendMsg (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3473835 ms
-adding message: play
-Logged in as betaos | Expiring in: 3472125 ms
-Validating as sp things work with action sendMsg (token 3814952879561312276)
-Logged in as betaos | Expiring in: 3471035 ms
-adding message: sp things work
-Logged in as betaos | Expiring in: 3469368 ms
-Logged in as betaos | Expiring in: 3466358 ms
-Logged in as betaos | Expiring in: 3463831 ms
-Logged in as betaos | Expiring in: 3461216 ms
-Logged in as betaos | Expiring in: 3458283 ms
-Logged in as betaos | Expiring in: 3455770 ms
-Logged in as betaos | Expiring in: 3453226 ms
-Logged in as betaos | Expiring in: 3450734 ms
-Logged in as betaos | Expiring in: 3448220 ms
-Logged in as betaos | Expiring in: 3445700 ms
-Logged in as betaos | Expiring in: 3443009 ms
-Logged in as betaos | Expiring in: 3440593 ms
-Logged in as betaos | Expiring in: 3438091 ms
-Logged in as betaos | Expiring in: 3435476 ms
-Logged in as betaos | Expiring in: 3433009 ms
-Logged in as betaos | Expiring in: 3430519 ms
-Logged in as betaos | Expiring in: 3427963 ms
-Logged in as betaos | Expiring in: 3425494 ms
-Logged in as betaos | Expiring in: 3422972 ms
-Logged in as betaos | Expiring in: 3420412 ms
-Logged in as betaos | Expiring in: 3417890 ms
-Logged in as betaos | Expiring in: 3415457 ms
-Logged in as betaos | Expiring in: 3412942 ms
-Logged in as betaos | Expiring in: 3410400 ms
-Logged in as betaos | Expiring in: 3407855 ms
-Logged in as betaos | Expiring in: 3405359 ms
-Logged in as betaos | Expiring in: 3402842 ms
-Logged in as betaos | Expiring in: 3400274 ms
-Logged in as betaos | Expiring in: 3397796 ms
-Logged in as betaos | Expiring in: 3395286 ms
-Logged in as betaos | Expiring in: 3392772 ms
-Logged in as betaos | Expiring in: 3390264 ms
-Logged in as betaos | Expiring in: 3387674 ms
-Logged in as betaos | Expiring in: 3385243 ms
-Logged in as betaos | Expiring in: 3382734 ms
-Logged in as betaos | Expiring in: 3380220 ms
-Logged in as betaos | Expiring in: 3377715 ms
-Logged in as betaos | Expiring in: 3375177 ms
-Logged in as betaos | Expiring in: 3372679 ms
-Logged in as betaos | Expiring in: 3369795 ms
-Logged in as betaos | Expiring in: 3367250 ms
-Logged in as betaos | Expiring in: 3364662 ms
-Logged in as betaos | Expiring in: 3362244 ms
-Logged in as betaos | Expiring in: 3359734 ms
-Logged in as betaos | Expiring in: 3357222 ms
-Logged in as betaos | Expiring in: 3354714 ms
-Logged in as foobar | Expiring in: 1165166 ms
-Logged in as betaos | Expiring in: 3352209 ms
-Logged in as foobar | Expiring in: 1162931 ms
-Logged in as betaos | Expiring in: 3349692 ms
-Logged in as foobar | Expiring in: 1160427 ms
-Logged in as betaos | Expiring in: 3347185 ms
-Logged in as foobar | Expiring in: 1157925 ms
-Logged in as betaos | Expiring in: 3344650 ms
-Logged in as foobar | Expiring in: 1154688 ms
-Logged in as betaos | Expiring in: 3342150 ms
-Logged in as betaos | Expiring in: 3339635 ms
-Logged in as foobar | Expiring in: 1149057 ms
-Logged in as betaos | Expiring in: 3337111 ms
-Logged in as betaos | Expiring in: 3334607 ms
-Logged in as foobar | Expiring in: 1144552 ms
-Logged in as betaos | Expiring in: 3332054 ms
-Logged in as betaos | Expiring in: 3329501 ms
-Logged in as betaos | Expiring in: 3327031 ms
-Logged in as foobar | Expiring in: 1136549 ms
-Logged in as betaos | Expiring in: 3324471 ms
-Logged in as betaos | Expiring in: 3321870 ms
-Logged in as betaos | Expiring in: 3319483 ms
-Logged in as betaos | Expiring in: 3316978 ms
-Logged in as betaos | Expiring in: 3314445 ms
-Logged in as betaos | Expiring in: 3311982 ms
-Logged in as betaos | Expiring in: 3309435 ms
-Logged in as foobar | Expiring in: 1120317 ms
-Logged in as betaos | Expiring in: 3306932 ms
-Logged in as betaos | Expiring in: 3304443 ms
-Logged in as betaos | Expiring in: 3301922 ms
-Logged in as betaos | Expiring in: 3299401 ms
-Logged in as betaos | Expiring in: 3296895 ms
-Logged in as betaos | Expiring in: 3294376 ms
-Logged in as betaos | Expiring in: 3291860 ms
-Logged in as betaos | Expiring in: 3289342 ms
-Logged in as betaos | Expiring in: 3286838 ms
-Logged in as foobar | Expiring in: 1096576 ms
-Logged in as betaos | Expiring in: 3284312 ms
-Logged in as betaos | Expiring in: 3281802 ms
-Logged in as betaos | Expiring in: 3279271 ms
-Logged in as betaos | Expiring in: 3276779 ms
-Logged in as betaos | Expiring in: 3274256 ms
-Logged in as betaos | Expiring in: 3271656 ms
-Logged in as betaos | Expiring in: 3269152 ms
-Logged in as betaos | Expiring in: 3266662 ms
-Logged in as betaos | Expiring in: 3264132 ms
-Logged in as betaos | Expiring in: 3261469 ms
-Logged in as betaos | Expiring in: 3259115 ms
-Logged in as betaos | Expiring in: 3256589 ms
-Logged in as betaos | Expiring in: 3254081 ms
-Logged in as foobar | Expiring in: 1064535 ms
-Logged in as betaos | Expiring in: 3251543 ms
-Logged in as betaos | Expiring in: 3249051 ms
-Logged in as betaos | Expiring in: 3246149 ms
-Logged in as betaos | Expiring in: 3243614 ms
-Logged in as foobar | Expiring in: 1054361 ms
-Logged in as betaos | Expiring in: 3241096 ms
-Logged in as betaos | Expiring in: 3238577 ms
-Logged in as betaos | Expiring in: 3236075 ms
-Logged in as betaos | Expiring in: 3233523 ms
-Logged in as betaos | Expiring in: 3230979 ms
-Logged in as betaos | Expiring in: 3228449 ms
-Logged in as betaos | Expiring in: 3225927 ms
-Logged in as betaos | Expiring in: 3223433 ms
-Logged in as betaos | Expiring in: 3220923 ms
-Logged in as betaos | Expiring in: 3218390 ms
-Logged in as betaos | Expiring in: 3215879 ms
-Logged in as betaos | Expiring in: 3213393 ms
-Logged in as betaos | Expiring in: 3210935 ms
-Logged in as foobar | Expiring in: 990229 ms
-Logged in as foobar | Expiring in: 921855 ms
-Logged in as foobar | Expiring in: 793710 ms
-Logged in as foobar | Expiring in: 785323 ms
-Logged in as foobar | Expiring in: 528683 ms
-Validating as  with action checkAccess (token 11339361901372793362)
-Logged in as c | Expiring in: -828198 ms
-Token expired. Logged out user.
-Validating as c with action login (token 4090079560671691222)
-Password OK for user c | Perms: 1
-Logging user c with expiry 1677469759257 (in 3600000 ms)
-Validating as  with action checkAccess (token 4090079560671691222)
-Logged in as c | Expiring in: 3596833 ms
-Support access granted!
-Logged in as c | Expiring in: 3596498 ms
-Logged in as c | Expiring in: 3593935 ms
-Logged in as foobar | Expiring in: 441524 ms
-Logged in as c | Expiring in: 3591492 ms
-Logged in as c | Expiring in: 3588985 ms
-Logged in as c | Expiring in: 3586476 ms
-Logged in as c | Expiring in: 3583965 ms
-Logged in as c | Expiring in: 3581417 ms
-Logged in as c | Expiring in: 3578958 ms
-Logged in as c | Expiring in: 3576456 ms
-Logged in as c | Expiring in: 3573953 ms
-Validating as why does the whole page have to reload every second with action sendMsg (token 4090079560671691222)
-Logged in as c | Expiring in: 3572900 ms
-adding message: why does the whole page have to reload every second
-Logged in as c | Expiring in: 3571457 ms
-Logged in as c | Expiring in: 3568893 ms
-Logged in as c | Expiring in: 3566435 ms
-Logged in as c | Expiring in: 3563942 ms
-Logged in as foobar | Expiring in: 318044 ms
-Logged in as foobar | Expiring in: 315607 ms
-Logged in as foobar | Expiring in: 311414 ms
-Logged in as foobar | Expiring in: 308744 ms
-Logged in as foobar | Expiring in: 300412 ms
-Logged in as foobar | Expiring in: 284438 ms
-Logged in as foobar | Expiring in: 261597 ms
-Logged in as foobar | Expiring in: 229592 ms
-Logged in as foobar | Expiring in: 216973 ms
-Logged in as foobar | Expiring in: 152891 ms
-Logged in as foobar | Expiring in: 11446 ms
-Logged in as foobar | Expiring in: -180269 ms
-Token expired. Logged out user.
-Validating as  with action checkAccess (token 7047372781085774592)
-No active session
-Validating as  with action checkAccess (token 4090079560671691222)
-Logged in as c | Expiring in: -5759344 ms
-Token expired. Logged out user.
-Validating as c with action login (token 17799820544408726264)
-Password OK for user c | Perms: 1
-Logging user c with expiry 1677479123554 (in 3600000 ms)
-Validating as  with action checkAccess (token 17799820544408726264)
-Logged in as c | Expiring in: 3597011 ms
-Support access granted!
-Logged in as c | Expiring in: 3596573 ms
-Logged in as c | Expiring in: 3594053 ms
-Validating as user with action login (token 15891132442784510044)
-Password OK for user user | Perms: 1
-Logging user user with expiry 1677500829060 (in 3600000 ms)
-Validating as  with action checkAccess (token 15891132442784510044)
-Logged in as user | Expiring in: 3596759 ms
-Support access granted!
-Logged in as user | Expiring in: 3596330 ms
-Logged in as user | Expiring in: 3593751 ms
-Logged in as user | Expiring in: 3591275 ms
-Validating as it does with action sendMsg (token 15891132442784510044)
-Logged in as user | Expiring in: 3590447 ms
-adding message: it does
-Validating as not with action sendMsg (token 15891132442784510044)
-Logged in as user | Expiring in: 3589492 ms
-adding message: not
-Logged in as user | Expiring in: 3588812 ms
-Logged in as user | Expiring in: 3586261 ms
-Logged in as user | Expiring in: 3583773 ms
-Logged in as user | Expiring in: 3581259 ms
-Logged in as user | Expiring in: 3578760 ms
-Logged in as user | Expiring in: 3576253 ms
-Logged in as user | Expiring in: 3573741 ms
-Validating as the refreshing is every two and a half seconds with action sendMsg (token 15891132442784510044)
-Logged in as user | Expiring in: 3573667 ms
-adding message: the refreshing is every two and a half seconds
-Logged in as user | Expiring in: 3571253 ms
-Logged in as user | Expiring in: 3568589 ms
-Validating as and every time a message is sent with action sendMsg (token 15891132442784510044)
-Logged in as user | Expiring in: 3568133 ms
-adding message: and every time a message is sent
-Logged in as user | Expiring in: 3566219 ms
-Validating as ...should with action sendMsg (token 15891132442784510044)
-Logged in as user | Expiring in: 3565118 ms
-adding message: ...should
-Logged in as user | Expiring in: 3563668 ms
-Logged in as user | Expiring in: 3561208 ms
-Logged in as user | Expiring in: 3558691 ms
-Logged in as user | Expiring in: 3556194 ms
-Logged in as user | Expiring in: 3553685 ms
-Logged in as user | Expiring in: 3551161 ms
-Logged in as user | Expiring in: 3548663 ms
-Logged in as user | Expiring in: 3546116 ms
-Logged in as user | Expiring in: 3543571 ms
-Logged in as user | Expiring in: 3541117 ms
-Logged in as user | Expiring in: 3538572 ms
-Logged in as user | Expiring in: 3535093 ms
-Logged in as user | Expiring in: 3532576 ms
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-Validating as  with action logout (token 15891132442784510044)
-Logging out 15891132442784510044
-Validating as user with action login (token 15945301273226540615)
-Password OK for user user | Perms: 1
-Logging user user with expiry 1677501092272 (in 3600000 ms)
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as user | Expiring in: 3597512 ms
-Support access granted!
-Logged in as user | Expiring in: 3597038 ms
-Logged in as user | Expiring in: 3594538 ms
-Validating as abc with action sendMsg (token 15945301273226540615)
-Logged in as user | Expiring in: 3594343 ms
-adding message: abc
-Logged in as user | Expiring in: 3594158 ms
-Validating as def with action sendMsg (token 15945301273226540615)
-Logged in as user | Expiring in: 3593496 ms
-adding message: def
-Logged in as user | Expiring in: 3593291 ms
-Logged in as user | Expiring in: 3592030 ms
-Validating as gijk with action sendMsg (token 15945301273226540615)
-Logged in as user | Expiring in: 3591814 ms
-adding message: gijk
-Logged in as user | Expiring in: 3591601 ms
-Validating as lmnop with action sendMsg (token 15945301273226540615)
-Logged in as user | Expiring in: 3590478 ms
-adding message: lmnop
-Logged in as user | Expiring in: 3590273 ms
-Logged in as user | Expiring in: 3589470 ms
-Validating as okay very nice with action sendMsg (token 15945301273226540615)
-Logged in as user | Expiring in: 3588500 ms
-adding message: okay very nice
-Logged in as user | Expiring in: 3588322 ms
-Logged in as user | Expiring in: 3587008 ms
-Logged in as user | Expiring in: 3584498 ms
-Validating as admin with action login (token 15945301273226540615)
+Validating as betatos with action login (token 5300610452146835189)
 Invalid credentials.
-Validating as admin with action login (token 15945301273226540615)
+Validating as  with action checkAccess_A (token NONE)
+No active session
+Validating as betaos with action login (token 7160078420186159237)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677515263893 (in 3600000 ms)
+Validating as  with action checkAccess_A (token 7160078420186159237)
+Logged in as betaos | Expiring in: 3594299 ms
+SysLog access granted!
+Logged in as betaos | Expiring in: 3593750 ms
+Logged in as betaos | Expiring in: 3573706 ms
+Logged in as betaos | Expiring in: 3553690 ms
+Logged in as betaos | Expiring in: 3533645 ms
+Logged in as betaos | Expiring in: 3513655 ms
+Logged in as betaos | Expiring in: 3493613 ms
+Logged in as betaos | Expiring in: 3473476 ms
+Logged in as betaos | Expiring in: 3453505 ms
+Logged in as betaos | Expiring in: 3433621 ms
+Logged in as betaos | Expiring in: 3413606 ms
+Logged in as betaos | Expiring in: 3393599 ms
+Logged in as betaos | Expiring in: 3373458 ms
+Logged in as betaos | Expiring in: 3353468 ms
+Logged in as betaos | Expiring in: 3333051 ms
+Logged in as betaos | Expiring in: 3313041 ms
+Logged in as betaos | Expiring in: 3292865 ms
+Logged in as betaos | Expiring in: 3273021 ms
+Validating as  with action checkAccess_A (token 7160078420186159237)
+Logged in as betaos | Expiring in: 3254703 ms
+SysLog access granted!
+Logged in as betaos | Expiring in: 3253664 ms
+Validating as  with action checkAccess_A (token 7160078420186159237)
+Logged in as betaos | Expiring in: 3251635 ms
+SysLog access granted!
+Logged in as betaos | Expiring in: 3250872 ms
+Logged in as betaos | Expiring in: 3230917 ms
+Logged in as betaos | Expiring in: 3210806 ms
+Logged in as betaos | Expiring in: 3190811 ms
+Validating as  with action checkAccess_A (token 7160078420186159237)
+Logged in as betaos | Expiring in: 3183785 ms
+SysLog access granted!
+Logged in as betaos | Expiring in: 3183048 ms
+Validating as  with action checkAccess (token 7160078420186159237)
+Logged in as betaos | Expiring in: 3177573 ms
+Support access granted!
+Validating as woords have been typed with action sendMsg (token 7160078420186159237)
+Logged in as betaos | Expiring in: 3171449 ms
+adding message: woords have been typed
+Validating as  with action logout (token 7160078420186159237)
+Logging out 7160078420186159237
+Validating as treblinka with action signup (token 6267039227028986397)
+Registered user treblinkawith pass: 8v299a24
+Validating as treblinka with action login (token 6267039227028986397)
+Password OK for user treblinka | Perms: 1
+Logging user treblinka with expiry 1677515719153 (in 3600000 ms)
+Validating as  with action checkAccess (token 6267039227028986397)
+Logged in as treblinka | Expiring in: 3595752 ms
+Support access granted!
+Validating as Greer with action sendMsg (token 6267039227028986397)
+Logged in as treblinka | Expiring in: 3589786 ms
+adding message: Greer
+Validating as Greetings with action sendMsg (token 6267039227028986397)
+Logged in as treblinka | Expiring in: 3584633 ms
+adding message: Greetings
+Validating as How does this website work? with action sendMsg (token 6267039227028986397)
+Logged in as treblinka | Expiring in: 3573328 ms
+adding message: How does this website work?
+Validating as  with action sendMsg (token 6267039227028986397)
+Unknown error
+Validating as  with action logout (token 6267039227028986397)
+Logging out 6267039227028986397
+Validating as admin with action login (token 9317883986469137060)
+Invalid credentials.
+Validating as admin with action login (token 13639836170408782258)
 Password OK for user admin | Perms: 2
-Logging user admin with expiry 1677501125260 (in 3600000 ms)
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 3593972 ms
-Support access granted!
-Logged in as admin | Expiring in: 3593519 ms
-Logged in as admin | Expiring in: 3591026 ms
-Validating as logged in as an admin with action sendMsg (token 15945301273226540615)
-Logged in as admin | Expiring in: 3590273 ms
-adding message: logged in as an admin
-Logged in as admin | Expiring in: 3590095 ms
-Validating as very nice with action sendMsg (token 15945301273226540615)
-Logged in as admin | Expiring in: 3588511 ms
-Logged in as admin | Expiring in: 3588507 ms
-adding message: very nice
-Logged in as admin | Expiring in: 3588325 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 3474042 ms
-Support access granted!
-Logged in as admin | Expiring in: 3473615 ms
-Logged in as admin | Expiring in: 3471119 ms
-Logged in as admin | Expiring in: 3468618 ms
-Logged in as admin | Expiring in: 3466095 ms
-Logged in as admin | Expiring in: 3462989 ms
-Logged in as admin | Expiring in: 3460524 ms
-Logged in as admin | Expiring in: 3458007 ms
-Logged in as admin | Expiring in: 3455486 ms
-Logged in as admin | Expiring in: 3452998 ms
-Logged in as admin | Expiring in: 3450425 ms
-Logged in as admin | Expiring in: 3447962 ms
-Logged in as admin | Expiring in: 3445463 ms
-Logged in as admin | Expiring in: 3442967 ms
-Logged in as admin | Expiring in: 3440458 ms
-Logged in as admin | Expiring in: 3437906 ms
-Logged in as admin | Expiring in: 3435444 ms
-Logged in as admin | Expiring in: 3432936 ms
-Logged in as admin | Expiring in: 3430408 ms
-Logged in as admin | Expiring in: 3427746 ms
-Logged in as admin | Expiring in: 3425395 ms
-Logged in as admin | Expiring in: 3422868 ms
-Logged in as admin | Expiring in: 3420362 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 3419866 ms
-Support access granted!
-Logged in as admin | Expiring in: 3419337 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 3417988 ms
-Support access granted!
-Logged in as admin | Expiring in: 3417545 ms
-Logged in as admin | Expiring in: 3414839 ms
-Logged in as admin | Expiring in: 3412325 ms
-Logged in as admin | Expiring in: 3409795 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 3408089 ms
-Support access granted!
-Logged in as admin | Expiring in: 3407669 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 3405631 ms
-Support access granted!
-Logged in as admin | Expiring in: 3405149 ms
-Logged in as admin | Expiring in: 3402447 ms
-Logged in as admin | Expiring in: 3399921 ms
-Logged in as admin | Expiring in: 3397411 ms
-Logged in as admin | Expiring in: 3394842 ms
-Logged in as admin | Expiring in: 3392379 ms
-Logged in as admin | Expiring in: 3389873 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 3388016 ms
-Support access granted!
-Logged in as admin | Expiring in: 3387517 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 3386335 ms
-Support access granted!
-Logged in as admin | Expiring in: 3385962 ms
-Logged in as admin | Expiring in: 3383282 ms
-Logged in as admin | Expiring in: 3380864 ms
-Logged in as admin | Expiring in: 3378316 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 3376106 ms
-Support access granted!
-Logged in as admin | Expiring in: 3375507 ms
-Logged in as admin | Expiring in: 3372645 ms
-Logged in as admin | Expiring in: 3370534 ms
-Logged in as admin | Expiring in: 3368034 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 3367906 ms
-Support access granted!
-Logged in as admin | Expiring in: 3366913 ms
-Logged in as admin | Expiring in: 3364480 ms
-Logged in as admin | Expiring in: 3361915 ms
-Logged in as admin | Expiring in: 3359465 ms
-Logged in as admin | Expiring in: 3356928 ms
-Logged in as admin | Expiring in: 3354455 ms
-Logged in as admin | Expiring in: 3351944 ms
-Logged in as admin | Expiring in: 3349129 ms
-Logged in as admin | Expiring in: 3346896 ms
-Logged in as admin | Expiring in: 3344406 ms
-Logged in as admin | Expiring in: 3341904 ms
-Logged in as admin | Expiring in: 3339334 ms
-Logged in as admin | Expiring in: 3336840 ms
-Logged in as admin | Expiring in: 3334371 ms
-Logged in as admin | Expiring in: 3331866 ms
-Logged in as admin | Expiring in: 3329356 ms
-Logged in as admin | Expiring in: 3326474 ms
-Logged in as admin | Expiring in: 3324251 ms
-Logged in as admin | Expiring in: 3321754 ms
-Logged in as admin | Expiring in: 3319227 ms
-Logged in as admin | Expiring in: 3316727 ms
-Logged in as admin | Expiring in: 3314201 ms
-Logged in as admin | Expiring in: 3311716 ms
-Logged in as admin | Expiring in: 3309209 ms
-Logged in as admin | Expiring in: 3306700 ms
-Logged in as admin | Expiring in: 3304081 ms
-Logged in as admin | Expiring in: 3301497 ms
-Logged in as admin | Expiring in: 3298992 ms
-Logged in as admin | Expiring in: 3295711 ms
-Logged in as admin | Expiring in: 3290270 ms
-Logged in as admin | Expiring in: 3285971 ms
-Logged in as admin | Expiring in: 3283483 ms
-Logged in as admin | Expiring in: 3280975 ms
-Logged in as admin | Expiring in: 3278412 ms
-Logged in as admin | Expiring in: 3275959 ms
-Logged in as admin | Expiring in: 3273454 ms
-Logged in as admin | Expiring in: 3270952 ms
-Logged in as admin | Expiring in: 3268443 ms
-Logged in as admin | Expiring in: 3265875 ms
-Logged in as admin | Expiring in: 3263412 ms
-Logged in as admin | Expiring in: 3260892 ms
-Logged in as admin | Expiring in: 3258395 ms
-Logged in as admin | Expiring in: 3255888 ms
-Logged in as admin | Expiring in: 3253338 ms
-Logged in as admin | Expiring in: 3248529 ms
-Logged in as admin | Expiring in: 3247117 ms
-Logged in as admin | Expiring in: 3245852 ms
-Logged in as admin | Expiring in: 3243349 ms
-Logged in as admin | Expiring in: 3240840 ms
-Logged in as admin | Expiring in: 3238318 ms
-Logged in as admin | Expiring in: 3235766 ms
-Logged in as admin | Expiring in: 3233243 ms
-Logged in as admin | Expiring in: 3230769 ms
-Logged in as admin | Expiring in: 3228278 ms
-Logged in as admin | Expiring in: 3225775 ms
-Logged in as admin | Expiring in: 3223200 ms
-Logged in as admin | Expiring in: 3220747 ms
-Logged in as admin | Expiring in: 3218214 ms
-Logged in as admin | Expiring in: 3215724 ms
-Logged in as admin | Expiring in: 3213223 ms
-Logged in as admin | Expiring in: 3210672 ms
-Logged in as admin | Expiring in: 3208216 ms
-Logged in as admin | Expiring in: 3205726 ms
-Logged in as admin | Expiring in: 3203210 ms
-Logged in as admin | Expiring in: 3200701 ms
-Logged in as admin | Expiring in: 3198144 ms
-Logged in as admin | Expiring in: 3195689 ms
-Logged in as admin | Expiring in: 3193183 ms
-Logged in as admin | Expiring in: 3190675 ms
-Logged in as admin | Expiring in: 3188174 ms
-Logged in as admin | Expiring in: 3185605 ms
-Logged in as admin | Expiring in: 3183153 ms
-Logged in as admin | Expiring in: 3180550 ms
-Logged in as admin | Expiring in: 3178124 ms
-Logged in as admin | Expiring in: 3175572 ms
-Logged in as admin | Expiring in: 3173062 ms
-Logged in as admin | Expiring in: 3170544 ms
-Logged in as admin | Expiring in: 3168090 ms
-Logged in as admin | Expiring in: 3165569 ms
-Logged in as admin | Expiring in: 3163005 ms
-Logged in as admin | Expiring in: 3160393 ms
-Logged in as admin | Expiring in: 3158029 ms
-Logged in as admin | Expiring in: 3155516 ms
-Logged in as admin | Expiring in: 3152980 ms
-Logged in as admin | Expiring in: 3150443 ms
-Logged in as admin | Expiring in: 3147914 ms
-Logged in as admin | Expiring in: 3145469 ms
-Logged in as admin | Expiring in: 3142962 ms
-Logged in as admin | Expiring in: 3140443 ms
-Logged in as admin | Expiring in: 3137877 ms
-Logged in as admin | Expiring in: 3135404 ms
-Logged in as admin | Expiring in: 3132890 ms
-Logged in as admin | Expiring in: 3130392 ms
-Logged in as admin | Expiring in: 3127791 ms
-Logged in as admin | Expiring in: 3125356 ms
-Logged in as admin | Expiring in: 3122841 ms
-Logged in as admin | Expiring in: 3120343 ms
-Logged in as admin | Expiring in: 3117835 ms
-Logged in as admin | Expiring in: 3115272 ms
-Logged in as admin | Expiring in: 3112809 ms
-Logged in as admin | Expiring in: 3110302 ms
-Logged in as admin | Expiring in: 3107772 ms
-Logged in as admin | Expiring in: 3105279 ms
-Logged in as admin | Expiring in: 3102723 ms
-Logged in as admin | Expiring in: 3100247 ms
-Logged in as admin | Expiring in: 3097742 ms
-Logged in as admin | Expiring in: 3095222 ms
-Logged in as admin | Expiring in: 3092667 ms
-Logged in as admin | Expiring in: 3090212 ms
-Logged in as admin | Expiring in: 3087703 ms
-Logged in as admin | Expiring in: 3085202 ms
-Logged in as admin | Expiring in: 3082687 ms
-Logged in as admin | Expiring in: 3080120 ms
-Logged in as admin | Expiring in: 3077659 ms
-Logged in as admin | Expiring in: 3075143 ms
-Logged in as admin | Expiring in: 3072627 ms
-Logged in as admin | Expiring in: 3069916 ms
-Logged in as admin | Expiring in: 3067581 ms
-Logged in as admin | Expiring in: 3065051 ms
-Logged in as admin | Expiring in: 3062551 ms
-Logged in as admin | Expiring in: 3059732 ms
-Logged in as admin | Expiring in: 3057542 ms
-Logged in as admin | Expiring in: 3055043 ms
-Logged in as admin | Expiring in: 3052536 ms
-Logged in as admin | Expiring in: 3050009 ms
-Logged in as admin | Expiring in: 3047450 ms
-Logged in as admin | Expiring in: 3044968 ms
-Logged in as admin | Expiring in: 3042466 ms
-Logged in as admin | Expiring in: 3039948 ms
-Logged in as admin | Expiring in: 3037429 ms
-Logged in as admin | Expiring in: 3034908 ms
-Logged in as admin | Expiring in: 3032367 ms
-Logged in as admin | Expiring in: 3029892 ms
-Logged in as admin | Expiring in: 3027324 ms
-Logged in as admin | Expiring in: 3024813 ms
-Logged in as admin | Expiring in: 3022359 ms
-Logged in as admin | Expiring in: 3019858 ms
-Logged in as admin | Expiring in: 3017351 ms
-Logged in as admin | Expiring in: 3014831 ms
-Logged in as admin | Expiring in: 3012326 ms
-Logged in as admin | Expiring in: 3009797 ms
-Logged in as admin | Expiring in: 3007305 ms
-Logged in as admin | Expiring in: 3004774 ms
-Logged in as admin | Expiring in: 3002275 ms
-Logged in as admin | Expiring in: 2999757 ms
-Logged in as admin | Expiring in: 2997248 ms
-Logged in as admin | Expiring in: 2994721 ms
-Logged in as admin | Expiring in: 2992231 ms
-Logged in as admin | Expiring in: 2989721 ms
-Logged in as admin | Expiring in: 2987220 ms
-Logged in as admin | Expiring in: 2984695 ms
-Logged in as admin | Expiring in: 2982190 ms
-Logged in as admin | Expiring in: 2979683 ms
-Logged in as admin | Expiring in: 2977163 ms
-Logged in as admin | Expiring in: 2974655 ms
-Logged in as admin | Expiring in: 2972169 ms
-Logged in as admin | Expiring in: 2969653 ms
-Logged in as admin | Expiring in: 2967150 ms
-Logged in as admin | Expiring in: 2964627 ms
-Logged in as admin | Expiring in: 2962110 ms
-Logged in as admin | Expiring in: 2959625 ms
-Logged in as admin | Expiring in: 2957001 ms
-Logged in as admin | Expiring in: 2954548 ms
-Logged in as admin | Expiring in: 2952095 ms
-Logged in as admin | Expiring in: 2949586 ms
-Logged in as admin | Expiring in: 2947059 ms
-Logged in as admin | Expiring in: 2944583 ms
-Logged in as admin | Expiring in: 2942048 ms
-Logged in as admin | Expiring in: 2939566 ms
-Logged in as admin | Expiring in: 2937063 ms
-Logged in as admin | Expiring in: 2934553 ms
-Logged in as admin | Expiring in: 2932028 ms
-Logged in as admin | Expiring in: 2929517 ms
-Logged in as admin | Expiring in: 2927010 ms
-Logged in as admin | Expiring in: 2924492 ms
-Logged in as admin | Expiring in: 2921943 ms
-Logged in as admin | Expiring in: 2919481 ms
-Logged in as admin | Expiring in: 2916975 ms
-Logged in as admin | Expiring in: 2914446 ms
-Logged in as admin | Expiring in: 2911832 ms
-Logged in as admin | Expiring in: 2909445 ms
-Logged in as admin | Expiring in: 2906925 ms
-Logged in as admin | Expiring in: 2904423 ms
-Logged in as admin | Expiring in: 2901906 ms
-Logged in as admin | Expiring in: 2899395 ms
-Logged in as admin | Expiring in: 2896910 ms
-Logged in as admin | Expiring in: 2894392 ms
-Logged in as admin | Expiring in: 2891898 ms
-Logged in as admin | Expiring in: 2889372 ms
-Logged in as admin | Expiring in: 2886892 ms
-Logged in as admin | Expiring in: 2884383 ms
-Logged in as admin | Expiring in: 2881879 ms
-Logged in as admin | Expiring in: 2879344 ms
-Logged in as admin | Expiring in: 2876859 ms
-Logged in as admin | Expiring in: 2874340 ms
-Logged in as admin | Expiring in: 2871838 ms
-Logged in as admin | Expiring in: 2869312 ms
-Logged in as admin | Expiring in: 2866801 ms
-Logged in as admin | Expiring in: 2864301 ms
-Logged in as admin | Expiring in: 2861800 ms
-Logged in as admin | Expiring in: 2859287 ms
-Logged in as admin | Expiring in: 2856798 ms
-Logged in as admin | Expiring in: 2854277 ms
-Logged in as admin | Expiring in: 2851754 ms
-Logged in as admin | Expiring in: 2849243 ms
-Logged in as admin | Expiring in: 2846742 ms
-Logged in as admin | Expiring in: 2844223 ms
-Logged in as admin | Expiring in: 2841709 ms
-Logged in as admin | Expiring in: 2839178 ms
-Logged in as admin | Expiring in: 2836672 ms
-Logged in as admin | Expiring in: 2834181 ms
-Logged in as admin | Expiring in: 2831664 ms
-Logged in as admin | Expiring in: 2829147 ms
-Logged in as admin | Expiring in: 2826645 ms
-Logged in as admin | Expiring in: 2824127 ms
-Logged in as admin | Expiring in: 2821599 ms
-Logged in as admin | Expiring in: 2819076 ms
-Logged in as admin | Expiring in: 2816580 ms
-Logged in as admin | Expiring in: 2814079 ms
-Logged in as admin | Expiring in: 2811569 ms
-Logged in as admin | Expiring in: 2809042 ms
-Logged in as admin | Expiring in: 2806521 ms
-Logged in as admin | Expiring in: 2804017 ms
-Logged in as admin | Expiring in: 2801519 ms
-Logged in as admin | Expiring in: 2799005 ms
-Logged in as admin | Expiring in: 2796520 ms
-Logged in as admin | Expiring in: 2794008 ms
-Logged in as admin | Expiring in: 2791512 ms
-Logged in as admin | Expiring in: 2788973 ms
-Logged in as admin | Expiring in: 2786466 ms
-Logged in as admin | Expiring in: 2783952 ms
-Logged in as admin | Expiring in: 2781440 ms
-Logged in as admin | Expiring in: 2778923 ms
-Logged in as admin | Expiring in: 2776432 ms
-Logged in as admin | Expiring in: 2773909 ms
-Logged in as admin | Expiring in: 2771404 ms
-Logged in as admin | Expiring in: 2768878 ms
-Logged in as admin | Expiring in: 2766392 ms
-Logged in as admin | Expiring in: 2763884 ms
-Logged in as admin | Expiring in: 2761376 ms
-Logged in as admin | Expiring in: 2758714 ms
-Logged in as admin | Expiring in: 2756353 ms
-Logged in as admin | Expiring in: 2753841 ms
-Logged in as admin | Expiring in: 2751325 ms
-Logged in as admin | Expiring in: 2748816 ms
-Logged in as admin | Expiring in: 2746210 ms
-Logged in as admin | Expiring in: 2743673 ms
-Logged in as admin | Expiring in: 2738604 ms
-Logged in as admin | Expiring in: 2731962 ms
-Logged in as admin | Expiring in: 2731819 ms
-Logged in as admin | Expiring in: 2728762 ms
-Logged in as admin | Expiring in: 2724383 ms
-Logged in as admin | Expiring in: 2721769 ms
-Logged in as admin | Expiring in: 2719356 ms
-Logged in as admin | Expiring in: 2715142 ms
-Logged in as admin | Expiring in: 2711897 ms
-Logged in as admin | Expiring in: 2709558 ms
-Logged in as admin | Expiring in: 2706992 ms
-Logged in as admin | Expiring in: 2704492 ms
-Logged in as admin | Expiring in: 2701985 ms
-Logged in as admin | Expiring in: 2699434 ms
-Logged in as admin | Expiring in: 2696891 ms
-Logged in as admin | Expiring in: 2694400 ms
-Logged in as admin | Expiring in: 2691894 ms
-Logged in as admin | Expiring in: 2689368 ms
-Logged in as admin | Expiring in: 2686863 ms
-Logged in as admin | Expiring in: 2684379 ms
-Logged in as admin | Expiring in: 2681862 ms
-Logged in as admin | Expiring in: 2679342 ms
-Logged in as admin | Expiring in: 2676850 ms
-Logged in as admin | Expiring in: 2674340 ms
-Logged in as admin | Expiring in: 2671824 ms
-Logged in as admin | Expiring in: 2669290 ms
-Logged in as admin | Expiring in: 2666732 ms
-Logged in as admin | Expiring in: 2664293 ms
-Logged in as admin | Expiring in: 2661786 ms
-Logged in as admin | Expiring in: 2659261 ms
-Logged in as admin | Expiring in: 2656746 ms
-Logged in as admin | Expiring in: 2654240 ms
-Logged in as admin | Expiring in: 2651744 ms
-Logged in as admin | Expiring in: 2649220 ms
-Logged in as admin | Expiring in: 2646718 ms
-Logged in as admin | Expiring in: 2644207 ms
-Logged in as admin | Expiring in: 2641688 ms
-Logged in as admin | Expiring in: 2639156 ms
-Logged in as admin | Expiring in: 2636661 ms
-Logged in as admin | Expiring in: 2634158 ms
-Logged in as admin | Expiring in: 2631660 ms
-Logged in as admin | Expiring in: 2629152 ms
-Logged in as admin | Expiring in: 2626635 ms
-Logged in as admin | Expiring in: 2624140 ms
-Logged in as admin | Expiring in: 2621580 ms
-Logged in as admin | Expiring in: 2619109 ms
-Logged in as admin | Expiring in: 2616586 ms
-Logged in as admin | Expiring in: 2614084 ms
-Logged in as admin | Expiring in: 2611570 ms
-Logged in as admin | Expiring in: 2609068 ms
-Logged in as admin | Expiring in: 2606539 ms
-Logged in as admin | Expiring in: 2604038 ms
-Logged in as admin | Expiring in: 2601533 ms
-Logged in as admin | Expiring in: 2599016 ms
-Logged in as admin | Expiring in: 2596361 ms
-Logged in as admin | Expiring in: 2593816 ms
-Logged in as admin | Expiring in: 2591368 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 2589750 ms
-Support access granted!
-Logged in as admin | Expiring in: 2589307 ms
-Logged in as admin | Expiring in: 2586694 ms
-Logged in as admin | Expiring in: 2584203 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 2582977 ms
-Support access granted!
-Logged in as admin | Expiring in: 2582528 ms
-Logged in as admin | Expiring in: 2579978 ms
-Logged in as admin | Expiring in: 2577451 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 2576893 ms
-Support access granted!
-Logged in as admin | Expiring in: 2576446 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 2575162 ms
-Support access granted!
-Logged in as admin | Expiring in: 2574538 ms
-Logged in as admin | Expiring in: 2571917 ms
-Logged in as admin | Expiring in: 2569420 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 2568917 ms
-Support access granted!
-Logged in as admin | Expiring in: 2568402 ms
-Logged in as admin | Expiring in: 2565839 ms
-Logged in as admin | Expiring in: 2563337 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 2563144 ms
-Support access granted!
-Logged in as admin | Expiring in: 2562715 ms
-Logged in as admin | Expiring in: 2560160 ms
-Logged in as admin | Expiring in: 2557620 ms
-Logged in as admin | Expiring in: 2555137 ms
-Logged in as admin | Expiring in: 2552632 ms
-Logged in as admin | Expiring in: 2550126 ms
-Logged in as admin | Expiring in: 2547608 ms
-Logged in as admin | Expiring in: 2545088 ms
-Logged in as admin | Expiring in: 2542572 ms
-Logged in as admin | Expiring in: 2540069 ms
-Logged in as admin | Expiring in: 2537560 ms
-Logged in as admin | Expiring in: 2535050 ms
-Logged in as admin | Expiring in: 2532521 ms
-Logged in as admin | Expiring in: 2529990 ms
-Logged in as admin | Expiring in: 2527522 ms
-Logged in as admin | Expiring in: 2525008 ms
-Logged in as admin | Expiring in: 2522494 ms
-Logged in as admin | Expiring in: 2519989 ms
-Logged in as admin | Expiring in: 2517487 ms
-Logged in as admin | Expiring in: 2514977 ms
-Logged in as admin | Expiring in: 2512453 ms
-Logged in as admin | Expiring in: 2509947 ms
-Logged in as admin | Expiring in: 2507433 ms
-Logged in as admin | Expiring in: 2504916 ms
-Logged in as admin | Expiring in: 2502403 ms
-Logged in as admin | Expiring in: 2499910 ms
-Logged in as admin | Expiring in: 2497408 ms
-Logged in as admin | Expiring in: 2494890 ms
-Logged in as admin | Expiring in: 2492361 ms
-Logged in as admin | Expiring in: 2489869 ms
-Logged in as admin | Expiring in: 2487370 ms
-Logged in as admin | Expiring in: 2484845 ms
-Logged in as admin | Expiring in: 2482336 ms
-Logged in as admin | Expiring in: 2479786 ms
-Logged in as admin | Expiring in: 2477341 ms
-Logged in as admin | Expiring in: 2474840 ms
-Logged in as admin | Expiring in: 2472337 ms
-Logged in as admin | Expiring in: 2469818 ms
-Logged in as admin | Expiring in: 2467328 ms
-Logged in as admin | Expiring in: 2464819 ms
-Logged in as admin | Expiring in: 2462296 ms
-Logged in as admin | Expiring in: 2459738 ms
-Logged in as admin | Expiring in: 2457259 ms
-Logged in as admin | Expiring in: 2454802 ms
-Logged in as admin | Expiring in: 2452291 ms
-Logged in as admin | Expiring in: 2449774 ms
-Logged in as admin | Expiring in: 2447289 ms
-Logged in as admin | Expiring in: 2444775 ms
-Logged in as admin | Expiring in: 2442292 ms
-Logged in as admin | Expiring in: 2439762 ms
-Logged in as admin | Expiring in: 2437234 ms
-Logged in as admin | Expiring in: 2434751 ms
-Logged in as admin | Expiring in: 2432239 ms
-Logged in as admin | Expiring in: 2429726 ms
-Logged in as admin | Expiring in: 2427218 ms
-Logged in as admin | Expiring in: 2424716 ms
-Logged in as admin | Expiring in: 2422195 ms
-Logged in as admin | Expiring in: 2419152 ms
-Logged in as admin | Expiring in: 2417191 ms
-Logged in as admin | Expiring in: 2414694 ms
-Logged in as admin | Expiring in: 2412186 ms
-Logged in as admin | Expiring in: 2409662 ms
-Logged in as admin | Expiring in: 2407157 ms
-Logged in as admin | Expiring in: 2404665 ms
-Logged in as admin | Expiring in: 2402158 ms
-Logged in as admin | Expiring in: 2399601 ms
-Logged in as admin | Expiring in: 2397077 ms
-Logged in as admin | Expiring in: 2394505 ms
-Logged in as admin | Expiring in: 2391944 ms
-Logged in as admin | Expiring in: 2389441 ms
-Logged in as admin | Expiring in: 2386740 ms
-Logged in as admin | Expiring in: 2384401 ms
-Logged in as admin | Expiring in: 2381890 ms
-Logged in as admin | Expiring in: 2379370 ms
-Logged in as admin | Expiring in: 2376853 ms
-Logged in as admin | Expiring in: 2374322 ms
-Logged in as admin | Expiring in: 2371814 ms
-Logged in as admin | Expiring in: 2369310 ms
-Logged in as admin | Expiring in: 2366804 ms
-Logged in as admin | Expiring in: 2364276 ms
-Logged in as admin | Expiring in: 2361749 ms
-Logged in as admin | Expiring in: 2359277 ms
-Logged in as admin | Expiring in: 2356762 ms
-Logged in as admin | Expiring in: 2354214 ms
-Logged in as admin | Expiring in: 2351720 ms
-Logged in as admin | Expiring in: 2348925 ms
-Logged in as admin | Expiring in: 2346492 ms
-Logged in as admin | Expiring in: 2343940 ms
-Logged in as admin | Expiring in: 2341461 ms
-Logged in as admin | Expiring in: 2338886 ms
-Logged in as admin | Expiring in: 2336380 ms
-Logged in as admin | Expiring in: 2333846 ms
-Logged in as admin | Expiring in: 2331331 ms
-Logged in as admin | Expiring in: 2328835 ms
-Logged in as admin | Expiring in: 2326315 ms
-Logged in as admin | Expiring in: 2323801 ms
-Logged in as admin | Expiring in: 2321302 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 2320975 ms
-Support access granted!
-Logged in as admin | Expiring in: 2320536 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 2318693 ms
-Support access granted!
-Logged in as admin | Expiring in: 2318227 ms
-Logged in as admin | Expiring in: 2315723 ms
-Logged in as admin | Expiring in: 2313172 ms
-Logged in as admin | Expiring in: 2310693 ms
-Logged in as admin | Expiring in: 2308174 ms
-Logged in as admin | Expiring in: 2305637 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 2305179 ms
-Support access granted!
-Logged in as admin | Expiring in: 2304708 ms
-Logged in as admin | Expiring in: 2302155 ms
-Logged in as admin | Expiring in: 2299662 ms
-Logged in as admin | Expiring in: 2297142 ms
-Validating as  with action checkAccess (token 15945301273226540615)
-Logged in as admin | Expiring in: 2296247 ms
-Support access granted!
-Logged in as admin | Expiring in: 2295819 ms
-Logged in as admin | Expiring in: 2293280 ms
-Logged in as admin | Expiring in: 2290752 ms
-Logged in as admin | Expiring in: 2288255 ms
-Logged in as admin | Expiring in: 2285753 ms
-Logged in as admin | Expiring in: 2283247 ms
-Logged in as admin | Expiring in: 2280718 ms
-Logged in as admin | Expiring in: 2278211 ms
-Logged in as admin | Expiring in: 2275708 ms
-Logged in as admin | Expiring in: 2273181 ms
-Logged in as admin | Expiring in: 2270663 ms
-Logged in as admin | Expiring in: 2268147 ms
-Logged in as admin | Expiring in: 2265655 ms
-Logged in as admin | Expiring in: 2263149 ms
-Logged in as admin | Expiring in: 2260625 ms
-Logged in as admin | Expiring in: 2257887 ms
-Logged in as admin | Expiring in: 2255364 ms
-Logged in as admin | Expiring in: 2252842 ms
-Logged in as admin | Expiring in: 2250325 ms
-Logged in as admin | Expiring in: 2247828 ms
-Logged in as admin | Expiring in: 2245297 ms
-Logged in as admin | Expiring in: 2242799 ms
-Logged in as admin | Expiring in: 2240275 ms
-Logged in as admin | Expiring in: 2237787 ms
-Logged in as admin | Expiring in: 2235273 ms
-Logged in as admin | Expiring in: 2232758 ms
-Logged in as admin | Expiring in: 2230241 ms
-Logged in as admin | Expiring in: 2227729 ms
-Logged in as admin | Expiring in: 2225222 ms
-Logged in as admin | Expiring in: 2222717 ms
-Logged in as admin | Expiring in: 2220190 ms
-Logged in as admin | Expiring in: 2217619 ms
-Logged in as admin | Expiring in: 2215153 ms
-Logged in as admin | Expiring in: 2212540 ms
-Logged in as admin | Expiring in: 2210054 ms
-Logged in as admin | Expiring in: 2207551 ms
-Logged in as admin | Expiring in: 2205057 ms
-Logged in as admin | Expiring in: 2202538 ms
-Logged in as admin | Expiring in: 2199983 ms
-Logged in as admin | Expiring in: 2197489 ms
-Logged in as admin | Expiring in: 2194993 ms
-Logged in as admin | Expiring in: 2192472 ms
-Logged in as admin | Expiring in: 2189950 ms
-Logged in as admin | Expiring in: 2187400 ms
-Logged in as admin | Expiring in: 2184894 ms
-Logged in as admin | Expiring in: 2182340 ms
-Logged in as admin | Expiring in: 2179837 ms
-Logged in as admin | Expiring in: 2177333 ms
-Logged in as admin | Expiring in: 2174801 ms
-Logged in as admin | Expiring in: 2172284 ms
-Logged in as admin | Expiring in: 2169740 ms
-Logged in as admin | Expiring in: 2167249 ms
-Logged in as admin | Expiring in: 2164739 ms
-Logged in as admin | Expiring in: 2161778 ms
-Logged in as admin | Expiring in: 2159692 ms
-Logged in as admin | Expiring in: 2157140 ms
-Logged in as admin | Expiring in: 2154642 ms
-Logged in as admin | Expiring in: 2152147 ms
-Logged in as admin | Expiring in: 2149603 ms
-Logged in as admin | Expiring in: 2147103 ms
-Logged in as admin | Expiring in: 2144596 ms
-Logged in as admin | Expiring in: 2141992 ms
-Logged in as admin | Expiring in: 2139569 ms
-Logged in as admin | Expiring in: 2137043 ms
-Logged in as admin | Expiring in: 2134575 ms
-Logged in as admin | Expiring in: 2132065 ms
-Logged in as admin | Expiring in: 2129551 ms
-Logged in as admin | Expiring in: 2127031 ms
-Logged in as admin | Expiring in: 2124545 ms
-Logged in as admin | Expiring in: 2122046 ms
-Logged in as admin | Expiring in: 2119511 ms
-Logged in as admin | Expiring in: 2117015 ms
-Logged in as admin | Expiring in: 2114511 ms
-Logged in as admin | Expiring in: 2111991 ms
-Logged in as admin | Expiring in: 2109446 ms
-Logged in as admin | Expiring in: 2106925 ms
-Logged in as admin | Expiring in: 2103915 ms
-Logged in as admin | Expiring in: 2101232 ms
-Logged in as admin | Expiring in: 2098728 ms
-Logged in as admin | Expiring in: 2096239 ms
-Logged in as admin | Expiring in: 2093718 ms
-Logged in as admin | Expiring in: 2091204 ms
-Logged in as admin | Expiring in: 2088683 ms
-Logged in as admin | Expiring in: 2086171 ms
-Logged in as admin | Expiring in: 2083655 ms
-Logged in as admin | Expiring in: 2081098 ms
-Logged in as admin | Expiring in: 2078603 ms
-Logged in as admin | Expiring in: 2076070 ms
-Logged in as admin | Expiring in: 2073600 ms
-Logged in as admin | Expiring in: 2071096 ms
-Logged in as admin | Expiring in: 2068570 ms
-Logged in as admin | Expiring in: 2066059 ms
-Logged in as admin | Expiring in: 2063507 ms
-Logged in as admin | Expiring in: 2060972 ms
-Logged in as admin | Expiring in: 2058480 ms
-Logged in as admin | Expiring in: 2055968 ms
-Logged in as admin | Expiring in: 2053474 ms
-Logged in as admin | Expiring in: 2050931 ms
-Logged in as admin | Expiring in: 2048420 ms
-Logged in as admin | Expiring in: 2042776 ms
-Logged in as admin | Expiring in: 2041771 ms
-Logged in as admin | Expiring in: 2040950 ms
-Logged in as admin | Expiring in: 2038383 ms
-Logged in as admin | Expiring in: 2035868 ms
-Logged in as admin | Expiring in: 2033326 ms
-Logged in as admin | Expiring in: 2030744 ms
-Logged in as admin | Expiring in: 2028269 ms
-Logged in as admin | Expiring in: 2025760 ms
-Logged in as admin | Expiring in: 2023232 ms
-Logged in as admin | Expiring in: 2020747 ms
-Logged in as admin | Expiring in: 2018220 ms
-Logged in as admin | Expiring in: 2015717 ms
-Logged in as admin | Expiring in: 2013204 ms
-Logged in as admin | Expiring in: 2010693 ms
-Logged in as admin | Expiring in: 2008154 ms
-Logged in as admin | Expiring in: 2005660 ms
-Logged in as admin | Expiring in: 2003145 ms
-Logged in as admin | Expiring in: 2000643 ms
-Logged in as admin | Expiring in: 1998115 ms
-Logged in as admin | Expiring in: 1995576 ms
-Logged in as admin | Expiring in: 1993094 ms
-Logged in as admin | Expiring in: 1990576 ms
-Logged in as admin | Expiring in: 1987923 ms
-Logged in as admin | Expiring in: 1985566 ms
-Logged in as admin | Expiring in: 1983057 ms
-Logged in as admin | Expiring in: 1980547 ms
-Logged in as admin | Expiring in: 1978006 ms
-Logged in as admin | Expiring in: 1975513 ms
-Logged in as admin | Expiring in: 1973012 ms
-Logged in as admin | Expiring in: 1970507 ms
-Logged in as admin | Expiring in: 1967996 ms
-Logged in as admin | Expiring in: 1965463 ms
-Logged in as admin | Expiring in: 1962974 ms
-Logged in as admin | Expiring in: 1960468 ms
-Logged in as admin | Expiring in: 1957969 ms
-Logged in as admin | Expiring in: 1955468 ms
-Logged in as admin | Expiring in: 1952923 ms
-Logged in as admin | Expiring in: 1950421 ms
-Logged in as admin | Expiring in: 1947922 ms
-Logged in as admin | Expiring in: 1945408 ms
-Logged in as admin | Expiring in: 1942871 ms
-Logged in as admin | Expiring in: 1940389 ms
-Logged in as admin | Expiring in: 1937876 ms
-Logged in as admin | Expiring in: 1935363 ms
-Logged in as admin | Expiring in: 1932849 ms
-Logged in as admin | Expiring in: 1930337 ms
-Logged in as admin | Expiring in: 1927803 ms
-Logged in as admin | Expiring in: 1925305 ms
-Logged in as admin | Expiring in: 1922780 ms
-Logged in as admin | Expiring in: 1920292 ms
-Logged in as admin | Expiring in: 1917774 ms
-Logged in as admin | Expiring in: 1915298 ms
-Logged in as admin | Expiring in: 1912786 ms
-Logged in as admin | Expiring in: 1910253 ms
-Logged in as admin | Expiring in: 1907740 ms
-Logged in as admin | Expiring in: 1905242 ms
-Logged in as admin | Expiring in: 1902742 ms
-Logged in as admin | Expiring in: 1900225 ms
-Logged in as admin | Expiring in: 1897729 ms
-Logged in as admin | Expiring in: 1895229 ms
-Logged in as admin | Expiring in: 1892703 ms
-Logged in as admin | Expiring in: 1890185 ms
-Logged in as admin | Expiring in: 1887693 ms
-Logged in as admin | Expiring in: 1885181 ms
-Logged in as admin | Expiring in: 1882683 ms
-Logged in as admin | Expiring in: 1880147 ms
-Logged in as admin | Expiring in: 1877679 ms
-Logged in as admin | Expiring in: 1875152 ms
-Logged in as admin | Expiring in: 1872649 ms
-Logged in as admin | Expiring in: 1870120 ms
-Logged in as admin | Expiring in: 1867619 ms
-Logged in as admin | Expiring in: 1865103 ms
-Logged in as admin | Expiring in: 1862600 ms
-Logged in as admin | Expiring in: 1860081 ms
-Logged in as admin | Expiring in: 1857570 ms
-Logged in as admin | Expiring in: 1854991 ms
-Logged in as admin | Expiring in: 1852534 ms
-Logged in as admin | Expiring in: 1850027 ms
-Logged in as admin | Expiring in: 1847528 ms
-Logged in as admin | Expiring in: 1844997 ms
-Logged in as admin | Expiring in: 1842491 ms
-Logged in as admin | Expiring in: 1839966 ms
-Logged in as admin | Expiring in: 1837478 ms
-Logged in as admin | Expiring in: 1834955 ms
-Logged in as admin | Expiring in: 1832461 ms
-Logged in as admin | Expiring in: 1829926 ms
-Logged in as admin | Expiring in: 1827432 ms
-Logged in as admin | Expiring in: 1824918 ms
-Logged in as admin | Expiring in: 1822397 ms
-Logged in as admin | Expiring in: 1819780 ms
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-Validating as  with action checkAccess (token 15945301273226540615)
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-Logged in as admin | Expiring in: 1682060 ms
-Support access granted!
-Logged in as admin | Expiring in: 1679355 ms
-Logged in as admin | Expiring in: 1676478 ms
-Logged in as admin | Expiring in: 1673926 ms
-Logged in as admin | Expiring in: 1671455 ms
-Logged in as admin | Expiring in: 1668789 ms
-Logged in as admin | Expiring in: 1666308 ms
-Logged in as admin | Expiring in: 1663815 ms
-Logged in as admin | Expiring in: 1661287 ms
-Logged in as admin | Expiring in: 1658774 ms
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-Logged in as admin | Expiring in: 1650798 ms
-Logged in as admin | Expiring in: 1650369 ms
-Logged in as admin | Expiring in: 1650228 ms
-Logged in as admin | Expiring in: 1647855 ms
-Logged in as admin | Expiring in: 1645351 ms
-Logged in as admin | Expiring in: 1642853 ms
-Logged in as admin | Expiring in: 1640059 ms
-Logged in as admin | Expiring in: 1637630 ms
-Logged in as admin | Expiring in: 1635133 ms
+Logging user admin with expiry 1677515932135 (in 3599999 ms)
+Validating as  with action checkAccess_A (token 13639836170408782258)
+Logged in as admin | Expiring in: 3594413 ms
+SysLog access granted!
+Logged in as admin | Expiring in: 3593643 ms
+Validating as  with action logout (token 13639836170408782258)
+Logging out 13639836170408782258
+Validating as user with action login (token 11441397758152701436)
+Password OK for user user | Perms: 1
+Logging user user with expiry 1677515968033 (in 3600000 ms)
+Validating as  with action checkAccess_A (token 11441397758152701436)
+Logged in as user | Expiring in: 3595205 ms
+No perms!

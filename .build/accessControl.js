@@ -27,13 +27,14 @@ var import_misc = require("./misc");
 var import_database = require("./database");
 var bcrypt = require("bcrypt");
 const path = require("path");
+const fs = require("fs");
 const DB = import_database.database.collection("SystemAUTH");
 const DB2 = import_database.database.collection("SupportMessaging");
 function validate(user, pwd, action, access, callback, token = "") {
-  if (action != "refresh")
+  if (action != "refresh" && action != "refresh_log")
     (0, import_misc.systemLog)("Validating as " + user + " with action " + action + " (token " + token + ")");
   if (!token || !token.match("[0-9]+") || (!user || user && action != "CMD" && action != "sendMsg" && !user.match("^[a-zA-Z0-9_]+$")) || (!pwd || action != "CMD" && pwd.length <= 0)) {
-    if (action != "checkAccess" && action != "logout" && action != "refresh") {
+    if (action != "checkAccess" && action != "checkAccess_A" && action != "logout" && action != "refresh" && action != "refresh_log") {
       (0, import_misc.systemLog)("Unknown error");
       callback.end(JSON.stringify("ERROR"));
       return;
@@ -45,12 +46,12 @@ function validate(user, pwd, action, access, callback, token = "") {
     callback.end(JSON.stringify("SUCCESS"));
     return;
   }
-  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh") {
+  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log") {
     DB.findOne({ fieldName: "TOKEN", token }).then(
       (obj) => {
         if (obj == null) {
           (0, import_misc.systemLog)("No active session");
-          if (action == "checkAccess") {
+          if (action == "checkAccess" || action == "checkAccess_A") {
             callback.sendFile(path.join(__dirname, "../frontend", "403.html"));
           } else
             callback.end(JSON.stringify("NOACTIVE"));
@@ -58,11 +59,12 @@ function validate(user, pwd, action, access, callback, token = "") {
         }
         let expiryTime = obj.expiry;
         let tokenUser = obj.associatedUser;
-        (0, import_misc.systemLog)("Logged in as " + tokenUser + " | Expiring in: " + (expiryTime - Date.now()) + " ms");
+        if (action != "refresh")
+          (0, import_misc.systemLog)("Logged in as " + tokenUser + " | Expiring in: " + (expiryTime - Date.now()) + " ms");
         if (expiryTime < Date.now()) {
           (0, import_misc.systemLog)("Token expired. Logged out user.");
           DB.deleteOne({ fieldName: "TOKEN", token });
-          if (action == "checkAccess")
+          if (action == "checkAccess" || action == "checkAccess_A")
             callback.sendFile(path.join(__dirname, "../frontend", "403.html"));
           else
             callback.end(JSON.stringify("EXPIRE"));
@@ -105,7 +107,11 @@ function validate(user, pwd, action, access, callback, token = "") {
               (0, import_misc.systemLog)("Support access granted!");
               callback.sendFile(path.join(__dirname, "../frontend", "support.html"));
               return;
-            } else if (action == "sendMsg") {
+            } else if (action == "checkAccess_A" && perms >= 2) {
+              (0, import_misc.systemLog)("SysLog access granted!");
+              callback.sendFile(path.join(__dirname, "../frontend", "sysLog.html"));
+              return;
+            } else if (action == "sendMsg" && perms >= 1) {
               (0, import_misc.systemLog)("adding message: " + user);
               DB2.insertOne({
                 fieldName: "MSG",
@@ -116,7 +122,7 @@ function validate(user, pwd, action, access, callback, token = "") {
               });
               callback.end(JSON.stringify("SUCCESS"));
               return;
-            } else if (action == "refresh") {
+            } else if (action == "refresh" && perms >= 1) {
               DB2.find({ fieldName: "MSG" }).toArray().then((objs) => {
                 let out = "";
                 for (let i = Math.max(0, objs.length - 100); i < objs.length; i++) {
@@ -145,6 +151,10 @@ function validate(user, pwd, action, access, callback, token = "") {
                 callback.end(JSON.stringify(out));
               });
               return;
+            } else if (action == "refresh_log" && perms >= 2) {
+              let msg = fs.readFileSync("./systemLog.txt").toString();
+              msg = msg.replaceAll("\n", "<br>");
+              callback.end(JSON.stringify(msg));
             } else {
               (0, import_misc.systemLog)("No perms!");
               callback.end(JSON.stringify("ACCESS"));
@@ -203,7 +213,7 @@ async function DBGarbageCollect() {
   DB2.find({ fieldName: "MSG" }).toArray().then(
     (objs) => {
       for (let i = 0; i < objs.length; i++) {
-        if (Date.now() > objs[i].expiry)
+        if (Date.now() > objs[i].expiry || objs[i].expiry == null)
           DB2.deleteOne({ fieldName: "MSG", expiry: objs[i].expiry });
       }
     }

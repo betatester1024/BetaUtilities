@@ -23,7 +23,7 @@ export function init() {
   }
   // cnc();
   loopy();
-  DBGarbageCollect();
+  setInterval(()=>{DBGarbageCollect()}, 10000);
 }
 
 

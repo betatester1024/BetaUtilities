@@ -22,7 +22,7 @@ body {
   display: inline-block;
   animation-name: mainanim;
   position: relative;
-  top: 3vh;
+  top: 0vh;
   animation-duration: 0.5s;
   width: 95vw;
   overflow-y:auto;
@@ -32,7 +32,7 @@ body {
   0%   {top:80vh; opacity: 0;}
 /*         3% {opacity: 0.02} */
   50% {opacity: 0.4}
-  100% {top:3vh; opacity: 1}
+  100% {top:0vh; opacity: 1}
 }
 
 
@@ -281,7 +281,7 @@ div#overlay {
   text-align: center;
   position: relative;
   left: auto;
-  top: calc( (100vh - 2.25em) / 2 );
+  top: calc(50vh - 0.5em);
 }
 
  .material-symbols-outlined {

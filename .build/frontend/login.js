@@ -7,6 +7,8 @@ function onLoad() {
       window.open("/signup", "_self");
     });
   }
+  document.getElementById("alert").hidden = true;
+  document.getElementById("h1").hidden = true;
 }
 function newUser(e, accessclass) {
   let id = e.target.id;
@@ -51,7 +53,7 @@ function validateLogin(action = "login", extData) {
       params = "user=&pass=&action=logout&token=" + sessionID;
     if (pass)
       pass.value = "";
-    if (action != "refresh")
+    if (action != "refresh" && action != "refresh_log")
       console.log("SENDING " + params);
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "login", true);
@@ -73,7 +75,7 @@ function validateLogin(action = "login", extData) {
             validateLogin("refresh", "");
             return;
           }
-          if (action == "refresh") {
+          if (action == "refresh" || action == "refresh_log") {
             if (res == "ACCESS" || res == "EXPIRE" || res == "NOACTIVE" || res == "ERROR") {
               location.reload();
             }
@@ -138,11 +140,12 @@ function validateLogin(action = "login", extData) {
       }
     };
     xhr.send(params);
-    if (action != "sendMsg" && action != "refresh") {
+    if (action != "sendMsg" && action != "refresh" && action != "refreshLog") {
       let ele = document.getElementById("overlay");
       if (ele)
         ele.className += "active";
       ele = document.getElementById("h1");
+      ele.hidden = false;
       if (ele)
         ele.className = "overload";
     }
@@ -167,6 +170,7 @@ function alertDialog(txt, callback) {
   ele.innerHTML = txt;
   dialog = true;
   cbk = callback;
+  div.hidden = false;
 }
 function clearalert() {
   if (dialog && cbk) {
@@ -176,6 +180,7 @@ function clearalert() {
     dialog = false;
     cbk();
     cbk = null;
+    alert.hidden = true;
   }
 }
 function updateTextArea(msgs) {

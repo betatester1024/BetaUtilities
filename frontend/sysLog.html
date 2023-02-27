@@ -7,10 +7,8 @@
     </script>
     <script>
       function onLoad() {
-        validateLogin("refresh", "");
-        setInterval(()=>{validateLogin("refresh", "")}, 2500);
-        document.getElementById("alert").hidden=true;
-        document.getElementById("h1").hidden=true;
+        validateLogin("refresh_log", "");
+        setInterval(()=>{validateLogin("refresh_log", "")}, 20000);
       }
     </script>
     <link rel="stylesheet" href="/globalformat.css">
@@ -55,6 +53,9 @@
         overflow-y: scroll;
         height: 60vh;
         margin-left: 5%;
+        text-align: left;
+        color: #0a84ff;
+        font-family: NotoSansDisplay;
       }
       .beta {
         color: #00ee00;
@@ -68,23 +69,13 @@
   </head>
   
   
-  <body onload = "onLoad(); setTimeout(()=>{document.getElementById('textINP').focus({ preventScroll: true });}, 500);">
+  <body onload = "onLoad();">
     <div id = "mainDiv">
-      <h1>BetaOS Support</h1>
+      <h1>System Log</h1>
       <hr class="rounded"></hr>
-      <div id="msgArea" onclick="document.getElementById('textINP').focus()">
+      <div id="msgArea">
         <b>Retrieving your messages...</b>
         <hr class="btnHr"></hr>
-      </div>
-      <div>
-        <div id="textDiv">
-          <input id="textINP" type="text" onchange="sendMsg()">
-          <hr class="inpHr"></hr>
-        </div>
-        <button id="send" onclick="sendMsg();">
-          <span class="material-symbols-outlined">send</span><br>
-<!--           <hr class="btnHr"></hr> -->
-        </button>
       </div>
       <button class="HOME" onclick="window.open('../', '_self');">&#x00AB Return to home<br><hr class="btnHr"></hr></button>
     </div>

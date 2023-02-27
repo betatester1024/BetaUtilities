@@ -4,6 +4,8 @@ function onLoad() {
   if (!match && document.URL.match("admin")) {
     alertDialog("You're not logged in!", () => { window.open("/signup", "_self"); });
   }
+  document.getElementById("alert").hidden=true;
+  document.getElementById("h1").hidden=true;
 }
 
 function newUser(e: Event, accessclass: string) {
@@ -55,7 +57,7 @@ function validateLogin(action: string = "login", extData: string) {
     }
     else params = "user=&pass=&action=logout&token=" + sessionID;
     if (pass) pass.value = "";
-    if (action != "refresh") console.log("SENDING " + params);
+    if (action != "refresh" && action != "refresh_log") console.log("SENDING " + params);
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "login", true);
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -73,7 +75,7 @@ function validateLogin(action: string = "login", extData: string) {
             validateLogin("refresh", "");
             return;
           }
-          if (action == "refresh") {
+          if (action == "refresh" || action== "refresh_log") {
             if (res == "ACCESS" || res == "EXPIRE" || res == "NOACTIVE" || res == "ERROR") {
               location.reload();
             }
@@ -123,10 +125,11 @@ function validateLogin(action: string = "login", extData: string) {
       }
     }
     xhr.send(params);
-    if (action != 'sendMsg' && action != "refresh") {
+    if (action != 'sendMsg' && action != "refresh" && action != "refreshLog") {
       let ele = document.getElementById('overlay');
       if (ele) ele.className += "active";
       ele = document.getElementById('h1');
+      ele.hidden=false;
       if (ele) ele.className = "overload";
     }
   } else if (!(user.value.match("^[a-zA-Z0-9_]+$"))) {
@@ -153,6 +156,7 @@ function alertDialog(txt: string, callback: () => any) {
   ele.innerHTML = txt;
   dialog = true;
   cbk = callback;
+  div.hidden=false;
   // console.log("ALERT");
 }
 
@@ -164,6 +168,7 @@ function clearalert() {
     dialog = false;
     cbk()
     cbk = null;
+    alert.hidden=true;
   }
 }
 

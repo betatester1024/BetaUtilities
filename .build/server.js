@@ -85,6 +85,9 @@ function updateServer() {
   app.get("/support", (req, res) => {
     (0, import_accessControl.validate)("", "", "checkAccess", "", res, req.query.token);
   });
+  app.get("/syslog", (req, res) => {
+    (0, import_accessControl.validate)("", "", "checkAccess_A", "", res, req.query.token);
+  });
   app.get("/*", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "404.html"));
   });

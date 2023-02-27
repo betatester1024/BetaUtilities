@@ -9,7 +9,10 @@ const app = express();
 const port = 4000;
 import {rooms} from './messageHandle';
 import { validate } from './accessControl';
-export function updateServer() {  
+import {systemLog} from './misc';
+export function updateServer() { 
+  systemLog("");
+  systemLog("Server active!")
   
   app.get('/', (req:any, res:any) => {
     res.sendFile(path.join( __dirname, '../frontend', 'index.html' ));
@@ -44,16 +47,14 @@ export function updateServer() {
     res.sendFile(path.join( __dirname, '../frontend', 'logout.html' ));
   });
 
-  app.get('./signup', (req:any, res:any) => {
+  app.get('/signup', (req:any, res:any) => {
     res.sendFile(path.join( __dirname, '../frontend', 'signup.html' ));
   });
   
   app.post('/login', urlencodedParser, function (req:any, res:any) {  
    // Prepare output in JSON format  
     // if ()
-    // console.log(req.body)
-    console.log("Logging in as "+req.body.action + "+"+req.body.token);
-    validate(req.body.user as string, req.body.pass as string, req.body.action, req.body.access as string, res, req.body.token as string)
+    validate(decodeURIComponent(req.body.user) as string, decodeURIComponent(req.body.pass) as string, req.body.action, req.body.access as string, res, req.body.token as string)
    
   });
 
@@ -70,9 +71,17 @@ export function updateServer() {
     res.sendFile(path.join( __dirname, '../frontend', 'status.html' ));
   });
 
-  app.get("/loader.css", (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'loader.css' ));
+  app.get("/globalformat.css", (req:any, res:any) => {
+    res.sendFile(path.join( __dirname, '../frontend', 'globalformat.css' ));
   }); 
+
+  app.get("/support", (req:any, res:any) => {
+    validate("", "", "checkAccess", "", res, req.query.token)
+  })
+  
+  app.get("/syslog", (req:any, res:any) => {
+    validate("", "", "checkAccess_A", "", res, req.query.token)
+  })
 
   app.get('/*', (req:any, res:any) => {
     res.sendFile(path.join( __dirname, '../frontend', '404.html' ));
@@ -84,6 +93,6 @@ export function updateServer() {
   // app.get()
   
   app.listen(port, () => {
-    console.log(`Front-end is running on ${port}.`);
+    systemLog(`Front-end is running on ${port}.`);
   });
 }

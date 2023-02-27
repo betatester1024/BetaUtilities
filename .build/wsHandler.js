@@ -22,14 +22,17 @@ __export(wsHandler_exports, {
 });
 module.exports = __toCommonJS(wsHandler_exports);
 var import_ws = require("ws");
+var import_database = require("./database");
 var import_messageHandle = require("./messageHandle");
 var import_messageHandle2 = require("./messageHandle");
+var import_misc = require("./misc");
 const DATALOGGING = false;
 const Database = require("@replit/database");
 class WS {
   static CALLTIMEOUT = 3e4;
   url;
   nick;
+  setNickQ = false;
   socket;
   pausedQ = false;
   roomName;
@@ -41,7 +44,6 @@ class WS {
   transferOutQ = false;
   bypass = false;
   confirmcode = -1;
-  static db = new Database();
   static toSendInfo(msg, data = null) {
     if (data)
       return `{"type":"send", "data":{"content":"${msg}","parent":"${data["data"]["id"]}"}}`;
@@ -49,23 +51,37 @@ class WS {
       return `{"type":"send", "data":{"content":"${msg}"}`;
   }
   incrRunCt() {
-    WS.db.get("RUNCOUNT").then((value) => {
-      WS.db.set("RUNCOUNT", value + 1);
-    });
+    import_database.DB.findOne({ fieldName: "COUNTERS" }).then(
+      (obj) => {
+        import_database.DB.updateOne(
+          { fieldName: "COUNTERS" },
+          {
+            $set: { "runCt": obj.runCt + 1 },
+            $currentDate: { lastModified: true }
+          }
+        );
+      }
+    );
   }
   incrPingCt() {
-    WS.db.get("PINGCOUNT").then((value) => {
-      WS.db.set("PINGCOUNT", value + 1);
-    });
+    import_database.DB.findOne({ fieldName: "COUNTERS" }).then(
+      (obj) => {
+        import_database.DB.updateOne(
+          { fieldName: "COUNTERS" },
+          {
+            $set: { "pingCt": obj.pingCt + 1 },
+            $currentDate: { lastModified: true }
+          }
+        );
+      }
+    );
   }
   displayStats(data) {
-    WS.db.get("RUNCOUNT").then((value) => {
-      let RUNCOUNT = value;
-      WS.db.get("PINGCOUNT").then((value2) => {
-        let PINGCOUNT = value2;
-        this.delaySendMsg("Run count: " + RUNCOUNT + "\\nPing count: " + PINGCOUNT, data, 0);
-      });
-    });
+    import_database.DB.findOne({ fieldName: "COUNTERS" }).then(
+      (obj) => {
+        this.delaySendMsg("Run count: " + obj.runCt + "\\nPing count: " + obj.pingCt, data, 0);
+      }
+    );
   }
   bumpCallReset(data) {
     if (this.callReset)
@@ -100,13 +116,16 @@ class WS {
   }
   sendMsg(msg, data) {
     this.socket.send(WS.toSendInfo(msg, data));
+    this.incrRunCt();
   }
   onOpen() {
-    console.log("BetaUtilities open in " + this.socket.url);
+    (0, import_misc.systemLog)("BetaUtilities open in " + this.socket.url);
     WS.resetTime = 1e3;
   }
   initNick() {
-    this.changeNick(this.nick);
+    if (!this.setNickQ)
+      this.changeNick(this.nick);
+    this.setNickQ = true;
   }
   changeNick(nick) {
     this.socket.send(`{"type": "nick", "data": {"name": "${nick}"},"id": "1"}`);
@@ -122,7 +141,7 @@ class WS {
       let msg = data["data"]["content"].toLowerCase().trim();
       let snd = data["data"]["sender"]["name"];
       if (DATALOGGING)
-        console.log(`(${this.roomName})[${snd}] ${msg}`);
+        (0, import_misc.systemLog)(`(${this.roomName})[${snd}] ${msg}`);
       if (msg == "!kill @" + this.nick.toLowerCase()) {
         this.sendMsg("/me crashes", data);
         setTimeout(() => {
@@ -213,9 +232,9 @@ class WS {
         new WS(this.url, this.nick, this.roomName, this.transferOutQ);
         (0, import_messageHandle2.updateActive)(this.roomName, true);
       }, WS.resetTime);
-      console.log("Retrying in: " + Math.round(WS.resetTime / 1e3) + " seconds");
+      (0, import_misc.systemLog)("Retrying in: " + Math.round(WS.resetTime / 1e3) + " seconds");
       let dateStr = new Date().toLocaleDateString("en-US", { timeZone: "EST" }) + "/" + new Date().toLocaleTimeString("en-US", { timeZone: "EST" });
-      console.log("[close] Connection at " + this.url + " was killed at " + dateStr);
+      (0, import_misc.systemLog)("[close] Connection at " + this.url + " was killed at " + dateStr);
     }
   }
   constructor(url, nick, roomName, transferQ) {

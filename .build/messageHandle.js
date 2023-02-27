@@ -26,11 +26,13 @@ module.exports = __toCommonJS(messageHandle_exports);
 var import_wsHandler = require("./wsHandler");
 var import_misc = require("./misc");
 var import_wordListHandle = require("./wordListHandle");
+var import_database = require("./database");
 const serviceKey = process.env["serviceKey"];
 const serviceResponse = process.env["serviceResponse"];
 let DATE = new Date();
 let VERSION = "ServiceVersion STABLE 1.5271 | Build-time: " + DATE.toUTCString();
 const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! Press :three: to toggle ANTISPAM.\\n\\n Press :zero: to exit support at any time.`;
+let workingUsers = [];
 let leetlentCt = 1;
 let wordleCt = 1;
 let STARTTIME = Date.now();
@@ -48,7 +50,7 @@ function replyMessage(msg, sender, data) {
     this.incrPingCt();
   }
   if (msg == "!debugwordle") {
-    console.log(import_wordListHandle.validWords[import_wordListHandle.todayWordID], import_wordListHandle.todayLeetCODE.join(""));
+    (0, import_misc.systemLog)(import_wordListHandle.validWords[import_wordListHandle.todayWordID] + " " + import_wordListHandle.todayLeetCODE.join(""));
     return "> See console <";
   }
   if (msg == "!conjure @" + this.nick.toLowerCase()) {
@@ -69,19 +71,69 @@ function replyMessage(msg, sender, data) {
     this.clearCallReset();
     return (0, import_misc.getUptimeStr)(STARTTIME) + " (Total uptime: " + (0, import_misc.getUptimeStr)() + ")";
   }
+  import_database.DB.findOne({ fieldName: "WORKINGUSERS" }).then((obj) => {
+    let match3 = msg.match("^!work @(.*)$");
+    let workingUsers2 = obj.working;
+    if (match3 || msg == "!work") {
+      if (match3 && workingUsers2.indexOf(match3[1].toLowerCase()) >= 0) {
+        this.delaySendMsg("This user is already supposed to be working!", data, 0);
+        return;
+      } else if (match3) {
+        workingUsers2.push(match3[1].toLowerCase());
+        this.delaySendMsg("Will scream at @" + match3[1], data, 0);
+      } else if (workingUsers2.indexOf(sender.toLowerCase()) < 0) {
+        workingUsers2.push(sender.toLowerCase());
+        this.changeNick("WorkBot V2");
+        setTimeout(() => this.changeNick(this.nick), 10);
+      } else {
+        this.delaySendMsg("Wait, you're already in the work- GET TO WORK.", data, 0);
+        return;
+      }
+    }
+    match3 = msg.match("^!play @(.*)$");
+    if (match3 || msg == "!play") {
+      if (match3 && workingUsers2.indexOf(match3[1].toLowerCase()) < 0) {
+        this.delaySendMsg("This user was not working in the first place.", data, 0);
+        return;
+      } else if (match3) {
+        workingUsers2.splice(workingUsers2.indexOf(match3[1].toLowerCase()), 1);
+        this.delaySendMsg("They're off the hook... for now.", data, 0);
+      } else {
+        workingUsers2.splice(workingUsers2.indexOf(sender.toLowerCase()), 1);
+        this.delaySendMsg("You're off the hook... for now.", data, 0);
+      }
+    }
+    if (workingUsers2.indexOf(sender.toLowerCase()) >= 0) {
+      this.changeNick("WorkBot V2");
+      this.delaySendMsg("GET TO WORK.", data, 0);
+      this.changeNick(this.nick);
+    }
+    ;
+    import_database.DB.updateOne(
+      { fieldName: "WORKINGUSERS" },
+      {
+        $set: { working: workingUsers2 },
+        $currentDate: { lastModified: true }
+      }
+    );
+  });
+  if (msg == "!renick") {
+    this.changeNick(this.nick);
+    return ":white_check_mark:";
+  }
   if (msg.match("!version[ ]+@" + this.nick.toLowerCase())) {
     return VERSION;
   }
   let match2 = msg.match("@" + this.nick.toLowerCase() + " !mitoseto &([a-z0-9]+) as @(.+)");
   if (match2) {
-    console.log(match2);
+    (0, import_misc.systemLog)(match2);
     let newNick = match2[2] == null ? "BetaUtilities" : match2[2];
     if (rooms.indexOf(match2[1]) >= 0)
       return "We're already in this room!";
     try {
       new import_wsHandler.WS("wss://euphoria.io/room/" + match2[1] + "/ws", newNick, match2[1], false);
     } catch (e) {
-      console.log(e);
+      (0, import_misc.systemLog)(e);
     }
     updateActive(match2[1], true);
     return "Sent @" + newNick + " to &" + match2[1];
@@ -93,13 +145,12 @@ function replyMessage(msg, sender, data) {
   if (msg.match(/^!potato$/))
     return "potato.io";
   if (msg == "!rating @" + this.nick.toLowerCase()) {
-    import_wsHandler.WS.db.get("SUM").then((value) => {
-      import_wsHandler.WS.db.get("CT").then((value2) => {
-        let r = "Current @" + this.nick + " rating - " + (value / value2).toFixed(2);
+    import_database.DB.findOne({ fieldName: "RATING" }).then(
+      (obj) => {
+        let r = "Current @" + this.nick + " rating - " + (obj.SUM / obj.COUNT).toFixed(2);
         this.delaySendMsg(r, data, 0);
-      });
-    });
-    return "";
+      }
+    );
   }
   if (msg == "!status @" + this.nick.toLowerCase()) {
     return "Status-tracker: https://betatester1024.repl.co";
@@ -258,10 +309,13 @@ function replyMessage(msg, sender, data) {
     else {
       return "I don't think you entered that right.";
     }
-    import_wsHandler.WS.db.get("SUM").then((value) => {
-      import_wsHandler.WS.db.get("CT").then((value2) => {
-        import_wsHandler.WS.db.set("SUM", value + dv);
-        import_wsHandler.WS.db.set("CT", value2 + 1);
+    import_database.DB.findOne({ fieldName: "RATING" }).then((obj) => {
+      import_database.DB.updateOne({ fieldName: "RATING" }, {
+        $set: {
+          SUM: obj.SUM + dv,
+          COUNT: obj.COUNT + 1
+        },
+        $currentDate: { lastModified: true }
       });
     });
     this.callStatus = -1;
@@ -298,7 +352,7 @@ function replyMessage(msg, sender, data) {
         this.bypass = false;
         this.callTimes = [];
         this.sendMsg("/me has automatically re-enabled ANTISPAM", data);
-      }, 5 * 60 * 1e3);
+      }, 30 * 60 * 1e3);
     return "ANTISPAM is currently: " + (this.bypass ? "OFF" : "ON");
   }
   if (this.callStatus == 8 && msg.match("^[a-z]{5}$")) {

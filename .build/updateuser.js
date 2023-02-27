@@ -18,19 +18,33 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var updateuser_exports = {};
 __export(updateuser_exports, {
-  updateuser: () => updateuser
+  initUsers: () => initUsers,
+  updateUser: () => updateUser
 });
 module.exports = __toCommonJS(updateuser_exports);
-var import_wsHandler = require("./wsHandler");
+var import_database = require("./database");
 var bcrypt = require("bcrypt");
-function updateuser() {
-  import_wsHandler.WS.db.set("betatester1024", bcrypt.hashSync(process.env["betatester1024"], 8));
-  import_wsHandler.WS.db.set("betatester1024^PERM", "2");
-  import_wsHandler.WS.db.set("user", bcrypt.hashSync("pass", 8));
-  import_wsHandler.WS.db.set("user^PERM", "1");
+const DB = import_database.database.collection("SystemAUTH");
+function initUsers() {
+  updateUser("betatester1024", process.env["betatester1024"], 3);
+  updateUser("user", "pass", 1);
+}
+function updateUser(username, pwd, access = 1) {
+  DB.updateOne(
+    { fieldName: "UserData", user: username },
+    {
+      $set: {
+        permLevel: access,
+        passHash: bcrypt.hashSync(pwd, 8)
+      },
+      $currentDate: { lastModified: true }
+    },
+    { upsert: true }
+  );
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  updateuser
+  initUsers,
+  updateUser
 });
 //# sourceMappingURL=updateuser.js.map

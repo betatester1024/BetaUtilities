@@ -6,7 +6,7 @@ export function getUptimeStr(STARTTIME:number=-1) {
     return formatTime(time);
   }
   let timeElapsed = Date.now() - STARTTIME;
-  let date = new Date(Date.now());
+  let date = new Date(STARTTIME);
   return (
     `/me has been up since ${date.toUTCString()} (It's been ${formatTime(timeElapsed)})`
   );
@@ -37,4 +37,9 @@ function formatTime(ms:number) {
 
 function format(n:number) {
   return n < 10 ? "0" + n : n;
+}
+
+export function systemLog(thing:any) {
+  // console.log(thing);
+  fs.writeFileSync('./systemLog.txt', fs.readFileSync("./systemLog.txt")+thing.toString()+"\n");
 }

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sign up</title>
+    <meta name="viewport" content="width=device-width">
+    <script src="/login.js">
+    </script>
+    <link rel="stylesheet" href="/globalformat.css">
+  </head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
+  <body onload = "onLoad(); setTimeout(()=>{document.getElementById('userINP').focus();}, 500);">
+    <div id = "mainDiv">
+      <h1>Sign-up
+      </h1>
+      <hr class="rounded"></hr>
+      <div id="login">
+      <form action = "javascript:validateLogin('signup', '');">
+        <div id="userDiv" onclick="document.getElementById('userINP').focus();" onchange="document.getElementById('passINP').focus();">
+<!--           <p id="userP">Username:</p> -->
+          <input type="text" placeholder="Username" id="userINP"/>
+          <hr class="inpHr" id="userhr"></hr>
+        </div><div id="pwdDiv" onclick="document.getElementById('passINP').focus();">
+<!--           <p id="passP"> -->
+<!--             Password:</p> -->
+          <input type="password" id="passINP" placeholder="Password" onchange="document.getElementById('passINPCONF').focus();"/>
+          <hr class="inpHr"></hr>
+         
+        </div> <div id="pwdDiv2" onclick="document.getElementById('passINPCONF').focus();">
+          <input type="password" id="passINPCONF" placeholder="Confirm password"/>
+          <hr class="inpHr"></hr>
+        </div>
+        <button type="submit" id="loginBTN" onclick="validateLogin('signup', '')">Sign up<br><hr class="btnHr"></hr></button>
+      </div>
+      </form>
+      <button class="HOME" onclick="window.open('../', '_self');">&#x00AB Return to home<br><hr class="btnHr"></hr></button>
+    </div>
+    <h1 class="beforeoverload" id="h1">Sorry, this is taking longer than expected. 
+      <br>
+      <a href = '/'> Return to home</a>
+    </h1>
+     <div id="alert" onclick = "clearalert()" onkeydown="clearalert()"><p id="alerttxt" style="width: 90%"></p><button style="position: relative; top: 50vh; height: 4em;"><u>> Continue <</u></button></div>
+    <div id="overlay"></div>
+  </body>
+ </html>

@@ -1,9 +1,10 @@
 const DATALOGGING = false;
 // Copyright (c) 2023 BetaOS
 import {WebSocket} from 'ws';
-import {init} from './initialiser'
+import {DB} from './database';
 import {replyMessage} from './messageHandle';
 import { updateActive } from './messageHandle';
+import {systemLog} from './misc';
 
 // const { getUserInfo } = require("@replit/repl-auth")
 const Database = require("@replit/database")
@@ -14,6 +15,7 @@ export class WS
   static CALLTIMEOUT = 30000;
   url:string
   nick:string;
+  setNickQ: boolean = false;
   socket: WebSocket;
   pausedQ=false;
   roomName:string;
@@ -25,26 +27,37 @@ export class WS
   transferOutQ = false; // is a room that one should recommend transferring out?
   bypass = false;
   confirmcode = -1;
-  static db = new Database();
+  // static db = new Database();
   static toSendInfo(msg: string, data:any=null) {
     if (data) return `{"type":"send", "data":{"content":"${msg}","parent":"${data["data"]["id"]}"}}`;
     else return `{"type":"send", "data":{"content":"${msg}"}`;
   }
 
   incrRunCt() {
-    WS.db.get("RUNCOUNT").then((value:number) => { WS.db.set("RUNCOUNT", value + 1) });
+    DB.findOne({fieldName: "COUNTERS"}).then(
+    (obj: {runCt:number})=>{
+      DB.updateOne({fieldName:"COUNTERS"}, 
+        {
+          $set: {'runCt': obj.runCt+1},
+          $currentDate: { lastModified: true }
+        })
+    });
   }
   incrPingCt() {
-    WS.db.get("PINGCOUNT").then((value:number) => { WS.db.set("PINGCOUNT", value + 1) });
+    DB.findOne({fieldName: "COUNTERS"}).then(
+    (obj: {pingCt:number})=>{
+      DB.updateOne({fieldName:"COUNTERS"}, 
+        {
+          $set: {'pingCt': obj.pingCt+1},
+          $currentDate: { lastModified: true }
+        })
+    });
   }
 
   displayStats(data:any) {
-    WS.db.get("RUNCOUNT").then((value:number) => {
-      let RUNCOUNT = value;
-      WS.db.get("PINGCOUNT").then((value2:number) => {
-        let PINGCOUNT = value2;
-        this.delaySendMsg("Run count: "+RUNCOUNT+"\\nPing count: "+PINGCOUNT, data, 0);
-      })
+    DB.findOne({fieldName: "COUNTERS"}).then(
+      (obj: {runCt:number, pingCt: number}) => {
+        this.delaySendMsg("Run count: "+obj.runCt+"\\nPing count: "+obj.pingCt, data, 0);
     });
   }
 
@@ -85,15 +98,17 @@ export class WS
 
   sendMsg(msg:string, data:any) {
     this.socket.send(WS.toSendInfo(msg, data))
+    this.incrRunCt();
   }
   
   onOpen() {
-    console.log("BetaUtilities open in "+this.socket.url);
+    systemLog(("BetaUtilities open in "+this.socket.url));
     WS.resetTime =1000;
   }
 
   initNick() {
-    this.changeNick(this.nick)
+    if (!this.setNickQ) this.changeNick(this.nick)
+    this.setNickQ = true;
   }
 
   changeNick(nick:string) {
@@ -113,7 +128,7 @@ export class WS
 
       let msg = data["data"]["content"].toLowerCase().trim();
       let snd = data["data"]["sender"]["name"];
-      if (DATALOGGING) console.log(`(${this.roomName})[${snd}] ${msg}`);
+      if (DATALOGGING) systemLog((`(${this.roomName})[${snd}] ${msg}`));
       // Required methods
       // !kill
       if (msg == "!kill @" + this.nick.toLowerCase()) {
@@ -210,7 +225,7 @@ export class WS
 
   static resetTime = 1000;
   onClose(event:any) {
-    // console.log("Perished in:"+this.roomName);
+    // systemLog(("Perished in:"+this.roomName);
     if (event != 1000 && event!=1006) {
       updateActive(this.roomName, false);
       setTimeout(() => {
@@ -230,9 +245,9 @@ export class WS
         updateActive(this.roomName, true);
       }, WS.resetTime);
       
-      console.log("Retrying in: "+Math.round(WS.resetTime/1000)+" seconds");
+      systemLog(("Retrying in: "+Math.round(WS.resetTime/1000)+" seconds"));
       let dateStr = (new Date()).toLocaleDateString("en-US", {timeZone:"EST"})+"/"+(new Date()).toLocaleTimeString("en-US", {timeZone:"EST"});
-      console.log("[close] Connection at "+this.url+" was killed at "+dateStr);
+      systemLog(("[close] Connection at "+this.url+" was killed at "+dateStr));
     }
   }
 
@@ -248,7 +263,7 @@ export class WS
     this.socket.on('close', this.onClose.bind(this));
     this.socket.on('error', (e)=>{
       this.socket.close(1000, "");
-      // console.log("ERROR for room-ID: "+this.roomName)
+      // systemLog(("ERROR for room-ID: "+this.roomName)
       updateActive(this.roomName, false);
     })
     this.replyMessage = replyMessage;

@@ -18,7 +18,8 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var misc_exports = {};
 __export(misc_exports, {
-  getUptimeStr: () => getUptimeStr
+  getUptimeStr: () => getUptimeStr,
+  systemLog: () => systemLog
 });
 module.exports = __toCommonJS(misc_exports);
 const fs = require("fs");
@@ -28,7 +29,7 @@ function getUptimeStr(STARTTIME = -1) {
     return formatTime(time);
   }
   let timeElapsed = Date.now() - STARTTIME;
-  let date = new Date(Date.now());
+  let date = new Date(STARTTIME);
   return `/me has been up since ${date.toUTCString()} (It's been ${formatTime(timeElapsed)})`;
 }
 function formatTime(ms) {
@@ -45,8 +46,12 @@ function formatTime(ms) {
 function format(n) {
   return n < 10 ? "0" + n : n;
 }
+function systemLog(thing) {
+  fs.writeFileSync("./systemLog.txt", fs.readFileSync("./systemLog.txt") + thing.toString() + "\n");
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  getUptimeStr
+  getUptimeStr,
+  systemLog
 });
 //# sourceMappingURL=misc.js.map

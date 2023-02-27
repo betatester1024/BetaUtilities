@@ -6,111 +6,87 @@
       // alert(document.cookie);
       if (document.cookie.match("session=[0-9.]+")) {
         let ele = document.getElementById("loginbtn");
-        ele.innerHTML = "Logout<br><hr class=\"btnHr\"></hr>";
-        ele.onclick= ()=> {window.open('/logout', '_self');}
+        ele.innerHTML = "<span class=\"material-symbols-outlined\">logout</span> Logout<br><hr class=\"btnHr\"></hr>";
+        ele.onclick= ()=> {window.open('/logout', '_self');};
+      } else {
+        let ele = document.getElementById("configbtn");
+        ele.innerHTML = "Sign up<br><hr class=\"btnHr\"></hr>";
+        ele.onclick= ()=> {window.open('/signup', '_self');}
       }
+    }
+    function support() {
+      let match=document.cookie.match("session=([0-9.]+)")
+      window.open('./support?token='+(match?match[1]:"NONE"), '_self');
+    }
+    function log() {
+      let match=document.cookie.match("session=([0-9.]+)")
+      window.open('./syslog?token='+(match?match[1]:"NONE"), '_self');
     }
     </script>
     <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="/globalformat.css">
     <style>
       html {
-        background-color: #eee;
-      } 
-      h1 {
-        font-family: NotoSansDisplay;
-        
-/*         display: inline-block; */
-        left: auto;
-/*         margin: 0px; */
-        font-size: 4em;
-        color: #0a84ff;
-      }
-      body {
-        text-align: center;
-        overflow: hidden; /* Hide scrollbars */
-      }
-      #mainDiv{
-/*         text-align: center; */
-        display: inline-block;
-        animation-name: mainanim;
-        position: relative;
-        top: 10vh;
-        animation-duration: 0.4s;
-        width: 90vw;
-      }
-      @keyframes mainanim {
-        0%   {top:80vh; opacity: 0;}
-/*         3% {opacity: 0.02} */
-        50% {opacity: 0.4}
-        100% {top:10vh; opacity: 1}
-      }
-      hr.rounded {
-        border: 3px solid #0e0;
-        width: 90vw;
-        border-radius: 5px;
-      }
-      hr {
-        border: 2px solid #000;
-        border-radius: 4px;
+        overflow-y: scroll;  
       }
       button {
         width: 5em;
         height: 2.5em;
-        border: none;
         border-radius: 0.3em;
         font-size: 2.5em;
-        background-color: #eee; 
-        color: #0a84ff;
       }
-      hr.btnHr {
-        opacity: 0;
+      span {
+        font-size: 1.25em !important;
         position: relative;
-        margin: 2px;
+        top: 10px;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+        'FILL' 0,
+        'wght' 500,
+        'GRAD' 0,
+        'opsz' 48
+      }
+      .full {
         display: inline-block;
-        right: auto;
-        transition: opacity, width 0.5s ease-in-out;
-      }
-      button {
-        transition: background-color 0.5s ease-in-out;
-        background-color: #eee;
-        text-align: center;
-/*         display: flex; */
-/*         justify-content: center; */
-      }
-      button:hover > hr.btnHr{
-        position: relative;
-        right: auto;
-        display: inline-block;
-        opacity: 1;
-        animation-name: buttonHover;
-        animation-duration: 0.5s;
-        width: 90%;
-      }
-      button:hover {
-        background-color: #fff;
-      }
-      @keyframes buttonHover {
-        0% {width: 0%;}
-        100% {width: 90%} 
-      }
-
-      @font-face { 
-        font-family: NotoSansDisplay; 
-        src: url('../NotoSansDisplay-Variable.ttf'), local('Courier New'); 
-        font-display: swap;
+        max-width: 15em;
+        width: min(15em, 100%)
       }
     </style>
   </head>
-  <link rel="preload" href="https://fonts.googleapis.com">
-  <link rel="preload" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <body onload = "onLoad()">
     <div id = "mainDiv">
       <h1>Welcome to BetaOS Services!</h1>
       <hr class="rounded"></hr>
-      <button onclick="window.open('./status', '_self');">Status<br><hr class="btnHr"></hr></button>
-      <button onclick="window.open('./login', '_self');" id="loginbtn">Login<br><hr class="btnHr"></hr></button>
-      <button onclick="window.open('./admin', '_self');">Config<br><hr class="btnHr"></hr></button>
+      <button onclick="window.open('./status', '_self');">
+        <span class="material-symbols-outlined">check</span>
+        Status<br><hr class="btnHr"></hr></button>
+      <button onclick="window.open('./login', '_self');" id="loginbtn">
+        <span class="material-symbols-outlined">login</span>
+        Login<br><hr class="btnHr"></hr></button>
+      <button onclick="window.open('./admin', '_self');" id="configbtn">
+        <span class="material-symbols-outlined">settings</span>
+        Config<br><hr class="btnHr"></hr></button>
+      <br>
+      <button onclick="support()" class="full">
+        <span class="material-symbols-outlined">help</span>
+        Support
+        <hr class="btnHr"></hr>
+      </button><br>
+      <button onclick="log()">
+        <span class="material-symbols-outlined">security</span>
+        SysLog
+        <hr class="btnHr"></hr>
+      </button>
+      <button onclick="window.open('./about')" >
+        <span class="material-symbols-outlined">info</span>
+        About
+        <hr class="btnHr"></hr>
+      </button>
     </div>
   </body>
  </html>

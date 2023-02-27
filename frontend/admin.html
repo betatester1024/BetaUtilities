@@ -5,266 +5,34 @@
     <meta name="viewport" content="width=device-width">
     <script src="/login.js">
     </script>
+    <link rel="stylesheet" href="/globalformat.css">
     <style>
-      html {
-        background-color: #eee;
-      } 
-      h1 {
-        font-family: NotoSansDisplay;
-        margin-top: 0px;
-/*         display: inline-block; */
-        left: auto;
-        font-size: 5em;
-        color: #0a84ff;
-      }
-      hr {
-        border: 2px solid #000;
-        border-radius: 4px;
-      }
-      body {
-        text-align: center;
-        overflow: hidden; /* Hide scrollbars */
-      }
-      #mainDiv{
-/*         text-align: center; */
-        display: inline-block;
-        animation-name: mainanim;
-        position: relative;
-        top: 3vh;
-        animation-duration: 0.5s;
-        width: 90vw;
-      }
-      @keyframes mainanim {
-        0%   {top:80vh; opacity: 0;}
-/*         3% {opacity: 0.02} */
-        50% {opacity: 0.4}
-        100% {top:3vh; opacity: 1}
-      }
-      hr.rounded {
-        border: 3px solid #0e0;
-        width: 90vw;
-        border-radius: 5px;
-      }
-      button, select, #loginDIV {
-        width: 89vw;
-        height: 110%;
-        border: none;
-        border-radius: 3vh;
-        font-size: 2em;
-        background-color: #eee; 
-        color: #0a84ff;
-        transition: background-color 0.5s ease-in-out;
-        background-color: #eee;
-        text-align: center;
-      }
-      select {
-        width: 8.5em;
-        height: 70%;
-        font-size: 1.95em;
-        border: 1px solid #eee;
-        border-radius: 10px;
-      }
-      hr.btnHr, hr.inpHr {
-        opacity: 0;
-        position: relative;
-        margin: 10px;
-        width: 1vh;
-        display: block;
-        transition: opacity, width 0.5s ease-in-out;
-      }
-      hr.inpHr {
-        display:block;
-      }
-      #userDiv:hover > hr.inpHr,
-      #pwdDiv:hover > hr.inpHr,
-      input:focus + hr{
-        position: relative;
-/*         right: auto; */
-        display: block;
-        opacity: 1;
-        left: 11em;
-        animation-name: buttonHover;
-        animation-duration: 0.5s;
-        width: calc(100% - 11em );
-        cursor: text;
-      }
-
-      #userDiv, #pwdDiv, p, input {
-        text-align: left;
-      }
-
-      input {
-        background: none;
-        border: none;
-        display: inline-block;
-        height: 4vh;
-        font-size: 2em;
-        width: calc(100% - 6em);
-      }
-      p {
-        margin-bottom: 0px;
-        margin-top: 0px;
-        text-align: left;
-        display: inline-block;
-        font-family: NotoSansDisplay;
-        color: #0a84ff;
-        font-size: 2.25em;
-        width: calc(2.25em*2.2);
-      }
-
-      #userP, #passP {
-        margin-top: 20px;
-      }
-      #loginDIV:hover > hr.btnHr, button:hover > hr.btnHr {
-        position: relative;
-        left:5%;
-        display: block;
-        opacity: 1;
-        animation-name: buttonHover2;
-        animation-duration: 0.5s;
-        width: 90%;
-        top: 10%;
-      }
-      #loginDIV:hover {
-        background-color: #f8f8f8;
-      }
-      #loginDIV:hover > button  {
-        background-color: #fff;
-        
-      }
-      #loginDIV{
-        font-size: 1em;
-        height: 120%;
-        white-space: nowrap;
-      }
-      #loginDIV:hover > select {
-        background-color: #fff;
+      button {
         height: 100%;
       }
-      button:hover {
-        background-color: #fff;
-      }
-      @keyframes buttonHover {
-        0% {width: 0%;}
-        100% {width: calc(100% - 11em );} 
-      }
-      @keyframes buttonHover2 {
-        0% {width: 0%;}
-        100% {width: 90%;} 
-      }
-
-      div#overlay.active {
-        width: 100vw;
-        z-index: 2;
-        height: 100vh;
-        animation-name: overlayAnim;
-        animation-duration: 0.7s;
-        position: absolute;
-        top: 0px;
-        left:0px;
-        background-color: #ccc;
-      }
-      div#overlay.active > span.loader {
-        animation-name: loaderanim;
-        animation-duration: 0.7s;
-      }
-      div#overlay {
-        position: absolute;
-        top: 100vh;
-        left: 0px;
-      }
-      #loginBTN {
-        display: inline-block;
-        text-align: right;
-        width: 10.8em;
-        border: 1px solid #eee;
-        border-radius: 10px;
-      }
-      #loginBTN:hover, select:hover {
-        border: 1px solid #000;
-      }
-      @keyframes overlayAnim {
-        0% {width: 0vw;}
-        60% {width: 0vw;}
-        100% {width: 100vw;}
-      }
-      @keyframes loaderAnim {
-        0% {left: -50%;}
-        60% {left: -50%;}
-        100% {left: 50%;}
-      }
-      .overload {
-        animation-name: overloadAnim;
-        z-index: 3;
-        top: 20vh;
-        position: absolute;
-        animation-duration: 4s;
-        width: 100%;
-      }
-      .beforeoverload {
-        position: absolute;
-        top: 100vh;
-        width: 100%;
-      }
-      
-      @keyframes overloadAnim {
-        0% {top: 100vh; opacity: 0;}
-        70% {top: 100vh; opacity: 0;}
-        100% {top: 20vh; opacity: 1;}
-      }
-      
-      @font-face { 
-        font-family: NotoSansDisplay; 
-        src: url('../NotoSansDisplay-Variable.ttf'), local('Courier New'); 
-        font-display: swap;
-      }
-      #alert {
-        position:absolute;
-        top: 100vh;
-        left: 0px;
-        width: 100vw;
-        height: 100vh;
-        animation-duration:0.5s; 
-        background-color: #eee;
-      }
-      @keyframes incoming {
-        0% {top: 100vh }
-        100% { top: 0vh}
-      }
-
-      @keyframes outgoing {
-        0% {top: 0vh }
-        100% { top: 100vh}
-      }
-
-      #alerttxt {
-        width:100%;
-        height: 2.25em;
-        text-align: center;
-        position: relative;
-        left: auto;
-        top: calc( (100vh - 2.25em) / 2 );
-      }
-      
     </style>
-    <link rel="stylesheet" href="/loader.css">
+    
   </head>
- <link rel="preload" href="https://fonts.googleapis.com">
-  <link rel="preload" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
-  <body onload = "onLoad()">
+  <body onload = "onLoad(); setTimeout(()=>{document.getElementById('userINP').focus();}, 500);">
     <div id = "mainDiv">
       <h1>Configuration</h1>
       <hr class="rounded"></hr>
       <div id="login">
         <div id="userDiv" onclick="document.getElementById('userINP').focus();" onchange="document.getElementById('passINP').focus();">
-          <p id="userP">Username:</p>
-          <input type="text" id="userINP"/>
+<!--           <p id="userP">Username:</p> -->
+          <input type="text" placeholder="Username" id="userINP"/>
           <hr class="inpHr" id="userhr"></hr>
         </div><div id="pwdDiv" onclick="document.getElementById('passINP').focus();">
-          <p id="passP">
-            Password:</p>
-          <input type="password" id="passINP" onchange="newUser(event)"/>
+<!--           <p id="passP"> -->
+<!--             Password:</p> -->
+          <input type="password" id="passINP" placeholder="Password" onchange="document.getElementById('passINPCONF').focus();"/>
+          <hr class="inpHr"></hr>
+         
+        </div> <div id="pwdDiv2" onclick="document.getElementById('passINPCONF').focus();">
+          <input type="password" id="passINPCONF" placeholder="Confirm password" onchange="newUser(event)"/>
           <hr class="inpHr"></hr>
         </div>
         <div id="loginDIV" onclick="newUser(event, document.getElementById('sel').value)">
@@ -274,6 +42,10 @@
             <option value="2">ADMINISTRATOR</option>
           </select><br>
           <hr class="btnHr"></hr>
+        </div><br>
+        <div id="danger" onclick="document.getElementById('command').focus();">
+          <input type="input" id="command" placeholder="Enter commands here..." onchange="validateLogin('CMD')"/>
+          <hr class="inpHr"></hr>
         </div>
       </div>
       
@@ -283,7 +55,7 @@
       <br>
       <a href = '/'> Return to home</a>
     </h1>
-    <div id="alert" onclick = "clearalert()" onkeydown="clearalert()"><p id="alerttxt" style="width: 90%"></p><button style="position: relative; top: calc( ( 50vh - 2.25em ) / 2 + 7em); height: 4em;"><u>> Continue <</u></button></div>
+     <div id="alert" onclick = "clearalert()" onkeydown="clearalert()"><p id="alerttxt" style="width: 90%"></p><button style="position: relative; top: 50vh; height: 4em;"><u>> Continue <</u></button></div>
     <div id="overlay"></div>
   </body>
  </html>

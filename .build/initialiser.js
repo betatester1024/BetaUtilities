@@ -26,7 +26,8 @@ var import_wsHandler = require("./wsHandler");
 var import_server = require("./server");
 var import_messageHandle = require("./messageHandle");
 var import_updateuser = require("./updateuser");
-let rooms = ["xkcd", "test", "bots", "ai", "room", "srs", "rpg", "a", "b", "memes"];
+var import_accessControl = require("./accessControl");
+let rooms = ["xkcd", "test", "bots", "ai", "room", "srs"];
 let nicks = [
   "BetaUtilities",
   "BetaUtilities_TEST",
@@ -43,12 +44,15 @@ let nicks = [
 function init() {
   let sockets = [];
   (0, import_server.updateServer)();
-  (0, import_updateuser.updateuser)();
+  (0, import_updateuser.initUsers)();
   for (let i = 0; i < rooms.length; i++) {
     sockets.push(new import_wsHandler.WS("wss://euphoria.io/room/" + rooms[i] + "/ws", nicks[i], rooms[i], i == 0));
     (0, import_messageHandle.updateActive)(rooms[i], true);
   }
   (0, import_wordListHandle.loopy)();
+  setInterval(() => {
+    (0, import_accessControl.DBGarbageCollect)();
+  }, 1e4);
 }
 init();
 // Annotate the CommonJS export names for ESM import in node:

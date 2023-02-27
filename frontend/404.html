@@ -12,21 +12,10 @@
       clearTimeout(t)
     }
     </script>
+    <link rel="stylesheet" href="/globalformat.css">
     <style>
-      html {
-        background-color: #eee;
-      } 
       h1 {
-        font-family: NotoSansDisplay;
-        
-/*         display: inline-block; */
-        left: auto;
         font-size: 4em;
-        color: #0a84ff;
-      }
-      body {
-        text-align: center;
-        overflow: hidden; /* Hide scrollbars */
       }
       #mainDiv{
 /*         text-align: center; */
@@ -37,59 +26,30 @@
         animation-duration: 2s;
         width: 90vw;
       }
-      .overload {
-        animation-name: overloadAnim;
-        top: 0vh;
-        position: absolute;
-        animation-duration: 6s;
-      }
-      @keyframes mainanim {
-        0%   {top:100vh; opacity: 0;}
-        30% {top: 0vh; opacity: 1;}
-        90% {top: 0vh;}
-        100% {top:-600vh; opacity: 1;}
-      }
-      @keyframes overloadAnim {
-        0% {top: 100vh; opacity: 0;}
-        70% {top: 100vh; opacity: 0;}
-        100% {top: 0vh; opacity: 1;}
-      }
-      hr.rounded {
-        border: 3px solid #0e0;
-        width: 90vw;
-        border-radius: 5px;
-      }
-      a {
-        font-size: 0.8em;
-      }
       div#overlay {
         width: 100vw;
         z-index: -1;
         height: 100vh;
         animation-name: overlayAnim;
-        animation-duration: 6s;
+        animation-duration: 3s;
         position: absolute;
         top: 0px;
         left:0px;
         background-color: #ccc;
       }
-      @keyframes overlayAnim {
-        0% {width: 0vw;}
-        50% {width: 0vw;}
-        70% {width: 100vw;}
-        100% {width: 100vw;}
+      @keyframes mainanim {
+        0%   {top:100vh; opacity: 0;}
+        30% {top: 0vh; opacity: 1;}
+        80% {top: 0vh;}
+        100% {top:-600vh; opacity: 1;}
       }
-
-      @font-face { 
-        font-family: NotoSansDisplay; 
-        src: url('../NotoSansDisplay-Variable.ttf'), local('Courier New'); 
-        font-display: swap;
-      }
+     
     </style>
   </head>
-  <link rel="preload" href="https://fonts.googleapis.com">
-  <link rel="preload" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!--   <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap">  -->
   <body onload = "onLoad()">
     <div id = "mainDiv">
       <h1>Page not found!</h1>

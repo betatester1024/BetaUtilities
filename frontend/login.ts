@@ -46,7 +46,6 @@ function validateLogin(action: string = "login", extData: string) {
   let CMD = document.getElementById("command") as HTMLInputElement;
 
 
-
   if ((action != "login" && action != "add" && action != "signup") || (user.value.match("^[a-zA-Z0-9_]+$") && pass.value.length !== 0)) {
     if (confirm && (action == "add" || action == "signup") && confirm.value != pass.value) {
       console.log("Nomatch");
@@ -59,7 +58,7 @@ function validateLogin(action: string = "login", extData: string) {
     let sessionID = match ? match[1] : window.crypto.getRandomValues(arr);
     // ONLY USE THE sessionID WHEN ADDING A NEW session
 
-
+    let renickQ = false;
     // alert/(document.cookie);
     let params;
     if (action != "logout" && action != "CMD" 
@@ -71,6 +70,11 @@ function validateLogin(action: string = "login", extData: string) {
     }
     else if (action == "sendMsg") {
       params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData);
+      let match = extData.match("!renick @([a-zA-Z_0-9]+)");
+      if (match) {
+        params = "token="+sessionID+"&action=renick&user="+encodeURIComponent(match[1]);
+        renickQ = true;
+      }
       // temporarily add this message to the div (until refresh handles it)
       let ele = document.getElementById('msgArea') as HTMLDivElement;
       ele.innerHTML += `<p><b class='${CURRPERMS=="2"?"admin":(CURRPERMS=="3"?"beta":"")}''>${CURRUSER} [SendingAWAIT]:</b> ${extData}</p><br>`;
@@ -93,7 +97,13 @@ function validateLogin(action: string = "login", extData: string) {
         if (ele) ele.className = "beforeoverload";
         if (action != "login") {
           
-          
+          if (renickQ && res != "ERROR") {
+            CURRUSER = res;
+            alertDialog("Renicked successfully to @"+CURRUSER, ()=>{});
+          }
+          else if (renickQ) {
+            alertDialog("Error in re-nicking!", ()=>{});
+          }
           if (action == "sendMsg") {
             validateLogin("refresh", "send");
             return;
@@ -108,11 +118,15 @@ function validateLogin(action: string = "login", extData: string) {
             if (res == "ACCESS" || res == "EXPIRE" || res == "NOACTIVE" || res == "ERROR") {
               location.reload();
             }
+            ele = document.getElementById("msgArea") as HTMLDivElement;
+            // console.log(ele.scrollTop - ele.scrollHeight)
+            let scrDistOKQ =     Math.abs(ele.scrollTop - ele.scrollHeight) < 1000;
             updateTextArea(res);
-            if (!LOADEDQ || extData == "send") {
-              ele = document.getElementById("msgArea") as HTMLDivElement;
+            
+            if (!LOADEDQ || extData == "send" || scrDistOKQ)
+            {
               ele.scrollTop = ele.scrollHeight;
-              console.log("LOAD")
+              // console.log("Scrolling to bottom.")
               LOADEDQ = true;
             }
             return;

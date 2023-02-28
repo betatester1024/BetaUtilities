@@ -18,10 +18,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
      (!user || user && action !="CMD" && action !="sendMsg" && !user.match("^[a-zA-Z0-9_]+$")) || 
      (!pwd || action != "CMD" && pwd.length<=0)) 
   {
-    if (action!= "checkAccess" && action != "checkAccess_A"
-        && action != "logout" && 
-        action !="refresh" && action != "refresh_log" && 
-       action != "userReq" && action != "bMsg")
+    if (action == "add" || action == "login")
     {
       systemLog("Unknown error")
       callback.end(JSON.stringify("ERROR"))
@@ -35,7 +32,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       sender:"BetaOS_System", 
       data:user, 
       permLevel:3, 
-      expiry:Date.now()+1000*60*60*24});
+      expiry:Date.now()+1000*60*60});
     return;
   }
    // data validation complete
@@ -50,10 +47,10 @@ export function validate(user:string, pwd:string, action:string, access:string, 
   if (action=="add" || action=="CMD" || 
       action == "checkAccess" || action == "sendMsg"||
      action == "refresh" || action == "checkAccess_A" || 
-     action == "refresh_log" || action == "userReq") {
+     action == "refresh_log" || action == "userReq" || 
+     action == "renick") {
     DB.findOne({fieldName: "TOKEN", token:token}).then(
     (obj:{associatedUser:string, expiry:number})=>{
-      
       if (obj == null) {
         systemLog("No active session");
         if (action == "checkAccess" || action == "checkAccess_A") {
@@ -65,7 +62,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       let expiryTime = obj.expiry;
       let tokenUser = obj.associatedUser;
       if (action != "refresh" && action != "refresh_log"
-         && action != "sendMsg" && action != "bMsg") systemLog("Logged in as "+tokenUser+" | Expiring in: "+(expiryTime-Date.now()) + " ms");
+         && action != "sendMsg") systemLog("Logged in as "+tokenUser+" | Expiring in: "+(expiryTime-Date.now()) + " ms");
       if (expiryTime<Date.now()) {
         systemLog("Token expired. Logged out user.")
         DB.deleteOne({fieldName:"TOKEN", token:token});
@@ -80,8 +77,27 @@ export function validate(user:string, pwd:string, action:string, access:string, 
         return;
       }
       DB.findOne({fieldName:"UserData", user:obj.associatedUser}).then(
-      (obj2:{permLevel:number})=>{
+      (obj2:{permLevel:number, alias:string|null})=>{
         let perms = obj2.permLevel;
+        if (action == "renick" && perms >= 1)
+        {
+          if (obj.associatedUser != "betatester1024" && 
+              obj.associatedUser != "betaos" && 
+              (user.toLowerCase() == "betaos" || 
+               user.toLowerCase() == "betatester1024")) 
+          {
+            callback.end(JSON.stringify("ERROR"))
+            return;
+          }
+          DB.updateOne({fieldName:"UserData", user: obj.associatedUser}, {
+            $set: {
+              alias: user
+            },
+            $currentDate: { lastModified: true }
+          }, {upsert:true});
+          callback.end(JSON.stringify(user));
+          return;
+        } // renick 
         if (action=="add") {
           if (Number(perms)<2){
             if (user == tokenUser && access == "1") {
@@ -126,12 +142,12 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           // systemLog("adding message: "+user);
           DB2.insertOne({
             fieldName: "MSG", 
-            sender:obj.associatedUser, 
+            sender:obj2.alias?obj2.alias:obj.associatedUser, 
             data:user, 
             permLevel:perms, 
             expiry:Date.now()+1000*60*60})
           callback.end(JSON.stringify("SUCCESS"));
-          currHandler.onMessage(user, obj.associatedUser);
+          if (currHandler) currHandler.onMessage(user, obj2.alias?obj2.alias:obj.associatedUser);
           return;
         }
         
@@ -149,8 +165,8 @@ export function validate(user:string, pwd:string, action:string, access:string, 
               }
               let data = objs[i].data;
               data = data.replaceAll("&", "&amp;");
-              data = data.replaceAll("<", "&gt;");
-              data = data.replaceAll(">", "&lt;");
+              data = data.replaceAll(">", "&gt;");
+              data = data.replaceAll("<", "&lt;");
               data = data.replaceAll("\\n", "<br>");
               for (let i=0; i<replacements.length; i++){
                 data = data.replaceAll(replacements[i].from, "<span class='material-symbols-outlined'>"+replacements[i].to+"</span>")
@@ -160,7 +176,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
                 cls_w += " slashMe"
                 data = data.replace("/me", ""); 
               }
-              if (objs[i].sender == "betaos") {
+              if (objs[i].sender.toLowerCase() == "betaos") {
                 cls_n+=" beta";
                 extraText = " [SYSTEM]";
               }

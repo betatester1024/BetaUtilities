@@ -59,9 +59,9 @@ export function updateServer() {
   });
 
   app.get('/status', (req:any, res:any) => {
-    let str = "BetaUtilities is in: ";
+    let str = "BetaUtilities is in: <a href='/support'>Online Support</a>";
     for (let j = 0; j < rooms.length - 1; j++) { 
-      str += ` <a href="https://euphoria.io/room/${rooms[j]}">&${rooms[j]}</a>,` ; 
+      str += `, <a href="https://euphoria.io/room/${rooms[j]}">&${rooms[j]}</a>` ; 
     }
     str += ` ${rooms.length>1?"and ":""}<a href="https://euphoria.io/room/${rooms[rooms.length-1]}">&${rooms[rooms.length-1]}</a>!  `;
     if (rooms.length == 0) {
@@ -82,6 +82,10 @@ export function updateServer() {
   app.get("/syslog", (req:any, res:any) => {
     validate("", "", "checkAccess_A", "", res, req.query.token)
   })
+
+  app.get('/about', (req:any, res:any) => {
+    res.sendFile(path.join( __dirname, '../frontend', 'about.html' ));
+  });
 
   app.get('/*', (req:any, res:any) => {
     res.sendFile(path.join( __dirname, '../frontend', '404.html' ));

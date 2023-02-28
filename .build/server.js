@@ -70,9 +70,9 @@ function updateServer() {
     (0, import_accessControl.validate)(decodeURIComponent(req.body.user), decodeURIComponent(req.body.pass), req.body.action, req.body.access, res, req.body.token);
   });
   app.get("/status", (req, res) => {
-    let str = "BetaUtilities is in: ";
+    let str = "BetaUtilities is in: <a href='/support'>Online Support</a>";
     for (let j = 0; j < import_messageHandle.rooms.length - 1; j++) {
-      str += ` <a href="https://euphoria.io/room/${import_messageHandle.rooms[j]}">&${import_messageHandle.rooms[j]}</a>,`;
+      str += `, <a href="https://euphoria.io/room/${import_messageHandle.rooms[j]}">&${import_messageHandle.rooms[j]}</a>`;
     }
     str += ` ${import_messageHandle.rooms.length > 1 ? "and " : ""}<a href="https://euphoria.io/room/${import_messageHandle.rooms[import_messageHandle.rooms.length - 1]}">&${import_messageHandle.rooms[import_messageHandle.rooms.length - 1]}</a>!  `;
     if (import_messageHandle.rooms.length == 0) {
@@ -89,6 +89,9 @@ function updateServer() {
   });
   app.get("/syslog", (req, res) => {
     (0, import_accessControl.validate)("", "", "checkAccess_A", "", res, req.query.token);
+  });
+  app.get("/about", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "about.html"));
   });
   app.get("/*", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "404.html"));

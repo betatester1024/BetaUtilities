@@ -11,12 +11,12 @@
         setInterval(()=>{validateLogin("refresh", "")}, 2500);
         document.getElementById("alert").hidden=true;
         document.getElementById("h1").hidden=true;
-        console.log(document.cookie);
+        // console.log(document.cookie);
         let match = document.cookie.match("__Secure-user=([0-9a-zA-Z_]+)");
-        console.log(match[1]);
+        // console.log(match[1]);
         if (match) CURRUSER = match[1];
         match = document.cookie.match("__Secure-perms=([0-9]+)");
-        console.log(match[1]);
+        // console.log(match[1]);
         if (match) CURRPERMS = match[1];
       }
     </script>
@@ -38,6 +38,7 @@
         width: unset;
         font-size: 1em;
 /*         display: block; */
+        color: #000;
       }
       hr {
         margin-top: 5px !important;
@@ -67,10 +68,16 @@
         margin-left: 5%;
         text-align: left;
       }
-      
+      b {
+        color: #000;
+      }
+      p.admin, 
       b.admin {
-        color: #FBBC05; 
+        color: #0a84ff; 
 /*         text-shadow: 0px 0px 1px #FBBC05; */
+      }
+      p.beta {
+        color: #00ee00;
       }
       b.beta {
         color: #00ee00;
@@ -118,7 +125,7 @@
       <br>
       <a href = '/'> Return to home</a>
     </h1>
-    <div id="alert" onclick = "clearalert()" onkeydown="clearalert()"><p id="alerttxt" style="width: 90%"></p><button style="position: relative; top: 50vh; height: 4em;"><u>> Continue <</u></button></div>
+    <div id="alert" onclick = "clearalert()" onkeydown="clearalert()"><p id="alerttxt" style="width: 90%; font-size: 1.8em; color:#0a84ff;"></p><button style="position: relative; top: 50vh; height: 4em;"><u>> Continue <</u></button></div>
     <div id="overlay"></div>
   </body>
  </html>

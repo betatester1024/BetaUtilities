@@ -148,7 +148,7 @@ export class WebH
         (msg.match("!ping @" + this.nick.toLowerCase()) ||
          msg.match("!help @" + this.nick.toLowerCase()))) 
       {
-        this.sendMsg("/me has been paused by @"+this.pauser, dat);
+        this.sendMsg("/me has been paused by @"+this.pauser, data);
         return;
       } 
       // general unpaused ping

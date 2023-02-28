@@ -36,7 +36,7 @@ function validate(user, pwd, action, access, callback, token = "") {
   if (action != "refresh" && action != "refresh_log" && action != "sendMsg" && action != "bMsg")
     (0, import_misc.systemLog)("Validating as " + user + " with action " + action + " (token " + token + ")");
   if (!token || !token.match("[0-9]+") || (!user || user && action != "CMD" && action != "sendMsg" && !user.match("^[a-zA-Z0-9_]+$")) || (!pwd || action != "CMD" && pwd.length <= 0)) {
-    if (action != "checkAccess" && action != "checkAccess_A" && action != "logout" && action != "refresh" && action != "refresh_log" && action != "userReq" && action != "bMsg") {
+    if (action == "add" || action == "login") {
       (0, import_misc.systemLog)("Unknown error");
       callback.end(JSON.stringify("ERROR"));
       return;
@@ -48,7 +48,7 @@ function validate(user, pwd, action, access, callback, token = "") {
       sender: "BetaOS_System",
       data: user,
       permLevel: 3,
-      expiry: Date.now() + 1e3 * 60 * 60 * 24
+      expiry: Date.now() + 1e3 * 60 * 60
     });
     return;
   }
@@ -58,7 +58,7 @@ function validate(user, pwd, action, access, callback, token = "") {
     callback.end(JSON.stringify("SUCCESS"));
     return;
   }
-  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log" || action == "userReq") {
+  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log" || action == "userReq" || action == "renick") {
     DB.findOne({ fieldName: "TOKEN", token }).then(
       (obj) => {
         if (obj == null) {
@@ -71,7 +71,7 @@ function validate(user, pwd, action, access, callback, token = "") {
         }
         let expiryTime = obj.expiry;
         let tokenUser = obj.associatedUser;
-        if (action != "refresh" && action != "refresh_log" && action != "sendMsg" && action != "bMsg")
+        if (action != "refresh" && action != "refresh_log" && action != "sendMsg")
           (0, import_misc.systemLog)("Logged in as " + tokenUser + " | Expiring in: " + (expiryTime - Date.now()) + " ms");
         if (expiryTime < Date.now()) {
           (0, import_misc.systemLog)("Token expired. Logged out user.");
@@ -92,6 +92,20 @@ function validate(user, pwd, action, access, callback, token = "") {
         DB.findOne({ fieldName: "UserData", user: obj.associatedUser }).then(
           (obj2) => {
             let perms = obj2.permLevel;
+            if (action == "renick" && perms >= 1) {
+              if (obj.associatedUser != "betatester1024" && obj.associatedUser != "betaos" && (user.toLowerCase() == "betaos" || user.toLowerCase() == "betatester1024")) {
+                callback.end(JSON.stringify("ERROR"));
+                return;
+              }
+              DB.updateOne({ fieldName: "UserData", user: obj.associatedUser }, {
+                $set: {
+                  alias: user
+                },
+                $currentDate: { lastModified: true }
+              }, { upsert: true });
+              callback.end(JSON.stringify(user));
+              return;
+            }
             if (action == "add") {
               if (Number(perms) < 2) {
                 if (user == tokenUser && access == "1") {
@@ -133,13 +147,14 @@ function validate(user, pwd, action, access, callback, token = "") {
             } else if (action == "sendMsg" && perms >= 1) {
               DB2.insertOne({
                 fieldName: "MSG",
-                sender: obj.associatedUser,
+                sender: obj2.alias ? obj2.alias : obj.associatedUser,
                 data: user,
                 permLevel: perms,
                 expiry: Date.now() + 1e3 * 60 * 60
               });
               callback.end(JSON.stringify("SUCCESS"));
-              import_initialiser.currHandler.onMessage(user, obj.associatedUser);
+              if (import_initialiser.currHandler)
+                import_initialiser.currHandler.onMessage(user, obj2.alias ? obj2.alias : obj.associatedUser);
               return;
             } else if (action == "refresh" && perms >= 1) {
               DB2.find({ fieldName: "MSG" }).toArray().then((objs) => {
@@ -158,8 +173,8 @@ function validate(user, pwd, action, access, callback, token = "") {
                   }
                   let data = objs[i].data;
                   data = data.replaceAll("&", "&amp;");
-                  data = data.replaceAll("<", "&gt;");
-                  data = data.replaceAll(">", "&lt;");
+                  data = data.replaceAll(">", "&gt;");
+                  data = data.replaceAll("<", "&lt;");
                   data = data.replaceAll("\\n", "<br>");
                   for (let i2 = 0; i2 < import_replacements.replacements.length; i2++) {
                     data = data.replaceAll(import_replacements.replacements[i2].from, "<span class='material-symbols-outlined'>" + import_replacements.replacements[i2].to + "</span>");
@@ -169,7 +184,7 @@ function validate(user, pwd, action, access, callback, token = "") {
                     cls_w += " slashMe";
                     data = data.replace("/me", "");
                   }
-                  if (objs[i].sender == "betaos") {
+                  if (objs[i].sender.toLowerCase() == "betaos") {
                     cls_n += " beta";
                     extraText = " [SYSTEM]";
                   }

@@ -66,3 +66,99 @@
 (OnlineSUPPORT)[user] :confirm:
 (OnlineSUPPORT)[user] :confirm:
 (OnlineSUPPORT)[user] :egg::egg::confirm::white_check_mark:
+(OnlineSUPPORT)[user] :warn::error:
+(OnlineSUPPORT)[user] :info: This is a test.
+(OnlineSUPPORT)[user] !egg
+(OnlineSUPPORT)[user] !ping @BetaOS_System
+(OnlineSUPPORT)[user] !egg
+(OnlineSUPPORT)[user] !pong
+(OnlineSUPPORT)[user] !pong @BetaOS_System
+(OnlineSUPPORT)[user] !pong
+(OnlineSUPPORT)[user] !pong
+(OnlineSUPPORT)[user] !pong
+(OnlineSUPPORT)[user] !ping
+(OnlineSUPPORT)[user] !pong
+(OnlineSUPPORT)[betaos] !pong
+(OnlineSUPPORT)[betaos] !ping
+(OnlineSUPPORT)[betaos] !pong
+(OnlineSUPPORT)[betaos] very good
+(OnlineSUPPORT)[betaos] excellent
+(OnlineSUPPORT)[betatester1024] eee
+(OnlineSUPPORT)[betaos] dee
+(OnlineSUPPORT)[betaos] eee
+(OnlineSUPPORT)[betaos] aaa
+(OnlineSUPPORT)[betaos] boop
+(OnlineSUPPORT)[betaos] eee
+(OnlineSUPPORT)[betaos] WHOA
+(OnlineSUPPORT)[c] huh
+(OnlineSUPPORT)[c] 
+(OnlineSUPPORT)[betaos] heyo
+(OnlineSUPPORT)[betaos] hello
+(OnlineSUPPORT)[betaos] enter !renick to rename yourself
+(OnlineSUPPORT)[betaos] eh
+(OnlineSUPPORT)[c]  !renick
+(OnlineSUPPORT)[c] well
+(OnlineSUPPORT)[c] !renick
+(OnlineSUPPORT)[betaos] !renick AHJEJ
+(OnlineSUPPORT)[c] !renick a
+(OnlineSUPPORT)[c] a
+(OnlineSUPPORT)[betaos] no no i mean
+(OnlineSUPPORT)[betaos] !renick @[newnick]
+(OnlineSUPPORT)[betaos] a
+(OnlineSUPPORT)[c] !renick @
+(OnlineSUPPORT)[c] a
+(OnlineSUPPORT)[betaos] uhh
+(OnlineSUPPORT)[c] ???
+(OnlineSUPPORT)[betaos] did it not work
+(OnlineSUPPORT)[betaos] eee
+(OnlineSUPPORT)[c] ?
+(OnlineSUPPORT)[c] !renick @<
+(OnlineSUPPORT)[c] !renick @<>
+(OnlineSUPPORT)[c] !renick @><
+(OnlineSUPPORT)[c] !renick @>div<?>/div<
+(OnlineSUPPORT)[c] ???
+(OnlineSUPPORT)[betaos] [refresh]
+(OnlineSUPPORT)[c] oh
+(OnlineSUPPORT)[c] >
+(OnlineSUPPORT)[c] >i<what>/i<
+(OnlineSUPPORT)[betaos] hmm
+(OnlineSUPPORT)[c] why do the <'s reverse 
+(OnlineSUPPORT)[betaos] i might want to support markdown
+(OnlineSUPPORT)[betaos] <a
+(OnlineSUPPORT)[betaos] oh no
+(OnlineSUPPORT)[betaos] <a
+(OnlineSUPPORT)[betaos] stupid mistake
+(OnlineSUPPORT)[betaos] !testfeature
+(OnlineSUPPORT)[BetaOS] test test test
+(OnlineSUPPORT)[BetaOS] !testfeature
+(OnlineSUPPORT)[EEEE] doot
+(OnlineSUPPORT)[BetaOS] wait shit
+(OnlineSUPPORT)[BetaOS] you can't rename yourself as @BetaOS
+(OnlineSUPPORT)[a] !
+(OnlineSUPPORT)[user] !rename @BetaOS
+(OnlineSUPPORT)[user] updating
+(OnlineSUPPORT)[user] updating updating
+(OnlineSUPPORT)[user] updating
+(OnlineSUPPORT)[user] updating
+(OnlineSUPPORT)[user] updating
+(OnlineSUPPORT)[AAA] aaa
+(OnlineSUPPORT)[AAA] eee
+(OnlineSUPPORT)[AAA] ahfh
+(OnlineSUPPORT)[AAA] vnd
+(OnlineSUPPORT)[BetaOS] eee
+(OnlineSUPPORT)[BetaOS] :confirm: updated
+(OnlineSUPPORT)[betatester1024] :confirm: updated
+(OnlineSUPPORT)[betaOS] woo
+(OnlineSUPPORT)[betaOS] !testfeature
+(OnlineSUPPORT)[betatester1024] !testfeature
+(OnlineSUPPORT)[betatester1024] !ping @betaoS_System
+(OnlineSUPPORT)[betatester1024] !PING @BETAOS_SYSTEM
+(OnlineSUPPORT)[BetaOS] :confirm: updated OK!
+(OnlineSUPPORT)[BetaOS] w
+(OnlineSUPPORT)[BetaOS] !play
+(OnlineSUPPORT)[BetaOS] !
+(OnlineSUPPORT)[test] eee
+(OnlineSUPPORT)[test] eee
+(OnlineSUPPORT)[test] !ping
+(OnlineSUPPORT)[user] eee
+(OnlineSUPPORT)[user] !ping @BetaOS_System

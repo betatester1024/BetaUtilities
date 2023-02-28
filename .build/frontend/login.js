@@ -53,6 +53,7 @@ function validateLogin(action = "login", extData) {
     let arr = new BigUint64Array(1);
     let match = document.cookie.match("__Secure-session=([0-9.]+)");
     let sessionID = match ? match[1] : window.crypto.getRandomValues(arr);
+    let renickQ = false;
     let params;
     if (action != "logout" && action != "CMD" && action != "sendMsg" && action != "userReq")
       params = "user=" + encodeURIComponent(user ? user.value : "") + "&pass=" + encodeURIComponent(pass ? pass.value : "") + "&action=" + action + "&access=" + extData + "&token=" + sessionID;
@@ -61,6 +62,11 @@ function validateLogin(action = "login", extData) {
       CMD.value = "";
     } else if (action == "sendMsg") {
       params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData);
+      let match2 = extData.match("!renick @([a-zA-Z_0-9]+)");
+      if (match2) {
+        params = "token=" + sessionID + "&action=renick&user=" + encodeURIComponent(match2[1]);
+        renickQ = true;
+      }
       let ele = document.getElementById("msgArea");
       ele.innerHTML += `<p><b class='${CURRPERMS == "2" ? "admin" : CURRPERMS == "3" ? "beta" : ""}''>${CURRUSER} [SendingAWAIT]:</b> ${extData}</p><br>`;
       ele.scrollTop = ele.scrollHeight;
@@ -86,6 +92,14 @@ function validateLogin(action = "login", extData) {
         if (ele)
           ele.className = "beforeoverload";
         if (action != "login") {
+          if (renickQ && res != "ERROR") {
+            CURRUSER = res;
+            alertDialog("Renicked successfully to @" + CURRUSER, () => {
+            });
+          } else if (renickQ) {
+            alertDialog("Error in re-nicking!", () => {
+            });
+          }
           if (action == "sendMsg") {
             validateLogin("refresh", "send");
             return;
@@ -101,11 +115,11 @@ function validateLogin(action = "login", extData) {
             if (res == "ACCESS" || res == "EXPIRE" || res == "NOACTIVE" || res == "ERROR") {
               location.reload();
             }
+            ele = document.getElementById("msgArea");
+            let scrDistOKQ = Math.abs(ele.scrollTop - ele.scrollHeight) < 1e3;
             updateTextArea(res);
-            if (!LOADEDQ || extData == "send") {
-              ele = document.getElementById("msgArea");
+            if (!LOADEDQ || extData == "send" || scrDistOKQ) {
               ele.scrollTop = ele.scrollHeight;
-              console.log("LOAD");
               LOADEDQ = true;
             }
             return;

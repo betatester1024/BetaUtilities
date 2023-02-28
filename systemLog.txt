@@ -1,499 +1,1082 @@
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1526812 ms
-Validating as  with action checkAccess (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1525182 ms
+Validating as !systemLog with action sendMsg (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1764596 ms
+adding message: !systemLog
+(undefined)[betaos] !systemLog
+Validating as  with action userReq (token 2629320594754599752)
+Validating as  with action checkAccess_A (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1759452 ms
+SysLog access granted!
+Logged in as betaos | Expiring in: 1758386 ms
+Validating as  with action userReq (token 2629320594754599752)
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1751186 ms
 Support access granted!
-Validating as  with action checkAccess_A (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1521682 ms
-SysLog access granted!
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1521113 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1518693 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1516196 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1513687 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1511175 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1508683 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1506180 ms
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1699749 ms
+Support access granted!
+Validating as /me does the funni with action sendMsg (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1695318 ms
+adding message: /me does the funni
+(undefined)[betaos] /me does the funni
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1694458 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1688087 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1686213 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1681486 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1680150 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1678284 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1675035 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1649353 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1572552 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1569642 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1565494 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1560573 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1452179 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1449070 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1437163 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1327588 ms
+Support access granted!
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1308654 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1284624 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1282679 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1275357 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1272906 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1266012 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1245254 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1242857 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1238927 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1199978 ms
+Support access granted!
+Validating as e with action sendMsg (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1198191 ms
+adding message: e
+(undefined)[betaos] e
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1142925 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1106211 ms
+Support access granted!
 
 Server active!
 Front-end is running on 4000.
 BetaUtilities open in wss://euphoria.io/room/xkcd/ws
 BetaUtilities open in wss://euphoria.io/room/test/ws
-Validating as  with action refresh_log (token 11772389049870489251)
 BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-Validating as  with action checkAccess_A (token 11772389049870489251)
-Validating as  with action refresh_log (token 11772389049870489251)
 BetaUtilities open in wss://euphoria.io/room/room/ws
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1496148 ms
-Logged in as betaos | Expiring in: 1496138 ms
-Logged in as betaos | Expiring in: 1496096 ms
-SysLog access granted!
-Logged in as betaos | Expiring in: 1495841 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1495109 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1492122 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1489602 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1487102 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1484579 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1482093 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1479579 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1477076 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1474560 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1472068 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1469573 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1467042 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1464521 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1462042 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1459537 ms
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 1080689 ms
+Support access granted!
 
 Server active!
 Front-end is running on 4000.
-Validating as  with action refresh_log (token 11772389049870489251)
-BetaUtilities open in wss://euphoria.io/room/room/ws
 BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
 BetaUtilities open in wss://euphoria.io/room/bots/ws
 BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
 BetaUtilities open in wss://euphoria.io/room/srs/ws
-Logged in as betaos | Expiring in: 1450016 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1449560 ms
-Validating as  with action checkAccess_A (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1449321 ms
-SysLog access granted!
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1448794 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1446236 ms
-Validating as  with action checkAccess_A (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1445439 ms
-SysLog access granted!
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1444684 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1442206 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1439614 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1437199 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1434707 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1432204 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1429686 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1427191 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1424689 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1422198 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1419685 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1417192 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1414691 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1412173 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1409635 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1407176 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1404684 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1402180 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1399665 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1397182 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1394671 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1392174 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1389672 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1387159 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1384649 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1382137 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1379659 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1377154 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1374643 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1372123 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1369634 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1367119 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1364532 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1362059 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1359550 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1357029 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1354542 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1352012 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1349532 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1347022 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1344525 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1342020 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1339503 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1337010 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1334496 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1331964 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1329394 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1326988 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1324379 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1321991 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1319474 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1316954 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1314446 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1311938 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1309436 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1306902 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1304425 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1301919 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1299409 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1296864 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1294402 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1291902 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1289392 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1286882 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1284306 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1281870 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1279367 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1276858 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1274345 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1271820 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1269332 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1266824 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1264302 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1261783 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1259301 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1256768 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1254260 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1251740 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1249262 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1246739 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1244214 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1241701 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1239189 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1236679 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1234183 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1231667 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1229169 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1226635 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1224158 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1221623 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1219120 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1216614 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1214098 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1211550 ms
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 993657 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 979531 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 976398 ms
+Support access granted!
 
 Server active!
 Front-end is running on 4000.
-Validating as  with action checkAccess_A (token 11772389049870489251)
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 939578 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 937439 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 918097 ms
+Support access granted!
+
+Server active!
+Front-end is running on 4000.
+Validating as  with action checkAccess (token 2629320594754599752)
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+Logged in as betaos | Expiring in: 885757 ms
+Support access granted!
+
+Server active!
+Front-end is running on 4000.
+Validating as  with action checkAccess (token 2629320594754599752)
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+Logged in as betaos | Expiring in: 849310 ms
+Support access granted!
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 814878 ms
+Support access granted!
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 784797 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 779271 ms
+Support access granted!
+
+Server active!
+Front-end is running on 4000.
 BetaUtilities open in wss://euphoria.io/room/test/ws
 BetaUtilities open in wss://euphoria.io/room/xkcd/ws
 BetaUtilities open in wss://euphoria.io/room/ai/ws
 BetaUtilities open in wss://euphoria.io/room/bots/ws
 BetaUtilities open in wss://euphoria.io/room/srs/ws
 BetaUtilities open in wss://euphoria.io/room/room/ws
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1203464 ms
-SysLog access granted!
-Logged in as betaos | Expiring in: 1203253 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1202412 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1200327 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1197750 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1195294 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1192761 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1190211 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1187761 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1185261 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1182469 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1180023 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1177532 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1175012 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1172455 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1169978 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1167491 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1164990 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1162336 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1159861 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1157349 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1154929 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1152426 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1149904 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1147410 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1144896 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1142401 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1139896 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1137366 ms
-Validating as  with action checkAccess_A (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1135081 ms
-SysLog access granted!
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1134918 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1134242 ms
-Validating as  with action checkAccess_A (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1119192 ms
-SysLog access granted!
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1118379 ms
-Validating as  with action checkAccess_A (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1116192 ms
-SysLog access granted!
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1115448 ms
-Validating as  with action checkAccess_A (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1097944 ms
-SysLog access granted!
-Validating as  with action checkAccess_A (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1090086 ms
-SysLog access granted!
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1089521 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1069481 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1049463 ms
-Validating as  with action checkAccess_A (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1048936 ms
-SysLog access granted!
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1048029 ms
-Validating as  with action refresh_log (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1028342 ms
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-Validating as  with action checkAccess_A (token 11772389049870489251)
-Logged in as betaos | Expiring in: 1020041 ms
-SysLog access granted!
-Logged in as betaos | Expiring in: 1019408 ms
-Validating as  with action logout (token 11772389049870489251)
-Logging out 11772389049870489251
-Validating as  with action checkAccess_A (token NONE)
-No active session
-Validating as betatos with action login (token 5300610452146835189)
-Invalid credentials.
-Validating as  with action checkAccess_A (token NONE)
-No active session
-Validating as betaos with action login (token 7160078420186159237)
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 727650 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 704216 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 682854 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 680053 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 623646 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 610961 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 600582 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 597791 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 586230 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 583714 ms
+Support access granted!
+Validating as  with action checkAccess (token 2629320594754599752)
+Logged in as betaos | Expiring in: 581900 ms
+Support access granted!
+Validating as  with action userReq (token 2629320594754599752)
+Validating as  with action logout (token 2629320594754599752)
+Logging out 2629320594754599752
+Validating as betaos with action login (token 17512357249165988050)
 Password OK for user betaos | Perms: 2
-Logging user betaos with expiry 1677515263893 (in 3600000 ms)
-Validating as  with action checkAccess_A (token 7160078420186159237)
-Logged in as betaos | Expiring in: 3594299 ms
-SysLog access granted!
-Logged in as betaos | Expiring in: 3593750 ms
-Logged in as betaos | Expiring in: 3573706 ms
-Logged in as betaos | Expiring in: 3553690 ms
-Logged in as betaos | Expiring in: 3533645 ms
-Logged in as betaos | Expiring in: 3513655 ms
-Logged in as betaos | Expiring in: 3493613 ms
-Logged in as betaos | Expiring in: 3473476 ms
-Logged in as betaos | Expiring in: 3453505 ms
-Logged in as betaos | Expiring in: 3433621 ms
-Logged in as betaos | Expiring in: 3413606 ms
-Logged in as betaos | Expiring in: 3393599 ms
-Logged in as betaos | Expiring in: 3373458 ms
-Logged in as betaos | Expiring in: 3353468 ms
-Logged in as betaos | Expiring in: 3333051 ms
-Logged in as betaos | Expiring in: 3313041 ms
-Logged in as betaos | Expiring in: 3292865 ms
-Logged in as betaos | Expiring in: 3273021 ms
-Validating as  with action checkAccess_A (token 7160078420186159237)
-Logged in as betaos | Expiring in: 3254703 ms
-SysLog access granted!
-Logged in as betaos | Expiring in: 3253664 ms
-Validating as  with action checkAccess_A (token 7160078420186159237)
-Logged in as betaos | Expiring in: 3251635 ms
-SysLog access granted!
-Logged in as betaos | Expiring in: 3250872 ms
-Logged in as betaos | Expiring in: 3230917 ms
-Logged in as betaos | Expiring in: 3210806 ms
-Logged in as betaos | Expiring in: 3190811 ms
-Validating as  with action checkAccess_A (token 7160078420186159237)
-Logged in as betaos | Expiring in: 3183785 ms
-SysLog access granted!
-Logged in as betaos | Expiring in: 3183048 ms
-Validating as  with action checkAccess (token 7160078420186159237)
-Logged in as betaos | Expiring in: 3177573 ms
+Logging user betaos with expiry 1677531362220 (in 3600000 ms)
+Validating as  with action userReq (token 17512357249165988050)
+Validating as  with action checkAccess (token 17512357249165988050)
+Logged in as betaos | Expiring in: 3594983 ms
 Support access granted!
-Validating as woords have been typed with action sendMsg (token 7160078420186159237)
-Logged in as betaos | Expiring in: 3171449 ms
-adding message: woords have been typed
-Validating as  with action logout (token 7160078420186159237)
-Logging out 7160078420186159237
-Validating as treblinka with action signup (token 6267039227028986397)
-Registered user treblinkawith pass: 8v299a24
-Validating as treblinka with action login (token 6267039227028986397)
-Password OK for user treblinka | Perms: 1
-Logging user treblinka with expiry 1677515719153 (in 3600000 ms)
-Validating as  with action checkAccess (token 6267039227028986397)
-Logged in as treblinka | Expiring in: 3595752 ms
+Validating as a mere admin tests with action sendMsg (token 17512357249165988050)
+Logged in as betaos | Expiring in: 3590627 ms
+adding message: a mere admin tests
+(undefined)[betaos] a mere admin tests
+Validating as /me tests with action sendMsg (token 17512357249165988050)
+Logged in as betaos | Expiring in: 3589031 ms
+adding message: /me tests
+(undefined)[betaos] /me tests
+Validating as aw man i'm system to with action sendMsg (token 17512357249165988050)
+Logged in as betaos | Expiring in: 3584811 ms
+adding message: aw man i'm system to
+(undefined)[betaos] aw man i'm system to
+Validating as  with action userReq (token 17512357249165988050)
+Validating as  with action checkAccess (token 17512357249165988050)
+Logged in as betaos | Expiring in: 3582759 ms
 Support access granted!
-Validating as Greer with action sendMsg (token 6267039227028986397)
-Logged in as treblinka | Expiring in: 3589786 ms
-adding message: Greer
-Validating as Greetings with action sendMsg (token 6267039227028986397)
-Logged in as treblinka | Expiring in: 3584633 ms
-adding message: Greetings
-Validating as How does this website work? with action sendMsg (token 6267039227028986397)
-Logged in as treblinka | Expiring in: 3573328 ms
-adding message: How does this website work?
-Validating as  with action sendMsg (token 6267039227028986397)
-Unknown error
-Validating as  with action logout (token 6267039227028986397)
-Logging out 6267039227028986397
-Validating as admin with action login (token 9317883986469137060)
-Invalid credentials.
-Validating as admin with action login (token 13639836170408782258)
-Password OK for user admin | Perms: 2
-Logging user admin with expiry 1677515932135 (in 3599999 ms)
-Validating as  with action checkAccess_A (token 13639836170408782258)
-Logged in as admin | Expiring in: 3594413 ms
-SysLog access granted!
-Logged in as admin | Expiring in: 3593643 ms
-Validating as  with action logout (token 13639836170408782258)
-Logging out 13639836170408782258
-Validating as user with action login (token 11441397758152701436)
+Validating as  with action userReq (token 17512357249165988050)
+Validating as  with action logout (token 17512357249165988050)
+Logging out 17512357249165988050
+Validating as user with action login (token 14249549066527750790)
 Password OK for user user | Perms: 1
-Logging user user with expiry 1677515968033 (in 3600000 ms)
-Validating as  with action checkAccess_A (token 11441397758152701436)
-Logged in as user | Expiring in: 3595205 ms
-No perms!
+Logging user user with expiry 1677531387520 (in 3600000 ms)
+Validating as  with action userReq (token 14249549066527750790)
+Validating as  with action checkAccess (token 14249549066527750790)
+Logged in as user | Expiring in: 3597786 ms
+Support access granted!
+Validating as user with action sendMsg (token 14249549066527750790)
+Logged in as user | Expiring in: 3596347 ms
+adding message: user
+(undefined)[user] user
+Validating as /me tests with action sendMsg (token 14249549066527750790)
+Logged in as user | Expiring in: 3594832 ms
+adding message: /me tests
+(undefined)[user] /me tests
+Validating as mmm with action sendMsg (token 14249549066527750790)
+Logged in as user | Expiring in: 3593654 ms
+adding message: mmm
+(undefined)[user] mmm
+Validating as  with action userReq (token 14249549066527750790)
+Validating as  with action logout (token 14249549066527750790)
+Logging out 14249549066527750790
+Validating as admin with action login (token 18052541841134851129)
+Password OK for user admin | Perms: 2
+Logging user admin with expiry 1677531401385 (in 3600000 ms)
+Validating as  with action userReq (token 18052541841134851129)
+Validating as  with action checkAccess (token 18052541841134851129)
+Logged in as admin | Expiring in: 3596694 ms
+Support access granted!
+Validating as admin with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3594952 ms
+adding message: admin
+(undefined)[admin] admin
+Validating as /me tests with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3593373 ms
+adding message: /me tests
+(undefined)[admin] /me tests
+Validating as very nice with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3592213 ms
+adding message: very nice
+(undefined)[admin] very nice
+Validating as !kill @BetaOS_Services with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3581223 ms
+adding message: !kill @BetaOS_Services
+(undefined)[admin] !kill @BetaOS_Services
+Validating as uhh with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3571622 ms
+adding message: uhh
+(undefined)[admin] uhh
+Validating as !ping @BetaOS_Services with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3559762 ms
+adding message: !ping @BetaOS_Services
+(undefined)[admin] !ping @BetaOS_Services
+Validating as :one: with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3496365 ms
+adding message: :one:
+(undefined)[admin] :one:
+Validating as :two: with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3495292 ms
+adding message: :two:
+(undefined)[admin] :two:
+Validating as :nine: with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3493875 ms
+adding message: :nine:
+(undefined)[admin] :nine:
+Validating as :ten: with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3492614 ms
+adding message: :ten:
+(undefined)[admin] :ten:
+Validating as :zero: with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3491074 ms
+adding message: :zero:
+(undefined)[admin] :zero:
+Validating as zero with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3489670 ms
+adding message: zero
+(undefined)[admin] zero
+Validating as ZERO with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3488360 ms
+adding message: ZERO
+(undefined)[admin] ZERO
+Validating as 0 with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3487440 ms
+adding message: 0
+(undefined)[admin] 0
+Validating as !ping with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3471311 ms
+adding message: !ping
+(undefined)[admin] !ping
+Validating as Pong! with action bMsg (token )
+Validating as !ping @BetaOS_System with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3465725 ms
+adding message: !ping @BetaOS_System
+(undefined)[admin] !ping @BetaOS_System
+Validating as :white_check_mark: BetaOS services ONLINE with action bMsg (token )
+Validating as !kill @BetaOS_System with action sendMsg (token 18052541841134851129)
+Logged in as admin | Expiring in: 3460765 ms
+adding message: !kill @BetaOS_System
+(undefined)[admin] !kill @BetaOS_System
+Validating as /me crashes with action bMsg (token )
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+
+Server active!
+Front-end is running on 4000.
+Validating as  with action checkAccess (token 18052541841134851129)
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+Logged in as admin | Expiring in: 3424401 ms
+Support access granted!
+Validating as  with action checkAccess (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: -63521943 ms
+Token expired. Logged out user.
+Validating as ProgrammerG with action login (token 17944037583380365658)
+Password OK for user ProgrammerG | Perms: 1
+Logging user ProgrammerG with expiry 1677531619755 (in 3600000 ms)
+Validating as  with action userReq (token 17944037583380365658)
+Validating as  with action checkAccess_A (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: 3595446 ms
+Validating as  with action checkAccess (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: 3591552 ms
+Support access granted!
+Validating as hello! with action sendMsg (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: 3585150 ms
+adding message: hello!
+(undefined)[ProgrammerG] hello!
+Validating as /me waves.  with action sendMsg (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: 3578150 ms
+adding message: /me waves. 
+(undefined)[ProgrammerG] /me waves. 
+Validating as  with action sendMsg (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: 3573382 ms
+adding message: 
+(undefined)[ProgrammerG] 
+Validating as Beta ru reading this? with action sendMsg (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: 3553638 ms
+adding message: Beta ru reading this?
+(undefined)[ProgrammerG] Beta ru reading this?
+Validating as !ping with action sendMsg (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: 3252868 ms
+adding message: !ping
+(undefined)[ProgrammerG] !ping
+Validating as Pong! with action bMsg (token )
+Validating as :1: with action sendMsg (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: 3245934 ms
+adding message: :1:
+(undefined)[ProgrammerG] :1:
+Validating as !ping @BetaOS_System with action sendMsg (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: 3228371 ms
+adding message: !ping @BetaOS_System
+(undefined)[ProgrammerG] !ping @BetaOS_System
+Validating as :white_check_mark: BetaOS services ONLINE with action bMsg (token )
+Validating as !kill @BetaOS_System with action sendMsg (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: 3213508 ms
+adding message: !kill @BetaOS_System
+(undefined)[ProgrammerG] !kill @BetaOS_System
+Validating as /me crashes with action bMsg (token )
+Validating as !ping @BetaOS_System with action sendMsg (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: 3207236 ms
+adding message: !ping @BetaOS_System
+(undefined)[ProgrammerG] !ping @BetaOS_System
+Validating as :white_check_mark: BetaOS services ONLINE with action bMsg (token )
+Validating as  with action sendMsg (token 17944037583380365658)
+Unknown error
+Validating as  with action sendMsg (token 17944037583380365658)
+Unknown error
+Validating as @ProgrammerG with action sendMsg (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: 3149669 ms
+adding message: @ProgrammerG
+(undefined)[ProgrammerG] @ProgrammerG
+Validating as You can't scroll up with action sendMsg (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: 3113091 ms
+adding message: You can't scroll up
+(undefined)[ProgrammerG] You can't scroll up
+Validating as bt with action sendMsg (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: 3109288 ms
+adding message: bt
+(undefined)[ProgrammerG] bt
+Validating as w with action sendMsg (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: 3108611 ms
+adding message: w
+(undefined)[ProgrammerG] w
+Validating as Bug report with action sendMsg (token 17944037583380365658)
+Logged in as ProgrammerG | Expiring in: 3105658 ms
+adding message: Bug report
+(undefined)[ProgrammerG] Bug report
+Validating as  with action userReq (token 5392590380309557311)
+Validating as  with action userReq (token 5392590380309557311)
+Validating as 56indepdendent with action add (token 5392590380309557311)
+Logged in as user | Expiring in: -33649 ms
+Token expired. Logged out user.
+Validating as  with action logout (token 5392590380309557311)
+Logging out 5392590380309557311
+Validating as 56indepdendent with action login (token 14433245055013475548)
+Invalid credentials.
+Validating as 56indepdendent with action login (token 13767726638528844528)
+Invalid credentials.
+Validating as 56indepdendent with action login (token 14851409037450745)
+Invalid credentials.
+Validating as 56indepdendent with action login (token 7062302004116923048)
+Invalid credentials.
+Validating as  with action checkAccess (token NONE)
+No active session
+Validating as betaos with action login (token 9746917253686622827)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677538135343 (in 3599990 ms)
+Validating as  with action userReq (token 9746917253686622827)
+Validating as  with action userReq (token 9746917253686622827)
+Validating as  with action checkAccess (token 9746917253686622827)
+Logged in as betaos | Expiring in: 3479695 ms
+Support access granted!
+Validating as yes you can scroll up with action sendMsg (token 9746917253686622827)
+Logged in as betaos | Expiring in: 3466232 ms
+adding message: yes you can scroll up
+(undefined)[betaos] yes you can scroll up
+Validating as it's just that it refreshes and clears your scroll with action sendMsg (token 9746917253686622827)
+Logged in as betaos | Expiring in: 3458898 ms
+adding message: it's just that it refreshes and clears your scroll
+(undefined)[betaos] it's just that it refreshes and clears your scroll
+Validating as  with action checkAccess (token NONE)
+No active session
+Validating as betaos with action login (token 10599965572615185683)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677542376642 (in 3599997 ms)
+Validating as  with action userReq (token 10599965572615185683)
+Validating as betaos with action login (token 6468998104384768281)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677543255814 (in 3599996 ms)
+Validating as  with action userReq (token 6468998104384768281)
+Validating as  with action checkAccess (token 6468998104384768281)
+Logged in as betaos | Expiring in: 3595376 ms
+Support access granted!
+Validating as /me tests with action sendMsg (token 6468998104384768281)
+Logged in as betaos | Expiring in: 3589804 ms
+adding message: /me tests
+(undefined)[betaos] /me tests
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+Validating as  with action checkAccess (token 6468998104384768281)
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Logged in as betaos | Expiring in: 3280486 ms
+Support access granted!
+Validating as abc with action sendMsg (token 6468998104384768281)
+Logged in as betaos | Expiring in: 3275963 ms
+adding message: abc
+(undefined)[betaos] abc
+Validating as abc with action sendMsg (token 6468998104384768281)
+Logged in as betaos | Expiring in: 3275216 ms
+adding message: abc
+(undefined)[betaos] abc
+Validating as abc with action sendMsg (token 6468998104384768281)
+Logged in as betaos | Expiring in: 3274374 ms
+adding message: abc
+(undefined)[betaos] abc
+Validating as abc with action sendMsg (token 6468998104384768281)
+Logged in as betaos | Expiring in: 3273528 ms
+adding message: abc
+(undefined)[betaos] abc
+
+Server active!
+Front-end is running on 4000.
+Validating as  with action checkAccess (token 6468998104384768281)
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Logged in as betaos | Expiring in: 3242867 ms
+Support access granted!
+Validating as instant unformatted-send with action sendMsg (token 6468998104384768281)
+Logged in as betaos | Expiring in: 3237814 ms
+adding message: instant unformatted-send
+(undefined)[betaos] instant unformatted-send
+Validating as instant unformatted-send with action sendMsg (token 6468998104384768281)
+Logged in as betaos | Expiring in: 3233157 ms
+adding message: instant unformatted-send
+(undefined)[betaos] instant unformatted-send
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as  with action checkAccess (token 6468998104384768281)
+Logged in as betaos | Expiring in: 3177707 ms
+Support access granted!
+Validating as abcde with action sendMsg (token 6468998104384768281)
+Logged in as betaos | Expiring in: 3172471 ms
+adding message: abcde
+(undefined)[betaos] abcde
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+Validating as  with action userReq (token 6468998104384768281)
+Validating as  with action logout (token 6468998104384768281)
+Logging out 6468998104384768281
+Validating as betaos with action login (token 8999646807323372311)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677543879314 (in 3600000 ms)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as  with action userReq (token 8999646807323372311)
+Validating as  with action checkAccess (token 8999646807323372311)
+Logged in as betaos | Expiring in: 3511478 ms
+Support access granted!
+Validating as  with action logout (token 8999646807323372311)
+Logging out 8999646807323372311
+Validating as betaos with action login (token 2762873065000323077)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677543979186 (in 3600000 ms)
+Validating as  with action userReq (token 2762873065000323077)
+Validating as  with action logout (token 2762873065000323077)
+Logging out 2762873065000323077
+Validating as betaos with action login (token 8921454326157507720)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677543996538 (in 3600000 ms)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as betaos with action login (token 8921454326157507720)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677544020479 (in 3600000 ms)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+Validating as betaos with action login (token 8921454326157507720)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677544051279 (in 3600000 ms)
+Validating as  with action userReq (token 8921454326157507720)
+Validating as  with action checkAccess (token 8921454326157507720)
+Logged in as betaos | Expiring in: 3594054 ms
+Support access granted!
+Validating as instant with action sendMsg (token 8921454326157507720)
+Logged in as betaos | Expiring in: 3590543 ms
+adding message: instant
+(undefined)[betaos] instant
+Validating as unformatted with action sendMsg (token 8921454326157507720)
+Logged in as betaos | Expiring in: 3588688 ms
+adding message: unformatted
+(undefined)[betaos] unformatted
+Validating as send with action sendMsg (token 8921454326157507720)
+Logged in as betaos | Expiring in: 3587771 ms
+adding message: send
+(undefined)[betaos] send
+Validating as  with action checkAccess (token 8921454326157507720)
+Logged in as betaos | Expiring in: 3564517 ms
+Support access granted!
+Validating as testtwo with action sendMsg (token 8921454326157507720)
+Logged in as betaos | Expiring in: 3560788 ms
+adding message: testtwo
+(undefined)[betaos] testtwo
+Validating as testthree with action sendMsg (token 8921454326157507720)
+Logged in as betaos | Expiring in: 3556774 ms
+adding message: testthree
+(undefined)[betaos] testthree
+Validating as  with action checkAccess (token 8921454326157507720)
+Logged in as betaos | Expiring in: 3545570 ms
+Support access granted!
+Validating as  with action checkAccess (token 8921454326157507720)
+Logged in as betaos | Expiring in: 3467755 ms
+Support access granted!
+Validating as  with action checkAccess (token 8921454326157507720)
+Logged in as betaos | Expiring in: 3465058 ms
+Support access granted!
+
+Server active!
+Front-end is running on 4000.
+Validating as  with action checkAccess (token 8921454326157507720)
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Logged in as betaos | Expiring in: 3433613 ms
+Support access granted!
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+Validating as betaos with action login (token 3210069902644828359)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677550188191 (in 3600000 ms)
+Validating as  with action userReq (token 3210069902644828359)
+Validating as  with action checkAccess (token 3210069902644828359)
+Logged in as betaos | Expiring in: 3594911 ms
+Support access granted!
+Validating as betaos with action login (token 16759405474013521394)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677550303680 (in 3600000 ms)
+Validating as  with action userReq (token 16759405474013521394)
+Validating as  with action checkAccess (token 16759405474013521394)
+Logged in as betaos | Expiring in: 3590595 ms
+Support access granted!
+Validating as  with action checkAccess (token 16759405474013521394)
+Logged in as betaos | Expiring in: 3510327 ms
+Support access granted!
+Validating as  with action checkAccess (token 16759405474013521394)
+Logged in as betaos | Expiring in: 3502113 ms
+Support access granted!
+Validating as  with action checkAccess (token 16759405474013521394)
+Logged in as betaos | Expiring in: 3499896 ms
+Support access granted!
+Validating as  with action checkAccess (token 16759405474013521394)
+Logged in as betaos | Expiring in: 3498324 ms
+Support access granted!
+Validating as  with action checkAccess (token 16759405474013521394)
+Logged in as betaos | Expiring in: 3492671 ms
+Support access granted!
+Validating as  with action checkAccess (token 16759405474013521394)
+Logged in as betaos | Expiring in: 3484502 ms
+Support access granted!
+Validating as  with action userReq (token 16759405474013521394)
+Validating as  with action checkAccess (token 16759405474013521394)
+Logged in as betaos | Expiring in: 3479963 ms
+Support access granted!
+Validating as abc with action sendMsg (token 16759405474013521394)
+Logged in as betaos | Expiring in: 3476448 ms
+adding message: abc
+(undefined)[betaos] abc
+Validating as test with action sendMsg (token 16759405474013521394)
+Logged in as betaos | Expiring in: 3475448 ms
+adding message: test
+(undefined)[betaos] test
+Validating as abc with action sendMsg (token 16759405474013521394)
+Logged in as betaos | Expiring in: 3473706 ms
+adding message: abc
+(undefined)[betaos] abc
+Validating as deeee with action sendMsg (token 16759405474013521394)
+Logged in as betaos | Expiring in: 3472318 ms
+adding message: deeee
+(undefined)[betaos] deeee
+Validating as  with action userReq (token 16759405474013521394)
+Validating as  with action checkAccess (token 16759405474013521394)
+Logged in as betaos | Expiring in: 3465569 ms
+Support access granted!
+Validating as  with action userReq (token 16759405474013521394)
+Validating as  with action logout (token 16759405474013521394)
+Logging out 16759405474013521394
+Validating as  with action userReq (token 16759405474013521394)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+Validating as  with action logout (token 16759405474013521394)
+Logging out 16759405474013521394
+Validating as  with action userReq (token 16759405474013521394)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as  with action logout (token 16759405474013521394)
+Logging out 16759405474013521394
+Validating as  with action userReq (token 16759405474013521394)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+Validating as  with action userReq (token 16759405474013521394)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as  with action userReq (token 16759405474013521394)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as  with action userReq (token 16759405474013521394)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+Validating as  with action userReq (token 16759405474013521394)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as  with action userReq (token 16759405474013521394)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+Validating as  with action logout (token 16759405474013521394)
+Logging out 16759405474013521394
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+Validating as  with action logout (token 16759405474013521394)
+Logging out 16759405474013521394
+Validating as  with action userReq (token 16759405474013521394)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+Validating as  with action userReq (token 16759405474013521394)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as  with action userReq (token 16759405474013521394)
+Validating as  with action userReq (token 16759405474013521394)
+Validating as  with action userReq (token 16759405474013521394)
+Validating as  with action userReq (token 16759405474013521394)
+Validating as  with action userReq (token 16759405474013521394)
+Validating as  with action logout (token 16759405474013521394)
+Logging out 16759405474013521394
+Validating as  with action userReq (token 16759405474013521394)
+Validating as  with action logout (token 16759405474013521394)
+Logging out 16759405474013521394
+Validating as  with action userReq (token 16759405474013521394)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+Validating as  with action userReq (token 16759405474013521394)
+Validating as  with action logout (token 16759405474013521394)
+Logging out 16759405474013521394
+Validating as  with action userReq (token 16759405474013521394)
+Validating as betaos with action login (token 400650577250407405)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677554278717 (in 3600000 ms)
+Validating as  with action userReq (token 400650577250407405)
+Validating as  with action checkAccess_A (token 400650577250407405)
+Logged in as betaos | Expiring in: 3592497 ms
+SysLog access granted!
+Logged in as betaos | Expiring in: 3591705 ms
+Validating as  with action userReq (token 400650577250407405)
+Validating as  with action checkAccess (token 400650577250407405)
+Logged in as betaos | Expiring in: 3583415 ms
+Support access granted!
+Validating as /me tests with action sendMsg (token 400650577250407405)
+Logged in as betaos | Expiring in: 3579267 ms
+adding message: /me tests
+(undefined)[betaos] /me tests
+Validating as /me test with action sendMsg (token 400650577250407405)
+Logged in as betaos | Expiring in: 3576861 ms
+adding message: /me test
+(undefined)[betaos] /me test
+Validating as betaos with action login (token 5725168892901939008)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677555107607 (in 3600000 ms)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as betaos with action login (token 2329958402092768537)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677555339459 (in 3600000 ms)
+Validating as betaos with action login (token 4670093911726499741)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677555936566 (in 3600000 ms)
+Validating as  with action userReq (token 4670093911726499741)
+Validating as  with action checkAccess (token 4670093911726499741)
+Logged in as betaos | Expiring in: 3594116 ms
+Support access granted!
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as  with action userReq (token 4670093911726499741)
+Validating as  with action logout (token 4670093911726499741)
+Logging out 4670093911726499741
+Validating as  with action userReq (token 4670093911726499741)
+Validating as  with action checkAccess (token 4670093911726499741)
+No active session
+Validating as betaos with action login (token 4670093911726499741)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677555966975 (in 3600000 ms)
+Validating as  with action userReq (token 4670093911726499741)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as  with action logout (token 4670093911726499741)
+Logging out 4670093911726499741
+Validating as  with action userReq (token 4670093911726499741)
+Validating as  with action logout (token 4670093911726499741)
+Logging out 4670093911726499741
+Validating as betaos with action login (token 16495061008722813459)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677556105415 (in 3600000 ms)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as betaos with action login (token 5471541753588618243)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677557043673 (in 3600000 ms)
+Retrying in: 2 seconds
+[close] Connection at wss://euphoria.io/room/ai/ws was killed at 2/28/2023/12:13:00 AM
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+Retrying in: 2 seconds
+[close] Connection at wss://euphoria.io/room/bots/ws was killed at 2/28/2023/12:14:00 AM
+Retrying in: 2 seconds
+[close] Connection at wss://euphoria.io/room/room/ws was killed at 2/28/2023/12:14:00 AM
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+Validating as  with action checkAccess_A (token NONE)
+No active session
+Validating as  with action checkAccess (token NONE)
+No active session
+Validating as Mercury39 with action signup (token 12542921020703421591)
+Registered user Mercury39with pass: D3ltahnap13r
+Validating as Mercury39 with action login (token 12542921020703421591)
+Invalid credentials.
+Validating as  with action userReq (token 12542921020703421591)
+Validating as  with action checkAccess (token NONE)
+No active session
+Validating as betaos with action login (token 10782558800572359187)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677596034970 (in 3600000 ms)
+Validating as  with action userReq (token 12542921020703421591)
+Validating as  with action userReq (token 10782558800572359187)
+Validating as  with action checkAccess (token 10782558800572359187)
+Logged in as betaos | Expiring in: 3595860 ms
+Support access granted!
+Validating as  with action userReq (token 10782558800572359187)
+Validating as  with action checkAccess (token 10782558800572359187)
+Logged in as betaos | Expiring in: 3585668 ms
+Support access granted!
+Validating as huh. with action sendMsg (token 10782558800572359187)
+Logged in as betaos | Expiring in: 3583563 ms
+adding message: huh.
+(undefined)[betaos] huh.
+Validating as hmmm with action sendMsg (token 10782558800572359187)
+Logged in as betaos | Expiring in: 3581418 ms
+adding message: hmmm
+(undefined)[betaos] hmmm
+Validating as  with action userReq (token 12542921020703421591)
+Validating as  with action checkAccess (token 12542921020703421591)
+No active session
+Validating as still a bloody mess i say with action sendMsg (token 10782558800572359187)
+Logged in as betaos | Expiring in: 3576401 ms
+adding message: still a bloody mess i say
+(undefined)[betaos] still a bloody mess i say

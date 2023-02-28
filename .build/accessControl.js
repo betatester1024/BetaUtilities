@@ -22,6 +22,7 @@ __export(accessControl_exports, {
   validate: () => validate
 });
 module.exports = __toCommonJS(accessControl_exports);
+var import_initialiser = require("./initialiser");
 var import_updateuser = require("./updateuser");
 var import_misc = require("./misc");
 var import_database = require("./database");
@@ -34,11 +35,21 @@ function validate(user, pwd, action, access, callback, token = "") {
   if (action != "refresh" && action != "refresh_log")
     (0, import_misc.systemLog)("Validating as " + user + " with action " + action + " (token " + token + ")");
   if (!token || !token.match("[0-9]+") || (!user || user && action != "CMD" && action != "sendMsg" && !user.match("^[a-zA-Z0-9_]+$")) || (!pwd || action != "CMD" && pwd.length <= 0)) {
-    if (action != "checkAccess" && action != "checkAccess_A" && action != "logout" && action != "refresh" && action != "refresh_log") {
+    if (action != "checkAccess" && action != "checkAccess_A" && action != "logout" && action != "refresh" && action != "refresh_log" && action != "userReq" && action != "bMsg") {
       (0, import_misc.systemLog)("Unknown error");
       callback.end(JSON.stringify("ERROR"));
       return;
     }
+  }
+  if (action == "bMsg") {
+    DB2.insertOne({
+      fieldName: "MSG",
+      sender: "BetaOS_System",
+      data: user,
+      permLevel: 3,
+      expiry: Date.now() + 1e3 * 60 * 60 * 24
+    });
+    return;
   }
   if (action == "logout") {
     (0, import_misc.systemLog)("Logging out " + token);
@@ -46,9 +57,16 @@ function validate(user, pwd, action, access, callback, token = "") {
     callback.end(JSON.stringify("SUCCESS"));
     return;
   }
-  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log") {
+  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log" || action == "userReq") {
     DB.findOne({ fieldName: "TOKEN", token }).then(
       (obj) => {
+        if (action == "userReq") {
+          if (!obj)
+            callback.end(JSON.stringify("NOACTIVE"));
+          else
+            callback.end(JSON.stringify(obj.associatedUser));
+          return;
+        }
         if (obj == null) {
           (0, import_misc.systemLog)("No active session");
           if (action == "checkAccess" || action == "checkAccess_A") {
@@ -121,19 +139,20 @@ function validate(user, pwd, action, access, callback, token = "") {
                 expiry: Date.now() + 1e3 * 60 * 60 * 24
               });
               callback.end(JSON.stringify("SUCCESS"));
+              import_initialiser.currHandler.onMessage(user, obj.associatedUser);
               return;
             } else if (action == "refresh" && perms >= 1) {
               DB2.find({ fieldName: "MSG" }).toArray().then((objs) => {
                 let out = "";
                 for (let i = Math.max(0, objs.length - 100); i < objs.length; i++) {
-                  let cls = "", extraText = "";
+                  let cls_n = "", extraText = "";
                   switch (objs[i].permLevel) {
                     case 2:
-                      cls = "admin";
+                      cls_n = "admin";
                       extraText = " [ADMIN]";
                       break;
                     case 3:
-                      cls = "beta";
+                      cls_n = "beta";
                       extraText = " [SYSTEM]";
                       break;
                   }
@@ -141,12 +160,30 @@ function validate(user, pwd, action, access, callback, token = "") {
                   data = data.replaceAll("&", "&amp;");
                   data = data.replaceAll("<", "&gt;");
                   data = data.replaceAll(">", "&lt;");
+                  data = data.replaceAll("\\n", "<br>");
+                  data = data.replaceAll(":one:", "<span class='material-symbols-outlined'>counter_1</span>");
+                  data = data.replaceAll(":two:", "<span class='material-symbols-outlined'>counter_2</span>");
+                  data = data.replaceAll(":three:", "<span class='material-symbols-outlined'>counter_3</span>");
+                  data = data.replaceAll(":four:", "<span class='material-symbols-outlined'>counter_4</span>");
+                  data = data.replaceAll(":five:", "<span class='material-symbols-outlined'>counter_5</span>");
+                  data = data.replaceAll(":six:", "<span class='material-symbols-outlined'>counter_6</span>");
+                  data = data.replaceAll(":seven:", "<span class='material-symbols-outlined'>counter_7</span>");
+                  data = data.replaceAll(":eight:", "<span class='material-symbols-outlined'>counter_8</span>");
+                  data = data.replaceAll(":nine:", "<span class='material-symbols-outlined'>counter_9</span>");
+                  data = data.replaceAll(":zero:", "<span class='material-symbols-outlined'>counter_0</span>");
+                  data = data.replaceAll(":white_check_mark:", "<span class='material-symbols-outlined'>check_circle</span>");
+                  let cls_w = "";
+                  if (data.match("^/me")) {
+                    cls_w += " slashMe";
+                    data = data.replace("/me", "");
+                  }
                   if (objs[i].sender == "betaos") {
-                    cls = "beta";
+                    cls_n += " beta";
                     extraText = " [SYSTEM]";
                   }
-                  out += `<p><b class='${cls}''>
-              ${objs[i].sender}${extraText}:</b> ${data} </p>`;
+                  cls_w += " " + cls_n;
+                  out += `<p class="${cls_w}""><b class='${cls_n}'>
+              ${objs[i].sender}${extraText}:</b> ${data} </p><br>`;
                 }
                 callback.end(JSON.stringify(out));
               });
@@ -155,6 +192,8 @@ function validate(user, pwd, action, access, callback, token = "") {
               let msg = fs.readFileSync("./systemLog.txt").toString();
               msg = msg.replaceAll("\n", "<br>");
               callback.end(JSON.stringify(msg));
+            } else if (action == "refresh_log" || action == "refresh" || action == "checkAccess_A") {
+              callback.sendFile(path.join(__dirname, "../frontend", "403.html"));
             } else {
               (0, import_misc.systemLog)("No perms!");
               callback.end(JSON.stringify("ACCESS"));

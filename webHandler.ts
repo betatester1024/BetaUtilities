@@ -5,6 +5,7 @@ import {DB} from './database';
 import {replyMessage} from './messageHandle';
 import { updateActive } from './messageHandle';
 import {systemLog} from './misc';
+const fs = require('fs');
 
 // const { getUserInfo } = require("@replit/repl-auth")
 const Database = require("@replit/database")
@@ -99,22 +100,22 @@ export class WebH
   }
   
   onOpen() {
-    systemLog(("BetaUtilities open in "+this.socket.url));
+    systemLog("BetaUtilities open");
     WebH.resetTime =1000;
   }
 
   initNick() {
-    if (!this.setNickQ) this.changeNick(this.nick)
-    this.setNickQ = true;
+    // if (!this.setNickQ) this.changeNick(this.nick)
+    // this.setNickQ = true;
   }
 
   changeNick(nick:string) {
-    this.socket.send(`{"type": "nick", "data": {"name": "${nick}"},"id": "1"}`);
+    // this.socket.send(`{"type": "nick", "data": {"name": "${nick}"},"id": "1"}`);
   }
 
   onMessage(msg:string, snd:string) {
       let data = ""
-      if (DATALOGGING) systemLog((`(${this.roomName})[${snd}] ${msg}`));
+      if (DATALOGGING) fs.writeFileSync('./msgLog.txt', fs.readFileSync('./msgLog.txt').toString()+((`(${this.roomName})[${snd}] ${msg}\n`)));
       msg = msg.trim().toLowerCase();
       // Required methods
       // !kill
@@ -144,8 +145,8 @@ export class WebH
       } 
       // check paused and pings
       else if (this.pausedQ &&
-        (msg.match("!ping @" + this.nick.toLowerCase(), "gmiu") ||
-         msg.match("!help @" + this.nick.toLowerCase(), "gmiu"))) 
+        (msg.match("!ping @" + this.nick.toLowerCase()) ||
+         msg.match("!help @" + this.nick.toLowerCase()))) 
       {
         this.sendMsg("/me has been paused by @"+this.pauser, dat);
         return;
@@ -209,36 +210,13 @@ export class WebH
 
   static resetTime = 1000;
   onClose(event:any) {
-    // systemLog(("Perished in:"+this.roomName);
-    if (event != 1000 && event!=1006) {
-      updateActive(this.roomName, false);
-      setTimeout(() => {
-        new WS(this.url, this.nick, this.roomName, this.transferOutQ)
-        updateActive(this.roomName, true);
-      }, 1000);
-    } else {
-      updateActive(this.roomName, false);
-      if (event==1000) return;
-      WS.resetTime*=1.5;
-      if (WS.resetTime > 30000) {
-        WS.resetTime = 30000;
-        return;
-      }
-      setTimeout(()=>{
-        new WS(this.url, this.nick, this.roomName, this.transferOutQ)
-        updateActive(this.roomName, true);
-      }, WS.resetTime);
-      
-      systemLog(("Retrying in: "+Math.round(WebH.resetTime/1000)+" seconds"));
-      let dateStr = (new Date()).toLocaleDateString("en-US", {timeZone:"EST"})+"/"+(new Date()).toLocaleTimeString("en-US", {timeZone:"EST"});
-      systemLog(("[close] Connection at "+this.url+" was killed at "+dateStr));
-    }
+    systemLog("Closed");
   }
 
   
   constructor() {
     this.nick = "BetaOS_System";
     this.replyMessage = replyMessage;
-    
+    this.roomName = "OnlineSUPPORT";
   }
 }

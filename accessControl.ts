@@ -5,13 +5,15 @@ var bcrypt = require("bcrypt");
 const path = require('path');
 import { updateUser } from "./updateuser";
 import {systemLog} from './misc';
+import {replacements} from './replacements'
 const fs = require("fs");
 import {database} from './database';
 const DB = database.collection('SystemAUTH');
 const DB2 = database.collection('SupportMessaging');
 
 export function validate(user:string, pwd:string, action:string, access:string, callback:any, token:string="") {
-  if (action != "refresh" && action != "refresh_log") systemLog("Validating as "+user+" with action "+action +" (token "+token+")");
+  if (action != "refresh" && action != "refresh_log"
+      && action != "sendMsg" && action != "bMsg") systemLog("Validating as "+user+" with action "+action +" (token "+token+")");
   if (!token || !token.match("[0-9]+") || 
      (!user || user && action !="CMD" && action !="sendMsg" && !user.match("^[a-zA-Z0-9_]+$")) || 
      (!pwd || action != "CMD" && pwd.length<=0)) 
@@ -51,11 +53,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
      action == "refresh_log" || action == "userReq") {
     DB.findOne({fieldName: "TOKEN", token:token}).then(
     (obj:{associatedUser:string, expiry:number})=>{
-      if (action == "userReq") {
-        if (!obj) callback.end(JSON.stringify("NOACTIVE"));
-        else callback.end(JSON.stringify(obj.associatedUser));
-        return;
-      }
+      
       if (obj == null) {
         systemLog("No active session");
         if (action == "checkAccess" || action == "checkAccess_A") {
@@ -66,13 +64,19 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       }
       let expiryTime = obj.expiry;
       let tokenUser = obj.associatedUser;
-      if (action != "refresh") systemLog("Logged in as "+tokenUser+" | Expiring in: "+(expiryTime-Date.now()) + " ms");
+      if (action != "refresh" && action != "refresh_log"
+         && action != "sendMsg" && action != "bMsg") systemLog("Logged in as "+tokenUser+" | Expiring in: "+(expiryTime-Date.now()) + " ms");
       if (expiryTime<Date.now()) {
         systemLog("Token expired. Logged out user.")
         DB.deleteOne({fieldName:"TOKEN", token:token});
         if (action == "checkAccess" || action == "checkAccess_A") 
           callback.sendFile(path.join( __dirname, '../frontend', '403.html' ));
         else callback.end(JSON.stringify("EXPIRE"));
+        return;
+      }
+      if (action == "userReq") {
+        if (!obj) callback.end(JSON.stringify("NOACTIVE"));
+        else callback.end(JSON.stringify(obj.associatedUser));
         return;
       }
       DB.findOne({fieldName:"UserData", user:obj.associatedUser}).then(
@@ -119,13 +123,13 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           return;
         }
         else if (action == "sendMsg" && perms >= 1) {
-          systemLog("adding message: "+user);
+          // systemLog("adding message: "+user);
           DB2.insertOne({
             fieldName: "MSG", 
             sender:obj.associatedUser, 
             data:user, 
             permLevel:perms, 
-            expiry:Date.now()+1000*60*60*24})
+            expiry:Date.now()+1000*60*60})
           callback.end(JSON.stringify("SUCCESS"));
           currHandler.onMessage(user, obj.associatedUser);
           return;
@@ -137,7 +141,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           DB2.find({fieldName:"MSG"}).toArray().then((objs:{sender:string, data:string, permLevel:number}[])=>{
             let out = "";
             // console.log(objs)
-            for (let i=Math.max(0, objs.length-100); i<objs.length; i++) {
+            for (let i=0; i<objs.length; i++) {
               let cls_n="", extraText = "";
               switch (objs[i].permLevel) {
                 case 2: cls_n="admin"; extraText = " [ADMIN]"; break;
@@ -147,18 +151,10 @@ export function validate(user:string, pwd:string, action:string, access:string, 
               data = data.replaceAll("&", "&amp;");
               data = data.replaceAll("<", "&gt;");
               data = data.replaceAll(">", "&lt;");
-              data = data.replaceAll("\\n", "<br>")
-              data = data.replaceAll(":one:", "<span class='material-symbols-outlined'>counter_1</span>")
-              data = data.replaceAll(":two:", "<span class='material-symbols-outlined'>counter_2</span>")
-              data = data.replaceAll(":three:", "<span class='material-symbols-outlined'>counter_3</span>")
-              data = data.replaceAll(":four:", "<span class='material-symbols-outlined'>counter_4</span>")
-              data = data.replaceAll(":five:", "<span class='material-symbols-outlined'>counter_5</span>")
-              data = data.replaceAll(":six:", "<span class='material-symbols-outlined'>counter_6</span>")
-              data = data.replaceAll(":seven:", "<span class='material-symbols-outlined'>counter_7</span>")
-              data = data.replaceAll(":eight:", "<span class='material-symbols-outlined'>counter_8</span>")
-              data = data.replaceAll(":nine:", "<span class='material-symbols-outlined'>counter_9</span>")
-              data = data.replaceAll(":zero:", "<span class='material-symbols-outlined'>counter_0</span>")
-              data = data.replaceAll(":white_check_mark:", "<span class='material-symbols-outlined'>check_circle</span>")
+              data = data.replaceAll("\\n", "<br>");
+              for (let i=0; i<replacements.length; i++){
+                data = data.replaceAll(replacements[i].from, "<span class='material-symbols-outlined'>"+replacements[i].to+"</span>")
+              }
               let cls_w = ""
               if (data.match("^/me")){
                 cls_w += " slashMe"

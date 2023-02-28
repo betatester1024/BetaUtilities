@@ -647,3 +647,8 @@ BetaUtilities open in wss://euphoria.io/room/room/ws
 BetaUtilities open in wss://euphoria.io/room/srs/ws
 BetaUtilities open in wss://euphoria.io/room/bots/ws
 BetaUtilities open in wss://euphoria.io/room/ai/ws
+Validating as  with action checkAccess (token 8719212139633306364)
+Logged in as betaos | Expiring in: 2443442 ms
+Support access granted!
+Validating as  with action userReq (token 8719212139633306364)
+Logged in as betaos | Expiring in: 1807008 ms

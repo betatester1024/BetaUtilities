@@ -164,3 +164,4 @@
 (OnlineSUPPORT)[user] !ping @BetaOS_System
 (OnlineSUPPORT)[test] !renick
 (OnlineSUPPORT)[test] !play
+(OnlineSUPPORT)[BetaOS_726] m

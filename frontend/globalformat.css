@@ -1,13 +1,22 @@
 html {
   background-color: #eee;
 } 
-h1 {
+h1, h2 {
   font-family: NotoSansDisplay;
   margin-top: 0px;
 /*         display: inline-block; */
   left: auto;
-  font-size: 5em;
+  font-size: 4em;
   color: #0a84ff;
+}
+h2 {
+  font-size: xx-large;
+  margin-bottom: 0px;
+}
+h2 > span {
+  font-size: 1.25em !important;
+  position: relative;
+  top: 0.24em;
 }
 hr {
   border: 2px solid #000;

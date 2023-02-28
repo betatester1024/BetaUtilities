@@ -1,4 +1,4 @@
-const DATALOGGING = false;
+const DATALOGGING = true;
 // Copyright (c) 2023 BetaOS
 import {WebSocket} from 'ws';
 import {DB} from './database';
@@ -10,13 +10,10 @@ import {systemLog} from './misc';
 const Database = require("@replit/database")
 import {validate} from './accessControl';
 
-export class WS 
+export class WebH 
 {
   static CALLTIMEOUT = 30000;
-  url:string
   nick:string;
-  setNickQ: boolean = false;
-  socket: WebSocket;
   pausedQ=false;
   roomName:string;
   pauser:string|null = null;
@@ -26,7 +23,6 @@ export class WS
   callStatus=-1;
   transferOutQ = false; // is a room that one should recommend transferring out?
   bypass = false;
-  user:st
   confirmcode = -1;
   // static db = new Database();
   static toSendInfo(msg: string, data:any=null) {
@@ -68,7 +64,7 @@ export class WS
       clearTimeout(this.callReset);
     this.callReset = setTimeout(() => {
       this.resetCall(data); 
-    }, WS.CALLTIMEOUT);
+    }, WebH.CALLTIMEOUT);
   }
 
   clearCallReset() {
@@ -76,7 +72,7 @@ export class WS
     this.callStatus=-1;
   }
 
-  resetCall(this:WS, data:any) {
+  resetCall(this:WebH, data:any) {
     if (this.callStatus >= 0) {
       this.sendMsg("[CALLEND] Disconnected from BetaOS Services", data);
     }
@@ -98,13 +94,13 @@ export class WS
   }
 
   sendMsg(msg:string, user:string) {
-    validate(user,)
+    validate(msg, "", "bMsg", "", null, "");
     this.incrRunCt();
   }
   
   onOpen() {
     systemLog(("BetaUtilities open in "+this.socket.url));
-    WS.resetTime =1000;
+    WebH.resetTime =1000;
   }
 
   initNick() {
@@ -116,27 +112,15 @@ export class WS
     this.socket.send(`{"type": "nick", "data": {"name": "${nick}"},"id": "1"}`);
   }
 
-  onMessage(dat:string) {
-    
-    let data = JSON.parse(dat);
-    if (data["type"] == "ping-event") {
-      let reply = `{"type": "ping-reply","data": {"time":${data["data"]["time"]}},"id":"0"}`;
-      this.socket.send(reply);
-      setTimeout(this.initNick.bind(this), 3000);
-    }
-    if (data["type"] == "send-event") {
-      // check whether the message contents match the pattern
-
-      let msg = data["data"]["content"].toLowerCase().trim();
-      let snd = data["data"]["sender"]["name"];
+  onMessage(msg:string, snd:string) {
+      let data = ""
       if (DATALOGGING) systemLog((`(${this.roomName})[${snd}] ${msg}`));
+      msg = msg.trim().toLowerCase();
       // Required methods
       // !kill
       if (msg == "!kill @" + this.nick.toLowerCase()) {
         this.sendMsg("/me crashes", data);
-        setTimeout(()=>{
-          this.socket.close(1000, "!killed by user.");
-        }, 100);
+        
       }
         
       // !restore
@@ -206,7 +190,6 @@ export class WS
         }
         this.sendMsg(outStr, data);
       }
-    }
   }
 
   errorSocket() {
@@ -246,27 +229,15 @@ export class WS
         updateActive(this.roomName, true);
       }, WS.resetTime);
       
-      systemLog(("Retrying in: "+Math.round(WS.resetTime/1000)+" seconds"));
+      systemLog(("Retrying in: "+Math.round(WebH.resetTime/1000)+" seconds"));
       let dateStr = (new Date()).toLocaleDateString("en-US", {timeZone:"EST"})+"/"+(new Date()).toLocaleTimeString("en-US", {timeZone:"EST"});
       systemLog(("[close] Connection at "+this.url+" was killed at "+dateStr));
     }
   }
 
   
-  constructor(url:string, nick:string, roomName:string, transferQ:boolean) {
-    this.nick = nick;
-    this.url=url;
-    this.roomName = roomName;
-    this.socket = new WebSocket(url);
-    this.transferOutQ=transferQ;
-    this.socket.on('open', this.onOpen.bind(this));
-    this.socket.on('message', this.onMessage.bind(this));
-    this.socket.on('close', this.onClose.bind(this));
-    this.socket.on('error', (e)=>{
-      this.socket.close(1000, "");
-      // systemLog(("ERROR for room-ID: "+this.roomName)
-      updateActive(this.roomName, false);
-    })
+  constructor() {
+    this.nick = "BetaOS_System";
     this.replyMessage = replyMessage;
     
   }

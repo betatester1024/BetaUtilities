@@ -18,6 +18,7 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var initialiser_exports = {};
 __export(initialiser_exports, {
+  currHandler: () => currHandler,
   init: () => init
 });
 module.exports = __toCommonJS(initialiser_exports);
@@ -26,6 +27,7 @@ var import_wsHandler = require("./wsHandler");
 var import_server = require("./server");
 var import_messageHandle = require("./messageHandle");
 var import_updateuser = require("./updateuser");
+var import_webHandler = require("./webHandler");
 var import_accessControl = require("./accessControl");
 let rooms = ["xkcd", "test", "bots", "ai", "room", "srs"];
 let nicks = [
@@ -53,10 +55,13 @@ function init() {
   setInterval(() => {
     (0, import_accessControl.DBGarbageCollect)();
   }, 1e4);
+  currHandler = new import_webHandler.WebH();
 }
+let currHandler;
 init();
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  currHandler,
   init
 });
 //# sourceMappingURL=initialiser.js.map

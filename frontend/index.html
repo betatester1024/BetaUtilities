@@ -2,17 +2,20 @@
 <html lang="en">
   <head>
     <title>Welcome to BetaOS Services!</title>
+    <script src="login.js"></script>
     <script> function onLoad() {
       // alert(document.cookie);
       if (document.cookie.match("session=[0-9.]+")) {
         let ele = document.getElementById("loginbtn");
         ele.innerHTML = "<span class=\"material-symbols-outlined\">logout</span> Logout<br><hr class=\"btnHr\"></hr>";
         ele.onclick= ()=> {window.open('/logout', '_self');};
+        validateLogin("userReq", "");
       } else {
         let ele = document.getElementById("configbtn");
         ele.innerHTML = "Sign up<br><hr class=\"btnHr\"></hr>";
         ele.onclick= ()=> {window.open('/signup', '_self');}
       }
+      
     }
     function support() {
       let match=document.cookie.match("session=([0-9.]+)")
@@ -30,7 +33,7 @@
         overflow-y: scroll;  
       }
       button {
-        width: 5em;
+        width: 5.5em;
         height: 2.5em;
         border-radius: 0.3em;
         font-size: 2.5em;
@@ -49,8 +52,8 @@
       }
       .full {
         display: inline-block;
-        max-width: 15em;
-        width: min(15em, 100%)
+        max-width: 16.5em;
+        width: min(16.5em, 100%)
       }
     </style>
   </head>
@@ -60,7 +63,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <body onload = "onLoad()">
     <div id = "mainDiv">
-      <h1>Welcome to BetaOS Services!</h1>
+      <h1 id="header">Welcome.</h1>
       <hr class="rounded"></hr>
       <button onclick="window.open('./status', '_self');">
         <span class="material-symbols-outlined">check</span>

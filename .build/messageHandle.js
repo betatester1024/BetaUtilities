@@ -54,15 +54,17 @@ function replyMessage(msg, sender, data) {
     return "> See console <";
   }
   if (msg == "!conjure @" + this.nick.toLowerCase()) {
-    setTimeout(() => {
-      this.socket.close();
-    }, 120);
+    if (this.socket)
+      setTimeout(() => {
+        this.socket.close();
+      }, 120);
     return "/me r\xF6lls b\xFF and spontaneously combusts";
   }
   if (msg == "!reboot @" + this.nick.toLowerCase()) {
-    setTimeout(() => {
-      this.socket.close();
-    }, 120);
+    if (this.socket)
+      setTimeout(() => {
+        this.socket.close();
+      }, 120);
     return "/me is rebooting";
   }
   if (msg.match(/!testfeature/gimu))
@@ -117,6 +119,52 @@ function replyMessage(msg, sender, data) {
       }
     );
   });
+  import_database.DB.findOne({ fieldName: "SLEEPINGUSERS" }).then((obj) => {
+    let match3 = msg.match("^!sleep @(.*)$");
+    let sleepingUsers = obj.sleeping;
+    if (match3 || msg == "!sleep") {
+      if (match3 && sleepingUsers.indexOf(match3[1].toLowerCase()) >= 0) {
+        this.delaySendMsg("This user is already supposed to be sleeping!", data, 0);
+        return;
+      } else if (match3) {
+        sleepingUsers.push(match3[1].toLowerCase());
+        this.delaySendMsg("Will scream at @" + match3[1], data, 0);
+      } else if (sleepingUsers.indexOf(sender.toLowerCase()) < 0) {
+        sleepingUsers.push(sender.toLowerCase());
+        this.changeNick("SleepBot V2");
+        setTimeout(() => this.changeNick(this.nick), 10);
+      } else {
+        this.delaySendMsg("Wait, you're already in the- GO TO SLEEP", data, 0);
+        return;
+      }
+    }
+    match3 = msg.match("^!wake @(.*)$");
+    if (match3 || msg == "!wake") {
+      if (match3 && sleepingUsers.indexOf(match3[1].toLowerCase()) < 0) {
+        this.delaySendMsg("This user was not sleeping in the first place.", data, 0);
+        return;
+      } else if (match3) {
+        sleepingUsers.splice(sleepingUsers.indexOf(match3[1].toLowerCase()), 1);
+        this.delaySendMsg("They're off the hook... for now.", data, 0);
+      } else {
+        sleepingUsers.splice(sleepingUsers.indexOf(sender.toLowerCase()), 1);
+        this.delaySendMsg("You're off the hook... for now.", data, 0);
+      }
+    }
+    if (sleepingUsers.indexOf(sender.toLowerCase()) >= 0) {
+      this.changeNick("SleepBot V2");
+      this.delaySendMsg("GO TO SLEEP.", data, 0);
+      this.changeNick(this.nick);
+    }
+    ;
+    import_database.DB.updateOne(
+      { fieldName: "SLEEPINGUSERS" },
+      {
+        $set: { sleeping: sleepingUsers },
+        $currentDate: { lastModified: true }
+      }
+    );
+  });
   if (msg == "!renick") {
     this.changeNick(this.nick);
     return ":white_check_mark:";
@@ -156,9 +204,10 @@ function replyMessage(msg, sender, data) {
     return "Status-tracker: https://betatester1024.repl.co";
   }
   if (msg.match("^!die$")) {
-    setTimeout(() => {
-      this.socket.close();
-    }, 120);
+    if (this.socket)
+      setTimeout(() => {
+        this.socket.close();
+      }, 120);
     this.delaySendMsg("/me crashes", data, 100);
     return "aaaaghhh! death! blood! i'm dying!";
   }
@@ -175,6 +224,8 @@ function replyMessage(msg, sender, data) {
     return "ping!";
   }
   if (msg.match("(!help[ ]+@" + this.nick.toLowerCase() + "$|^[ ]+!help[ ]+$)|!contact @" + this.nick.toLowerCase()) != null) {
+    if (this.transferOutQ)
+      return "Due to spamming concerns, please start your call in another room like &test or &bots! \\nThank you for your understanding.";
     if (this.callStatus == 6)
       return "You're currently on hold! A moment, please.";
     this.callStatus = 0;
@@ -323,9 +374,10 @@ function replyMessage(msg, sender, data) {
   }
   if (this.callStatus == 5 && (msg == "one" || msg == "1" || msg == ":one:")) {
     this.clearCallReset();
-    setTimeout(() => {
-      this.socket.close();
-    }, 120);
+    if (this.socket)
+      setTimeout(() => {
+        this.socket.close();
+      }, 120);
     return "/me reboots";
   }
   if (msg == "!wordle" || this.callStatus == 5 && (msg == "two" || msg == "2" || msg == ":two:")) {

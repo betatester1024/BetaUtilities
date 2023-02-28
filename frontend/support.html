@@ -11,6 +11,13 @@
         setInterval(()=>{validateLogin("refresh", "")}, 2500);
         document.getElementById("alert").hidden=true;
         document.getElementById("h1").hidden=true;
+        console.log(document.cookie);
+        let match = document.cookie.match("__Secure-user=([0-9a-zA-Z_]+)");
+        console.log(match[1]);
+        if (match) CURRUSER = match[1];
+        match = document.cookie.match("__Secure-perms=([0-9]+)");
+        console.log(match[1]);
+        if (match) CURRPERMS = match[1];
       }
     </script>
     <link rel="stylesheet" href="/globalformat.css">
@@ -28,8 +35,9 @@
         width: 100%;
       }
       p {
-        width: 100%;
+        width: unset;
         font-size: 1em;
+/*         display: block; */
       }
       hr {
         margin-top: 5px !important;
@@ -46,6 +54,8 @@
       }
       span {
         font-size: 1.4em !important;
+        position: relative;
+        top: 5px;
       }
       #textDiv {
         display: inline-block;
@@ -55,15 +65,31 @@
         overflow-y: scroll;
         height: 60vh;
         margin-left: 5%;
+        text-align: left;
       }
-      .beta {
-        color: #00ee00;
-/*         text-shadow: 0px 0px 1px #00ee00;  */
-      }
-      .admin {
+      
+      b.admin {
         color: #FBBC05; 
 /*         text-shadow: 0px 0px 1px #FBBC05; */
       }
+      b.beta {
+        color: #00ee00;
+/*         text-shadow: 0px 0px 1px #00ee00;  */
+      }
+      .slashMe {
+        background-color: #abddfc;
+      }
+      .slashMe.admin {
+        background-color: #e8fc4e;
+      }
+      .slashMe.beta {
+        background-color: #96f98b;
+      }
+      
+      b {
+        background-color: #eee;
+      }
+      
     </style>
   </head>
   

@@ -4,6 +4,7 @@ import {WS} from './wsHandler';
 import { updateServer } from './server';
 import { updateActive } from './messageHandle';
 import { initUsers} from './updateuser';
+import {WebH} from './webHandler';
 import {DBGarbageCollect} from './accessControl'
 let rooms = ["xkcd", "test", "bots", "ai", "room", "srs"];
 let nicks = ["BetaUtilities", "BetaUtilities_TEST", 
@@ -24,7 +25,9 @@ export function init() {
   // cnc();
   loopy();
   setInterval(()=>{DBGarbageCollect()}, 10000);
+  currHandler = new WebH();
 }
+export let currHandler:WebH;
 
 
 

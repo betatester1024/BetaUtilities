@@ -53,7 +53,7 @@ export function updateServer() {
   
   app.post('/login', urlencodedParser, function (req:any, res:any) {  
    // Prepare output in JSON format  
-    // if ()
+    if (req.body.action == "bMsg") res.end(JSON.stringify("ACCESS"));
     validate(decodeURIComponent(req.body.user) as string, decodeURIComponent(req.body.pass) as string, req.body.action, req.body.access as string, res, req.body.token as string)
    
   });

@@ -1,5 +1,5 @@
 import { WS } from "./wsHandler";
-
+import {currHandler} from './initialiser';
 // import { hashSync, compareSync} from 
 var bcrypt = require("bcrypt");
 const path = require('path');
@@ -18,12 +18,23 @@ export function validate(user:string, pwd:string, action:string, access:string, 
   {
     if (action!= "checkAccess" && action != "checkAccess_A"
         && action != "logout" && 
-        action !="refresh" && action != "refresh_log")
+        action !="refresh" && action != "refresh_log" && 
+       action != "userReq" && action != "bMsg")
     {
       systemLog("Unknown error")
       callback.end(JSON.stringify("ERROR"))
       return;
     } 
+  }
+
+  if (action == "bMsg") {
+    DB2.insertOne({
+      fieldName: "MSG", 
+      sender:"BetaOS_System", 
+      data:user, 
+      permLevel:3, 
+      expiry:Date.now()+1000*60*60*24});
+    return;
   }
    // data validation complete
   if (action=="logout") {
@@ -37,9 +48,14 @@ export function validate(user:string, pwd:string, action:string, access:string, 
   if (action=="add" || action=="CMD" || 
       action == "checkAccess" || action == "sendMsg"||
      action == "refresh" || action == "checkAccess_A" || 
-     action == "refresh_log") {
+     action == "refresh_log" || action == "userReq") {
     DB.findOne({fieldName: "TOKEN", token:token}).then(
     (obj:{associatedUser:string, expiry:number})=>{
+      if (action == "userReq") {
+        if (!obj) callback.end(JSON.stringify("NOACTIVE"));
+        else callback.end(JSON.stringify(obj.associatedUser));
+        return;
+      }
       if (obj == null) {
         systemLog("No active session");
         if (action == "checkAccess" || action == "checkAccess_A") {
@@ -111,8 +127,10 @@ export function validate(user:string, pwd:string, action:string, access:string, 
             permLevel:perms, 
             expiry:Date.now()+1000*60*60*24})
           callback.end(JSON.stringify("SUCCESS"));
+          currHandler.onMessage(user, obj.associatedUser);
           return;
         }
+        
         else if (action == "refresh" && perms >= 1) {
           
           // let cursor = DB2.find({fieldName:"MSG"});
@@ -120,22 +138,39 @@ export function validate(user:string, pwd:string, action:string, access:string, 
             let out = "";
             // console.log(objs)
             for (let i=Math.max(0, objs.length-100); i<objs.length; i++) {
-              let cls="", extraText = "";
+              let cls_n="", extraText = "";
               switch (objs[i].permLevel) {
-                case 2: cls="admin"; extraText = " [ADMIN]"; break;
-                case 3: cls="beta"; extraText = " [SYSTEM]"; break;
+                case 2: cls_n="admin"; extraText = " [ADMIN]"; break;
+                case 3: cls_n="beta"; extraText = " [SYSTEM]"; break;
               }
               let data = objs[i].data;
               data = data.replaceAll("&", "&amp;");
               data = data.replaceAll("<", "&gt;");
               data = data.replaceAll(">", "&lt;");
-              
+              data = data.replaceAll("\\n", "<br>")
+              data = data.replaceAll(":one:", "<span class='material-symbols-outlined'>counter_1</span>")
+              data = data.replaceAll(":two:", "<span class='material-symbols-outlined'>counter_2</span>")
+              data = data.replaceAll(":three:", "<span class='material-symbols-outlined'>counter_3</span>")
+              data = data.replaceAll(":four:", "<span class='material-symbols-outlined'>counter_4</span>")
+              data = data.replaceAll(":five:", "<span class='material-symbols-outlined'>counter_5</span>")
+              data = data.replaceAll(":six:", "<span class='material-symbols-outlined'>counter_6</span>")
+              data = data.replaceAll(":seven:", "<span class='material-symbols-outlined'>counter_7</span>")
+              data = data.replaceAll(":eight:", "<span class='material-symbols-outlined'>counter_8</span>")
+              data = data.replaceAll(":nine:", "<span class='material-symbols-outlined'>counter_9</span>")
+              data = data.replaceAll(":zero:", "<span class='material-symbols-outlined'>counter_0</span>")
+              data = data.replaceAll(":white_check_mark:", "<span class='material-symbols-outlined'>check_circle</span>")
+              let cls_w = ""
+              if (data.match("^/me")){
+                cls_w += " slashMe"
+                data = data.replace("/me", ""); 
+              }
               if (objs[i].sender == "betaos") {
-                cls="beta";
+                cls_n+=" beta";
                 extraText = " [SYSTEM]";
               }
-              out +=`<p><b class='${cls}''>
-              ${objs[i].sender}${extraText}:</b> ${data} </p>`;
+              cls_w += " "+cls_n;
+              out +=`<p class=\"${cls_w}\""><b class='${cls_n}'>
+              ${objs[i].sender}${extraText}:</b> ${data} </p><br>`;
             }
             callback.end(JSON.stringify(out));
           });
@@ -145,6 +180,9 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           let msg = fs.readFileSync("./systemLog.txt").toString();
           msg = msg.replaceAll("\n","<br>")
           callback.end(JSON.stringify(msg));
+        }
+        else if (action == "refresh_log" || action == "refresh" || action == "checkAccess_A") {
+          callback.sendFile(path.join( __dirname, '../frontend', '403.html' ));
         }
         else {
           systemLog("No perms!")

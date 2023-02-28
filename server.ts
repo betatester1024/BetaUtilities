@@ -87,6 +87,10 @@ export function updateServer() {
     res.sendFile(path.join( __dirname, '../frontend', 'about.html' ));
   });
 
+  app.get('/contact', (req:any, res:any) => {
+    res.sendFile(path.join( __dirname, '../frontend', 'contact.html' ));
+  });
+
   app.get('/*', (req:any, res:any) => {
     res.sendFile(path.join( __dirname, '../frontend', '404.html' ));
   });

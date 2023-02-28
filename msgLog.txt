@@ -165,3 +165,9 @@
 (OnlineSUPPORT)[test] !renick
 (OnlineSUPPORT)[test] !play
 (OnlineSUPPORT)[BetaOS_726] m
+(OnlineSUPPORT)[BetaOS_726] :confirm:
+(OnlineSUPPORT)[BetaOS_726] this is a test
+(OnlineSUPPORT)[BetaOS_726] one two three
+(OnlineSUPPORT)[BetaOS] a
+(OnlineSUPPORT)[BetaOS] wahey
+(OnlineSUPPORT)[BetaOS] okay good

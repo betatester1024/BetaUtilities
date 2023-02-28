@@ -93,6 +93,9 @@ function updateServer() {
   app.get("/about", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "about.html"));
   });
+  app.get("/contact", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "contact.html"));
+  });
   app.get("/*", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "404.html"));
   });

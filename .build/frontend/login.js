@@ -12,6 +12,7 @@ function onLoad() {
 }
 let CURRUSER = "";
 let CURRPERMS = "";
+let LOADEDQ = false;
 function newUser(e, accessclass) {
   let id = e.target.id;
   console.log(id);
@@ -61,7 +62,7 @@ function validateLogin(action = "login", extData) {
     } else if (action == "sendMsg") {
       params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData);
       let ele = document.getElementById("msgArea");
-      ele.innerHTML += `<p><b class='${CURRPERMS == "2" ? "admin" : CURRPERMS == "3" ? "beta" : ""}''>${CURRUSER}:</b>${extData}</p>`;
+      ele.innerHTML += `<p><b class='${CURRPERMS == "2" ? "admin" : CURRPERMS == "3" ? "beta" : ""}''>${CURRUSER} [SendingAWAIT]:</b> ${extData}</p><br>`;
       ele.scrollTop = ele.scrollHeight;
     } else
       params = "user=&pass=&action=" + action + "&token=" + sessionID;
@@ -86,7 +87,7 @@ function validateLogin(action = "login", extData) {
           ele.className = "beforeoverload";
         if (action != "login") {
           if (action == "sendMsg") {
-            validateLogin("refresh", "");
+            validateLogin("refresh", "send");
             return;
           }
           if (action == "userReq") {
@@ -101,6 +102,12 @@ function validateLogin(action = "login", extData) {
               location.reload();
             }
             updateTextArea(res);
+            if (!LOADEDQ || extData == "send") {
+              ele = document.getElementById("msgArea");
+              ele.scrollTop = ele.scrollHeight;
+              console.log("LOAD");
+              LOADEDQ = true;
+            }
             return;
           }
           if (res == "ACCESS") {
@@ -141,36 +148,36 @@ function validateLogin(action = "login", extData) {
           });
           CURRUSER = user.value;
           CURRPERMS = "2";
-          console.log(document.cookie);
           deleteAllCookies();
-          document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;
-                            __Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
+          console.log(document.cookie);
+          document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
+          document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
           if (!match && action == "login")
-            document.cookie += "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
+            document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         } else if (res == "3") {
           CURRUSER = user.value;
           CURRPERMS = "3";
-          console.log(document.cookie);
           deleteAllCookies();
-          document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;
-                            __Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
+          console.log(document.cookie);
+          document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
+          document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
           alertDialog("Welcome, betatester1024.", () => {
             window.open("/admin", "_self");
           });
           if (!match && action == "login")
-            document.cookie += "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
+            document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         } else if (res == "1") {
           CURRUSER = user.value;
           CURRPERMS = "1";
-          console.log(document.cookie);
           deleteAllCookies();
-          document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;
-                            __Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
+          console.log(document.cookie);
+          document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
+          document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
           alertDialog("Welcome, " + user.value + "!", () => {
             window.open("/", "_self");
           });
           if (!match && action == "login")
-            document.cookie += "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
+            document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         } else {
           alertDialog("Error: Invalid login credentials", () => {
             window.open("/login", "_self");
@@ -224,7 +231,8 @@ function clearalert() {
 }
 function updateTextArea(msgs) {
   let ele = document.getElementById("msgArea");
+  let scrollHt = ele.scrollTop;
   ele.innerHTML = msgs;
-  ele.scrollTop = ele.scrollHeight;
+  ele.scrollTop = scrollHt;
 }
 //# sourceMappingURL=login.js.map

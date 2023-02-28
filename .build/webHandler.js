@@ -27,6 +27,7 @@ var import_messageHandle2 = require("./messageHandle");
 var import_misc = require("./misc");
 var import_accessControl = require("./accessControl");
 const DATALOGGING = true;
+const fs = require("fs");
 const Database = require("@replit/database");
 class WebH {
   static CALLTIMEOUT = 3e4;
@@ -116,21 +117,18 @@ class WebH {
     this.incrRunCt();
   }
   onOpen() {
-    (0, import_misc.systemLog)("BetaUtilities open in " + this.socket.url);
+    (0, import_misc.systemLog)("BetaUtilities open");
     WebH.resetTime = 1e3;
   }
   initNick() {
-    if (!this.setNickQ)
-      this.changeNick(this.nick);
-    this.setNickQ = true;
   }
   changeNick(nick) {
-    this.socket.send(`{"type": "nick", "data": {"name": "${nick}"},"id": "1"}`);
   }
   onMessage(msg, snd) {
     let data = "";
     if (DATALOGGING)
-      (0, import_misc.systemLog)(`(${this.roomName})[${snd}] ${msg}`);
+      fs.writeFileSync("./msgLog.txt", fs.readFileSync("./msgLog.txt").toString() + `(${this.roomName})[${snd}] ${msg}
+`);
     msg = msg.trim().toLowerCase();
     if (msg == "!kill @" + this.nick.toLowerCase()) {
       this.sendMsg("/me crashes", data);
@@ -147,7 +145,7 @@ class WebH {
       this.sendMsg(reply, data);
       this.pauser = snd;
       this.pausedQ = true;
-    } else if (this.pausedQ && (msg.match("!ping @" + this.nick.toLowerCase(), "gmiu") || msg.match("!help @" + this.nick.toLowerCase(), "gmiu"))) {
+    } else if (this.pausedQ && (msg.match("!ping @" + this.nick.toLowerCase()) || msg.match("!help @" + this.nick.toLowerCase()))) {
       this.sendMsg("/me has been paused by @" + this.pauser, dat);
       return;
     } else if (msg == "!ping") {
@@ -199,33 +197,12 @@ class WebH {
   }
   static resetTime = 1e3;
   onClose(event) {
-    if (event != 1e3 && event != 1006) {
-      (0, import_messageHandle2.updateActive)(this.roomName, false);
-      setTimeout(() => {
-        new WS(this.url, this.nick, this.roomName, this.transferOutQ);
-        (0, import_messageHandle2.updateActive)(this.roomName, true);
-      }, 1e3);
-    } else {
-      (0, import_messageHandle2.updateActive)(this.roomName, false);
-      if (event == 1e3)
-        return;
-      WS.resetTime *= 1.5;
-      if (WS.resetTime > 3e4) {
-        WS.resetTime = 3e4;
-        return;
-      }
-      setTimeout(() => {
-        new WS(this.url, this.nick, this.roomName, this.transferOutQ);
-        (0, import_messageHandle2.updateActive)(this.roomName, true);
-      }, WS.resetTime);
-      (0, import_misc.systemLog)("Retrying in: " + Math.round(WebH.resetTime / 1e3) + " seconds");
-      let dateStr = new Date().toLocaleDateString("en-US", { timeZone: "EST" }) + "/" + new Date().toLocaleTimeString("en-US", { timeZone: "EST" });
-      (0, import_misc.systemLog)("[close] Connection at " + this.url + " was killed at " + dateStr);
-    }
+    (0, import_misc.systemLog)("Closed");
   }
   constructor() {
     this.nick = "BetaOS_System";
     this.replyMessage = import_messageHandle.replyMessage;
+    this.roomName = "OnlineSUPPORT";
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

@@ -700,3 +700,18 @@ Logged in as betaos | Expiring in: 3163096 ms
 Validating as  with action userReq (token 8719212139633306364)
 Logged in as betaos | Expiring in: 2427409 ms
 BetaUtilities open in wss://euphoria.io/room/test/ws
+Validating as  with action checkAccess (token 8719212139633306364)
+Logged in as betaos | Expiring in: -4020631 ms
+Token expired. Logged out user.
+Validating as betaos with action login (token 8719212139633306364)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677621018508 (in 3599998 ms)
+Validating as  with action userReq (token 8719212139633306364)
+Logged in as betaos | Expiring in: 3594149 ms
+Validating as  with action checkAccess_A (token 8719212139633306364)
+Logged in as betaos | Expiring in: 3592284 ms
+SysLog access granted!
+Validating as  with action userReq (token 8719212139633306364)
+Logged in as betaos | Expiring in: 3589611 ms
+Validating as  with action userReq (token 8719212139633306364)
+Logged in as betaos | Expiring in: 3349869 ms

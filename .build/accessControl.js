@@ -33,7 +33,7 @@ const fs = require("fs");
 const DB = import_database.database.collection("SystemAUTH");
 const DB2 = import_database.database.collection("SupportMessaging");
 function validate(user, pwd, action, access, callback, token = "") {
-  if (action != "refresh" && action != "refresh_log" && action != "sendMsg" && action != "bMsg")
+  if (action != "refresh" && action != "refresh_log" && action != "sendMsg" && action != "bMsg" && action != "checkAccess_A")
     (0, import_misc.systemLog)("Validating as " + user + " with action " + action + " (token " + token + ")");
   if (!token || !token.match("[0-9]+") || (!user || user && action != "CMD" && action != "sendMsg" && !user.match("^[a-zA-Z0-9_]+$")) || (!pwd || action != "CMD" && pwd.length <= 0)) {
     if (action == "add" || action == "login") {
@@ -71,7 +71,7 @@ function validate(user, pwd, action, access, callback, token = "") {
         }
         let expiryTime = obj.expiry;
         let tokenUser = obj.associatedUser;
-        if (action != "refresh" && action != "refresh_log" && action != "sendMsg")
+        if (action != "refresh" && action != "refresh_log" && action != "sendMsg" && action != "checkAccess_A")
           (0, import_misc.systemLog)("Logged in as " + tokenUser + " | Expiring in: " + (expiryTime - Date.now()) + " ms");
         if (expiryTime < Date.now()) {
           (0, import_misc.systemLog)("Token expired. Logged out user.");
@@ -141,7 +141,6 @@ function validate(user, pwd, action, access, callback, token = "") {
               callback.sendFile(path.join(__dirname, "../frontend", "support.html"));
               return;
             } else if (action == "checkAccess_A" && perms >= 2) {
-              (0, import_misc.systemLog)("SysLog access granted!");
               callback.sendFile(path.join(__dirname, "../frontend", "sysLog.html"));
               return;
             } else if (action == "sendMsg" && perms >= 1) {

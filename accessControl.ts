@@ -13,7 +13,8 @@ const DB2 = database.collection('SupportMessaging');
 
 export function validate(user:string, pwd:string, action:string, access:string, callback:any, token:string="") {
   if (action != "refresh" && action != "refresh_log"
-      && action != "sendMsg" && action != "bMsg") systemLog("Validating as "+user+" with action "+action +" (token "+token+")");
+      && action != "sendMsg" && action != "bMsg" && 
+     action != "checkAccess_A") systemLog("Validating as "+user+" with action "+action +" (token "+token+")");
   if (!token || !token.match("[0-9]+") || 
      (!user || user && action !="CMD" && action !="sendMsg" && !user.match("^[a-zA-Z0-9_]+$")) || 
      (!pwd || action != "CMD" && pwd.length<=0)) 
@@ -62,7 +63,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       let expiryTime = obj.expiry;
       let tokenUser = obj.associatedUser;
       if (action != "refresh" && action != "refresh_log"
-         && action != "sendMsg") systemLog("Logged in as "+tokenUser+" | Expiring in: "+(expiryTime-Date.now()) + " ms");
+         && action != "sendMsg" && action != "checkAccess_A") systemLog("Logged in as "+tokenUser+" | Expiring in: "+(expiryTime-Date.now()) + " ms");
       if (expiryTime<Date.now()) {
         systemLog("Token expired. Logged out user.")
         DB.deleteOne({fieldName:"TOKEN", token:token});
@@ -134,7 +135,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           return;
         }
         else if (action == "checkAccess_A" && perms>=2) {
-          systemLog("SysLog access granted!")
+          // systemLog("SysLog access granted!")
           callback.sendFile(path.join( __dirname, '../frontend', 'sysLog.html' ));
           return;
         }

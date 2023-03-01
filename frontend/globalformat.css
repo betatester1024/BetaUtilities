@@ -32,16 +32,17 @@ body {
   animation-name: mainanim;
   position: relative;
   top: 0vh;
-  animation-duration: 0.5s;
+  animation-duration: 0.2s;
   width: 95vw;
+  opacity: 1;
   overflow-y:auto;
   overflow-x:hidden;
 }
 @keyframes mainanim {
-  0%   {top:80vh; opacity: 0;}
+  0%   {top: 40px; opacity: 0;}
 /*         3% {opacity: 0.02} */
   50% {opacity: 0.4}
-  100% {top:0vh; opacity: 1}
+  100% {top: 0px; opacity: 1}
 }
 
 

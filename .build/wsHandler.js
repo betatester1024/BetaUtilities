@@ -36,6 +36,7 @@ class WS {
   socket;
   pausedQ = false;
   roomName;
+  static FAILSAFETIMEOUT = null;
   pauser = null;
   failedQ = false;
   callTimes = [];
@@ -115,13 +116,14 @@ class WS {
     this.incrRunCt();
   }
   sendMsg(msg, data) {
-    console.log(data);
     this.socket.send(WS.toSendInfo(msg, data));
     this.incrRunCt();
   }
   onOpen() {
     (0, import_misc.systemLog)("BetaUtilities open in " + this.socket.url);
-    WS.resetTime = 1e3;
+    WS.FAILSAFETIMEOUT = setTimeout(() => {
+      WS.resetTime = 1e3;
+    }, 1e4);
   }
   initNick() {
     if (!this.setNickQ)
@@ -214,6 +216,10 @@ class WS {
   }
   static resetTime = 1e3;
   onClose(event) {
+    if (WS.FAILSAFETIMEOUT) {
+      clearTimeout(WS.FAILSAFETIMEOUT);
+      WS.FAILSAFETIMEOUT = null;
+    }
     if (event != 1e3 && event != 1006) {
       (0, import_messageHandle2.updateActive)(this.roomName, false);
       setTimeout(() => {

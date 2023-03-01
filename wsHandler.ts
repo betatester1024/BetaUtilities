@@ -19,6 +19,7 @@ export class WS
   socket: WebSocket;
   pausedQ=false;
   roomName:string;
+  static FAILSAFETIMEOUT:NodeJS.Timeout|null = null;
   pauser:string|null = null;
   failedQ = false;
   callTimes:number[]=[];
@@ -97,14 +98,13 @@ export class WS
   }
 
   sendMsg(msg:string, data:any) {
-    console.log(data);
     this.socket.send(WS.toSendInfo(msg, data))
     this.incrRunCt();
   }
   
   onOpen() {
     systemLog(("BetaUtilities open in "+this.socket.url));
-    WS.resetTime =1000;
+    WS.FAILSAFETIMEOUT =setTimeout(()=>{WS.resetTime =1000;}, 10000);
   }
 
   initNick() {
@@ -226,6 +226,10 @@ export class WS
 
   static resetTime = 1000;
   onClose(event:any) {
+    if (WS.FAILSAFETIMEOUT) {
+      clearTimeout(WS.FAILSAFETIMEOUT);
+      WS.FAILSAFETIMEOUT = null;
+    }
     // systemLog(("Perished in:"+this.roomName);
     if (event != 1000 && event!=1006) {
       updateActive(this.roomName, false);

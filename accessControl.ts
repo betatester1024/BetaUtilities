@@ -39,7 +39,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
    // data validation complete
   if (action=="logout") {
     systemLog("Logging out "+token)
-    DB.deleteOne({fieldName:"TOKEN", token:token});
+    DB.deleteOne({fieldName:"TOKEN", token:{$eq:token}});
     callback.end(JSON.stringify("SUCCESS"));
     return;
   }
@@ -50,7 +50,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
      action == "refresh" || action == "checkAccess_A" || 
      action == "refresh_log" || action == "userReq" || 
      action == "renick") {
-    DB.findOne({fieldName: "TOKEN", token:token}).then(
+    DB.findOne({fieldName: "TOKEN", token:{$eq:token}}).then(
     (obj:{associatedUser:string, expiry:number})=>{
       if (obj == null) {
         systemLog("No active session");
@@ -66,7 +66,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
          && action != "sendMsg" && action != "checkAccess_A") systemLog("Logged in as "+tokenUser+" | Expiring in: "+(expiryTime-Date.now()) + " ms");
       if (expiryTime<Date.now()) {
         systemLog("Token expired. Logged out user.")
-        DB.deleteOne({fieldName:"TOKEN", token:token});
+        DB.deleteOne({fieldName:"TOKEN", token:{$eq:token}});
         if (action == "checkAccess" || action == "checkAccess_A") 
           callback.sendFile(path.join( __dirname, '../frontend', '403.html' ));
         else callback.end(JSON.stringify("EXPIRE"));
@@ -125,7 +125,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
         } // add
         else if (action=="CMD" && perms == 3) {
           // var DB = ;
-          systemLog("Evaluating "+user);
+          // systemLog("Evaluating "+user);
           try {systemLog(eval(user));} catch(e:any) {systemLog(e);};
           callback.end(JSON.stringify("SUCCESS"));
         }
@@ -233,7 +233,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       callback.end(JSON.stringify(perm));  
       let exp = perm<3?(Date.now()+1000*60*60):(Date.now()+1000*60);
       systemLog("Logging user "+user+" with expiry "+exp+" (in "+(exp-Date.now())+" ms)");
-      DB.updateOne({fieldName:"TOKEN", token:token}, 
+      DB.updateOne({fieldName:"TOKEN", token:{$eq:token}}, 
       {
         $set: {
           associatedUser:user,

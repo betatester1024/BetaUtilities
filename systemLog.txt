@@ -784,3 +784,20 @@ Password OK for user betaos | Perms: 2
 Logging user betaos with expiry 1677689441921 (in 3599999 ms)
 Validating as  with action userReq (token 15868952040276324430)
 Logged in as betaos | Expiring in: 3596460 ms
+Validating as  with action userReq (token 5605106639488854930)
+Logged in as hi | Expiring in: -80023829 ms
+Token expired. Logged out user.
+Validating as  with action checkAccess (token )
+No active session
+Validating as hi with action login (token 5605106639488854930)
+Password OK for user hi | Perms: 1
+Logging user hi with expiry 1677690949725 (in 3600000 ms)
+Validating as  with action userReq (token 5605106639488854930)
+Logged in as hi | Expiring in: 3597684 ms
+Validating as  with action checkAccess (token )
+No active session
+Validating as  with action userReq (token 5605106639488854930)
+Logged in as hi | Expiring in: 3590682 ms
+Validating as  with action userReq (token 5605106639488854930)
+Logged in as hi | Expiring in: 3586617 ms
+No active session

@@ -10,9 +10,20 @@ const port = 4000;
 import {rooms} from './messageHandle';
 import { validate } from './accessControl';
 import {systemLog} from './misc';
+
+var RateLimit = require('express-rate-limit');
+
+
 export function updateServer() { 
   systemLog("");
   systemLog("Server active!")
+  var limiter = RateLimit({
+    windowMs: 1*60*1000, // 1 minute
+    max: 5
+  });
+  
+  // apply rate limiter to all requests
+  app.use(limiter);
   
   app.get('/', (req:any, res:any) => {
     res.sendFile(path.join( __dirname, '../frontend', 'index.html' ));

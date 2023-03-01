@@ -39,7 +39,7 @@ body {
   overflow-x:hidden;
 }
 @keyframes mainanim {
-  0%   {top: 80px; opacity: 0;}
+  0%   {top: 40px; opacity: 0;}
 /*         3% {opacity: 0.02} */
   50% {opacity: 0.4}
   100% {top: 0px; opacity: 1}

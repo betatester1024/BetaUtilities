@@ -776,3 +776,11 @@ Validating as CoderElijah with action login (token 2242437879202827219)
 Invalid credentials.
 Validating as  with action checkAccess (token NONE)
 No active session
+Validating as  with action checkAccess (token NONE)
+No active session
+No active session
+Validating as betaos with action login (token 15868952040276324430)
+Password OK for user betaos | Perms: 2
+Logging user betaos with expiry 1677689441921 (in 3599999 ms)
+Validating as  with action userReq (token 15868952040276324430)
+Logged in as betaos | Expiring in: 3596460 ms

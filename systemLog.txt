@@ -801,3 +801,16 @@ Logged in as hi | Expiring in: 3590682 ms
 Validating as  with action userReq (token 5605106639488854930)
 Logged in as hi | Expiring in: 3586617 ms
 No active session
+Validating as  with action userReq (token 15868952040276324430)
+Logged in as betaos | Expiring in: -425101 ms
+Token expired. Logged out user.
+Validating as  with action userReq (token 15868952040276324430)
+No active session
+Validating as  with action checkAccess (token 15868952040276324430)
+No active session
+Validating as  with action userReq (token 15868952040276324430)
+No active session
+Validating as  with action userReq (token 15868952040276324430)
+No active session
+Validating as  with action logout (token 15868952040276324430)
+Logging out 15868952040276324430

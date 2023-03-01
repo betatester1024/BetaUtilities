@@ -1,4 +1,5 @@
 import { WS } from "./wsHandler";
+var escape = require('escape-html');
 import {currHandler} from './initialiser';
 // import { hashSync, compareSync} from 
 var bcrypt = require("bcrypt");
@@ -96,7 +97,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
             },
             $currentDate: { lastModified: true }
           }, {upsert:true});
-          callback.end(JSON.stringify(user));
+          callback.end(JSON.stringify(escape(user)));
           return;
         } // renick 
         if (action=="add") {

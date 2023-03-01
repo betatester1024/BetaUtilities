@@ -174,3 +174,24 @@
 (OnlineSUPPORT)[no] no
 (OnlineSUPPORT)[admin] 🚨
 (OnlineSUPPORT)[admin] ‮Alarm!
+(OnlineSUPPORT)[BetaOS] not that
+(OnlineSUPPORT)[BetaOS] :egg:
+(OnlineSUPPORT)[otheralias] !mrala
+(OnlineSUPPORT)[otheralias] A test
+(OnlineSUPPORT)[otheralias] :egg:
+(OnlineSUPPORT)[SeaGrapes] EGG
+(OnlineSUPPORT)[SeaGrapes] :egg:
+(OnlineSUPPORT)[SeaGrapes] :egg:
+(OnlineSUPPORT)[SeaGrapes] :egg:
+(OnlineSUPPORT)[SeaGrapes] :egg:
+(OnlineSUPPORT)[SeaGrapes] :one:
+(OnlineSUPPORT)[otheralias] :confirm:
+(OnlineSUPPORT)[otheralias] :white_check_mark:
+(OnlineSUPPORT)[otheralias] what do you think
+(OnlineSUPPORT)[SeaGrapes] very egg
+(OnlineSUPPORT)[otheralias] very nice eh
+(OnlineSUPPORT)[otheralias] !ping @betaOS_System
+(OnlineSUPPORT)[otheralias] !wordle
+(OnlineSUPPORT)[otheralias] you can play wordle with it
+(OnlineSUPPORT)[SeaGrapes] egg
+(OnlineSUPPORT)[otheralias] eggss

@@ -171,3 +171,6 @@
 (OnlineSUPPORT)[BetaOS] a
 (OnlineSUPPORT)[BetaOS] wahey
 (OnlineSUPPORT)[BetaOS] okay good
+(OnlineSUPPORT)[no] no
+(OnlineSUPPORT)[admin] 🚨
+(OnlineSUPPORT)[admin] ‮Alarm!

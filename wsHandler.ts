@@ -97,6 +97,7 @@ export class WS
   }
 
   sendMsg(msg:string, data:any) {
+    console.log(data);
     this.socket.send(WS.toSendInfo(msg, data))
     this.incrRunCt();
   }
@@ -162,7 +163,7 @@ export class WS
         (msg.match("!ping @" + this.nick.toLowerCase(), "gmiu") ||
          msg.match("!help @" + this.nick.toLowerCase(), "gmiu"))) 
       {
-        this.sendMsg("/me has been paused by @"+this.pauser, dat);
+        this.sendMsg("/me has been paused by @"+this.pauser, data);
         return;
       } 
       // general unpaused ping

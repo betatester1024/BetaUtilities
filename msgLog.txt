@@ -322,3 +322,8 @@
 (xkcd)[betatester1024] right
 (xkcd)[betatester1024] !ping @betautilities
 (xkcd)[betatester1024] !disablelogging @betautilities
+(test)[betatester1024] !help @betautilities_test
+(test)[betatester1024] *#0*#
+(test)[betatester1024] 1
+(test)[betatester1024] *#0*#
+(test)[betatester1024] !version @betautilities_test

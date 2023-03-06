@@ -107,7 +107,14 @@ function validateLogin(action: string = "login", extData: string) {
         ele = document.getElementById('h1');
         if (ele) ele.className = "beforeoverload";
         if (action != "login") {
-          
+          if (res == "ERROR" || res == "NOACTIVE" || res == "ACCESS") {
+            // console.log("what?")
+            if (document.URL.match("betatester1024.repl.co/?$")) {
+              validateLogin("logout", "");
+            }
+            else alertDialog("Your login session is invalid!", () => { validateLogin("logout", ""); });
+            return;
+          }
           if (renickQ && res != "ERROR") {
             CURRUSER = res;
             alertDialog("Renicked successfully to @"+CURRUSER, ()=>{});
@@ -128,10 +135,7 @@ function validateLogin(action: string = "login", extData: string) {
               if (res != "ERROR" && res !="NOACTIVE" && res != "ACCESS")
                 ele.innerHTML = "Welcome, "+res.split(" ")[0]+"!";
               else ele.innerHTML = "Welcome to BetaOS Services!"
-            } else{
-              if (res == "ERROR" || res == "NOACTIVE" || res == "ACCESS") {
-                alertDialog("You're not logged in!", () => { window.open("/signup", "_self"); });
-              }
+            } else {
               switch(res.split(" ")[1]) {
                 case "1": 
                   (document.getElementById("sel") as HTMLSelectElement).hidden=true;

@@ -27,6 +27,7 @@ var import_wsHandler = require("./wsHandler");
 var import_misc = require("./misc");
 var import_wordListHandle = require("./wordListHandle");
 var import_database = require("./database");
+const fs = require("fs");
 const serviceKey = process.env["serviceKey"];
 const serviceResponse = process.env["serviceResponse"];
 let DATE = new Date();
@@ -212,6 +213,14 @@ function replyMessage(msg, sender, data) {
         this.delaySendMsg(r, data, 0);
       }
     );
+  }
+  if (msg == "!enablelogging" || msg == "!enablelogging @" + this.nick.toLowerCase()) {
+    this.DATALOGGING = true;
+    return "Enabled message logging.";
+  }
+  if (msg == "!disablelogging" || msg == "!disablelogging @" + this.nick.toLowerCase()) {
+    this.DATALOGGING = false;
+    return "Disabled message logging.";
   }
   if (msg == "!status" || msg == "!status @" + this.nick.toLowerCase()) {
     return "Status-tracker: https://betatester1024.repl.co/status";

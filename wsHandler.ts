@@ -1,10 +1,10 @@
-const DATALOGGING = false;
 // Copyright (c) 2023 BetaOS
 import {WebSocket} from 'ws';
 import {DB} from './database';
 import {replyMessage} from './messageHandle';
 import { updateActive } from './messageHandle';
 import {systemLog} from './misc';
+const fs = require('fs')
 
 // const { getUserInfo } = require("@replit/repl-auth")
 const Database = require("@replit/database")
@@ -12,6 +12,7 @@ const Database = require("@replit/database")
 
 export class WS 
 {
+  DATALOGGING = false;
   static CALLTIMEOUT = 30000;
   url:string;
   static sockets:WS[] = [];
@@ -130,7 +131,7 @@ export class WS
 
       let msg = data["data"]["content"].toLowerCase().trim();
       let snd = data["data"]["sender"]["name"];
-      if (DATALOGGING) systemLog((`(${this.roomName})[${snd}] ${msg}`));
+      if (this.DATALOGGING) fs.writeFileSync('./msgLog.txt', fs.readFileSync('./msgLog.txt').toString()+((`(${this.roomName})[${snd}] ${msg}\n`)));
       // Required methods
       // !kill
       if (msg == "!kill @" + this.nick.toLowerCase()) {
@@ -228,7 +229,6 @@ export class WS
   static resetTime = 1000;
   onClose(event:any) {
     WS.sockets.splice(WS.sockets.indexOf(this), 1);
-    console.log(WS.sockets);
     if (WS.FAILSAFETIMEOUT) {
       clearTimeout(WS.FAILSAFETIMEOUT);
       WS.FAILSAFETIMEOUT = null;
@@ -236,6 +236,7 @@ export class WS
     // systemLog(("Perished in:"+this.roomName);
     if (event != 1000 && event!=1006) {
       updateActive(this.roomName, false);
+      systemLog("!killed in &"+this.roomName);
       setTimeout(() => {
         new WS(this.url, this.nick, this.roomName, this.transferOutQ)
         updateActive(this.roomName, true);
@@ -261,7 +262,7 @@ export class WS
 
   static killall() {
     for(let i=0; i<WS.sockets.length; i++) {
-      WS.sockets[i].socket.close();
+      WS.sockets[i].socket.close(1000, "!killall-ed");
       updateActive(WS.sockets[i].roomName, false);
     }
   }
@@ -269,7 +270,7 @@ export class WS
   constructor(url:string, nick:string, roomName:string, transferQ:boolean) {
     this.nick = nick;
     WS.sockets.push(this);
-    console.log(WS.sockets);
+    // console.log(WS.sockets);
     this.url=url;
     this.roomName = roomName;
     this.socket = new WebSocket(url);

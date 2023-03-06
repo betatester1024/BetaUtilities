@@ -93,7 +93,7 @@ function updateServer() {
     res.sendFile(path.join(__dirname, "../frontend", "globalformat.css"));
   });
   app.get("/support", (req, res) => {
-    (0, import_accessControl.validate)("", "", "checkAccess", "", res, req.query.token);
+    res.sendFile(path.join(__dirname, "../frontend", "support.html"));
   });
   app.get("/syslog", (req, res) => {
     (0, import_accessControl.validate)("", "", "checkAccess_A", "", res, req.query.token);

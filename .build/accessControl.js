@@ -113,15 +113,17 @@ function validate(user, pwd, action, access, callback, token = "") {
               DB.findOne({ fieldName: "UserData", user: { $eq: user } }).then(
                 (obj3) => {
                   if (obj3 && obj3.permLevel > perms) {
+                    (0, import_misc.systemLog)("Trying to delete a higher-level user");
                     callback.end(JSON.stringify("ACCESS"));
                     return;
                   } else if (action == "delete" && (perms >= 2 || user == obj.associatedUser)) {
                     DB.findOneAndDelete({ fieldName: "UserData", user: { $eq: user } }).then((res) => {
-                      callback.end(JSON.stringify(user));
+                      callback.end(JSON.stringify(escape(user)));
                     });
-                    (0, import_misc.systemLog)("deleted user" + user);
+                    (0, import_misc.systemLog)("Deleted user " + user);
                     return;
                   } else if (action == "delete") {
+                    (0, import_misc.systemLog)("Insufficient access for deletion");
                     callback.end(JSON.stringify("ACCESS"));
                     return;
                   }
@@ -164,6 +166,8 @@ function validate(user, pwd, action, access, callback, token = "") {
             } else if (action == "CMD" && perms == 3) {
               if (user == "!killall") {
                 import_wsHandler.WS.killall();
+                callback.end(JSON.stringify("SUCCESS"));
+                return;
               }
               try {
                 (0, import_misc.systemLog)(eval(user));

@@ -34,6 +34,7 @@ const path = require("path");
 const fs = require("fs");
 const DB = import_database.database.collection("SystemAUTH");
 const DB2 = import_database.database.collection("SupportMessaging");
+const DB3 = import_database.database.collection("BetaUtilities");
 function validate(user, pwd, action, access, callback, token = "") {
   if (action != "refresh" && action != "refresh_log" && action != "sendMsg" && action != "bMsg" && action != "checkAccess_A" && action != "checkAccess" && action != "userReq")
     (0, import_misc.systemLog)("Validating as " + user + " with action " + action + " (token " + token + ")");
@@ -316,6 +317,16 @@ async function DBGarbageCollect() {
       for (let i = 0; i < objs.length; i++) {
         if (Date.now() > objs[i].expiry || objs[i].expiry == null)
           DB2.deleteOne({ fieldName: "MSG", expiry: objs[i].expiry });
+      }
+    }
+  );
+  DB3.find({ fieldName: "TIMER" }).toArray().then(
+    (objs) => {
+      for (let i = 0; i < objs.length; i++) {
+        if (Date.now() > objs[i].expiry || objs[i].expiry == null) {
+          DB3.deleteOne({ fieldName: "TIMER", expiry: objs[i].expiry });
+          import_wsHandler.WS.notifRoom.socket.send(import_wsHandler.WS.toSendInfo("@" + objs[i].notifyingUser + ", you are reminded of: " + objs[i].msg.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, '\\"')));
+        }
       }
     }
   );

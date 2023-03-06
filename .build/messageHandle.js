@@ -31,6 +31,7 @@ const fs = require("fs");
 const serviceKey = process.env["serviceKey"];
 const DB_USERS = import_database.database.collection("SystemAUTH");
 const serviceResponse = process.env["serviceResponse"];
+const DB3 = import_database.database.collection("BetaUtilities");
 let DATE = new Date();
 let VERSION = "ServiceVersion STABLE 1.5271 | Build-time: " + DATE.toUTCString();
 const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! Press :three: to toggle ANTISPAM.\\n\\n Press :zero: to exit support at any time.`;
@@ -194,6 +195,30 @@ function replyMessage(msg, sender, data) {
     );
     return "Set information for @" + norm(sender);
   }
+  let match = msg.match("^!remindme of (.+) in ([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?");
+  if (match) {
+    let remindMsg = match[1];
+    console.log(match[1] + "," + match[2] + "," + match[3] + "," + match[4] + "," + match[5]);
+    let exp3 = Date.now();
+    if (match[2])
+      exp3 += Number(match[2].split("d")[0]) * 1e3 * 60 * 60 * 24;
+    if (match[3])
+      exp3 += Number(match[3].split("h")[0]) * 1e3 * 60 * 60;
+    if (match[4])
+      exp3 += Number(match[4].split("m")[0]) * 1e3 * 60;
+    if (match[5])
+      exp3 += Number(match[5].split("s")[0]) * 1e3;
+    if (exp3 == Date.now()) {
+      return "No reminder time provided!";
+    }
+    DB3.insertOne({
+      fieldName: "TIMER",
+      expiry: exp3,
+      notifyingUser: norm(sender),
+      msg: remindMsg
+    });
+    return "Will remind you.";
+  }
   if (msg == "!renick") {
     this.changeNick(this.nick);
     return ":white_check_mark:";
@@ -310,7 +335,7 @@ function replyMessage(msg, sender, data) {
   let exp2 = /^!unblock[ ]+((?:(?:(?:https?|ftp):)?\/\/)?(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?)$/;
   if (msg.length > 1e4)
     return "ERROR: Your message is way too long.";
-  let match = this.callStatus == 2 ? msg.match(exp) : msg.match(exp2);
+  match = this.callStatus == 2 ? msg.match(exp) : msg.match(exp2);
   if (match) {
     this.callStatus = -1;
     this.clearCallReset();

@@ -12,6 +12,7 @@ const Database = require("@replit/database")
 
 export class WS 
 {
+  static notifRoom:WS;
   DATALOGGING = false;
   static CALLTIMEOUT = 30000;
   url:string;
@@ -33,7 +34,9 @@ export class WS
   // static db = new Database();
   static toSendInfo(msg: string, data:any=null) {
     if (data) return `{"type":"send", "data":{"content":"${msg}","parent":"${data["data"]["id"]}"}}`;
-    else return `{"type":"send", "data":{"content":"${msg}"}`;
+    else {
+      return `{"type":"send", "data":{"content":"${msg}"}}`;
+    }
   }
 
   incrRunCt() {
@@ -269,6 +272,7 @@ export class WS
   
   constructor(url:string, nick:string, roomName:string, transferQ:boolean) {
     this.nick = nick;
+    if (roomName == "xkcd") WS.notifRoom = this;
     WS.sockets.push(this);
     // console.log(WS.sockets);
     this.url=url;

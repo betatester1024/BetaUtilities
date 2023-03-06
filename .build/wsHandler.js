@@ -29,6 +29,7 @@ var import_misc = require("./misc");
 const fs = require("fs");
 const Database = require("@replit/database");
 class WS {
+  static notifRoom;
   DATALOGGING = false;
   static CALLTIMEOUT = 3e4;
   url;
@@ -50,8 +51,9 @@ class WS {
   static toSendInfo(msg, data = null) {
     if (data)
       return `{"type":"send", "data":{"content":"${msg}","parent":"${data["data"]["id"]}"}}`;
-    else
-      return `{"type":"send", "data":{"content":"${msg}"}`;
+    else {
+      return `{"type":"send", "data":{"content":"${msg}"}}`;
+    }
   }
   incrRunCt() {
     import_database.DB.findOne({ fieldName: "COUNTERS" }).then(
@@ -257,6 +259,8 @@ class WS {
   }
   constructor(url, nick, roomName, transferQ) {
     this.nick = nick;
+    if (roomName == "test")
+      WS.notifRoom = this;
     WS.sockets.push(this);
     this.url = url;
     this.roomName = roomName;

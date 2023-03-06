@@ -270,6 +270,11 @@ function replyMessage(msg, sender, data) {
     this.callStatus = 3;
     return "Are you sure you would like to proceed? Press :two: to continue.";
   }
+  if (this.callStatus == 0 && msg == "*#0*#") {
+    this.clearCallReset();
+    this.callStatus = -1;
+    return "System - BetaOS_OnboardHelpline | Version" + VERSION;
+  }
   if (this.callStatus == 3 && (msg == "2" || msg == ":two" || msg == "two")) {
     this.clearCallReset();
     this.callStatus = -1;

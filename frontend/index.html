@@ -12,7 +12,7 @@
         validateLogin("userReq", "");
       } else {
         let ele = document.getElementById("configbtn");
-        ele.innerHTML = "Sign up<br><hr class=\"btnHr\"></hr>";
+        ele.innerHTML = "<span class=\"material-symbols-outlined\">person_add</span> Sign up<br><hr class=\"btnHr\"></hr>";
         ele.onclick= ()=> {window.open('/signup', '_self');}
       }
       

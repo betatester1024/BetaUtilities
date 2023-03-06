@@ -73,18 +73,22 @@ function replyMessage(msg, sender, data) {
     this.clearCallReset();
     return (0, import_misc.getUptimeStr)(STARTTIME) + " (Total uptime: " + (0, import_misc.getUptimeStr)() + ")";
   }
+  if (msg == "!issue" || msg == "!bug" || msg == "!feature") {
+    return "https://github.com/betatester1024/BetaUtilities/issues/new/choose";
+  }
   import_database.DB.findOne({ fieldName: "WORKINGUSERS" }).then((obj) => {
     let match3 = msg.match("^!work @(.*)$");
     let workingUsers2 = obj.working;
     if (match3 || msg == "!work") {
-      if (match3 && workingUsers2.indexOf(match3[1].toLowerCase()) >= 0) {
+      if (match3 && workingUsers2.indexOf(norm(match3[1].toLowerCase())) >= 0) {
         this.delaySendMsg("This user is already supposed to be working!", data, 0);
         return;
       } else if (match3) {
-        workingUsers2.push(match3[1].toLowerCase());
-        this.delaySendMsg("Will scream at @" + match3[1], data, 0);
-      } else if (workingUsers2.indexOf(sender.toLowerCase()) < 0) {
-        workingUsers2.push(sender.toLowerCase());
+        workingUsers2.push(norm(match3[1].toLowerCase()));
+        (0, import_misc.systemLog)("WORKACTIVATE in room: " + this.roomName + " by " + sender);
+        this.delaySendMsg("Will scream at @" + norm(match3[1]), data, 0);
+      } else if (workingUsers2.indexOf(norm(sender.toLowerCase())) < 0) {
+        workingUsers2.push(norm(sender.toLowerCase()));
         this.changeNick("WorkBot V2");
         setTimeout(() => this.changeNick(this.nick), 10);
       } else {
@@ -94,18 +98,18 @@ function replyMessage(msg, sender, data) {
     }
     match3 = msg.match("^!play @(.*)$");
     if (match3 || msg == "!play") {
-      if (match3 && workingUsers2.indexOf(match3[1].toLowerCase()) < 0) {
+      if (match3 && workingUsers2.indexOf(norm(match3[1].toLowerCase())) < 0) {
         this.delaySendMsg("This user was not working in the first place.", data, 0);
         return;
       } else if (match3) {
-        workingUsers2.splice(workingUsers2.indexOf(match3[1].toLowerCase()), 1);
+        workingUsers2.splice(workingUsers2.indexOf(norm(match3[1].toLowerCase())), 1);
         this.delaySendMsg("They're off the hook... for now.", data, 0);
       } else {
-        workingUsers2.splice(workingUsers2.indexOf(sender.toLowerCase()), 1);
+        workingUsers2.splice(workingUsers2.indexOf(norm(sender.toLowerCase())), 1);
         this.delaySendMsg("You're off the hook... for now.", data, 0);
       }
     }
-    if (workingUsers2.indexOf(sender.toLowerCase()) >= 0) {
+    if (workingUsers2.indexOf(norm(sender.toLowerCase())) >= 0) {
       this.changeNick("WorkBot V2");
       this.delaySendMsg("GET TO WORK.", data, 0);
       this.changeNick(this.nick);
@@ -123,14 +127,15 @@ function replyMessage(msg, sender, data) {
     let match3 = msg.match("^!sleep @(.*)$");
     let sleepingUsers = obj.sleeping;
     if (match3 || msg == "!sleep") {
-      if (match3 && sleepingUsers.indexOf(match3[1].toLowerCase()) >= 0) {
+      if (match3 && sleepingUsers.indexOf(norm(match3[1].toLowerCase())) >= 0) {
         this.delaySendMsg("This user is already supposed to be sleeping!", data, 0);
         return;
       } else if (match3) {
-        sleepingUsers.push(match3[1].toLowerCase());
-        this.delaySendMsg("Will scream at @" + match3[1], data, 0);
-      } else if (sleepingUsers.indexOf(sender.toLowerCase()) < 0) {
-        sleepingUsers.push(sender.toLowerCase());
+        sleepingUsers.push(norm(match3[1].toLowerCase()));
+        (0, import_misc.systemLog)("SLEEPACTIVATE in room: " + this.roomName + " by " + sender);
+        this.delaySendMsg("Will scream at @" + norm(match3[1]), data, 0);
+      } else if (sleepingUsers.indexOf(norm(sender.toLowerCase())) < 0) {
+        sleepingUsers.push(norm(sender.toLowerCase()));
         this.changeNick("SleepBot V2");
         setTimeout(() => this.changeNick(this.nick), 10);
       } else {
@@ -140,18 +145,18 @@ function replyMessage(msg, sender, data) {
     }
     match3 = msg.match("^!wake @(.*)$");
     if (match3 || msg == "!wake") {
-      if (match3 && sleepingUsers.indexOf(match3[1].toLowerCase()) < 0) {
+      if (match3 && sleepingUsers.indexOf(norm(match3[1].toLowerCase())) < 0) {
         this.delaySendMsg("This user was not sleeping in the first place.", data, 0);
         return;
       } else if (match3) {
-        sleepingUsers.splice(sleepingUsers.indexOf(match3[1].toLowerCase()), 1);
+        sleepingUsers.splice(sleepingUsers.indexOf(norm(match3[1].toLowerCase())), 1);
         this.delaySendMsg("They're off the hook... for now.", data, 0);
       } else {
-        sleepingUsers.splice(sleepingUsers.indexOf(sender.toLowerCase()), 1);
+        sleepingUsers.splice(sleepingUsers.indexOf(norm(sender.toLowerCase())), 1);
         this.delaySendMsg("You're off the hook... for now.", data, 0);
       }
     }
-    if (sleepingUsers.indexOf(sender.toLowerCase()) >= 0) {
+    if (sleepingUsers.indexOf(norm(sender.toLowerCase())) >= 0) {
       this.changeNick("SleepBot V2");
       this.delaySendMsg("GO TO SLEEP.", data, 0);
       this.changeNick(this.nick);
@@ -168,6 +173,14 @@ function replyMessage(msg, sender, data) {
   if (msg == "!renick") {
     this.changeNick(this.nick);
     return ":white_check_mark:";
+  }
+  if (msg == "!leet") {
+    this.changeNick(this.nick);
+    return "https://euphoria.leet.nu/room/" + this.roomName;
+  }
+  if (msg == "!instant") {
+    this.changeNick(this.nick);
+    return "https://instant.leet.nu/room/" + this.roomName;
   }
   if (msg.match("!version[ ]+@" + this.nick.toLowerCase())) {
     return VERSION;
@@ -200,8 +213,14 @@ function replyMessage(msg, sender, data) {
       }
     );
   }
-  if (msg == "!status @" + this.nick.toLowerCase()) {
-    return "Status-tracker: https://betatester1024.repl.co";
+  if (msg == "!status" || msg == "!status @" + this.nick.toLowerCase()) {
+    return "Status-tracker: https://betatester1024.repl.co/status";
+  }
+  if (msg == "!systemhome" || msg == "!systemhome @" + this.nick.toLowerCase()) {
+    return "https://betatester1024.repl.co";
+  }
+  if (msg == "!syslog" || msg == "!syslog @" + this.nick.toLowerCase()) {
+    return "https://betatester1024.repl.co/syslog";
   }
   if (msg.match("^!die$")) {
     if (this.socket)
@@ -252,6 +271,8 @@ function replyMessage(msg, sender, data) {
   }
   let exp = /^((?:(?:(?:https?|ftp):)?\/\/)?(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?)$/;
   let exp2 = /^!unblock[ ]+((?:(?:(?:https?|ftp):)?\/\/)?(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?)$/;
+  if (msg.length > 1e4)
+    return "ERROR: Your message is way too long.";
   let match = this.callStatus == 2 ? msg.match(exp) : msg.match(exp2);
   if (match) {
     this.callStatus = -1;
@@ -268,7 +289,7 @@ function replyMessage(msg, sender, data) {
   }
   if (this.callStatus == 1 && (msg == ":one:" || msg == "one" || msg == "1")) {
     this.clearCallReset();
-    return "Important commands: !ping, !help, !pause, !restore, !kill, !pong, !uptime, !uuid. \\n Bot-specific commands: !unblock <LINK>; !potato, !src @" + this.nick + " !runStats !testfeature, !creatorinfo, !version, !activeRooms, !die, !contact, !antispam, !rating, !wordle, !leetlent. \\n @" + this.nick + " !mitoseTo &ROOMNAME as @NICK to send BetaUtilities to any room. !status @" + this.nick + " to get the system status.";
+    return "Important commands: !ping, !help, !pause, !restore, !kill, !pong, !uptime, !uuid. \\n Bot-specific commands: see https://betatester1024.repl.co/about!";
   }
   if (this.callStatus == 1 && (msg == ":two:" || msg == "two" || msg == "2")) {
     this.delaySendMsg("/me crashes", data, 3e3);
@@ -462,6 +483,9 @@ function replyMessage(msg, sender, data) {
     return "Yes?";
   } else
     return "";
+}
+function norm(str) {
+  return str.replaceAll(" ", "");
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

@@ -44,21 +44,26 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
     return getUptimeStr(STARTTIME)+" (Total uptime: "+getUptimeStr()+")";
   }
 
+  if (msg == "!issue" || msg == "!bug" || msg == "!feature") {
+    return "https://github.com/betatester1024/BetaUtilities/issues/new/choose"
+  }
+
   DB.findOne({fieldName:"WORKINGUSERS"}).then((obj:{working:string[]})=>{
     let match3 = msg.match("^!work @(.*)$");
     let workingUsers = obj.working;
     if (match3 || msg == "!work") { 
       // systemLog(workingUsers);
-      if (match3 && workingUsers.indexOf(match3[1].toLowerCase())>=0){
+      if (match3 && workingUsers.indexOf(norm(match3[1].toLowerCase()))>=0){
         this.delaySendMsg("This user is already supposed to be working!", data, 0);
         return;
       }
       else if (match3){
-        workingUsers.push(match3[1].toLowerCase());
-        this.delaySendMsg("Will scream at @"+match3[1], data, 0);
+        workingUsers.push(norm(match3[1].toLowerCase()));
+        systemLog("WORKACTIVATE in room: "+this.roomName+" by "+sender);
+        this.delaySendMsg("Will scream at @"+norm(match3[1]), data, 0);
       }
-      else if (workingUsers.indexOf(sender.toLowerCase())<0) {
-        workingUsers.push(sender.toLowerCase());
+      else if (workingUsers.indexOf(norm(sender.toLowerCase()))<0) {
+        workingUsers.push(norm(sender.toLowerCase()));
         this.changeNick("WorkBot V2");
         setTimeout(()=>this.changeNick(this.nick), 10);
       }
@@ -71,21 +76,21 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
     
     if (match3 || msg == "!play") { 
       // systemLog(workingUsers);
-      if (match3 && workingUsers.indexOf(match3[1].toLowerCase())<0){
+      if (match3 && workingUsers.indexOf(norm(match3[1].toLowerCase()))<0){
         this.delaySendMsg("This user was not working in the first place.", data, 0);
         return;
       }
       else if (match3){
-        workingUsers.splice(workingUsers.indexOf(match3[1].toLowerCase()), 1);
+        workingUsers.splice(workingUsers.indexOf(norm(match3[1].toLowerCase())), 1);
         this.delaySendMsg("They're off the hook... for now.", data, 0);
       }
       else {
-        workingUsers.splice(workingUsers.indexOf(sender.toLowerCase()), 1);
+        workingUsers.splice(workingUsers.indexOf(norm(sender.toLowerCase())), 1);
         this.delaySendMsg("You're off the hook... for now.", data, 0);
       }
       
     }
-    if (workingUsers.indexOf(sender.toLowerCase())>=0) {
+    if (workingUsers.indexOf(norm(sender.toLowerCase()))>=0) {
       this.changeNick("WorkBot V2");
       this.delaySendMsg("GET TO WORK.", data, 0);
       this.changeNick(this.nick);
@@ -103,16 +108,17 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   let sleepingUsers = obj.sleeping;
   if (match3 || msg == "!sleep") { 
     // systemLog(workingUsers);
-    if (match3 && sleepingUsers.indexOf(match3[1].toLowerCase())>=0){
+    if (match3 && sleepingUsers.indexOf(norm(match3[1].toLowerCase()))>=0){
       this.delaySendMsg("This user is already supposed to be sleeping!", data, 0);
       return;
-    }
+    }  
     else if (match3){
-      sleepingUsers.push(match3[1].toLowerCase());
-      this.delaySendMsg("Will scream at @"+match3[1], data, 0);
+      sleepingUsers.push(norm(match3[1].toLowerCase()));
+      systemLog("SLEEPACTIVATE in room: "+this.roomName+" by "+sender);
+      this.delaySendMsg("Will scream at @"+norm(match3[1]), data, 0);
     }
-    else if (sleepingUsers.indexOf(sender.toLowerCase())<0) {
-      sleepingUsers.push(sender.toLowerCase());
+    else if (sleepingUsers.indexOf(norm(sender.toLowerCase()))<0) {
+      sleepingUsers.push(norm(sender.toLowerCase()));
       this.changeNick("SleepBot V2");
       setTimeout(()=>this.changeNick(this.nick), 10);
     }
@@ -125,21 +131,21 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   
   if (match3 || msg == "!wake") { 
     // systemLog(workingUsers);
-    if (match3 && sleepingUsers.indexOf(match3[1].toLowerCase())<0){
+    if (match3 && sleepingUsers.indexOf(norm(match3[1].toLowerCase()))<0){
       this.delaySendMsg("This user was not sleeping in the first place.", data, 0);
       return;
     }
     else if (match3){
-      sleepingUsers.splice(sleepingUsers.indexOf(match3[1].toLowerCase()), 1);
+      sleepingUsers.splice(sleepingUsers.indexOf(norm(match3[1].toLowerCase())), 1);
       this.delaySendMsg("They're off the hook... for now.", data, 0);
     }
     else {
-      sleepingUsers.splice(sleepingUsers.indexOf(sender.toLowerCase()), 1);
+      sleepingUsers.splice(sleepingUsers.indexOf(norm(sender.toLowerCase())), 1);
       this.delaySendMsg("You're off the hook... for now.", data, 0);
     }
     
   }
-  if (sleepingUsers.indexOf(sender.toLowerCase())>=0) {
+  if (sleepingUsers.indexOf(norm(sender.toLowerCase()))>=0) {
     this.changeNick("SleepBot V2");
     this.delaySendMsg("GO TO SLEEP.", data, 0);
     this.changeNick(this.nick);
@@ -156,6 +162,15 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   if (msg == "!renick") {
     this.changeNick(this.nick);
     return ":white_check_mark:";
+  }
+
+  if (msg == "!leet") {
+    this.changeNick(this.nick);
+    return "https://euphoria.leet.nu/room/"+this.roomName;
+  }
+  if (msg == "!instant") {
+    this.changeNick(this.nick);
+    return "https://instant.leet.nu/room/"+this.roomName;
   }
 
   if (msg.match("!version[ ]+@"+this.nick.toLowerCase())) {return VERSION;}
@@ -182,8 +197,14 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
     });
 
   }
-  if (msg == "!status @"+this.nick.toLowerCase()) {
-    return "Status-tracker: https://betatester1024.repl.co";
+  if (msg == "!status" || msg == "!status @"+this.nick.toLowerCase()) {
+    return "Status-tracker: https://betatester1024.repl.co/status";
+  }
+  if (msg == "!systemhome" || msg == "!systemhome @"+this.nick.toLowerCase()) {
+    return "https://betatester1024.repl.co";
+  }
+  if (msg == "!syslog" || msg == "!syslog @"+this.nick.toLowerCase()) {
+    return "https://betatester1024.repl.co/syslog";
   }
   if (msg.match("^!die$")) {
     if (this.socket) setTimeout(()=>{this.socket.close()}, 120);
@@ -259,10 +280,7 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
     this.clearCallReset();
     return (
       "Important commands: !ping, !help, !pause, !restore, !kill, !pong, !uptime, !uuid. \\n " +
-      "Bot-specific commands: !unblock <LINK>; !potato, !src @" +
-      this.nick +
-      " !runStats !testfeature, !creatorinfo, !version, !activeRooms, !die, !contact, !antispam, !rating, !wordle, !leetlent. \\n"+
-      " @"+this.nick+" !mitoseTo &ROOMNAME as @NICK to send BetaUtilities to any room. !status @"+this.nick+" to get the system status."
+      "Bot-specific commands: see https://betatester1024.repl.co/about!"
     );
   }
   if (this.callStatus == 1 && (msg == ":two:" || msg == "two" || msg == "2")) {
@@ -434,4 +452,8 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   }
 
   else return "";
+}
+
+function norm(str:number) {
+  return str.replaceAll(" ","");
 }

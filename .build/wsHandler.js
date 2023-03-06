@@ -31,6 +31,7 @@ const Database = require("@replit/database");
 class WS {
   static CALLTIMEOUT = 3e4;
   url;
+  static sockets = [];
   nick;
   setNickQ = false;
   socket;
@@ -216,6 +217,8 @@ class WS {
   }
   static resetTime = 1e3;
   onClose(event) {
+    WS.sockets.splice(WS.sockets.indexOf(this), 1);
+    console.log(WS.sockets);
     if (WS.FAILSAFETIMEOUT) {
       clearTimeout(WS.FAILSAFETIMEOUT);
       WS.FAILSAFETIMEOUT = null;
@@ -244,8 +247,16 @@ class WS {
       (0, import_misc.systemLog)("[close] Connection at " + this.url + " was killed at " + dateStr);
     }
   }
+  static killall() {
+    for (let i = 0; i < WS.sockets.length; i++) {
+      WS.sockets[i].socket.close();
+      (0, import_messageHandle2.updateActive)(WS.sockets[i].roomName, false);
+    }
+  }
   constructor(url, nick, roomName, transferQ) {
     this.nick = nick;
+    WS.sockets.push(this);
+    console.log(WS.sockets);
     this.url = url;
     this.roomName = roomName;
     this.socket = new import_ws.WebSocket(url);

@@ -13,7 +13,8 @@ const Database = require("@replit/database")
 export class WS 
 {
   static CALLTIMEOUT = 30000;
-  url:string
+  url:string;
+  static sockets:WS[] = [];
   nick:string;
   setNickQ: boolean = false;
   socket: WebSocket;
@@ -226,6 +227,8 @@ export class WS
 
   static resetTime = 1000;
   onClose(event:any) {
+    WS.sockets.splice(WS.sockets.indexOf(this), 1);
+    console.log(WS.sockets);
     if (WS.FAILSAFETIMEOUT) {
       clearTimeout(WS.FAILSAFETIMEOUT);
       WS.FAILSAFETIMEOUT = null;
@@ -256,9 +259,17 @@ export class WS
     }
   }
 
+  static killall() {
+    for(let i=0; i<WS.sockets.length; i++) {
+      WS.sockets[i].socket.close();
+      updateActive(WS.sockets[i].roomName, false);
+    }
+  }
   
   constructor(url:string, nick:string, roomName:string, transferQ:boolean) {
     this.nick = nick;
+    WS.sockets.push(this);
+    console.log(WS.sockets);
     this.url=url;
     this.roomName = roomName;
     this.socket = new WebSocket(url);

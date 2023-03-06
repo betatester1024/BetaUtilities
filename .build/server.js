@@ -31,9 +31,17 @@ const bodyParser = require("body-parser");
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 const app = express();
 const port = 4e3;
+var RateLimit = require("express-rate-limit");
 function updateServer() {
   (0, import_misc.systemLog)("");
   (0, import_misc.systemLog)("Server active!");
+  var limiter = RateLimit({
+    windowMs: 10 * 1e3,
+    max: 50,
+    message: "Too many requests, please try again later.",
+    statusCode: 429
+  });
+  app.use(limiter);
   app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "index.html"));
   });

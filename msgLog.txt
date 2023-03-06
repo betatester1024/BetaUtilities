@@ -327,3 +327,4 @@
 (test)[betatester1024] 1
 (test)[betatester1024] *#0*#
 (test)[betatester1024] !version @betautilities_test
+(OnlineSUPPORT)[betaos] what

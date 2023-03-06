@@ -9,8 +9,9 @@ import {systemLog} from './misc';
 import {replacements} from './replacements'
 const fs = require("fs");
 import {database} from './database';
-const DB = database.collection('SystemAUTH');
-const DB2 = database.collection('SupportMessaging');
+  const DB = database.collection('SystemAUTH');
+  const DB2 = database.collection('SupportMessaging');
+  const DB3 = database.collection('BetaUtilities');
 
 export function validate(user:string, pwd:string, action:string, access:string, callback:any, token:string="") {
   if (action != "refresh" && action != "refresh_log"
@@ -311,4 +312,15 @@ export async function DBGarbageCollect() {
         DB2.deleteOne({fieldName:"MSG",expiry:objs[i].expiry})
     }
   });
+  DB3.find({fieldName:"TIMER"}).toArray().then(
+  (objs:{expiry:number, notifyingUser:string, msg:string}[])=>{
+    for (let i=0; i<objs.length; i++) {
+      if (Date.now()>objs[i].expiry || objs[i].expiry == null) {
+        DB3.deleteOne({fieldName:"TIMER",expiry:objs[i].expiry})
+        WS.notifRoom.socket.send(WS.toSendInfo("@"+objs[i].notifyingUser+", you are reminded of: "+
+                                               objs[i].msg.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, "\\\"")));
+      }
+    }
+  });
+  
 }

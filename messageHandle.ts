@@ -4,7 +4,8 @@ const fs = require('fs');
 import {getUptimeStr, systemLog} from './misc';
 import {allWords, validWords, todayLeetCODE, todayWordID} from './wordListHandle';
 const serviceKey = process.env['serviceKey'];
-import {DB} from './database';
+import {DB, database} from './database';
+const DB_USERS = database.collection('SystemAUTH')
 const serviceResponse = process.env['serviceResponse'];
 let DATE = new Date();
 
@@ -158,7 +159,28 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
     $currentDate: { lastModified: true }
   });
 })
-  
+
+  let match4 = msg.match("^!about @(.+)");
+  if (match4 && match4[1]) {
+    DB_USERS.findOne({fieldName:"AboutData", user:{$eq:norm(match4[1]).toLowerCase()}})
+      .then((obj:{about:string}) => {
+      if (obj && obj.about) 
+        this.delaySendMsg("About @"+norm(match4[1])+": "+
+          obj.about.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, "\\\""), data, 0);
+      else this.delaySendMsg("No information about @"+norm(match4[1]), data, 0);
+    });
+    return "";
+  }
+
+  match4 = msg.match("^!about set (.+)");
+  if (match4) {
+    DB_USERS.updateOne({fieldName:"AboutData", user:{$eq:norm(sender.toLowerCase())}},
+    {
+      $set: {about: match4[1]},
+      $currentDate: { lastModified: true }
+    }, {upsert:true});
+    return "Set information for @"+norm(sender);
+  }
 
   if (msg == "!renick") {
     this.changeNick(this.nick);
@@ -469,5 +491,7 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
 }
 
 function norm(str:string) {
+  str = str.replaceAll(/[^a-zA-Z0-9_!@#$%^&*]/gm, "");
+  str = str.replaceAll(/"/gm, "\\\"");
   return str.replaceAll(" ","");
 }

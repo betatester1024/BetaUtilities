@@ -29,6 +29,7 @@ var import_wordListHandle = require("./wordListHandle");
 var import_database = require("./database");
 const fs = require("fs");
 const serviceKey = process.env["serviceKey"];
+const DB_USERS = import_database.database.collection("SystemAUTH");
 const serviceResponse = process.env["serviceResponse"];
 let DATE = new Date();
 let VERSION = "ServiceVersion STABLE 1.5271 | Build-time: " + DATE.toUTCString();
@@ -171,6 +172,28 @@ function replyMessage(msg, sender, data) {
       }
     );
   });
+  let match4 = msg.match("^!about @(.+)");
+  if (match4 && match4[1]) {
+    DB_USERS.findOne({ fieldName: "AboutData", user: { $eq: norm(match4[1]).toLowerCase() } }).then((obj) => {
+      if (obj && obj.about)
+        this.delaySendMsg("About @" + norm(match4[1]) + ": " + obj.about.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, '\\"'), data, 0);
+      else
+        this.delaySendMsg("No information about @" + norm(match4[1]), data, 0);
+    });
+    return "";
+  }
+  match4 = msg.match("^!about set (.+)");
+  if (match4) {
+    DB_USERS.updateOne(
+      { fieldName: "AboutData", user: { $eq: norm(sender.toLowerCase()) } },
+      {
+        $set: { about: match4[1] },
+        $currentDate: { lastModified: true }
+      },
+      { upsert: true }
+    );
+    return "Set information for @" + norm(sender);
+  }
   if (msg == "!renick") {
     this.changeNick(this.nick);
     return ":white_check_mark:";
@@ -499,6 +522,8 @@ function replyMessage(msg, sender, data) {
     return "";
 }
 function norm(str) {
+  str = str.replaceAll(/[^a-zA-Z0-9_!@#$%^&*]/gm, "");
+  str = str.replaceAll(/"/gm, '\\"');
   return str.replaceAll(" ", "");
 }
 // Annotate the CommonJS export names for ESM import in node:

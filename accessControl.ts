@@ -9,8 +9,8 @@ import {systemLog} from './misc';
 import {replacements} from './replacements'
 const fs = require("fs");
 import {database} from './database';
-const DB = database.collection('SystemAUTH');
-const DB2 = database.collection('SupportMessaging');
+  const DB = database.collection('SystemAUTH');
+  const DB2 = database.collection('SupportMessaging');
 
 export function validate(user:string, pwd:string, action:string, access:string, callback:any, token:string="") {
   if (action != "refresh" && action != "refresh_log"

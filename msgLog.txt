@@ -311,3 +311,14 @@
 (OnlineSUPPORT)[BetaOS_System] whoa
 (OnlineSUPPORT)[BetaOS_System] i can do this?
 (OnlineSUPPORT)[hello] test
+(OnlineSUPPORT)[betatester1024] !ping
+(test)[betatester1024] a
+(test)[betatester1024] a
+(test)[betatester1024] a
+(test)[betatester1024] a
+(test)[betatester1024] a
+(test)[betatester1024] a
+(test)[betatester1024] wahey
+(xkcd)[betatester1024] right
+(xkcd)[betatester1024] !ping @betautilities
+(xkcd)[betatester1024] !disablelogging @betautilities

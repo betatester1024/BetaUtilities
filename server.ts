@@ -90,7 +90,8 @@ export function updateServer() {
   }); 
 
   app.get("/support", (req:any, res:any) => {
-    validate("", "", "checkAccess", "", res, req.query.token)
+    res.sendFile(path.join( __dirname, '../frontend', 'support.html' ));
+    // validate("", "", "checkAccess", "", res, req.query.token)
   })
   
   app.get("/syslog", (req:any, res:any) => {

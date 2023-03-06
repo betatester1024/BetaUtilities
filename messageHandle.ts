@@ -1,4 +1,5 @@
 import {WS} from './wsHandler';
+const fs = require('fs');
 //import {rooms} from './initialiser'
 import {getUptimeStr, systemLog} from './misc';
 import {allWords, validWords, todayLeetCODE, todayWordID} from './wordListHandle';
@@ -196,6 +197,14 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
       this.delaySendMsg(r, data, 0);
     });
 
+  }
+  if (msg == "!enablelogging" || msg == "!enablelogging @"+this.nick.toLowerCase()) {
+    this.DATALOGGING = true;
+    return "Enabled message logging."
+  }
+  if (msg == "!disablelogging" || msg == "!disablelogging @"+this.nick.toLowerCase()) {
+    this.DATALOGGING = false;
+    return "Disabled message logging.";
   }
   if (msg == "!status" || msg == "!status @"+this.nick.toLowerCase()) {
     return "Status-tracker: https://betatester1024.repl.co/status";
@@ -454,6 +463,6 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   else return "";
 }
 
-function norm(str:number) {
+function norm(str:string) {
   return str.replaceAll(" ","");
 }

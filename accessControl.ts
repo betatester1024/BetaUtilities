@@ -108,16 +108,18 @@ export function validate(user:string, pwd:string, action:string, access:string, 
             (obj3: {permLevel:number}) => {
               // console.log(obj3);
               if (obj3 && obj3.permLevel>perms) {
+                systemLog("Trying to delete a higher-level user");
                 callback.end(JSON.stringify("ACCESS"));
                 return;
               }
               else if (action == "delete" && (perms >= 2||user == obj.associatedUser)) {
                 DB.findOneAndDelete({fieldName:"UserData", user:{$eq:user}})
-                  .then((res:any)=>{callback.end(JSON.stringify(user))});
-                systemLog("deleted user"+user);
+                  .then((res:any)=>{callback.end(JSON.stringify(escape(user)))});
+                systemLog("Deleted user "+user);
                 return;
               }
               else if (action == "delete") {
+                systemLog("Insufficient access for deletion")
                 callback.end(JSON.stringify("ACCESS"));
                 return;
               }
@@ -162,6 +164,8 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           // systemLog("Evaluating "+user);
           if (user == "!killall") {
             WS.killall();
+            callback.end(JSON.stringify("SUCCESS"));
+            return;
           }
           try {systemLog(eval(user));} catch(e:any) {systemLog(e);};
           callback.end(JSON.stringify("SUCCESS"));

@@ -26,9 +26,10 @@ var import_database = require("./database");
 var import_messageHandle = require("./messageHandle");
 var import_messageHandle2 = require("./messageHandle");
 var import_misc = require("./misc");
-const DATALOGGING = false;
+const fs = require("fs");
 const Database = require("@replit/database");
 class WS {
+  DATALOGGING = false;
   static CALLTIMEOUT = 3e4;
   url;
   static sockets = [];
@@ -144,8 +145,9 @@ class WS {
     if (data["type"] == "send-event") {
       let msg = data["data"]["content"].toLowerCase().trim();
       let snd = data["data"]["sender"]["name"];
-      if (DATALOGGING)
-        (0, import_misc.systemLog)(`(${this.roomName})[${snd}] ${msg}`);
+      if (this.DATALOGGING)
+        fs.writeFileSync("./msgLog.txt", fs.readFileSync("./msgLog.txt").toString() + `(${this.roomName})[${snd}] ${msg}
+`);
       if (msg == "!kill @" + this.nick.toLowerCase()) {
         this.sendMsg("/me crashes", data);
         setTimeout(() => {
@@ -218,13 +220,13 @@ class WS {
   static resetTime = 1e3;
   onClose(event) {
     WS.sockets.splice(WS.sockets.indexOf(this), 1);
-    console.log(WS.sockets);
     if (WS.FAILSAFETIMEOUT) {
       clearTimeout(WS.FAILSAFETIMEOUT);
       WS.FAILSAFETIMEOUT = null;
     }
     if (event != 1e3 && event != 1006) {
       (0, import_messageHandle2.updateActive)(this.roomName, false);
+      (0, import_misc.systemLog)("!killed in &" + this.roomName);
       setTimeout(() => {
         new WS(this.url, this.nick, this.roomName, this.transferOutQ);
         (0, import_messageHandle2.updateActive)(this.roomName, true);
@@ -249,14 +251,13 @@ class WS {
   }
   static killall() {
     for (let i = 0; i < WS.sockets.length; i++) {
-      WS.sockets[i].socket.close();
+      WS.sockets[i].socket.close(1e3, "!killall-ed");
       (0, import_messageHandle2.updateActive)(WS.sockets[i].roomName, false);
     }
   }
   constructor(url, nick, roomName, transferQ) {
     this.nick = nick;
     WS.sockets.push(this);
-    console.log(WS.sockets);
     this.url = url;
     this.roomName = roomName;
     this.socket = new import_ws.WebSocket(url);

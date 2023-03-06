@@ -15,7 +15,8 @@ const DB2 = database.collection('SupportMessaging');
 export function validate(user:string, pwd:string, action:string, access:string, callback:any, token:string="") {
   if (action != "refresh" && action != "refresh_log"
       && action != "sendMsg" && action != "bMsg" && 
-     action != "checkAccess_A") systemLog("Validating as "+user+" with action "+action +" (token "+token+")");
+     action != "checkAccess_A" && action != "checkAccess" &&
+      action != "userReq") systemLog("Validating as "+user+" with action "+action +" (token "+token+")");
   if (!token || !token.match("[0-9]+") || 
      (!user || user && action !="CMD" && action !="sendMsg" && !user.match("^[a-zA-Z0-9_]+$")) || 
      (!pwd || action != "CMD" && pwd.length<=0)) 
@@ -50,7 +51,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       action == "checkAccess" || action == "sendMsg"||
      action == "refresh" || action == "checkAccess_A" || 
      action == "refresh_log" || action == "userReq" || 
-     action == "renick") {
+     action == "renick" || action == "delete") {
     DB.findOne({fieldName: "TOKEN", token:{$eq:token}}).then(
     (obj:{associatedUser:string, expiry:number})=>{
       if (obj == null) {
@@ -64,7 +65,8 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       let expiryTime = obj.expiry;
       let tokenUser = obj.associatedUser;
       if (action != "refresh" && action != "refresh_log"
-         && action != "sendMsg" && action != "checkAccess_A") systemLog("Logged in as "+tokenUser+" | Expiring in: "+(expiryTime-Date.now()) + " ms");
+         && action != "sendMsg" && action != "checkAccess_A" &&
+         action != "userReq" && action !="checkAccess") systemLog("Logged in as "+tokenUser+" | Expiring in: "+(expiryTime-Date.now()) + " ms");
       if (expiryTime<Date.now()) {
         systemLog("Token expired. Logged out user.")
         DB.deleteOne({fieldName:"TOKEN", token:{$eq:token}});
@@ -73,13 +75,10 @@ export function validate(user:string, pwd:string, action:string, access:string, 
         else callback.end(JSON.stringify("EXPIRE"));
         return;
       }
-      if (action == "userReq") {
-        if (!obj) callback.end(JSON.stringify("NOACTIVE"));
-        else callback.end(JSON.stringify(obj.associatedUser));
-        return;
-      }
+      
       DB.findOne({fieldName:"UserData", user:obj.associatedUser}).then(
       (obj2:{permLevel:number, alias:string|null})=>{
+        if (!obj2) {callback.end(JSON.stringify("ERROR")); return;}
         let perms = obj2.permLevel;
         if (action == "renick" && perms >= 1)
         {
@@ -100,33 +99,70 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           callback.end(JSON.stringify(escape(user)));
           return;
         } // renick 
-        if (action=="add") {
-          if (Number(perms)<2){
-            if (user == tokenUser && access == "1") {
-              systemLog("Updating password");
-              updateUser(user, pwd);
-              callback.end(JSON.stringify("SUCCESS"))
-              return;
-            }
-            systemLog("Permissions insufficient.")
-            callback.end(JSON.stringify("ACCESS"));
-            return;
-          }
-          else if (Number(access) < 3) {
-            systemLog("Access granted; Token not expired. Adding "+user+" with permissions"+access);
-            updateUser(user, pwd, Number(access));
-            callback.end(JSON.stringify("SUCCESS"));
-            return;
-          }
-          else { // attempting to add a full site administrator user - forbidden!
-            systemLog("Invalid access-level granting:")
-            callback.end(JSON.stringify("ACCESS"))
-            return;
-          }
+        if (action == "userReq") {
+          callback.end(JSON.stringify(obj.associatedUser+" "+obj2.permLevel));
+          return;
+        }
+        if (action=="add" || action == "delete") {
+          DB.findOne({fieldName:"UserData", user:{$eq:user}}).then(
+            (obj3: {permLevel:number}) => {
+              // console.log(obj3);
+              if (obj3 && obj3.permLevel>perms) {
+                callback.end(JSON.stringify("ACCESS"));
+                return;
+              }
+              else if (action == "delete" && (perms >= 2||user == obj.associatedUser)) {
+                DB.findOneAndDelete({fieldName:"UserData", user:{$eq:user}})
+                  .then((res:any)=>{callback.end(JSON.stringify(user))});
+                systemLog("deleted user"+user);
+                return;
+              }
+              else if (action == "delete") {
+                callback.end(JSON.stringify("ACCESS"));
+                return;
+              }
+              if (Number(perms)<2){
+                if (user == tokenUser && access == "1") {
+                  systemLog("Updating password");
+                  updateUser(user, pwd);
+                  callback.end(JSON.stringify("SUCCESS"))
+                  let exp = perms<3?(Date.now()+1000*60*60):(Date.now()+1000*60);
+                  systemLog("Logging user "+user+" with expiry "+exp+" (in "+(exp-Date.now())+" ms)");
+                  DB.updateOne({fieldName:"TOKEN", token:{$eq:token}}, 
+                  {
+                    $set: {
+                      associatedUser:user,
+                      expiry: exp
+                    },
+                    $currentDate: { lastModified: true }
+                  }, {upsert: true});
+                  return;
+                }
+                systemLog("Permissions insufficient.")
+                callback.end(JSON.stringify("ACCESS"));
+                return;
+              }
+              else if (Number(access) < 3) {
+                systemLog("Access granted; Token not expired. Adding "+user+" with permissions"+access);
+                updateUser(user, pwd, Number(access));
+                callback.end(JSON.stringify("SUCCESS"));
+                return;
+              }
+              else { // attempting to add a full site administrator user - forbidden!
+                systemLog("Invalid access-level granting:")
+                callback.end(JSON.stringify("ACCESS"))
+                return;
+              }
+            } // callback for searching user to be updated
+          );
+          return;
         } // add
         else if (action=="CMD" && perms == 3) {
           // var DB = ;
           // systemLog("Evaluating "+user);
+          if (user == "!killall") {
+            WS.killall();
+          }
           try {systemLog(eval(user));} catch(e:any) {systemLog(e);};
           callback.end(JSON.stringify("SUCCESS"));
         }
@@ -170,6 +206,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
               data = data.replaceAll(">", "&gt;");
               data = data.replaceAll("<", "&lt;");
               data = data.replaceAll("\\n", "<br>");
+              data = data.replaceAll("&([0-9a-zA-Z]+)", (match:string, p1:string)=>{return "<a href='euphoria.io/room/"+p1+"'>"+p1+"</a>"});
               for (let i=0; i<replacements.length; i++){
                 data = data.replaceAll(replacements[i].from, "<span class='material-symbols-outlined'>"+replacements[i].to+"</span>")
               }
@@ -198,6 +235,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
         else if (action == "refresh_log" || action == "refresh" || action == "checkAccess_A") {
           callback.sendFile(path.join( __dirname, '../frontend', '403.html' ));
         }
+        
         else {
           systemLog("No perms!")
           callback.end(JSON.stringify("ACCESS"));
@@ -217,8 +255,17 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       else {
         systemLog("Registered user "+user +"with pass: "+pwd)
         updateUser(user, pwd, 1);
-        validate(user, pwd, "login", "", callback, token);
-        // callback.end(JSON.stringify("SUCCESS"));
+        let exp = (Date.now()+1000*60*60);
+        systemLog("Logging user "+user+" with expiry "+exp+" (in "+(exp-Date.now())+" ms)");
+        DB.updateOne({fieldName:"TOKEN", token:{$eq:token}}, 
+        {
+          $set: {
+            associatedUser:user,
+            expiry: exp
+          },
+          $currentDate: { lastModified: true }
+        }, {upsert: true});
+        callback.end(JSON.stringify("SUCCESS"));
         return;
       }
     })
@@ -232,7 +279,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       let perm = obj.permLevel
       systemLog("Password OK for user "+user+" | Perms: "+perm)
       callback.end(JSON.stringify(perm));  
-      let exp = perm<3?(Date.now()+1000*60*60):(Date.now()+1000*60);
+      let exp = perm<3?(Date.now()+1000*60*60):(Date.now()+1000*300);
       systemLog("Logging user "+user+" with expiry "+exp+" (in "+(exp-Date.now())+" ms)");
       DB.updateOne({fieldName:"TOKEN", token:{$eq:token}}, 
       {

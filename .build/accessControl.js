@@ -22,18 +22,20 @@ __export(accessControl_exports, {
   validate: () => validate
 });
 module.exports = __toCommonJS(accessControl_exports);
+var import_wsHandler = require("./wsHandler");
 var import_initialiser = require("./initialiser");
 var import_updateuser = require("./updateuser");
 var import_misc = require("./misc");
 var import_replacements = require("./replacements");
 var import_database = require("./database");
+var escape = require("escape-html");
 var bcrypt = require("bcrypt");
 const path = require("path");
 const fs = require("fs");
 const DB = import_database.database.collection("SystemAUTH");
 const DB2 = import_database.database.collection("SupportMessaging");
 function validate(user, pwd, action, access, callback, token = "") {
-  if (action != "refresh" && action != "refresh_log" && action != "sendMsg" && action != "bMsg" && action != "checkAccess_A")
+  if (action != "refresh" && action != "refresh_log" && action != "sendMsg" && action != "bMsg" && action != "checkAccess_A" && action != "checkAccess" && action != "userReq")
     (0, import_misc.systemLog)("Validating as " + user + " with action " + action + " (token " + token + ")");
   if (!token || !token.match("[0-9]+") || (!user || user && action != "CMD" && action != "sendMsg" && !user.match("^[a-zA-Z0-9_]+$")) || (!pwd || action != "CMD" && pwd.length <= 0)) {
     if (action == "add" || action == "login") {
@@ -54,12 +56,12 @@ function validate(user, pwd, action, access, callback, token = "") {
   }
   if (action == "logout") {
     (0, import_misc.systemLog)("Logging out " + token);
-    DB.deleteOne({ fieldName: "TOKEN", token });
+    DB.deleteOne({ fieldName: "TOKEN", token: { $eq: token } });
     callback.end(JSON.stringify("SUCCESS"));
     return;
   }
-  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log" || action == "userReq" || action == "renick") {
-    DB.findOne({ fieldName: "TOKEN", token }).then(
+  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log" || action == "userReq" || action == "renick" || action == "delete") {
+    DB.findOne({ fieldName: "TOKEN", token: { $eq: token } }).then(
       (obj) => {
         if (obj == null) {
           (0, import_misc.systemLog)("No active session");
@@ -71,26 +73,23 @@ function validate(user, pwd, action, access, callback, token = "") {
         }
         let expiryTime = obj.expiry;
         let tokenUser = obj.associatedUser;
-        if (action != "refresh" && action != "refresh_log" && action != "sendMsg" && action != "checkAccess_A")
+        if (action != "refresh" && action != "refresh_log" && action != "sendMsg" && action != "checkAccess_A" && action != "userReq" && action != "checkAccess")
           (0, import_misc.systemLog)("Logged in as " + tokenUser + " | Expiring in: " + (expiryTime - Date.now()) + " ms");
         if (expiryTime < Date.now()) {
           (0, import_misc.systemLog)("Token expired. Logged out user.");
-          DB.deleteOne({ fieldName: "TOKEN", token });
+          DB.deleteOne({ fieldName: "TOKEN", token: { $eq: token } });
           if (action == "checkAccess" || action == "checkAccess_A")
             callback.sendFile(path.join(__dirname, "../frontend", "403.html"));
           else
             callback.end(JSON.stringify("EXPIRE"));
           return;
         }
-        if (action == "userReq") {
-          if (!obj)
-            callback.end(JSON.stringify("NOACTIVE"));
-          else
-            callback.end(JSON.stringify(obj.associatedUser));
-          return;
-        }
         DB.findOne({ fieldName: "UserData", user: obj.associatedUser }).then(
           (obj2) => {
+            if (!obj2) {
+              callback.end(JSON.stringify("ERROR"));
+              return;
+            }
             let perms = obj2.permLevel;
             if (action == "renick" && perms >= 1) {
               if (obj.associatedUser != "betatester1024" && obj.associatedUser != "betaos" && (user.toLowerCase() == "betaos" || user.toLowerCase() == "betatester1024")) {
@@ -103,32 +102,69 @@ function validate(user, pwd, action, access, callback, token = "") {
                 },
                 $currentDate: { lastModified: true }
               }, { upsert: true });
-              callback.end(JSON.stringify(user));
+              callback.end(JSON.stringify(escape(user)));
               return;
             }
-            if (action == "add") {
-              if (Number(perms) < 2) {
-                if (user == tokenUser && access == "1") {
-                  (0, import_misc.systemLog)("Updating password");
-                  (0, import_updateuser.updateUser)(user, pwd);
-                  callback.end(JSON.stringify("SUCCESS"));
-                  return;
+            if (action == "userReq") {
+              callback.end(JSON.stringify(obj.associatedUser + " " + obj2.permLevel));
+              return;
+            }
+            if (action == "add" || action == "delete") {
+              DB.findOne({ fieldName: "UserData", user: { $eq: user } }).then(
+                (obj3) => {
+                  if (obj3 && obj3.permLevel > perms) {
+                    callback.end(JSON.stringify("ACCESS"));
+                    return;
+                  } else if (action == "delete" && (perms >= 2 || user == obj.associatedUser)) {
+                    DB.findOneAndDelete({ fieldName: "UserData", user: { $eq: user } }).then((res) => {
+                      callback.end(JSON.stringify(user));
+                    });
+                    (0, import_misc.systemLog)("deleted user" + user);
+                    return;
+                  } else if (action == "delete") {
+                    callback.end(JSON.stringify("ACCESS"));
+                    return;
+                  }
+                  if (Number(perms) < 2) {
+                    if (user == tokenUser && access == "1") {
+                      (0, import_misc.systemLog)("Updating password");
+                      (0, import_updateuser.updateUser)(user, pwd);
+                      callback.end(JSON.stringify("SUCCESS"));
+                      let exp = perms < 3 ? Date.now() + 1e3 * 60 * 60 : Date.now() + 1e3 * 60;
+                      (0, import_misc.systemLog)("Logging user " + user + " with expiry " + exp + " (in " + (exp - Date.now()) + " ms)");
+                      DB.updateOne(
+                        { fieldName: "TOKEN", token: { $eq: token } },
+                        {
+                          $set: {
+                            associatedUser: user,
+                            expiry: exp
+                          },
+                          $currentDate: { lastModified: true }
+                        },
+                        { upsert: true }
+                      );
+                      return;
+                    }
+                    (0, import_misc.systemLog)("Permissions insufficient.");
+                    callback.end(JSON.stringify("ACCESS"));
+                    return;
+                  } else if (Number(access) < 3) {
+                    (0, import_misc.systemLog)("Access granted; Token not expired. Adding " + user + " with permissions" + access);
+                    (0, import_updateuser.updateUser)(user, pwd, Number(access));
+                    callback.end(JSON.stringify("SUCCESS"));
+                    return;
+                  } else {
+                    (0, import_misc.systemLog)("Invalid access-level granting:");
+                    callback.end(JSON.stringify("ACCESS"));
+                    return;
+                  }
                 }
-                (0, import_misc.systemLog)("Permissions insufficient.");
-                callback.end(JSON.stringify("ACCESS"));
-                return;
-              } else if (Number(access) < 3) {
-                (0, import_misc.systemLog)("Access granted; Token not expired. Adding " + user + " with permissions" + access);
-                (0, import_updateuser.updateUser)(user, pwd, Number(access));
-                callback.end(JSON.stringify("SUCCESS"));
-                return;
-              } else {
-                (0, import_misc.systemLog)("Invalid access-level granting:");
-                callback.end(JSON.stringify("ACCESS"));
-                return;
-              }
+              );
+              return;
             } else if (action == "CMD" && perms == 3) {
-              (0, import_misc.systemLog)("Evaluating " + user);
+              if (user == "!killall") {
+                import_wsHandler.WS.killall();
+              }
               try {
                 (0, import_misc.systemLog)(eval(user));
               } catch (e) {
@@ -175,6 +211,9 @@ function validate(user, pwd, action, access, callback, token = "") {
                   data = data.replaceAll(">", "&gt;");
                   data = data.replaceAll("<", "&lt;");
                   data = data.replaceAll("\\n", "<br>");
+                  data = data.replaceAll("&([0-9a-zA-Z]+)", (match, p1) => {
+                    return "<a href='euphoria.io/room/" + p1 + "'>" + p1 + "</a>";
+                  });
                   for (let i2 = 0; i2 < import_replacements.replacements.length; i2++) {
                     data = data.replaceAll(import_replacements.replacements[i2].from, "<span class='material-symbols-outlined'>" + import_replacements.replacements[i2].to + "</span>");
                   }
@@ -220,7 +259,20 @@ function validate(user, pwd, action, access, callback, token = "") {
       } else {
         (0, import_misc.systemLog)("Registered user " + user + "with pass: " + pwd);
         (0, import_updateuser.updateUser)(user, pwd, 1);
-        validate(user, pwd, "login", "", callback, token);
+        let exp = Date.now() + 1e3 * 60 * 60;
+        (0, import_misc.systemLog)("Logging user " + user + " with expiry " + exp + " (in " + (exp - Date.now()) + " ms)");
+        DB.updateOne(
+          { fieldName: "TOKEN", token: { $eq: token } },
+          {
+            $set: {
+              associatedUser: user,
+              expiry: exp
+            },
+            $currentDate: { lastModified: true }
+          },
+          { upsert: true }
+        );
+        callback.end(JSON.stringify("SUCCESS"));
         return;
       }
     });
@@ -232,10 +284,10 @@ function validate(user, pwd, action, access, callback, token = "") {
         let perm = obj3.permLevel;
         (0, import_misc.systemLog)("Password OK for user " + user + " | Perms: " + perm);
         callback.end(JSON.stringify(perm));
-        let exp = perm < 3 ? Date.now() + 1e3 * 60 * 60 : Date.now() + 1e3 * 60;
+        let exp = perm < 3 ? Date.now() + 1e3 * 60 * 60 : Date.now() + 1e3 * 300;
         (0, import_misc.systemLog)("Logging user " + user + " with expiry " + exp + " (in " + (exp - Date.now()) + " ms)");
         DB.updateOne(
-          { fieldName: "TOKEN", token },
+          { fieldName: "TOKEN", token: { $eq: token } },
           {
             $set: {
               associatedUser: user,

@@ -51,7 +51,8 @@ function init() {
     sockets.push(new import_wsHandler.WS("wss://euphoria.io/room/" + rooms[i] + "/ws", nicks[i], rooms[i], i == 0));
     (0, import_messageHandle.updateActive)(rooms[i], true);
   }
-  (0, import_wordListHandle.loopy)();
+  console.log("It loaded.");
+  (0, import_wordListHandle.loopy)(sockets[0]);
   setInterval(() => {
     (0, import_accessControl.DBGarbageCollect)();
   }, 1e4);

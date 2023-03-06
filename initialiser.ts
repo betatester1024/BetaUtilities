@@ -22,8 +22,9 @@ export function init() {
     sockets.push(new WS("wss://euphoria.io/room/" + rooms[i] + "/ws", nicks[i], rooms[i], i==0));
     updateActive(rooms[i], true);
   }
+  console.log("It loaded.");
   // cnc();
-  loopy();
+  loopy(sockets[0]);
   setInterval(()=>{DBGarbageCollect()}, 10000);
   currHandler = new WebH();
 }

@@ -1,816 +1,676 @@
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-Validating as  with action checkAccess (token 16149483245659936822)
-Logged in as user | Expiring in: 1010934 ms
-Support access granted!
-Validating as  with action userReq (token 16149483245659936822)
-Logged in as user | Expiring in: 985362 ms
-Validating as  with action userReq (token 16149483245659936822)
-Logged in as user | Expiring in: 828064 ms
-Validating as  with action checkAccess (token 16149483245659936822)
-Logged in as user | Expiring in: 819797 ms
-Support access granted!
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-Validating as  with action checkAccess (token 16149483245659936822)
-Logged in as user | Expiring in: 614148 ms
-Support access granted!
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-Validating as  with action checkAccess (token 16149483245659936822)
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-Logged in as user | Expiring in: 480119 ms
-Support access granted!
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-Validating as  with action checkAccess (token 16149483245659936822)
-Logged in as user | Expiring in: 128542 ms
-Support access granted!
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-Validating as  with action checkAccess (token 16149483245659936822)
-Logged in as user | Expiring in: 40353 ms
-Support access granted!
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-Validating as  with action checkAccess (token 16149483245659936822)
-Logged in as user | Expiring in: 7618 ms
-Support access granted!
-Token expired. Logged out user.
-Validating as  with action checkAccess (token 16149483245659936822)
-No active session
-Validating as betaos with action login (token 16149483245659936822)
-Password OK for user betaos | Perms: 2
-Logging user betaos with expiry 1677601828373 (in 3600000 ms)
-Validating as  with action userReq (token 16149483245659936822)
-Logged in as betaos | Expiring in: 3596477 ms
-Validating as  with action checkAccess (token 16149483245659936822)
-Logged in as betaos | Expiring in: 3595566 ms
-Support access granted!
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-Validating as  with action checkAccess (token 16149483245659936822)
-Logged in as betaos | Expiring in: 3521517 ms
-Support access granted!
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-Validating as  with action checkAccess (token 16149483245659936822)
-Logged in as betaos | Expiring in: 3463849 ms
-Support access granted!
-Validating as  with action checkAccess (token 16149483245659936822)
-Logged in as betaos | Expiring in: 3453939 ms
-Support access granted!
-Validating as  with action userReq (token 16149483245659936822)
-Logged in as betaos | Expiring in: 3264891 ms
-Validating as  with action checkAccess_A (token 16149483245659936822)
-Logged in as betaos | Expiring in: 3258900 ms
-SysLog access granted!
-Validating as  with action userReq (token 16149483245659936822)
-Logged in as betaos | Expiring in: 3251077 ms
-Validating as  with action checkAccess (token 16149483245659936822)
-Logged in as betaos | Expiring in: 2347035 ms
-Support access granted!
-Validating as  with action checkAccess (token 16149483245659936822)
-Logged in as betaos | Expiring in: 2336448 ms
-Support access granted!
-Validating as  with action checkAccess (token 16149483245659936822)
-Logged in as betaos | Expiring in: 2325247 ms
-Support access granted!
-Validating as  with action userReq (token 16149483245659936822)
-Logged in as betaos | Expiring in: 2304149 ms
-Validating as  with action logout (token 16149483245659936822)
-Logging out 16149483245659936822
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-Validating as betatester1024 with action login (token 3496497786809558735)
-Password OK for user betatester1024 | Perms: 3
-Logging user betatester1024 with expiry 1677599846564 (in 60000 ms)
-Validating as  with action userReq (token 3496497786809558735)
-Logged in as betatester1024 | Expiring in: 56769 ms
-Validating as  with action checkAccess (token 3496497786809558735)
-Logged in as betatester1024 | Expiring in: 55647 ms
-Support access granted!
-Token expired. Logged out user.
-Validating as  with action checkAccess (token 3496497786809558735)
-No active session
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-Validating as betaos with action login (token 3496497786809558735)
-Password OK for user betaos | Perms: 2
-Logging user betaos with expiry 1677604967176 (in 3600000 ms)
-Validating as  with action userReq (token 3496497786809558735)
-Logged in as betaos | Expiring in: 3596550 ms
-Validating as  with action checkAccess (token 3496497786809558735)
-Logged in as betaos | Expiring in: 3593988 ms
-Support access granted!
-
-Server active!
-Front-end is running on 4000.
-Validating as  with action checkAccess (token 3496497786809558735)
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-Logged in as betaos | Expiring in: 3563680 ms
-Support access granted!
-Validating as EEEE with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 3557855 ms
-No perms!
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-Validating as EEE with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 3541381 ms
-No perms!
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-Validating as BETAOS with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 3398224 ms
-No perms!
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-Validating as EYREAJDSJSJSJ with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 3360644 ms
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-Validating as  with action userReq (token 17799820544408726264)
-Logged in as c | Expiring in: -76449454 ms
-Token expired. Logged out user.
-Validating as  with action checkAccess (token 17799820544408726264)
-No active session
-Validating as c with action login (token 17799820544408726264)
-Password OK for user c | Perms: 1
-Logging user c with expiry 1677605340150 (in 3600000 ms)
-Validating as  with action userReq (token 17799820544408726264)
-Logged in as c | Expiring in: 3598197 ms
-Validating as  with action checkAccess (token 17799820544408726264)
-Logged in as c | Expiring in: 3596851 ms
-Support access granted!
-Validating as  with action userReq (token 17799820544408726264)
-Logged in as c | Expiring in: 3575544 ms
-Validating as  with action userReq (token 17799820544408726264)
-Logged in as c | Expiring in: 3570904 ms
-Validating as  with action checkAccess_A (token 17799820544408726264)
-Logged in as c | Expiring in: 3569324 ms
-Validating as  with action userReq (token 17799820544408726264)
-Logged in as c | Expiring in: 3566665 ms
-Validating as  with action checkAccess (token )
-No active session
-Validating as  with action checkAccess (token )
-No active session
-Validating as BetaOS with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 3185396 ms
-Validating as  with action checkAccess (token )
-No active session
-Validating as c with action login (token 17799820544408726264)
-Password OK for user c | Perms: 1
-Logging user c with expiry 1677605384483 (in 3600000 ms)
-Validating as  with action userReq (token 17799820544408726264)
-Logged in as c | Expiring in: 3597997 ms
-Validating as  with action checkAccess (token 17799820544408726264)
-Logged in as c | Expiring in: 3591921 ms
-Support access granted!
-Validating as Sarah with action login (token 10957252346672468109)
-Password OK for user Sarah | Perms: 2
-Logging user Sarah with expiry 1677605396864 (in 3600000 ms)
-Validating as  with action userReq (token 10957252346672468109)
-Logged in as Sarah | Expiring in: 3596526 ms
-Validating as  with action userReq (token 3496497786809558735)
-Logged in as betaos | Expiring in: 3147669 ms
-Validating as  with action checkAccess (token 3496497786809558735)
-Logged in as betaos | Expiring in: 3146291 ms
-Support access granted!
-Validating as BEetaOS with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 3121653 ms
-Validating as a with action renick (token 17799820544408726264)
-Logged in as c | Expiring in: 3532801 ms
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-Validating as  with action checkAccess (token 3496497786809558735)
-BetaUtilities open in wss://euphoria.io/room/room/ws
-Logged in as betaos | Expiring in: 3053943 ms
-Support access granted!
-Validating as BetaOS with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 3046526 ms
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Validating as BEEEE with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2916249 ms
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-Validating as  with action checkAccess (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2815162 ms
-Support access granted!
-Validating as EEEE with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2809747 ms
-Validating as BetaOS with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2796912 ms
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-Validating as  with action checkAccess (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2525955 ms
-Support access granted!
-Validating as BetaOS with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2522320 ms
-Validating as BetaOS with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2513673 ms
-Validating as  with action checkAccess_A (token NONE)
-No active session
-Validating as  with action checkAccess (token NONE)
-No active session
-Validating as SeaGrapes with action login (token 15964592557082193667)
-Password OK for user SeaGrapes | Perms: 1
-Logging user SeaGrapes with expiry 1677606093352 (in 3600000 ms)
-Validating as  with action userReq (token 15964592557082193667)
-Logged in as SeaGrapes | Expiring in: 3598137 ms
-Validating as  with action checkAccess (token 15964592557082193667)
-Logged in as SeaGrapes | Expiring in: 3596903 ms
-Support access granted!
-Validating as  with action userReq (token 15964592557082193667)
-Logged in as SeaGrapes | Expiring in: 3526167 ms
-Validating as  with action checkAccess_A (token 15964592557082193667)
-Logged in as SeaGrapes | Expiring in: 3523920 ms
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-Validating as  with action userReq (token 15964592557082193667)
-Logged in as SeaGrapes | Expiring in: 3517406 ms
-Validating as  with action checkAccess (token )
-No active session
-Validating as  with action userReq (token 15964592557082193667)
-Logged in as SeaGrapes | Expiring in: 3511878 ms
-Validating as  with action checkAccess (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2383920 ms
-Support access granted!
-Validating as  with action checkAccess (token )
-No active session
-Validating as hi with action signup (token 5605106639488854930)
-Registered user hiwith pass: 1234
-Validating as hi with action login (token 5605106639488854930)
-Password OK for user hi | Perms: 1
-Logging user hi with expiry 1677606201103 (in 3600000 ms)
-Validating as  with action userReq (token 5605106639488854930)
-Logged in as hi | Expiring in: 3598391 ms
-Validating as  with action checkAccess (token 5605106639488854930)
-Logged in as hi | Expiring in: 3591411 ms
-Support access granted!
-Validating as BetaOS with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2323667 ms
-Validating as AAA with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2319124 ms
-Validating as BetaOS with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2312808 ms
-Validating as BetaOS with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2304723 ms
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-Validating as BetaOS with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2223652 ms
-Validating as betatester1024 with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2212805 ms
-Validating as betaOS with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2200137 ms
-Validating as betatester1024 with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2191875 ms
-Validating as BetaOS with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2173184 ms
-Validating as  with action checkAccess (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2144230 ms
-Support access granted!
-Validating as BetaOS with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2140347 ms
-Validating as  with action checkAccess (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2133474 ms
-Support access granted!
-Validating as BetaOS with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2130286 ms
-Validating as  with action checkAccess (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2128432 ms
-Support access granted!
-Validating as BetaOS with action renick (token 3496497786809558735)
-Logged in as betaos | Expiring in: 2123984 ms
-Validating as  with action userReq (token 3496497786809558735)
-Logged in as betaos | Expiring in: 1809210 ms
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-
-Server active!
-Front-end is running on 4000.
-
-Server active!
-Front-end is running on 4000.
-Validating as  with action userReq (token 3496497786809558735)
-Logged in as betaos | Expiring in: 1445233 ms
-Validating as  with action checkAccess (token 3496497786809558735)
-Logged in as betaos | Expiring in: 1444087 ms
-Support access granted!
-
-Server active!
-Front-end is running on 4000.
-
-Server active!
-Front-end is running on 4000.
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-Validating as  with action userReq (token 5605106639488854930)
-Logged in as hi | Expiring in: 2505749 ms
-Validating as  with action checkAccess_A (token 5605106639488854930)
-Logged in as hi | Expiring in: 2504128 ms
-Validating as hi with action login (token 5605106639488854930)
-Password OK for user hi | Perms: 1
-Logging user hi with expiry 1677607306886 (in 3600000 ms)
-Validating as  with action userReq (token 5605106639488854930)
-Logged in as hi | Expiring in: 3597480 ms
-Validating as  with action userReq (token 5605106639488854930)
-Logged in as hi | Expiring in: 3515357 ms
-Validating as  with action userReq (token 3496497786809558735)
-Logged in as betaos | Expiring in: 1159908 ms
-Validating as  with action checkAccess (token 3496497786809558735)
-
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-Retrying in: 2 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:54:27 PM
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-Retrying in: 2 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:54:29 PM
-Retrying in: 2 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:54:31 PM
-Retrying in: 3 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:54:33 PM
-Retrying in: 5 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:54:37 PM
-Retrying in: 8 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:54:42 PM
-Retrying in: 11 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:54:50 PM
-Retrying in: 17 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:55:02 PM
-Retrying in: 26 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:55:19 PM
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-Retrying in: 2 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:59:16 PM
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-Retrying in: 2 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:59:18 PM
-Retrying in: 3 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:59:20 PM
-Retrying in: 5 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:59:24 PM
-Retrying in: 2 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:59:29 PM
-Retrying in: 2 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:59:31 PM
-Retrying in: 3 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:59:34 PM
-Retrying in: 5 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:59:37 PM
-Retrying in: 8 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:59:43 PM
-Retrying in: 11 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/9:59:50 PM
-Retrying in: 17 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/10:00:02 PM
-Retrying in: 26 seconds
-[close] Connection at wss://euphoria.io/room/err/ws was killed at 2/28/2023/10:00:20 PM
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-Validating as  with action checkAccess (token )
-No active session
-Validating as betaos with action login (token 2851332544780633308)
-Password OK for user betaos | Perms: 2
-Logging user betaos with expiry 1677644640742 (in 3600000 ms)
-Validating as  with action userReq (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3594555 ms
-Validating as  with action checkAccess (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3593732 ms
-Support access granted!
-Validating as otheralias with action renick (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3573916 ms
-Validating as  with action userReq (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3515786 ms
-Validating as  with action checkAccess_A (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3514691 ms
-SysLog access granted!
-Validating as  with action userReq (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3508431 ms
-Retrying in: 2 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:27:30 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Validating as  with action checkAccess_A (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3288616 ms
-SysLog access granted!
-Retrying in: 2 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:29:34 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Validating as  with action checkAccess_A (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3258138 ms
-SysLog access granted!
-Validating as  with action userReq (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3229514 ms
-Validating as  with action checkAccess (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3221125 ms
-Support access granted!
-Retrying in: 2 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:30:38 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 2 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:30:40 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 3 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:30:43 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 5 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:30:47 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 8 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:30:52 PM
-Validating as  with action checkAccess (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3186398 ms
-Support access granted!
-Validating as  with action userReq (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3184216 ms
-Validating as  with action checkAccess_A (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3183415 ms
-SysLog access granted!
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 11 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:31:00 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 17 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:31:12 PM
-Validating as  with action checkAccess_A (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3166605 ms
-SysLog access granted!
-Validating as  with action checkAccess (token NONE)
-No active session
-Validating as  with action checkAccess_A (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3154661 ms
-SysLog access granted!
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 26 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:31:29 PM
-Validating as  with action checkAccess_A (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3150210 ms
-SysLog access granted!
-Validating as SeaGrapes with action login (token 10465151831297937491)
-Password OK for user SeaGrapes | Perms: 1
-Logging user SeaGrapes with expiry 1677645092622 (in 3600000 ms)
-Validating as  with action userReq (token 10465151831297937491)
-Logged in as SeaGrapes | Expiring in: 3598278 ms
-Validating as  with action checkAccess (token 10465151831297937491)
-Logged in as SeaGrapes | Expiring in: 3596931 ms
-Support access granted!
-Validating as  with action userReq (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3135175 ms
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Validating as  with action userReq (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3125229 ms
-Validating as  with action checkAccess (token 2851332544780633308)
-Logged in as betaos | Expiring in: 3124154 ms
-Support access granted!
-
-Server active!
-Front-end is running on 4000.
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-BetaUtilities open in wss://euphoria.io/room/test/ws
-BetaUtilities open in wss://euphoria.io/room/room/ws
-BetaUtilities open in wss://euphoria.io/room/bots/ws
-Retrying in: 2 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:34:43 PM
-BetaUtilities open in wss://euphoria.io/room/srs/ws
-BetaUtilities open in wss://euphoria.io/room/ai/ws
-Validating as  with action userReq (token 2851332544780633308)
-Logged in as betaos | Expiring in: 2956297 ms
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 2 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:34:45 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 3 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:34:48 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 5 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:34:51 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 2 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:34:57 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 2 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:34:58 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 3 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:35:01 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 5 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:35:05 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 8 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:35:10 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 11 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:35:18 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Retrying in: 17 seconds
-[close] Connection at wss://euphoria.io/room/xkcd/ws was killed at 2/28/2023/10:35:29 PM
-BetaUtilities open in wss://euphoria.io/room/xkcd/ws
-Validating as  with action userReq (token 2851332544780633308)
-Logged in as betaos | Expiring in: 2621501 ms
-Validating as  with action checkAccess (token 2851332544780633308)
-Logged in as betaos | Expiring in: 2620241 ms
-Support access granted!
-Validating as  with action userReq (token 2851332544780633308)
-Logged in as betaos | Expiring in: 2616978 ms
-Validating as  with action userReq (token 2851332544780633308)
-Logged in as betaos | Expiring in: 2612558 ms
-Validating as  with action userReq (token 2851332544780633308)
-Logged in as betaos | Expiring in: 2607829 ms
-Validating as  with action checkAccess (token NONE)
-No active session
-Validating as  with action checkAccess (token NONE)
-No active session
-No active session
-Validating as  with action checkAccess (token NONE)
-No active session
-Validating as CoderElijah with action login (token 2242437879202827219)
+Validating as user with action delete (token 9449684388086840182)
+Logged in as betaos | Expiring in: 3390869 ms
+Validating as  with action userReq (token 9449684388086840182)
+Logged in as betaos | Expiring in: 3376169 ms
+Validating as  with action logout (token 9449684388086840182)
+Logging out 9449684388086840182
+Validating as user with action login (token 17331456655452255017)
 Invalid credentials.
-Validating as  with action checkAccess (token NONE)
+Validating as user with action signup (token 6386149618814838065)
+Registered user userwith pass: pass
+Validating as user with action login (token 6386149618814838065)
+Invalid credentials.
+Validating as  with action userReq (token 6386149618814838065)
 No active session
-Validating as  with action checkAccess (token NONE)
+Validating as  with action userReq (token 6386149618814838065)
 No active session
+Validating as  with action userReq (token 6386149618814838065)
 No active session
-Validating as betaos with action login (token 15868952040276324430)
+Validating as  with action checkAccess (token 6386149618814838065)
+No active session
+Validating as betaos with action login (token 6386149618814838065)
 Password OK for user betaos | Perms: 2
-Logging user betaos with expiry 1677689441921 (in 3599999 ms)
-Validating as  with action userReq (token 15868952040276324430)
-Logged in as betaos | Expiring in: 3596460 ms
-Validating as  with action userReq (token 5605106639488854930)
-Logged in as hi | Expiring in: -80023829 ms
+Logging user betaos with expiry 1678054481117 (in 3600000 ms)
+Validating as  with action userReq (token 6386149618814838065)
+Logged in as betaos | Expiring in: 3598300 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as betatester1024 with action add (token 6386149618814838065)
+Logged in as betaos | Expiring in: 3375366 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+Validating as betatester1024 with action delete (token 6386149618814838065)
+Logged in as betaos | Expiring in: 3346896 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+Validating as betatester1024 with action delete (token 6386149618814838065)
+Logged in as betaos | Expiring in: 3158321 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+Validating as betatester1024 with action delete (token 6386149618814838065)
+Logged in as betaos | Expiring in: 2971762 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as betatester1024 with action delete (token 6386149618814838065)
+Logged in as betaos | Expiring in: 2934521 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+Validating as betatester1024 with action delete (token 6386149618814838065)
+Logged in as betaos | Expiring in: 2868415 ms
+Validating as betaos with action delete (token 6386149618814838065)
+Logged in as betaos | Expiring in: 2862637 ms
+Validating as betaos with action delete (token 6386149618814838065)
+Logged in as betaos | Expiring in: 2859388 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as betaos with action delete (token 6386149618814838065)
+Logged in as betaos | Expiring in: 2818321 ms
+Validating as betaos with action delete (token 6386149618814838065)
+Logged in as betaos | Expiring in: 2815409 ms
+Validating as  with action userReq (token 6386149618814838065)
+Logged in as betaos | Expiring in: 2811180 ms
+Validating as  with action userReq (token 6386149618814838065)
+Logged in as betaos | Expiring in: 2806963 ms
+Validating as betaos with action delete (token 6386149618814838065)
+Logged in as betaos | Expiring in: 2798133 ms
+Validating as  with action userReq (token 6386149618814838065)
+Logged in as betaos | Expiring in: 2795467 ms
+Validating as  with action logout (token 6386149618814838065)
+Logging out 6386149618814838065
+Validating as betaos with action login (token 12606961048068513003)
+Invalid credentials.
+Validating as betaos with action signup (token 1683533792766909662)
+Registered user betaoswith pass: pass
+Validating as betaos with action login (token 1683533792766909662)
+Invalid credentials.
+Validating as  with action userReq (token 1683533792766909662)
+No active session
+Validating as  with action checkAccess (token 1683533792766909662)
+No active session
+Validating as  with action userReq (token 1683533792766909662)
+No active session
+Validating as  with action logout (token 1683533792766909662)
+Logging out 1683533792766909662
+Validating as betaos with action login (token 12398707834629116374)
+Password OK for user betaos | Perms: 1
+Logging user betaos with expiry 1678055328385 (in 3600000 ms)
+Validating as  with action userReq (token 12398707834629116374)
+Logged in as betaos | Expiring in: 3598432 ms
+Validating as  with action checkAccess (token 12398707834629116374)
+Logged in as betaos | Expiring in: 3597861 ms
+Support access granted!
+Validating as  with action userReq (token 12398707834629116374)
+Logged in as betaos | Expiring in: 3592534 ms
+Validating as  with action logout (token 12398707834629116374)
+Logging out 12398707834629116374
+Validating as betaos with action login (token 11314435375022971694)
+Password OK for user betaos | Perms: 1
+Logging user betaos with expiry 1678055345593 (in 3600000 ms)
+Validating as  with action userReq (token 11314435375022971694)
+Logged in as betaos | Expiring in: 3598062 ms
+Validating as  with action checkAccess (token 11314435375022971694)
+Logged in as betaos | Expiring in: 3595922 ms
+Support access granted!
+Validating as  with action userReq (token 11314435375022971694)
+Logged in as betaos | Expiring in: 3592900 ms
+Validating as betaos with action delete (token 11314435375022971694)
+Logged in as betaos | Expiring in: 3587189 ms
+Validating as betaos with action delete (token 11314435375022971694)
+Logged in as betaos | Expiring in: 3584707 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as betaos with action delete (token 11314435375022971694)
+Logged in as betaos | Expiring in: 3530985 ms
+Validating as  with action userReq (token 11314435375022971694)
+Logged in as betaos | Expiring in: 3527442 ms
+Validating as  with action userReq (token 11314435375022971694)
+Logged in as betaos | Expiring in: 3523381 ms
+Validating as  with action logout (token 11314435375022971694)
+Logging out 11314435375022971694
+Validating as betaos with action signup (token 3036332957449675948)
+Registered user betaoswith pass: pass
+Validating as betaos with action login (token 3036332957449675948)
+Invalid credentials.
+Validating as  with action userReq (token 3036332957449675948)
+No active session
+Validating as  with action userReq (token 3036332957449675948)
+No active session
+SLEEPACTIVATE in room: xkcd by ProgrammerG 
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+Validating as testuser3 with action signup (token 17283805108365023412)
+Registered user testuser3with pass: pass
+Validating as testuser3 with action login (token 17283805108365023412)
+Invalid credentials.
+Validating as  with action userReq (token 17283805108365023412)
+No active session
+Validating as  with action userReq (token 17283805108365023412)
+No active session
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+Validating as  with action logout (token 17283805108365023412)
+Logging out 17283805108365023412
+Validating as testuser4 with action signup (token 15979859534914239173)
+Registered user testuser4with pass: pass
+Logging user testuser4 with expiry 1678057109945 (in 3600000 ms)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+Validating as testuser4 with action signup (token 8543350628431220437)
+testuser4 was already registered
+Validating as abcde with action signup (token 13536536607595683986)
+abcde was already registered
+Validating as abcdefff with action signup (token 830849864541428578)
+Registered user abcdefffwith pass: fff
+Logging user abcdefff with expiry 1678057218973 (in 3600000 ms)
+Validating as  with action userReq (token 830849864541428578)
+Logged in as abcdefff | Expiring in: 3598642 ms
+Validating as  with action checkAccess (token 830849864541428578)
+Logged in as abcdefff | Expiring in: 3596632 ms
+Support access granted!
+Validating as  with action userReq (token 830849864541428578)
+Logged in as abcdefff | Expiring in: 3594109 ms
+Validating as abcdefff with action delete (token 830849864541428578)
+Logged in as abcdefff | Expiring in: 3587671 ms
+Validating as  with action userReq (token 830849864541428578)
+Logged in as abcdefff | Expiring in: 3584534 ms
+Validating as betaos with action add (token 830849864541428578)
+Logged in as abcdefff | Expiring in: 3389179 ms
+Validating as betaos with action delete (token 830849864541428578)
+Logged in as abcdefff | Expiring in: 3387572 ms
+Validating as betaos with action delete (token 830849864541428578)
+Logged in as abcdefff | Expiring in: 3385572 ms
+Validating as  with action userReq (token 830849864541428578)
+Logged in as abcdefff | Expiring in: 3383858 ms
+Validating as  with action logout (token 830849864541428578)
+Logging out 830849864541428578
+Validating as betaos with action login (token 7307549938913541476)
+Password OK for user betaos | Perms: 1
+Logging user betaos with expiry 1678057443774 (in 3600000 ms)
+Validating as  with action userReq (token 7307549938913541476)
+Logged in as betaos | Expiring in: 3598636 ms
+Validating as betatester1024 with action add (token 7307549938913541476)
+Logged in as betaos | Expiring in: 3540437 ms
+Validating as betatester1024 with action delete (token 7307549938913541476)
+Logged in as betaos | Expiring in: 3538503 ms
+Validating as  with action userReq (token 7307549938913541476)
+Logged in as betaos | Expiring in: 3473853 ms
+Validating as  with action userReq (token 7307549938913541476)
+Logged in as betaos | Expiring in: 3265501 ms
+SLEEPACTIVATE in room: xkcd by betatester1024
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+Validating as  with action logout (token 7307549938913541476)
+Logging out 7307549938913541476
+No active session
+No active session
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+Validating as user with action login (token 18165617268427296923)
+Password OK for user user | Perms: 1
+Logging user user with expiry 1678058798405 (in 3600000 ms)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+Validating as user with action delete (token 18165617268427296923)
+Logged in as user | Expiring in: 3315774 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+Validating as user with action delete (token 18165617268427296923)
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Logged in as user | Expiring in: 3199916 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+Validating as  with action logout (token 18165617268427296923)
+Logging out 18165617268427296923
+Validating as user with action login (token 15326362895187802423)
+Password OK for user user | Perms: 1
+Logging user user with expiry 1678059288509 (in 3600000 ms)
+Validating as user with action delete (token 15326362895187802423)
+Logged in as user | Expiring in: 3595804 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+Validating as user with action delete (token 15326362895187802423)
+Logged in as user | Expiring in: 3505073 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+Validating as user with action delete (token 15326362895187802423)
+Logged in as user | Expiring in: 3470049 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as user with action delete (token 15326362895187802423)
+Logged in as user | Expiring in: 3428285 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+Validating as user with action delete (token 15326362895187802423)
+Logged in as user | Expiring in: 2974662 ms
+deleted useruser
+Validating as  with action logout (token 15326362895187802423)
+Logging out 15326362895187802423
+Validating as user with action login (token 13989152922653138587)
+Invalid credentials.
+Validating as user with action signup (token 8682118368293194328)
+Registered user userwith pass: pass
+Logging user user with expiry 1678059930692 (in 3600000 ms)
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as  with action logout (token 8682118368293194328)
+Logging out 8682118368293194328
+No active session
+Validating as admin with action login (token 11883679371835638732)
+Password OK for user admin | Perms: 2
+Logging user admin with expiry 1678060394383 (in 3600000 ms)
+Validating as betaos with action add (token 11883679371835638732)
+Logged in as admin | Expiring in: 3584412 ms
+Access granted; Token not expired. Adding betaos with permissions2
+Validating as  with action delete (token 11883679371835638732)
+Logged in as admin | Expiring in: 3578812 ms
+deleted user
+Validating as  with action logout (token 11883679371835638732)
+Logging out 11883679371835638732
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+No active session
+Validating as betaos with action signup (token 1194461705408624425)
+betaos was already registered
+Validating as betaos with action signup (token 16175135329558273392)
+betaos was already registered
+Validating as user with action signup (token 163437902295115350)
+user was already registered
+Validating as user with action signup (token 5745928658748720398)
+user was already registered
+Validating as admin with action login (token 12120007522593172037)
+Password OK for user admin | Perms: 2
+Logging user admin with expiry 1678060946420 (in 3600000 ms)
+Validating as user with action delete (token 12120007522593172037)
+Logged in as admin | Expiring in: 3585135 ms
+deleted useruser
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as deleteit with action delete (token 12120007522593172037)
+Logged in as admin | Expiring in: 3535365 ms
+deleted userdeleteit
+Validating as  with action logout (token 12120007522593172037)
+Logging out 12120007522593172037
+Validating as user with action login (token 5666722387215224005)
+Password OK for user user | Perms: 1
+Logging user user with expiry 1678061026627 (in 3600000 ms)
+Validating as user with action delete (token 5666722387215224005)
+Logged in as user | Expiring in: 3595312 ms
+deleted useruser
+Validating as user with action delete (token 5666722387215224005)
+Logged in as user | Expiring in: 3591320 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+Validating as user with action delete (token 5666722387215224005)
+Logged in as user | Expiring in: 3556095 ms
+deleted useruser
+Validating as  with action logout (token 5666722387215224005)
+Logging out 5666722387215224005
+Validating as user with action login (token 281488121399766874)
+Invalid credentials.
+Validating as user with action login (token 4003847023173035423)
+Invalid credentials.
+Validating as user with action signup (token 10757019627672199881)
+Registered user userwith pass: pass
+Logging user user with expiry 1678061101599 (in 3600000 ms)
+Validating as user with action delete (token 10757019627672199881)
+Logged in as user | Expiring in: 3589734 ms
+deleted useruser
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+Validating as user with action delete (token 10757019627672199881)
+Logged in as user | Expiring in: 3539453 ms
+deleted useruser
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as user with action delete (token 10757019627672199881)
+Logged in as user | Expiring in: 3449370 ms
+deleted useruser
+Validating as  with action logout (token 10757019627672199881)
+Logging out 10757019627672199881
+Validating as user with action signup (token 6705430110479532505)
+Registered user userwith pass: pass
+Logging user user with expiry 1678061260549 (in 3600000 ms)
+Support access granted!
+Validating as BetaOS_System with action renick (token 6705430110479532505)
+Logged in as user | Expiring in: 3587111 ms
+Validating as BetaOS with action renick (token 6705430110479532505)
+Logged in as user | Expiring in: 3579629 ms
+Validating as hello with action renick (token 6705430110479532505)
+Logged in as user | Expiring in: 3574479 ms
+Validating as user with action delete (token 6705430110479532505)
+Logged in as user | Expiring in: 3565706 ms
+deleted useruser
+Validating as  with action logout (token 6705430110479532505)
+Logging out 6705430110479532505
+Validating as user with action login (token 5687005338041240197)
+Invalid credentials.
+Validating as user with action signup (token 6531778315988834378)
+Registered user userwith pass: pass
+Logging user user with expiry 1678061307340 (in 3600000 ms)
+
+Server active!
+
+Server active!
+
+Server active!
+
+Server active!
+
+Server active!
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as  with action logout (token 6531778315988834378)
+Logging out 6531778315988834378
+Validating as betatester1024 with action login (token 13424066944096500929)
+Password OK for user betatester1024 | Perms: 3
+Logging user betatester1024 with expiry 1678058409285 (in 60000 ms)
+Validating as !killall with action CMD (token 13424066944096500929)
+Logged in as betatester1024 | Expiring in: 52097 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+Validating as  with action delete (token 13424066944096500929)
+Logged in as betatester1024 | Expiring in: 14026 ms
+deleted user
+Validating as !killall with action CMD (token 13424066944096500929)
+Logged in as betatester1024 | Expiring in: 10880 ms
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
 Token expired. Logged out user.
-Validating as  with action checkAccess (token )
+Validating as  with action delete (token 13424066944096500929)
 No active session
-Validating as hi with action login (token 5605106639488854930)
-Password OK for user hi | Perms: 1
-Logging user hi with expiry 1677690949725 (in 3600000 ms)
-Validating as  with action userReq (token 5605106639488854930)
-Logged in as hi | Expiring in: 3597684 ms
-Validating as  with action checkAccess (token )
+Validating as !killall with action CMD (token 13424066944096500929)
 No active session
-Validating as  with action userReq (token 5605106639488854930)
-Logged in as hi | Expiring in: 3590682 ms
-Validating as  with action userReq (token 5605106639488854930)
-Logged in as hi | Expiring in: 3586617 ms
 No active session
-Validating as  with action userReq (token 15868952040276324430)
-Logged in as betaos | Expiring in: -425101 ms
-Token expired. Logged out user.
-Validating as  with action userReq (token 15868952040276324430)
-No active session
-Validating as  with action checkAccess (token 15868952040276324430)
-No active session
-Validating as  with action userReq (token 15868952040276324430)
-No active session
-Validating as  with action userReq (token 15868952040276324430)
-No active session
-Validating as  with action logout (token 15868952040276324430)
-Logging out 15868952040276324430
+Validating as  with action logout (token 13424066944096500929)
+Logging out 13424066944096500929
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+Validating as betatester1024 with action login (token 7263017154596084843)
+Password OK for user betatester1024 | Perms: 3
+Logging user betatester1024 with expiry 1678059309050 (in 300000 ms)
+Validating as !killall with action CMD (token 7263017154596084843)
+Logged in as betatester1024 | Expiring in: 239686 ms
+ReferenceError: killall is not defined
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+Validating as !killall with action CMD (token 7263017154596084843)
+Logged in as betatester1024 | Expiring in: 169770 ms
+ReferenceError: killall is not defined
+
+Server active!
+Front-end is running on 4000.
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/room/ws
+Validating as !killall with action CMD (token 7263017154596084843)
+Logged in as betatester1024 | Expiring in: 122063 ms
+ReferenceError: killall is not defined
+BetaUtilities open in wss://euphoria.io/room/room/ws
+BetaUtilities open in wss://euphoria.io/room/srs/ws
+BetaUtilities open in wss://euphoria.io/room/xkcd/ws
+BetaUtilities open in wss://euphoria.io/room/bots/ws
+BetaUtilities open in wss://euphoria.io/room/ai/ws
+BetaUtilities open in wss://euphoria.io/room/test/ws

@@ -16,10 +16,13 @@ var RateLimit = require('express-rate-limit');
 
 export function updateServer() { 
   systemLog("");
+  
   systemLog("Server active!")
   var limiter = RateLimit({
-    windowMs: 1*60*1000, // 1 minute
-    max: 5
+    windowMs: 10*1000, // 1 minute
+    max: 50,
+    message: "Too many requests, please try again later.",
+    statusCode: 429, // 429 status = Too Many Requests (RFC 6585)
   });
   
   // apply rate limiter to all requests

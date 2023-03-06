@@ -7,10 +7,9 @@ function onLoad() {
       window.open("/signup", "_self");
     });
   }
-  document.getElementById("alert").hidden = true;
-  document.getElementById("h1").hidden = true;
 }
 let CURRUSER = "";
+let CURRACCNAME = "";
 let CURRPERMS = "";
 let LOADEDQ = false;
 function newUser(e, accessclass) {
@@ -18,7 +17,7 @@ function newUser(e, accessclass) {
   console.log(id);
   if (id != "loginBTN")
     return;
-  validateLogin("add", accessclass);
+  validateLogin("add", escapeHtml(accessclass));
 }
 function deleteAllCookies() {
   const cookies = document.cookie.split(";");
@@ -29,6 +28,9 @@ function deleteAllCookies() {
     document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
   }
 }
+const escapeHtml = (unsafe) => {
+  return unsafe.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+};
 function sendMsg() {
   let inp = document.getElementById("textINP");
   let msg = inp.value;
@@ -77,6 +79,8 @@ function validateLogin(action = "login", extData) {
     if (action != "refresh" && action != "refresh_log")
       console.log("SENDING " + params);
     var xhr = new XMLHttpRequest();
+    let m = document.URL.match("redirect=(.*)");
+    let redirectTo = m ? m[1] : "/";
     xhr.open("POST", "login", true);
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhr.onreadystatechange = function() {
@@ -88,6 +92,8 @@ function validateLogin(action = "login", extData) {
         let ele = document.getElementById("overlay");
         if (ele)
           ele.className = "";
+        console.log(res);
+        console.log("action:" + action);
         ele = document.getElementById("h1");
         if (ele)
           ele.className = "beforeoverload";
@@ -106,10 +112,42 @@ function validateLogin(action = "login", extData) {
           }
           if (action == "userReq") {
             let ele2 = document.getElementById("header");
-            if (res != "ERROR" && res != "NOACTIVE" && res != "ACCESS")
-              ele2.innerHTML = "Welcome, " + res + "!";
-            else
-              ele2.innerHTML = "Welcome to BetaOS Services!";
+            CURRUSER = res.split(" ")[0];
+            CURRACCNAME = res.split(" ")[0];
+            CURRPERMS = res.split(" ")[1];
+            if (ele2) {
+              if (res != "ERROR" && res != "NOACTIVE" && res != "ACCESS")
+                ele2.innerHTML = "Welcome, " + res.split(" ")[0] + "!";
+              else
+                ele2.innerHTML = "Welcome to BetaOS Services!";
+            } else {
+              if (res == "ERROR" || res == "NOACTIVE" || res == "ACCESS") {
+                alertDialog("You're not logged in!", () => {
+                  window.open("/signup", "_self");
+                });
+              }
+              switch (res.split(" ")[1]) {
+                case "1":
+                  document.getElementById("sel").hidden = true;
+                  document.getElementById("loginDIV").hidden = true;
+                  document.getElementById("userLoginBTN").hidden = false;
+                  let userinp = document.getElementById("userINP");
+                  userinp.value = res.split(" ")[0];
+                  document.getElementById("userDiv").hidden = true;
+                  document.getElementById("danger").hidden = true;
+                  break;
+              }
+            }
+            return;
+          }
+          if (action == "delete" && res != "NOACTIVE" && res != "EXPIRE" && res != "ACCESS" && res != "ERROR") {
+            alertDialog("Deleted user:" + res, CURRPERMS == "1" ? () => {
+              window.open("/", "_self");
+            } : () => {
+            });
+            if (CURRACCNAME == res)
+              validateLogin("logout", "");
+            return;
           }
           if (action == "refresh" || action == "refresh_log") {
             if (res == "ACCESS" || res == "EXPIRE" || res == "NOACTIVE" || res == "ERROR") {
@@ -132,13 +170,13 @@ function validateLogin(action = "login", extData) {
               validateLogin("logout", "");
             });
           else if (res == "NOACTIVE") {
-            alertDialog("Error: You are not logged in!", () => {
-              window.open("/", "_self");
+            alertDialog("Error: Your login session is invalid!", () => {
+              validateLogin("logout", "");
             });
           } else if (action == "logout") {
             document.cookie = "__Secure-session=; Secure;";
             alertDialog("You've been logged out", () => {
-              window.open("/", "_self");
+              window.open(redirectTo, "_self");
             });
           } else if (res == "ERROR") {
             alertDialog("Unknown error!", () => {
@@ -149,7 +187,7 @@ function validateLogin(action = "login", extData) {
           } else {
             alertDialog("Action complete!", () => {
               if (action == "signup")
-                window.open("/", "_self");
+                window.open(redirectTo, "_self");
             });
             if (!match && action == "signup")
               document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
@@ -158,9 +196,10 @@ function validateLogin(action = "login", extData) {
         }
         if (res == "2") {
           alertDialog("Welcome, " + user.value + "! | Administrative access granted.", () => {
-            window.open("/admin", "_self");
+            window.open(redirectTo, "_self");
           });
           CURRUSER = user.value;
+          CURRACCNAME = user.value;
           CURRPERMS = "2";
           deleteAllCookies();
           console.log(document.cookie);
@@ -170,31 +209,33 @@ function validateLogin(action = "login", extData) {
             document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         } else if (res == "3") {
           CURRUSER = user.value;
+          CURRACCNAME = user.value;
           CURRPERMS = "3";
           deleteAllCookies();
           console.log(document.cookie);
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
           alertDialog("Welcome, betatester1024.", () => {
-            window.open("/admin", "_self");
+            window.open(redirectTo, "_self");
           });
           if (!match && action == "login")
             document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         } else if (res == "1") {
           CURRUSER = user.value;
+          CURRACCNAME = user.value;
           CURRPERMS = "1";
           deleteAllCookies();
           console.log(document.cookie);
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
           alertDialog("Welcome, " + user.value + "!", () => {
-            window.open("/", "_self");
+            window.open(redirectTo, "_self");
           });
           if (!match && action == "login")
             document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         } else {
           alertDialog("Error: Invalid login credentials", () => {
-            window.open("/login", "_self");
+            location.reload();
           });
         }
       }
@@ -205,7 +246,8 @@ function validateLogin(action = "login", extData) {
       if (ele)
         ele.className += "active";
       ele = document.getElementById("h1");
-      ele.hidden = false;
+      if (ele)
+        ele.hidden = false;
       if (ele)
         ele.className = "overload";
     }
@@ -213,12 +255,12 @@ function validateLogin(action = "login", extData) {
     alertDialog("Please enter a username with only alphanumeric characters, or underscores.", () => {
     });
   } else if (pass.value.length == 0) {
-    alertDialog("Please enter a password.", () => {
-    });
   }
 }
 function logout() {
   validateLogin("logout", "");
+  CURRUSER = "";
+  CURRACCNAME = "";
 }
 let dialog = false;
 let cbk;
@@ -227,7 +269,7 @@ function alertDialog(txt, callback) {
   div.style.animationName = "incoming";
   div.style.top = "0px";
   let ele = document.getElementById("alerttxt");
-  ele.innerHTML = txt;
+  ele.innerText = txt;
   dialog = true;
   cbk = callback;
   div.hidden = false;
@@ -240,7 +282,6 @@ function clearalert() {
     dialog = false;
     cbk();
     cbk = null;
-    alert.hidden = true;
   }
 }
 function updateTextArea(msgs) {

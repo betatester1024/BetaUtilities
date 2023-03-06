@@ -5,10 +5,18 @@
     <meta name="viewport" content="width=device-width">
     <script src="/login.js">
     </script>
+    <script> 
+    function onLoad() {
+      validateLogin("userReq", "");
+    }
+    </script>
     <link rel="stylesheet" href="/globalformat.css">
     <style>
       button {
         height: 100%;
+      }
+      .HOME, #del, #userLoginBTN {
+        height: 3em;
       }
     </style>
     
@@ -43,6 +51,10 @@
           </select><br>
           <hr class="btnHr"></hr>
         </div><br>
+        <button id="userLoginBTN" onclick="newUser(event, 1)" hidden>Update user
+         <hr class="btnHr"></hr></button>
+         <button id="del" onclick="validateLogin('delete')">Delete user
+         <hr class="btnHr"></hr></button>
         <div id="danger" onclick="document.getElementById('command').focus();">
           <input type="input" id="command" placeholder="Enter commands here..." onchange="validateLogin('CMD')"/>
           <hr class="inpHr"></hr>

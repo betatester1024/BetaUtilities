@@ -4,11 +4,12 @@ function onLoad() {
   if (!match && document.URL.match("admin")) {
     alertDialog("You're not logged in!", () => { window.open("/signup", "_self"); });
   }
-  document.getElementById("alert").hidden=true;
-  document.getElementById("h1").hidden=true;
+  // document.getElementById("alert").hidden=true;
+  // document.getElementById("h1").hidden=true;
 }
 
 let CURRUSER = "";
+let CURRACCNAME = "";
 let CURRPERMS = "";
 let LOADEDQ = false;
 
@@ -29,6 +30,7 @@ function deleteAllCookies() {
       const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
       document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
   }
+  // alert(document.cookie);
 }
 
 const escapeHtml = (unsafe:string) => {
@@ -88,6 +90,9 @@ function validateLogin(action: string = "login", extData: string) {
     if (pass) pass.value = "";
     if (action != "refresh" && action != "refresh_log") console.log("SENDING " + params);
     var xhr = new XMLHttpRequest();
+    let m = document.URL.match("redirect=(.*)");
+    let redirectTo = m?m[1]:"/";
+    // console.log(redirectTo);
     xhr.open("POST", "login", true);
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhr.onreadystatechange = function() {
@@ -97,6 +102,8 @@ function validateLogin(action: string = "login", extData: string) {
         res = JSON.parse(res);
         let ele = document.getElementById('overlay');
         if (ele) ele.className = "";
+        console.log(res);
+        console.log("action:"+action);
         ele = document.getElementById('h1');
         if (ele) ele.className = "beforeoverload";
         if (action != "login") {
@@ -114,9 +121,36 @@ function validateLogin(action: string = "login", extData: string) {
           }
           if (action == "userReq") {
             let ele = document.getElementById("header") as HTMLHeadingElement;
-            if (res != "ERROR" && res !="NOACTIVE" && res != "ACCESS")
-              ele.innerHTML = "Welcome, "+res+"!";
-            else ele.innerHTML = "Welcome to BetaOS Services!"
+            CURRUSER = res.split(" ")[0];
+            CURRACCNAME = res.split(" ")[0];
+            CURRPERMS = res.split(" ")[1];
+            if (ele) {
+              if (res != "ERROR" && res !="NOACTIVE" && res != "ACCESS")
+                ele.innerHTML = "Welcome, "+res.split(" ")[0]+"!";
+              else ele.innerHTML = "Welcome to BetaOS Services!"
+            } else{
+              if (res == "ERROR" || res == "NOACTIVE" || res == "ACCESS") {
+                alertDialog("You're not logged in!", () => { window.open("/signup", "_self"); });
+              }
+              switch(res.split(" ")[1]) {
+                case "1": 
+                  (document.getElementById("sel") as HTMLSelectElement).hidden=true;
+                  (document.getElementById('loginDIV') as HTMLDivElement).hidden=true;
+                  (document.getElementById("userLoginBTN")as HTMLButtonElement).hidden=false;
+                  let userinp=document.getElementById("userINP") as HTMLInputElement;
+                  userinp.value = res.split(" ")[0];
+                  (document.getElementById("userDiv") as HTMLDivElement).hidden=true;
+                  (document.getElementById("danger") as HTMLDivElement).hidden=true;
+                break;
+              }
+            } // admin page
+            return;
+          }
+          if (action == "delete" && res != "NOACTIVE" && res !="EXPIRE" && res != "ACCESS" && res != "ERROR") {
+            alertDialog("Deleted user:"+res, (CURRPERMS=="1")?()=>{window.open("/","_self");}:()=>{})
+            // deleteAllCookies();
+            if (CURRACCNAME == res) validateLogin("logout", "");
+            return;
           }
           if (action == "refresh" || action== "refresh_log") {
             if (res == "ACCESS" || res == "EXPIRE" || res == "NOACTIVE" || res == "ERROR") {
@@ -141,12 +175,13 @@ function validateLogin(action: string = "login", extData: string) {
           else if (res == "EXPIRE")
             alertDialog("Error: Your login session has expired!", () => { validateLogin("logout", "") });
           else if (res == "NOACTIVE") {
-            alertDialog("Error: You are not logged in!", () => { window.open("/", "_self") });
+            
+            alertDialog("Error: Your login session is invalid!", () => {validateLogin("logout", "");});
           }
           else if (action == "logout") {
             // alert("Logging out");
             document.cookie = "__Secure-session=; Secure;";
-            alertDialog("You've been logged out", () => { window.open("/", "_self") });
+            alertDialog("You've been logged out", () => { window.open(redirectTo, "_self") });
           }
           else if (res == "ERROR") {
             alertDialog("Unknown error!", () => { });
@@ -155,14 +190,15 @@ function validateLogin(action: string = "login", extData: string) {
             alertDialog("This username is already taken!", () => { });
           }
           else {
-            alertDialog("Action complete!", () => { if (action == "signup") window.open("/", "_self") });
+            alertDialog("Action complete!", () => { if (action == "signup") window.open(redirectTo, "_self") });
             if (!match && action == "signup") document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
           }
           return;
         } // not login
         if (res == "2") {
-          alertDialog("Welcome, " + user.value + "! | Administrative access granted.", () => { window.open("/admin", "_self"); })
+          alertDialog("Welcome, " + user.value + "! | Administrative access granted.", () => { window.open(redirectTo, "_self"); })
           CURRUSER = user.value;
+          CURRACCNAME = user.value;
           CURRPERMS = "2";
           deleteAllCookies();
           console.log(document.cookie);
@@ -173,27 +209,29 @@ function validateLogin(action: string = "login", extData: string) {
         }
         else if (res == "3") {
           CURRUSER = user.value;
+          CURRACCNAME = user.value;
           CURRPERMS = "3";
           deleteAllCookies();
           console.log(document.cookie);
           
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
-          alertDialog("Welcome, betatester1024.", () => { window.open("/admin", "_self") });
+          alertDialog("Welcome, betatester1024.", () => { window.open(redirectTo, "_self") });
           if (!match && action == "login") document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         }
         else if (res == "1") {
           CURRUSER = user.value;
+          CURRACCNAME = user.value;
           CURRPERMS = "1";
           deleteAllCookies();
           console.log(document.cookie);
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
-          alertDialog("Welcome, " + user.value + "!", () => { window.open("/", "_self"); });
+          alertDialog("Welcome, " + user.value + "!", () => { window.open(redirectTo, "_self"); });
           if (!match && action == "login") document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         }
         else {
-          alertDialog("Error: Invalid login credentials", () => { window.open("/login", "_self"); });
+          alertDialog("Error: Invalid login credentials", () => { location.reload()});
         }
       }
     }
@@ -202,13 +240,13 @@ function validateLogin(action: string = "login", extData: string) {
       let ele = document.getElementById('overlay');
       if (ele) ele.className += "active";
       ele = document.getElementById('h1');
-      ele.hidden=false;
+      if (ele) ele.hidden=false;
       if (ele) ele.className = "overload";
     }
   } else if (!(user.value.match("^[a-zA-Z0-9_]+$"))) {
     alertDialog("Please enter a username with only alphanumeric characters, or underscores.", () => { });
   } else if (pass.value.length == 0) {
-    alertDialog("Please enter a password.", () => { })
+    // alertDialog("Please enter a password.", () => { })
   }
 }
 
@@ -216,10 +254,12 @@ function logout() {
   // document.cookie = "__Secure-session=";
   // console.log("Cookie should be removed.")
   validateLogin("logout", "");
+  CURRUSER="";
+  CURRACCNAME="";
 }
 
 let dialog = false;
-let cbk: ()=>any;
+let cbk: null|(()=>any);
 
 function alertDialog(txt: string, callback: () => any) {
   let div = document.getElementById("alert") as HTMLDivElement;
@@ -241,7 +281,7 @@ function clearalert() {
     dialog = false;
     cbk()
     cbk = null;
-    alert.hidden=true;
+    // alert.hidden=true;
   }
 }
 

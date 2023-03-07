@@ -1,4 +1,6 @@
 const fs = require('fs');
+import {DB} from './database';
+
 
 export function getUptimeStr(STARTTIME:number=-1) {
   if (STARTTIME < 0) {
@@ -38,8 +40,26 @@ function formatTime(ms:number) {
 function format(n:number) {
   return n < 10 ? "0" + n : n;
 }
-
+let actionQueue:string[] = []
 export function systemLog(thing:any) {
   // console.log(thing);
-  fs.writeFileSync('./systemLog.txt', fs.readFileSync("./systemLog.txt")+thing.toString()+"\n");
+  actionQueue.push(thing);
+  if (actionQueue.length == 1) nextEleInQueue();
+}
+
+function nextEleInQueue() {
+  if (actionQueue.length > 0) {
+    console.log("Writing "+actionQueue[0]);
+    DB.findOne({fieldName:"SYSTEMLOG"}).then((obj:{data:string}) => {
+      DB.updateOne({fieldName:"SYSTEMLOG"}, 
+      {$set: {
+          data: obj.data+actionQueue[0].toString()+"\n"
+        },
+        $currentDate: { lastModified: true }
+      })
+      .then(()=>{
+        actionQueue.shift(); nextEleInQueue()
+      })     
+    })
+  }
 }

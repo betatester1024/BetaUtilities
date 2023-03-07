@@ -214,12 +214,17 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           return;
         }
         else if (action == "refresh_log" && perms >=2 ) {
-          let msg = fs.readFileSync("./systemLog.txt").toString();
-          msg = msg.replaceAll("\n","<br>")
-          callback.end(JSON.stringify(msg));
+          DB3.findOne({fieldName:"SYSTEMLOG"}).then((obj:{data:string})=> {
+            callback.end(JSON.stringify(obj.data.replaceAll("\n","<br>")));
+          })
+          return;
+          // let msg = fs.readFileSync("./systemLog.txt").toString();
+          // msg = msg.replaceAll("\n","<br>")
+          // callback.end(JSON.stringify(msg));
         }
         else if (action == "refresh_log" || action == "refresh" || action == "checkAccess_A") {
           callback.sendFile(path.join( __dirname, '../frontend', '403.html' ));
+          return;
         }
         
         else {

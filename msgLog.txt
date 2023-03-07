@@ -527,3 +527,29 @@
 (OnlineSUPPORT)[BetaOS] de de de
 (OnlineSUPPORT)[BetaOS] !uptime @BetaOS_System
 (OnlineSUPPORT)[BetaOS] /me tests
+(test)[betatester1024] a
+(test)[betatester1024] e
+(test)[betatester1024] h
+(test)[betatester1024] y
+(test)[betatester1024] e
+(xkcd)[betatester1024] i think it works
+(xkcd)[betatester1024] *think*
+(xkcd)[betatester1024] !disablelogging
+(test)[betatester1024] !testfeature
+(test)[betatester1024] !about @betatester1024
+(test)[betatester1024] !about set heyo, betatester1024 here. also known as betaos. find us at https://betatester1024.repl.co/support (sign up for an account to start chatting!)
+(OnlineSUPPORT)[BetaOS] !help
+(OnlineSUPPORT)[BetaOS] !ping
+(OnlineSUPPORT)[BetaOS] !uptime @BetaUtilities
+(OnlineSUPPORT)[BetaOS] !uptime @BetaOS_System
+(OnlineSUPPORT)[BetaOS] /me tests
+(OnlineSUPPORT)[BetaOS] &room
+(OnlineSUPPORT)[BetaOS] &room
+(OnlineSUPPORT)[BetaOS] testing &room &a &b &CDE &f &22020
+(OnlineSUPPORT)[BetaOS] abc
+(OnlineSUPPORT)[BetaOS] deee
+(OnlineSUPPORT)[BetaOS] &:"'
+(OnlineSUPPORT)[BetaOS] &#(@*&!
+(OnlineSUPPORT)[BetaOS] &49292&
+(OnlineSUPPORT)[BetaOS] & 
+(OnlineSUPPORT)[BetaOS] join us at &abbb

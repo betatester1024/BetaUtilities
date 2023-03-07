@@ -49,7 +49,7 @@ export function systemLog(thing:any) {
 
 function nextEleInQueue() {
   if (actionQueue.length > 0) {
-    console.log("Writing "+actionQueue[0]);
+    // console.log("Writing "+actionQueue[0]);
     DB.findOne({fieldName:"SYSTEMLOG"}).then((obj:{data:string}) => {
       DB.updateOne({fieldName:"SYSTEMLOG"}, 
       {$set: {

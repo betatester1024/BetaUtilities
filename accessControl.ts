@@ -8,6 +8,7 @@ import { updateUser } from "./updateuser";
 import {systemLog} from './misc';
 import {replacements} from './replacements'
 const fs = require("fs");
+const EXPIRY = 1000*60*60*24;
 import { sendMsgAllRooms } from "./server";
 import {database} from './database';
   const DB = database.collection('SystemAUTH');
@@ -37,7 +38,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       sender:"BetaOS_System", 
       data:user, 
       permLevel:3, 
-      expiry:Date.now()+1000*60*60});
+      expiry:Date.now()+EXPIRY});
    
     sendMsgAllRooms(format({permLevel:3, data:user, sender:"BetaOS_System"}));
     return;
@@ -132,7 +133,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
                   systemLog("Updating password");
                   updateUser(user, pwd);
                   callback.end(JSON.stringify("SUCCESS"))
-                  let exp = perms<3?(Date.now()+1000*60*60):(Date.now()+1000*60);
+                  let exp = perms<3?(Date.now()+1000*60*60*24*30):(Date.now()+1000*300);
                   systemLog("Logging user "+user+" with expiry "+exp+" (in "+(exp-Date.now())+" ms)");
                   DB.updateOne({fieldName:"TOKEN", token:{$eq:token}}, 
                   {
@@ -192,7 +193,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
             sender:snd, 
             data:user, 
             permLevel:perms, 
-            expiry:Date.now()+1000*60*60})
+            expiry:Date.now()+EXPIRY})
           callback.end(JSON.stringify("SUCCESS"));
           console.log("Sending message:"+user);
           sendMsgAllRooms(format({permLevel:perms, data:user, sender:snd}));
@@ -246,7 +247,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       else {
         systemLog("Registered user "+user +"with pass: [REDACTED]")
         updateUser(user, pwd, 1);
-        let exp = (Date.now()+1000*60*60);
+        let exp = (Date.now()+1000*60*60*24*30);
         systemLog("Logging user "+user+" with expiry "+exp+" (in "+(exp-Date.now())+" ms)");
         DB.updateOne({fieldName:"TOKEN", token:{$eq:token}}, 
         {
@@ -318,11 +319,12 @@ function format(obj:{permLevel:number, data:string, sender:string}) {
     case 3: cls_n="beta"; extraText = " [SYSTEM]"; break;
   }
   let data = obj.data;
-  data = data.replaceAll("&", "&amp;");
+  
   data = data.replaceAll(">", "&gt;");
   data = data.replaceAll("<", "&lt;");
   data = data.replaceAll("\\n", "<br>");
-  data = data.replaceAll("&([0-9a-zA-Z]+)", (match:string, p1:string)=>{return "<a href='euphoria.io/room/"+p1+"'>"+p1+"</a>"});
+  data = data.replaceAll(/&([0-9a-zA-Z]+)/gm, (match:string, p1:string)=>{return "<a href='euphoria.io/room/"+p1+"'>&"+p1+"</a>"});
+  data = data.replaceAll("&", "&amp;");
   for (let i=0; i<replacements.length; i++){
     data = data.replaceAll(replacements[i].from, "<span class='material-symbols-outlined'>"+replacements[i].to+"</span>")
   }

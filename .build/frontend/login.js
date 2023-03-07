@@ -69,9 +69,6 @@ function validateLogin(action = "login", extData) {
         params = "token=" + sessionID + "&action=renick&user=" + encodeURIComponent(match2[1]);
         renickQ = true;
       }
-      let ele = document.getElementById("msgArea");
-      ele.innerHTML += `<p><b class='${CURRPERMS == "2" ? "admin" : CURRPERMS == "3" ? "beta" : ""}''>${CURRUSER} [SendingAWAIT]:</b> ${extData}</p><br>`;
-      ele.scrollTop = ele.scrollHeight;
     } else
       params = "user=&pass=&action=" + action + "&token=" + sessionID;
     if (pass)
@@ -92,7 +89,6 @@ function validateLogin(action = "login", extData) {
         let ele = document.getElementById("overlay");
         if (ele)
           ele.className = "";
-        console.log(res);
         console.log("action:" + action);
         ele = document.getElementById("h1");
         if (ele)
@@ -116,7 +112,6 @@ function validateLogin(action = "login", extData) {
             });
           }
           if (action == "sendMsg") {
-            validateLogin("refresh", "send");
             return;
           }
           if (action == "userReq") {

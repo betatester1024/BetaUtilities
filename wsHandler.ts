@@ -131,7 +131,6 @@ export class WS
     }
     if (data["type"] == "send-event") {
       // check whether the message contents match the pattern
-
       let msg = data["data"]["content"].toLowerCase().trim();
       let snd = data["data"]["sender"]["name"];
       if (this.DATALOGGING) fs.writeFileSync('./msgLog.txt', fs.readFileSync('./msgLog.txt').toString()+((`(${this.roomName})[${snd}] ${msg}\n`)));
@@ -187,6 +186,11 @@ export class WS
       else if (msg == "!help"){
         this.sendMsg("Enter !help @"+this.nick+" for help!", data);
       } 
+
+      if (data["data"]["sender"]["id"].match("bot:")) {
+        // don't respond to the bots.
+        return;
+      }
 
       // send to messageHandle to process messages.
       else if (!this.pausedQ) {

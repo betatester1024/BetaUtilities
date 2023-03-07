@@ -52,7 +52,7 @@ function init() {
     (0, import_messageHandle.updateActive)(rooms[i], true);
   }
   console.log("It loaded.");
-  (0, import_wordListHandle.loopy)(sockets[0]);
+  (0, import_wordListHandle.loopy)();
   setInterval(() => {
     (0, import_accessControl.DBGarbageCollect)();
   }, 1e4);

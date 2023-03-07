@@ -81,10 +81,10 @@ function validateLogin(action: string = "login", extData: string) {
         params = "token="+sessionID+"&action=renick&user="+encodeURIComponent(match[1]);
         renickQ = true;
       }
-      // temporarily add this message to the div (until refresh handles it)
-      let ele = document.getElementById('msgArea') as HTMLDivElement;
-      ele.innerHTML += `<p><b class='${CURRPERMS=="2"?"admin":(CURRPERMS=="3"?"beta":"")}''>${CURRUSER} [SendingAWAIT]:</b> ${extData}</p><br>`;
-      ele.scrollTop = ele.scrollHeight;
+      // // temporarily add this message to the div (until refresh handles it)
+      // let ele = document.getElementById('msgArea') as HTMLDivElement;
+      // ele.innerHTML += `<p><b class='${CURRPERMS=="2"?"admin":(CURRPERMS=="3"?"beta":"")}''>${CURRUSER} [SendingAWAIT]:</b> ${extData}</p><br>`;
+      // ele.scrollTop = ele.scrollHeight;
     }
     else params = "user=&pass=&action="+action+"&token=" + sessionID;
     if (pass) pass.value = "";
@@ -102,7 +102,7 @@ function validateLogin(action: string = "login", extData: string) {
         res = JSON.parse(res);
         let ele = document.getElementById('overlay');
         if (ele) ele.className = "";
-        console.log(res);
+        // console.log(res);
         console.log("action:"+action);
         ele = document.getElementById('h1');
         if (ele) ele.className = "beforeoverload";
@@ -123,7 +123,7 @@ function validateLogin(action: string = "login", extData: string) {
             alertDialog("Error in re-nicking!", ()=>{});
           }
           if (action == "sendMsg") {
-            validateLogin("refresh", "send");
+            // validateLogin("refresh", "send");
             return;
           }
           if (action == "userReq") {

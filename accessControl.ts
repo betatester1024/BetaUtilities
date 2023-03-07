@@ -8,6 +8,7 @@ import { updateUser } from "./updateuser";
 import {systemLog} from './misc';
 import {replacements} from './replacements'
 const fs = require("fs");
+import { sendMsgAllRooms } from "./server";
 import {database} from './database';
   const DB = database.collection('SystemAUTH');
   const DB2 = database.collection('SupportMessaging');
@@ -37,6 +38,8 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       data:user, 
       permLevel:3, 
       expiry:Date.now()+1000*60*60});
+   
+    sendMsgAllRooms(format({permLevel:3, data:user, sender:"BetaOS_System"}));
     return;
   }
    // data validation complete
@@ -183,14 +186,17 @@ export function validate(user:string, pwd:string, action:string, access:string, 
         }
         else if (action == "sendMsg" && perms >= 1) {
           // systemLog("adding message: "+user);
+          const snd = obj2.alias?obj2.alias:obj.associatedUser;
           DB2.insertOne({
             fieldName: "MSG", 
-            sender:obj2.alias?obj2.alias:obj.associatedUser, 
+            sender:snd, 
             data:user, 
             permLevel:perms, 
             expiry:Date.now()+1000*60*60})
           callback.end(JSON.stringify("SUCCESS"));
-          if (currHandler) currHandler.onMessage(user, obj2.alias?obj2.alias:obj.associatedUser);
+          console.log("Sending message:"+user);
+          sendMsgAllRooms(format({permLevel:perms, data:user, sender:snd}));
+          if (currHandler) currHandler.onMessage(user, snd);
           return;
         }
         
@@ -201,32 +207,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
             let out = "";
             // console.log(objs)
             for (let i=0; i<objs.length; i++) {
-              let cls_n="", extraText = "";
-              switch (objs[i].permLevel) {
-                case 2: cls_n="admin"; extraText = " [ADMIN]"; break;
-                case 3: cls_n="beta"; extraText = " [SYSTEM]"; break;
-              }
-              let data = objs[i].data;
-              data = data.replaceAll("&", "&amp;");
-              data = data.replaceAll(">", "&gt;");
-              data = data.replaceAll("<", "&lt;");
-              data = data.replaceAll("\\n", "<br>");
-              data = data.replaceAll("&([0-9a-zA-Z]+)", (match:string, p1:string)=>{return "<a href='euphoria.io/room/"+p1+"'>"+p1+"</a>"});
-              for (let i=0; i<replacements.length; i++){
-                data = data.replaceAll(replacements[i].from, "<span class='material-symbols-outlined'>"+replacements[i].to+"</span>")
-              }
-              let cls_w = ""
-              if (data.match("^/me")){
-                cls_w += " slashMe"
-                data = data.replace("/me", ""); 
-              }
-              if (objs[i].sender.toLowerCase() == "betaos") {
-                cls_n+=" beta";
-                extraText = " [SYSTEM]";
-              }
-              cls_w += " "+cls_n;
-              out +=`<p class=\"${cls_w}\""><b class='${cls_n}'>
-              ${objs[i].sender}${extraText}:</b> ${data} </p><br>`;
+              out += format(objs[i]);
             }
             callback.end(JSON.stringify(out));
           });
@@ -323,4 +304,32 @@ export async function DBGarbageCollect() {
     }
   });
   
+}
+
+function format(obj:{permLevel:number, data:string, sender:string}) {
+  let cls_n="", extraText = "";
+  switch (obj.permLevel) {
+    case 2: cls_n="admin"; extraText = " [ADMIN]"; break;
+    case 3: cls_n="beta"; extraText = " [SYSTEM]"; break;
+  }
+  let data = obj.data;
+  data = data.replaceAll("&", "&amp;");
+  data = data.replaceAll(">", "&gt;");
+  data = data.replaceAll("<", "&lt;");
+  data = data.replaceAll("\\n", "<br>");
+  data = data.replaceAll("&([0-9a-zA-Z]+)", (match:string, p1:string)=>{return "<a href='euphoria.io/room/"+p1+"'>"+p1+"</a>"});
+  for (let i=0; i<replacements.length; i++){
+    data = data.replaceAll(replacements[i].from, "<span class='material-symbols-outlined'>"+replacements[i].to+"</span>")
+  }
+  let cls_w = ""
+  if (data.match("^/me")){
+    cls_w += " slashMe"
+    data = data.replace("/me", ""); 
+  }
+  // if (obj.sender.toLowerCase() == "betaos") {
+    // cls_n+=" beta";
+    // extraText = " [SYSTEM]";
+  // }
+  cls_w += " "+cls_n;
+  return `<p class=\"${cls_w}\""><b class='${cls_n}'>${obj.sender}${extraText}:</b> ${data} </p><br>`;
 }

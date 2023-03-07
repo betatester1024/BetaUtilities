@@ -179,6 +179,9 @@ class WS {
         this.incrPingCt();
       } else if (msg == "!help") {
         this.sendMsg("Enter !help @" + this.nick + " for help!", data);
+      }
+      if (data["data"]["sender"]["id"].match("bot:")) {
+        return;
       } else if (!this.pausedQ) {
         let outStr = this.replyMessage(msg.trim(), snd, data);
         if (this.failedQ && outStr != "")

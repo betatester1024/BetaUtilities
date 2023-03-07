@@ -24,7 +24,7 @@ export function init() {
   }
   console.log("It loaded.");
   // cnc();
-  loopy(sockets[0]);
+  loopy();
   setInterval(()=>{DBGarbageCollect()}, 10000);
   currHandler = new WebH();
 }

@@ -18,6 +18,7 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var server_exports = {};
 __export(server_exports, {
+  sendMsgAllRooms: () => sendMsgAllRooms,
   updateServer: () => updateServer
 });
 module.exports = __toCommonJS(server_exports);
@@ -32,7 +33,8 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false });
 const app = express();
 const port = 4e3;
 var RateLimit = require("express-rate-limit");
-function updateServer() {
+let pushEvents = [];
+async function updateServer() {
   (0, import_misc.systemLog)("");
   (0, import_misc.systemLog)("Server active!");
   var limiter = RateLimit({
@@ -77,6 +79,25 @@ function updateServer() {
       res.end(JSON.stringify("ACCESS"));
     (0, import_accessControl.validate)(decodeURIComponent(req.body.user), decodeURIComponent(req.body.pass), req.body.action, req.body.access, res, req.body.token);
   });
+  app.get("/stream", async (req, res) => {
+    res.set({
+      "Cache-Control": "no-cache",
+      "Content-Type": "text/event-stream",
+      "Connection": "keep-alive"
+    });
+    res.flushHeaders();
+    pushEvents.push(res);
+    res.write("retry:500\n\n");
+    console.log("Added stream");
+    res.on("close", () => {
+      pushEvents.splice(pushEvents.indexOf(res), 1);
+      res.end();
+      console.log("Removed stream");
+    });
+  });
+  app.get("/testevents", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "support_v2.html"));
+  });
   app.get("/status", (req, res) => {
     let str = "BetaUtilities is in: <a href='/support'>Online Support</a>";
     for (let j = 0; j < import_messageHandle.rooms.length - 1; j++) {
@@ -111,8 +132,15 @@ function updateServer() {
     (0, import_misc.systemLog)(`Front-end is running on ${port}.`);
   });
 }
+function sendMsgAllRooms(msg) {
+  for (let i = 0; i < pushEvents.length; i++) {
+    console.log("Writing " + msg);
+    pushEvents[i].write("data:" + msg + "\n\n");
+  }
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  sendMsgAllRooms,
   updateServer
 });
 //# sourceMappingURL=server.js.map

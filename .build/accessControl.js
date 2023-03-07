@@ -27,6 +27,7 @@ var import_initialiser = require("./initialiser");
 var import_updateuser = require("./updateuser");
 var import_misc = require("./misc");
 var import_replacements = require("./replacements");
+var import_server = require("./server");
 var import_database = require("./database");
 var escape = require("escape-html");
 var bcrypt = require("bcrypt");
@@ -53,6 +54,7 @@ function validate(user, pwd, action, access, callback, token = "") {
       permLevel: 3,
       expiry: Date.now() + 1e3 * 60 * 60
     });
+    (0, import_server.sendMsgAllRooms)(format({ permLevel: 3, data: user, sender: "BetaOS_System" }));
     return;
   }
   if (action == "logout") {
@@ -185,55 +187,25 @@ function validate(user, pwd, action, access, callback, token = "") {
               callback.sendFile(path.join(__dirname, "../frontend", "sysLog.html"));
               return;
             } else if (action == "sendMsg" && perms >= 1) {
+              const snd = obj2.alias ? obj2.alias : obj.associatedUser;
               DB2.insertOne({
                 fieldName: "MSG",
-                sender: obj2.alias ? obj2.alias : obj.associatedUser,
+                sender: snd,
                 data: user,
                 permLevel: perms,
                 expiry: Date.now() + 1e3 * 60 * 60
               });
               callback.end(JSON.stringify("SUCCESS"));
+              console.log("Sending message:" + user);
+              (0, import_server.sendMsgAllRooms)(format({ permLevel: perms, data: user, sender: snd }));
               if (import_initialiser.currHandler)
-                import_initialiser.currHandler.onMessage(user, obj2.alias ? obj2.alias : obj.associatedUser);
+                import_initialiser.currHandler.onMessage(user, snd);
               return;
             } else if (action == "refresh" && perms >= 1) {
               DB2.find({ fieldName: "MSG" }).toArray().then((objs) => {
                 let out = "";
                 for (let i = 0; i < objs.length; i++) {
-                  let cls_n = "", extraText = "";
-                  switch (objs[i].permLevel) {
-                    case 2:
-                      cls_n = "admin";
-                      extraText = " [ADMIN]";
-                      break;
-                    case 3:
-                      cls_n = "beta";
-                      extraText = " [SYSTEM]";
-                      break;
-                  }
-                  let data = objs[i].data;
-                  data = data.replaceAll("&", "&amp;");
-                  data = data.replaceAll(">", "&gt;");
-                  data = data.replaceAll("<", "&lt;");
-                  data = data.replaceAll("\\n", "<br>");
-                  data = data.replaceAll("&([0-9a-zA-Z]+)", (match, p1) => {
-                    return "<a href='euphoria.io/room/" + p1 + "'>" + p1 + "</a>";
-                  });
-                  for (let i2 = 0; i2 < import_replacements.replacements.length; i2++) {
-                    data = data.replaceAll(import_replacements.replacements[i2].from, "<span class='material-symbols-outlined'>" + import_replacements.replacements[i2].to + "</span>");
-                  }
-                  let cls_w = "";
-                  if (data.match("^/me")) {
-                    cls_w += " slashMe";
-                    data = data.replace("/me", "");
-                  }
-                  if (objs[i].sender.toLowerCase() == "betaos") {
-                    cls_n += " beta";
-                    extraText = " [SYSTEM]";
-                  }
-                  cls_w += " " + cls_n;
-                  out += `<p class="${cls_w}""><b class='${cls_n}'>
-              ${objs[i].sender}${extraText}:</b> ${data} </p><br>`;
+                  out += format(objs[i]);
                 }
                 callback.end(JSON.stringify(out));
               });
@@ -330,6 +302,41 @@ async function DBGarbageCollect() {
       }
     }
   );
+}
+function format(obj3) {
+  let cls_n = "", extraText = "";
+  switch (obj3.permLevel) {
+    case 2:
+      cls_n = "admin";
+      extraText = " [ADMIN]";
+      break;
+    case 3:
+      cls_n = "beta";
+      extraText = " [SYSTEM]";
+      break;
+  }
+  let data = obj3.data;
+  data = data.replaceAll("&", "&amp;");
+  data = data.replaceAll(">", "&gt;");
+  data = data.replaceAll("<", "&lt;");
+  data = data.replaceAll("\\n", "<br>");
+  data = data.replaceAll("&([0-9a-zA-Z]+)", (match, p1) => {
+    return "<a href='euphoria.io/room/" + p1 + "'>" + p1 + "</a>";
+  });
+  for (let i = 0; i < import_replacements.replacements.length; i++) {
+    data = data.replaceAll(import_replacements.replacements[i].from, "<span class='material-symbols-outlined'>" + import_replacements.replacements[i].to + "</span>");
+  }
+  let cls_w = "";
+  if (data.match("^/me")) {
+    cls_w += " slashMe";
+    data = data.replace("/me", "");
+  }
+  if (obj3.sender.toLowerCase() == "betaos") {
+    cls_n += " beta";
+    extraText = " [SYSTEM]";
+  }
+  cls_w += " " + cls_n;
+  return `<p class="${cls_w}""><b class='${cls_n}'>${obj3.sender}${extraText}:</b> ${data} </p><br>`;
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

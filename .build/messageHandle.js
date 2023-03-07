@@ -552,8 +552,8 @@ function replyMessage(msg, sender, data) {
 }
 function norm(str) {
   str = str.replaceAll(/[^a-zA-Z0-9_!@#$%^&*().]/gm, "");
-  str = str.replaceAll(/"/gm, '\\"');
   str = str.replaceAll(/\\/gm, "\\\\");
+  str = str.replaceAll(/"/gm, '\\"');
   return str.replaceAll(" ", "");
 }
 // Annotate the CommonJS export names for ESM import in node:

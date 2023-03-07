@@ -211,11 +211,13 @@ function validate(user, pwd, action, access, callback, token = "") {
               });
               return;
             } else if (action == "refresh_log" && perms >= 2) {
-              let msg = fs.readFileSync("./systemLog.txt").toString();
-              msg = msg.replaceAll("\n", "<br>");
-              callback.end(JSON.stringify(msg));
+              DB3.findOne({ fieldName: "SYSTEMLOG" }).then((obj3) => {
+                callback.end(JSON.stringify(obj3.data.replaceAll("\n", "<br>")));
+              });
+              return;
             } else if (action == "refresh_log" || action == "refresh" || action == "checkAccess_A") {
               callback.sendFile(path.join(__dirname, "../frontend", "403.html"));
+              return;
             } else {
               (0, import_misc.systemLog)("No perms!");
               callback.end(JSON.stringify("ACCESS"));
@@ -330,10 +332,6 @@ function format(obj3) {
   if (data.match("^/me")) {
     cls_w += " slashMe";
     data = data.replace("/me", "");
-  }
-  if (obj3.sender.toLowerCase() == "betaos") {
-    cls_n += " beta";
-    extraText = " [SYSTEM]";
   }
   cls_w += " " + cls_n;
   return `<p class="${cls_w}""><b class='${cls_n}'>${obj3.sender}${extraText}:</b> ${data} </p><br>`;

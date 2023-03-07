@@ -22,6 +22,7 @@ __export(misc_exports, {
   systemLog: () => systemLog
 });
 module.exports = __toCommonJS(misc_exports);
+var import_database = require("./database");
 const fs = require("fs");
 function getUptimeStr(STARTTIME = -1) {
   if (STARTTIME < 0) {
@@ -46,8 +47,30 @@ function formatTime(ms) {
 function format(n) {
   return n < 10 ? "0" + n : n;
 }
+let actionQueue = [];
 function systemLog(thing) {
-  fs.writeFileSync("./systemLog.txt", fs.readFileSync("./systemLog.txt") + thing.toString() + "\n");
+  actionQueue.push(thing);
+  if (actionQueue.length == 1)
+    nextEleInQueue();
+}
+function nextEleInQueue() {
+  if (actionQueue.length > 0) {
+    console.log("Writing " + actionQueue[0]);
+    import_database.DB.findOne({ fieldName: "SYSTEMLOG" }).then((obj) => {
+      import_database.DB.updateOne(
+        { fieldName: "SYSTEMLOG" },
+        {
+          $set: {
+            data: obj.data + actionQueue[0].toString() + "\n"
+          },
+          $currentDate: { lastModified: true }
+        }
+      ).then(() => {
+        actionQueue.shift();
+        nextEleInQueue();
+      });
+    });
+  }
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

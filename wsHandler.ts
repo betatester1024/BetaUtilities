@@ -272,7 +272,7 @@ export class WS
   
   constructor(url:string, nick:string, roomName:string, transferQ:boolean) {
     this.nick = nick;
-    if (roomName == "xkcd") WS.notifRoom = this;
+    if (roomName == "bots") WS.notifRoom = this;
     WS.sockets.push(this);
     // console.log(WS.sockets);
     this.url=url;

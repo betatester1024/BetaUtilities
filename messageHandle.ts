@@ -275,8 +275,14 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
     return "ping!";
   }
   if (msg.match("(!help[ ]+@" + this.nick.toLowerCase() + "$|^[ ]+!help[ ]+$)|!contact @"+this.nick.toLowerCase()) != null) {
-    if (this.transferOutQ) return "Due to spamming concerns, please start your call in another room like &test or &bots! \\nThank you for your understanding."
+    if (this.transferOutQ) return "Due to spamming concerns, please start your call in another room like &test or &bots! \\nThank you for your understanding."+
+      "\\n Enter !help @"+this.nick+" -FORCE to enter the help-menu here.";
     if (this.callStatus == 6) return "You're currently on hold! A moment, please."
+    this.callStatus = 0;
+    this.bumpCallReset(data);
+    return "Welcome to BetaOS Services! Press :one: to connect! Press :zero: to end call at any time.";
+  }
+  if (msg == "!help @"+this.nick.toLowerCase()+" -force") {
     this.callStatus = 0;
     this.bumpCallReset(data);
     return "Welcome to BetaOS Services! Press :one: to connect! Press :zero: to end call at any time.";
@@ -513,7 +519,8 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
 }
 
 function norm(str:string) {
-  str = str.replaceAll(/[^a-zA-Z0-9_!@#$%^&*]/gm, "");
+  str = str.replaceAll(/[^a-zA-Z0-9_!@#$%^&*().]/gm, "");
   str = str.replaceAll(/"/gm, "\\\"");
+  str = str.replaceAll(/\\/gm, "\\\\");
   return str.replaceAll(" ","");
 }

@@ -197,7 +197,6 @@ function validate(user, pwd, action, access, callback, token = "") {
                 expiry: Date.now() + EXPIRY
               });
               callback.end(JSON.stringify("SUCCESS"));
-              console.log("Sending message:" + user);
               (0, import_server.sendMsgAllRooms)(format({ permLevel: perms, data: user, sender: snd }));
               if (import_initialiser.currHandler)
                 import_initialiser.currHandler.onMessage(user, snd);

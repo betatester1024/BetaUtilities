@@ -604,3 +604,4 @@
 (OnlineSUPPORT)[BetaOS] abc\n
 (OnlineSUPPORT)[BetaOS] abc\ndef
 (OnlineSUPPORT)[BetaOS] abcdef
+(OnlineSUPPORT)[BetaOS] !status

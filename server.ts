@@ -117,6 +117,11 @@ export async function updateServer() {
     res.sendFile(path.join( __dirname, '../frontend', 'support.html' ));
     // validate("", "", "checkAccess", "", res, req.query.token)
   })
+
+  app.get("/todo", (req:any, res:any) => {
+    res.sendFile(path.join( __dirname, '../frontend', 'TODO.html' ));
+    // validate("", "", "checkAccess", "", res, req.query.token)
+  })
   
   app.get("/syslog", (req:any, res:any) => {
     validate("", "", "checkAccess_A", "", res, req.query.token)

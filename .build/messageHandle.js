@@ -198,7 +198,6 @@ function replyMessage(msg, sender, data) {
   let match = msg.match("^!remindme of (.+) in ([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?");
   if (match) {
     let remindMsg = match[1];
-    console.log(match[1] + "," + match[2] + "," + match[3] + "," + match[4] + "," + match[5]);
     let exp3 = Date.now();
     if (match[2])
       exp3 += Number(match[2].split("d")[0]) * 1e3 * 60 * 60 * 24;
@@ -301,9 +300,14 @@ function replyMessage(msg, sender, data) {
   }
   if (msg.match("(!help[ ]+@" + this.nick.toLowerCase() + "$|^[ ]+!help[ ]+$)|!contact @" + this.nick.toLowerCase()) != null) {
     if (this.transferOutQ)
-      return "Due to spamming concerns, please start your call in another room like &test or &bots! \\nThank you for your understanding.";
+      return "Due to spamming concerns, please start your call in another room like &test or &bots! \\nThank you for your understanding.\\n Enter !help @" + this.nick + " -FORCE to enter the help-menu here.";
     if (this.callStatus == 6)
       return "You're currently on hold! A moment, please.";
+    this.callStatus = 0;
+    this.bumpCallReset(data);
+    return "Welcome to BetaOS Services! Press :one: to connect! Press :zero: to end call at any time.";
+  }
+  if (msg == "!help @" + this.nick.toLowerCase() + " -force") {
     this.callStatus = 0;
     this.bumpCallReset(data);
     return "Welcome to BetaOS Services! Press :one: to connect! Press :zero: to end call at any time.";
@@ -547,8 +551,9 @@ function replyMessage(msg, sender, data) {
     return "";
 }
 function norm(str) {
-  str = str.replaceAll(/[^a-zA-Z0-9_!@#$%^&*]/gm, "");
+  str = str.replaceAll(/[^a-zA-Z0-9_!@#$%^&*().]/gm, "");
   str = str.replaceAll(/"/gm, '\\"');
+  str = str.replaceAll(/\\/gm, "\\\\");
   return str.replaceAll(" ", "");
 }
 // Annotate the CommonJS export names for ESM import in node:

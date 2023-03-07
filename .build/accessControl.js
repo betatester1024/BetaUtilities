@@ -262,7 +262,7 @@ function validate(user, pwd, action, access, callback, token = "") {
         callback.end(JSON.stringify("TAKEN"));
         return;
       } else {
-        (0, import_misc.systemLog)("Registered user " + user + "with pass: " + pwd);
+        (0, import_misc.systemLog)("Registered user " + user + "with pass: [REDACTED]");
         (0, import_updateuser.updateUser)(user, pwd, 1);
         let exp = Date.now() + 1e3 * 60 * 60;
         (0, import_misc.systemLog)("Logging user " + user + " with expiry " + exp + " (in " + (exp - Date.now()) + " ms)");
@@ -289,7 +289,7 @@ function validate(user, pwd, action, access, callback, token = "") {
         let perm = obj3.permLevel;
         (0, import_misc.systemLog)("Password OK for user " + user + " | Perms: " + perm);
         callback.end(JSON.stringify(perm));
-        let exp = perm < 3 ? Date.now() + 1e3 * 60 * 60 : Date.now() + 1e3 * 300;
+        let exp = perm < 3 ? Date.now() + 1e3 * 60 * 60 * 24 * 30 : Date.now() + 1e3 * 300;
         (0, import_misc.systemLog)("Logging user " + user + " with expiry " + exp + " (in " + (exp - Date.now()) + " ms)");
         DB.updateOne(
           { fieldName: "TOKEN", token: { $eq: token } },
@@ -325,7 +325,7 @@ async function DBGarbageCollect() {
       for (let i = 0; i < objs.length; i++) {
         if (Date.now() > objs[i].expiry || objs[i].expiry == null) {
           DB3.deleteOne({ fieldName: "TIMER", expiry: objs[i].expiry });
-          import_wsHandler.WS.notifRoom.socket.send(import_wsHandler.WS.toSendInfo("@" + objs[i].notifyingUser + ", you are reminded of: " + objs[i].msg.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, '\\"')));
+          import_wsHandler.WS.notifRoom.socket.send(import_wsHandler.WS.toSendInfo("!tell @" + objs[i].notifyingUser + " You are reminded of: " + objs[i].msg.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, '\\"')));
         }
       }
     }

@@ -258,7 +258,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
         return;
       }
       else {
-        systemLog("Registered user "+user +"with pass: "+pwd)
+        systemLog("Registered user "+user +"with pass: [REDACTED]")
         updateUser(user, pwd, 1);
         let exp = (Date.now()+1000*60*60);
         systemLog("Logging user "+user+" with expiry "+exp+" (in "+(exp-Date.now())+" ms)");
@@ -284,7 +284,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       let perm = obj.permLevel
       systemLog("Password OK for user "+user+" | Perms: "+perm)
       callback.end(JSON.stringify(perm));  
-      let exp = perm<3?(Date.now()+1000*60*60):(Date.now()+1000*300);
+      let exp = perm<3?(Date.now()+1000*60*60*24*30):(Date.now()+1000*300);
       systemLog("Logging user "+user+" with expiry "+exp+" (in "+(exp-Date.now())+" ms)");
       DB.updateOne({fieldName:"TOKEN", token:{$eq:token}}, 
       {
@@ -317,7 +317,7 @@ export async function DBGarbageCollect() {
     for (let i=0; i<objs.length; i++) {
       if (Date.now()>objs[i].expiry || objs[i].expiry == null) {
         DB3.deleteOne({fieldName:"TIMER",expiry:objs[i].expiry})
-        WS.notifRoom.socket.send(WS.toSendInfo("@"+objs[i].notifyingUser+", you are reminded of: "+
+        WS.notifRoom.socket.send(WS.toSendInfo("!tell @"+objs[i].notifyingUser+" You are reminded of: "+
                                                objs[i].msg.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, "\\\"")));
       }
     }

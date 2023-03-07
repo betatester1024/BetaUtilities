@@ -328,3 +328,31 @@
 (test)[betatester1024] *#0*#
 (test)[betatester1024] !version @betautilities_test
 (OnlineSUPPORT)[betaos] what
+(OnlineSUPPORT)[betaos] !help
+(OnlineSUPPORT)[betaos] !remindme to 
+(OnlineSUPPORT)[betaos] !remindme of drink coffee in 20s
+(OnlineSUPPORT)[betaos] !alias @betatester1024
+(OnlineSUPPORT)[betatester1024] !remindme of thing in 0.2s
+(OnlineSUPPORT)[Mercury39] !help
+(OnlineSUPPORT)[Mercury39] !help @
+(OnlineSUPPORT)[Mercury39] !help @BetaOS_System
+(OnlineSUPPORT)[Mercury39] 1
+(OnlineSUPPORT)[Credential] !sleep @
+(OnlineSUPPORT)[Credential] !sleep @K
+(OnlineSUPPORT)[ProgrammerG] Hi
+(OnlineSUPPORT)[betatester1024] oh hi everyone
+(OnlineSUPPORT)[BetaOS] welcome
+(OnlineSUPPORT)[BetaOS] BetaOS system still exists here
+(OnlineSUPPORT)[BetaOS] !remindme of test in 0s
+(OnlineSUPPORT)[BetaOS] !remindme of test in 2s
+(OnlineSUPPORT)[BetaOS] !ping
+(OnlineSUPPORT)[BetaOS] !ping
+(OnlineSUPPORT)[Mercury39] ayo
+(OnlineSUPPORT)[BetaOS] hey
+(OnlineSUPPORT)[Mercury39] tralala
+(OnlineSUPPORT)[BetaOS] noice
+(OnlineSUPPORT)[BetaOS] !help @betaos_system
+(OnlineSUPPORT)[BetaOS] 1
+(OnlineSUPPORT)[BetaOS] :nine"
+(OnlineSUPPORT)[BetaOS] :nine:
+(OnlineSUPPORT)[BetaOS] ee

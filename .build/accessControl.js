@@ -323,8 +323,20 @@ function format(obj3) {
   data = data.replaceAll("<", "&lt;");
   data = data.replaceAll("\\n", "<br>");
   data = data.replaceAll(/&([0-9a-zA-Z]+)/gm, (match, p1) => {
-    return "<a href='euphoria.io/room/" + p1 + "'>&" + p1 + "</a>";
+    return "<a href='https://euphoria.io/room/" + p1 + "'>&" + p1 + "</a>";
   });
+  data = data.replaceAll(
+    /(((http|https):\/\/)((([a-z0-9\-]+\.)+([a-z]{2,}))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=-_~:@/?]*)?)(\s+|$))/gmiu,
+    (match, p1) => {
+      return "<a href='" + match + "'>" + match + "</a>";
+    }
+  );
+  data = data.replaceAll(
+    /(((([a-z0-9\-]+\.)+([a-z]{2,}))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=-_~:@/?]*)?)(\s+|$))/gmiu,
+    (match, p1) => {
+      return "<a href='https://" + match + "'>" + match + "</a>";
+    }
+  );
   data = data.replaceAll("&", "&amp;");
   for (let i = 0; i < import_replacements.replacements.length; i++) {
     data = data.replaceAll(import_replacements.replacements[i].from, "<span class='material-symbols-outlined'>" + import_replacements.replacements[i].to + "</span>");

@@ -553,3 +553,54 @@
 (OnlineSUPPORT)[BetaOS] &49292&
 (OnlineSUPPORT)[BetaOS] & 
 (OnlineSUPPORT)[BetaOS] join us at &abbb
+(OnlineSUPPORT)[BetaOS] https://betatester1024.repl.co
+(OnlineSUPPORT)[BetaOS] https://betatester1024.repl.co
+(OnlineSUPPORT)[BetaOS] nest.place
+(OnlineSUPPORT)[BetaOS] https://betatester1024.repl.co
+(OnlineSUPPORT)[BetaOS] betatester1024.repl.co
+(OnlineSUPPORT)[BetaOS] betatester1024.repl.co
+(OnlineSUPPORT)[BetaOS] betatester1024.repl.co
+(OnlineSUPPORT)[BetaOS] http://nest.place
+(OnlineSUPPORT)[BetaOS] nest.place
+(OnlineSUPPORT)[BetaOS] http://nest.place
+(OnlineSUPPORT)[BetaOS] http://nest.place
+(OnlineSUPPORT)[BetaOS] https://nest.place
+(OnlineSUPPORT)[BetaOS] very good
+(OnlineSUPPORT)[BetaOS] abc.def
+(OnlineSUPPORT)[BetaOS] ghij
+(OnlineSUPPORT)[BetaOS] hello.thisisatest
+(OnlineSUPPORT)[BetaOS] abcdef
+(OnlineSUPPORT)[BetaOS] betatester1024.repl.co
+(OnlineSUPPORT)[BetaOS] ://abc
+(OnlineSUPPORT)[BetaOS] f://abc
+(OnlineSUPPORT)[BetaOS] file:///c:\test
+(OnlineSUPPORT)[BetaOS] abc.def
+(OnlineSUPPORT)[BetaOS] abc.com
+(OnlineSUPPORT)[BetaOS] example.com
+(OnlineSUPPORT)[BetaOS] humanity.ca
+(OnlineSUPPORT)[BetaOS] humanity.inc
+(OnlineSUPPORT)[BetaOS] abc.com/
+(OnlineSUPPORT)[BetaOS] help.com/abcdefghi///
+(OnlineSUPPORT)[BetaOS] abc.com/a/a/a
+(OnlineSUPPORT)[BetaOS] a//e
+(OnlineSUPPORT)[BetaOS] a/e
+(OnlineSUPPORT)[BetaOS] w./e
+(OnlineSUPPORT)[BetaOS] abc.e/a
+(OnlineSUPPORT)[BetaOS] abc.de/a
+(OnlineSUPPORT)[BetaOS] pr.pn
+(OnlineSUPPORT)[BetaOS] prpn.leet.nu
+(OnlineSUPPORT)[BetaOS] &ROOM
+(OnlineSUPPORT)[BetaOS] &room
+(OnlineSUPPORT)[BetaOS] &verylonggggggggggggg
+(OnlineSUPPORT)[BetaOS] &a
+(OnlineSUPPORT)[BetaOS] &b
+(OnlineSUPPORT)[BetaOS] &list
+(OnlineSUPPORT)[BetaOS] !ping @BetaOS_System
+(OnlineSUPPORT)[BetaOS] :confirm:
+(OnlineSUPPORT)[BetaOS] :white_check_mark:
+(OnlineSUPPORT)[BetaOS] @BetaOS_System
+(OnlineSUPPORT)[BetaOS] !runstats @BetaOS_Syste
+(OnlineSUPPORT)[BetaOS] !runstats @BetaOS_System
+(OnlineSUPPORT)[BetaOS] abc\n
+(OnlineSUPPORT)[BetaOS] abc\ndef
+(OnlineSUPPORT)[BetaOS] abcdef

@@ -6,9 +6,9 @@ import { updateActive } from './messageHandle';
 import { initUsers} from './updateuser';
 import {WebH} from './webHandler';
 import {DBGarbageCollect} from './accessControl'
-let rooms = ["xkcd", "test", "bots", "ai", "room", "srs"];
+let rooms = ["xkcd", "test", "bots", "ai", "room", "srs", "memes"];
 let nicks = ["BetaUtilities", "BetaUtilities_TEST", 
-             "BetaUtilities", "BetaUtilities", 
+             "BetaUtilities", "BetaOS_Systems", 
              "BetaUtilities", "BetaUtilities", 
              "BetaUtilities", "BetaUtilities", 
              "BetaUtilities", "BetaUtilities",

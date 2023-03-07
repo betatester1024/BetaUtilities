@@ -527,3 +527,103 @@
 (OnlineSUPPORT)[BetaOS] de de de
 (OnlineSUPPORT)[BetaOS] !uptime @BetaOS_System
 (OnlineSUPPORT)[BetaOS] /me tests
+(test)[betatester1024] a
+(test)[betatester1024] e
+(test)[betatester1024] h
+(test)[betatester1024] y
+(test)[betatester1024] e
+(xkcd)[betatester1024] i think it works
+(xkcd)[betatester1024] *think*
+(xkcd)[betatester1024] !disablelogging
+(test)[betatester1024] !testfeature
+(test)[betatester1024] !about @betatester1024
+(test)[betatester1024] !about set heyo, betatester1024 here. also known as betaos. find us at https://betatester1024.repl.co/support (sign up for an account to start chatting!)
+(OnlineSUPPORT)[BetaOS] !help
+(OnlineSUPPORT)[BetaOS] !ping
+(OnlineSUPPORT)[BetaOS] !uptime @BetaUtilities
+(OnlineSUPPORT)[BetaOS] !uptime @BetaOS_System
+(OnlineSUPPORT)[BetaOS] /me tests
+(OnlineSUPPORT)[BetaOS] &room
+(OnlineSUPPORT)[BetaOS] &room
+(OnlineSUPPORT)[BetaOS] testing &room &a &b &CDE &f &22020
+(OnlineSUPPORT)[BetaOS] abc
+(OnlineSUPPORT)[BetaOS] deee
+(OnlineSUPPORT)[BetaOS] &:"'
+(OnlineSUPPORT)[BetaOS] &#(@*&!
+(OnlineSUPPORT)[BetaOS] &49292&
+(OnlineSUPPORT)[BetaOS] & 
+(OnlineSUPPORT)[BetaOS] join us at &abbb
+(OnlineSUPPORT)[BetaOS] https://betatester1024.repl.co
+(OnlineSUPPORT)[BetaOS] https://betatester1024.repl.co
+(OnlineSUPPORT)[BetaOS] nest.place
+(OnlineSUPPORT)[BetaOS] https://betatester1024.repl.co
+(OnlineSUPPORT)[BetaOS] betatester1024.repl.co
+(OnlineSUPPORT)[BetaOS] betatester1024.repl.co
+(OnlineSUPPORT)[BetaOS] betatester1024.repl.co
+(OnlineSUPPORT)[BetaOS] http://nest.place
+(OnlineSUPPORT)[BetaOS] nest.place
+(OnlineSUPPORT)[BetaOS] http://nest.place
+(OnlineSUPPORT)[BetaOS] http://nest.place
+(OnlineSUPPORT)[BetaOS] https://nest.place
+(OnlineSUPPORT)[BetaOS] very good
+(OnlineSUPPORT)[BetaOS] abc.def
+(OnlineSUPPORT)[BetaOS] ghij
+(OnlineSUPPORT)[BetaOS] hello.thisisatest
+(OnlineSUPPORT)[BetaOS] abcdef
+(OnlineSUPPORT)[BetaOS] betatester1024.repl.co
+(OnlineSUPPORT)[BetaOS] ://abc
+(OnlineSUPPORT)[BetaOS] f://abc
+(OnlineSUPPORT)[BetaOS] file:///c:\test
+(OnlineSUPPORT)[BetaOS] abc.def
+(OnlineSUPPORT)[BetaOS] abc.com
+(OnlineSUPPORT)[BetaOS] example.com
+(OnlineSUPPORT)[BetaOS] humanity.ca
+(OnlineSUPPORT)[BetaOS] humanity.inc
+(OnlineSUPPORT)[BetaOS] abc.com/
+(OnlineSUPPORT)[BetaOS] help.com/abcdefghi///
+(OnlineSUPPORT)[BetaOS] abc.com/a/a/a
+(OnlineSUPPORT)[BetaOS] a//e
+(OnlineSUPPORT)[BetaOS] a/e
+(OnlineSUPPORT)[BetaOS] w./e
+(OnlineSUPPORT)[BetaOS] abc.e/a
+(OnlineSUPPORT)[BetaOS] abc.de/a
+(OnlineSUPPORT)[BetaOS] pr.pn
+(OnlineSUPPORT)[BetaOS] prpn.leet.nu
+(OnlineSUPPORT)[BetaOS] &ROOM
+(OnlineSUPPORT)[BetaOS] &room
+(OnlineSUPPORT)[BetaOS] &verylonggggggggggggg
+(OnlineSUPPORT)[BetaOS] &a
+(OnlineSUPPORT)[BetaOS] &b
+(OnlineSUPPORT)[BetaOS] &list
+(OnlineSUPPORT)[BetaOS] !ping @BetaOS_System
+(OnlineSUPPORT)[BetaOS] :confirm:
+(OnlineSUPPORT)[BetaOS] :white_check_mark:
+(OnlineSUPPORT)[BetaOS] @BetaOS_System
+(OnlineSUPPORT)[BetaOS] !runstats @BetaOS_Syste
+(OnlineSUPPORT)[BetaOS] !runstats @BetaOS_System
+(OnlineSUPPORT)[BetaOS] abc\n
+(OnlineSUPPORT)[BetaOS] abc\ndef
+(OnlineSUPPORT)[BetaOS] abcdef
+(OnlineSUPPORT)[BetaOS] !status
+(OnlineSUPPORT)[BetaOS] &room
+(OnlineSUPPORT)[BetaOS] &
+(OnlineSUPPORT)[BetaOS] &amp;
+(OnlineSUPPORT)[BetaOS] &amp
+(OnlineSUPPORT)[BetaOS] &abc
+(OnlineSUPPORT)[BetaOS] &amp
+(OnlineSUPPORT)[BetaOS] &&
+(OnlineSUPPORT)[BetaOS] &abc
+(OnlineSUPPORT)[BetaOS] &amp
+(OnlineSUPPORT)[BetaOS] &am
+(OnlineSUPPORT)[BetaOS] &ampp
+(OnlineSUPPORT)[BetaOS] &amp
+(OnlineSUPPORT)[BetaOS] &amp
+(OnlineSUPPORT)[BetaOS] &amp;
+(OnlineSUPPORT)[BetaOS] &amp;
+(OnlineSUPPORT)[BetaOS] &
+(OnlineSUPPORT)[BetaOS] &abc
+(OnlineSUPPORT)[BetaOS] &amp;
+(OnlineSUPPORT)[BetaOS] &amp
+(OnlineSUPPORT)[BetaOS] &abc
+(OnlineSUPPORT)[BetaOS] &def
+(OnlineSUPPORT)[BetaOS] edeee

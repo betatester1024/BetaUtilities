@@ -33,6 +33,7 @@ var escape = require("escape-html");
 var bcrypt = require("bcrypt");
 const path = require("path");
 const fs = require("fs");
+const EXPIRY = 1e3 * 60 * 60 * 24;
 const DB = import_database.database.collection("SystemAUTH");
 const DB2 = import_database.database.collection("SupportMessaging");
 const DB3 = import_database.database.collection("BetaUtilities");
@@ -52,7 +53,7 @@ function validate(user, pwd, action, access, callback, token = "") {
       sender: "BetaOS_System",
       data: user,
       permLevel: 3,
-      expiry: Date.now() + 1e3 * 60 * 60
+      expiry: Date.now() + EXPIRY
     });
     (0, import_server.sendMsgAllRooms)(format({ permLevel: 3, data: user, sender: "BetaOS_System" }));
     return;
@@ -135,7 +136,7 @@ function validate(user, pwd, action, access, callback, token = "") {
                       (0, import_misc.systemLog)("Updating password");
                       (0, import_updateuser.updateUser)(user, pwd);
                       callback.end(JSON.stringify("SUCCESS"));
-                      let exp = perms < 3 ? Date.now() + 1e3 * 60 * 60 : Date.now() + 1e3 * 60;
+                      let exp = perms < 3 ? Date.now() + 1e3 * 60 * 60 * 24 * 30 : Date.now() + 1e3 * 300;
                       (0, import_misc.systemLog)("Logging user " + user + " with expiry " + exp + " (in " + (exp - Date.now()) + " ms)");
                       DB.updateOne(
                         { fieldName: "TOKEN", token: { $eq: token } },
@@ -193,10 +194,9 @@ function validate(user, pwd, action, access, callback, token = "") {
                 sender: snd,
                 data: user,
                 permLevel: perms,
-                expiry: Date.now() + 1e3 * 60 * 60
+                expiry: Date.now() + EXPIRY
               });
               callback.end(JSON.stringify("SUCCESS"));
-              console.log("Sending message:" + user);
               (0, import_server.sendMsgAllRooms)(format({ permLevel: perms, data: user, sender: snd }));
               if (import_initialiser.currHandler)
                 import_initialiser.currHandler.onMessage(user, snd);
@@ -238,7 +238,7 @@ function validate(user, pwd, action, access, callback, token = "") {
       } else {
         (0, import_misc.systemLog)("Registered user " + user + "with pass: [REDACTED]");
         (0, import_updateuser.updateUser)(user, pwd, 1);
-        let exp = Date.now() + 1e3 * 60 * 60;
+        let exp = Date.now() + 1e3 * 60 * 60 * 24 * 30;
         (0, import_misc.systemLog)("Logging user " + user + " with expiry " + exp + " (in " + (exp - Date.now()) + " ms)");
         DB.updateOne(
           { fieldName: "TOKEN", token: { $eq: token } },
@@ -322,9 +322,21 @@ function format(obj3) {
   data = data.replaceAll(">", "&gt;");
   data = data.replaceAll("<", "&lt;");
   data = data.replaceAll("\\n", "<br>");
-  data = data.replaceAll("&([0-9a-zA-Z]+)", (match, p1) => {
-    return "<a href='euphoria.io/room/" + p1 + "'>" + p1 + "</a>";
+  data = data.replaceAll(/\&amp;([0-9a-zA-Z]+)/gm, (match, p1) => {
+    return "<a href='https://euphoria.io/room/" + p1 + "'>" + match + "</a>";
   });
+  data = data.replaceAll(
+    /(((http|https):\/\/)((([a-z0-9\-]+\.)+([a-z]{2,}))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=\-_~:@/?]*)?)(\s+|$))/gmiu,
+    (match, p1) => {
+      return "<a href='" + match + "'>" + match + "</a>";
+    }
+  );
+  data = data.replaceAll(
+    /(((([a-z0-9\-]+\.)+([a-z]{2,}))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=\-_~:@/?]*)?)(\s+|$))/gmiu,
+    (match, p1) => {
+      return "<a href='https://" + match + "'>" + match + "</a>";
+    }
+  );
   for (let i = 0; i < import_replacements.replacements.length; i++) {
     data = data.replaceAll(import_replacements.replacements[i].from, "<span class='material-symbols-outlined'>" + import_replacements.replacements[i].to + "</span>");
   }

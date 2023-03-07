@@ -147,9 +147,11 @@ class WS {
     if (data["type"] == "send-event") {
       let msg = data["data"]["content"].toLowerCase().trim();
       let snd = data["data"]["sender"]["name"];
-      if (this.DATALOGGING)
+      if (this.DATALOGGING) {
+        console.log("LOG");
         fs.writeFileSync("./msgLog.txt", fs.readFileSync("./msgLog.txt").toString() + `(${this.roomName})[${snd}] ${msg}
 `);
+      }
       if (msg == "!kill @" + this.nick.toLowerCase()) {
         this.sendMsg("/me crashes", data);
         setTimeout(() => {

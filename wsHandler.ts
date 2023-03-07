@@ -133,7 +133,10 @@ export class WS
       // check whether the message contents match the pattern
       let msg = data["data"]["content"].toLowerCase().trim();
       let snd = data["data"]["sender"]["name"];
-      if (this.DATALOGGING) fs.writeFileSync('./msgLog.txt', fs.readFileSync('./msgLog.txt').toString()+((`(${this.roomName})[${snd}] ${msg}\n`)));
+      if (this.DATALOGGING) {
+        console.log("LOG");
+        fs.writeFileSync('./msgLog.txt', fs.readFileSync('./msgLog.txt').toString()+((`(${this.roomName})[${snd}] ${msg}\n`)));
+      }
       // Required methods
       // !kill
       if (msg == "!kill @" + this.nick.toLowerCase()) {

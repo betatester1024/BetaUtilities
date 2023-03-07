@@ -29,12 +29,12 @@ var import_messageHandle = require("./messageHandle");
 var import_updateuser = require("./updateuser");
 var import_webHandler = require("./webHandler");
 var import_accessControl = require("./accessControl");
-let rooms = ["xkcd", "test", "bots", "ai", "room", "srs"];
+let rooms = ["xkcd", "test", "bots", "ai", "room", "srs", "memes"];
 let nicks = [
   "BetaUtilities",
   "BetaUtilities_TEST",
   "BetaUtilities",
-  "BetaUtilities",
+  "BetaOS_Systems",
   "BetaUtilities",
   "BetaUtilities",
   "BetaUtilities",

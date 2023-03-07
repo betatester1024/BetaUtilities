@@ -55,7 +55,6 @@ function systemLog(thing) {
 }
 function nextEleInQueue() {
   if (actionQueue.length > 0) {
-    console.log("Writing " + actionQueue[0]);
     import_database.DB.findOne({ fieldName: "SYSTEMLOG" }).then((obj) => {
       import_database.DB.updateOne(
         { fieldName: "SYSTEMLOG" },

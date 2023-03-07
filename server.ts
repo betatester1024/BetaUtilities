@@ -84,11 +84,11 @@ export async function updateServer() {
     // Tell the client to retry every 10 seconds if connectivity is lost
     pushEvents.push(res);
     res.write("retry:500\n\n");
-    console.log("Added stream")
+    // console.log("Added stream")
     res.on("close", () => {
       pushEvents.splice(pushEvents.indexOf(res), 1);
       res.end();
-      console.log("Removed stream");
+      // console.log("Removed stream");
     });
   });
 
@@ -115,6 +115,11 @@ export async function updateServer() {
 
   app.get("/support", (req:any, res:any) => {
     res.sendFile(path.join( __dirname, '../frontend', 'support.html' ));
+    // validate("", "", "checkAccess", "", res, req.query.token)
+  })
+
+  app.get("/todo", (req:any, res:any) => {
+    res.sendFile(path.join( __dirname, '../frontend', 'TODO.html' ));
     // validate("", "", "checkAccess", "", res, req.query.token)
   })
   
@@ -146,7 +151,7 @@ export async function updateServer() {
 
 export function sendMsgAllRooms(msg:string) {
   for (let i=0; i<pushEvents.length; i++) {
-    console.log("Writing "+msg);
+    // console.log("Writing "+msg);
     pushEvents[i].write("data:"+msg+"\n\n");
   }
 }

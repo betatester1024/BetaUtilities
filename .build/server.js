@@ -88,11 +88,9 @@ async function updateServer() {
     res.flushHeaders();
     pushEvents.push(res);
     res.write("retry:500\n\n");
-    console.log("Added stream");
     res.on("close", () => {
       pushEvents.splice(pushEvents.indexOf(res), 1);
       res.end();
-      console.log("Removed stream");
     });
   });
   app.get("/testevents", (req, res) => {
@@ -116,6 +114,9 @@ async function updateServer() {
   app.get("/support", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "support.html"));
   });
+  app.get("/todo", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "TODO.html"));
+  });
   app.get("/syslog", (req, res) => {
     (0, import_accessControl.validate)("", "", "checkAccess_A", "", res, req.query.token);
   });
@@ -134,7 +135,6 @@ async function updateServer() {
 }
 function sendMsgAllRooms(msg) {
   for (let i = 0; i < pushEvents.length; i++) {
-    console.log("Writing " + msg);
     pushEvents[i].write("data:" + msg + "\n\n");
   }
 }

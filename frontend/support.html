@@ -8,7 +8,7 @@
     <script>
       function onLoad() {
         validateLogin("refresh", "");
-        setInterval(()=>{validateLogin("refresh", "")}, 2500);
+        // setInterval(()=>{validateLogin("refresh", "")}, 2500);
         document.getElementById("alert").hidden=true;
         document.getElementById("h1").hidden=true;
         // console.log(document.cookie);
@@ -19,6 +19,35 @@
         // console.log(match[1]);
         if (match) CURRPERMS = match[1];
       }
+      // system refresh auto!
+      let LOADEDQ2 = false;
+      async function initClient()
+      {
+        try {
+        console.log("Starting client.")
+        const source = new EventSource('/stream');
+
+        source.addEventListener('message', message => {
+          // console.log('Got', message);
+
+          
+          document.getElementById("msgArea").innerHTML+=message.data;
+          ele = document.getElementById("msgArea");
+          let scrDistOKQ =  (ele.scrollTop) >= (ele.scrollHeight-ele.offsetHeight - 100)
+          if (!LOADEDQ2 || scrDistOKQ)
+          {
+            ele.scrollTop = ele.scrollHeight;
+            // console.log("Scrolling to bottom.")
+            LOADEDQ2 = true;
+          }
+        });
+        } catch (e) {
+          console.log("Restarting client ("+e+")")
+          initClient();
+        }
+      } // initClient();
+      initClient();
+      
     </script>
     <link rel="stylesheet" href="/globalformat.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -35,10 +64,11 @@
         width: 100%;
       }
       p {
-        width: unset;
+        width: 87vw;
         font-size: 1em;
 /*         display: block; */
         color: #000;
+        overflow-wrap: break-word;
       }
       hr {
         margin-top: 5px !important;
@@ -67,6 +97,7 @@
         height: 60vh;
         margin-left: 5%;
         text-align: left;
+        overflow-x: clip;
       }
       b {
         color: #000;
@@ -83,14 +114,12 @@
         color: #00ee00;
 /*         text-shadow: 0px 0px 1px #00ee00;  */
       }
-      .slashMe {
-        background-color: #c9c9c9;
+      .slashMe{
+/*         background-color: #c9c9c9; */
+        font-style: italic;
       }
-      .slashMe.admin {
-        background-color:  #b8d9f9;
-      }
-      .slashMe.beta {
-        background-color: #b8d9f9;
+      .slashMe > b {
+        font-style: initial;
       }
       
       b {

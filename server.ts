@@ -13,8 +13,9 @@ import {systemLog} from './misc';
 
 var RateLimit = require('express-rate-limit');
 
+let pushEvents: any[] = [];
 
-export function updateServer() { 
+export async function updateServer() { 
   systemLog("");
   
   systemLog("Server active!")
@@ -72,6 +73,29 @@ export function updateServer() {
    
   });
 
+  app.get("/stream", async (req:any, res:any) => {
+    res.set({
+      'Cache-Control': 'no-cache',
+      'Content-Type': 'text/event-stream',
+      'Connection': 'keep-alive'
+    });
+    res.flushHeaders();
+
+    // Tell the client to retry every 10 seconds if connectivity is lost
+    pushEvents.push(res);
+    res.write("retry:500\n\n");
+    console.log("Added stream")
+    res.on("close", () => {
+      pushEvents.splice(pushEvents.indexOf(res), 1);
+      res.end();
+      console.log("Removed stream");
+    });
+  });
+
+  app.get("/testevents", (req:any, res:any) => {
+    res.sendFile(path.join( __dirname, '../frontend', 'support_v2.html' ));
+  })
+
   app.get('/status', (req:any, res:any) => {
     let str = "BetaUtilities is in: <a href='/support'>Online Support</a>";
     for (let j = 0; j < rooms.length - 1; j++) { 
@@ -118,4 +142,11 @@ export function updateServer() {
   app.listen(port, () => {
     systemLog(`Front-end is running on ${port}.`);
   });
+}
+
+export function sendMsgAllRooms(msg:string) {
+  for (let i=0; i<pushEvents.length; i++) {
+    console.log("Writing "+msg);
+    pushEvents[i].write("data:"+msg+"\n\n");
+  }
 }

@@ -112,7 +112,7 @@ function validateLogin(action: string = "login", extData: string) {
             if (document.URL.match("betatester1024.repl.co/?$")) {
               validateLogin("logout", "");
             }
-            else alertDialog("Your login session is invalid!", () => { validateLogin("logout", ""); });
+            else alertDialog("Your login session is invalid!", () => { validateLogin("logout", document.URL); });
             return;
           }
           if (renickQ && res != "ERROR") {
@@ -185,6 +185,7 @@ function validateLogin(action: string = "login", extData: string) {
           else if (action == "logout") {
             // alert("Logging out");
             document.cookie = "__Secure-session=; Secure;";
+            if (extData) window.open("/login?redirect="+extData, "_self");
             alertDialog("You've been logged out", () => { window.open(redirectTo, "_self") });
           }
           else if (res == "ERROR") {

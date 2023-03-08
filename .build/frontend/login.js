@@ -99,7 +99,7 @@ function validateLogin(action = "login", extData) {
               validateLogin("logout", "");
             } else
               alertDialog("Your login session is invalid!", () => {
-                validateLogin("logout", "");
+                validateLogin("logout", document.URL);
               });
             return;
           }
@@ -174,6 +174,8 @@ function validateLogin(action = "login", extData) {
             });
           } else if (action == "logout") {
             document.cookie = "__Secure-session=; Secure;";
+            if (extData)
+              window.open("/login?redirect=" + extData, "_self");
             alertDialog("You've been logged out", () => {
               window.open(redirectTo, "_self");
             });

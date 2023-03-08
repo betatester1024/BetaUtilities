@@ -3,6 +3,7 @@ var escape = require('escape-html');
 import {currHandler} from './initialiser';
 // import { hashSync, compareSync} from 
 var bcrypt = require("bcrypt");
+const linkifyHtml = require("linkify-html");
 const path = require('path');
 import { updateUser } from "./updateuser";
 import {systemLog} from './misc';
@@ -325,10 +326,10 @@ function format(obj:{permLevel:number, data:string, sender:string}) {
   data = data.replaceAll("<", "&lt;");
   data = data.replaceAll("\\n", "<br>");
   data = data.replaceAll(/\&amp;([0-9a-zA-Z]+)/gm, (match:string, p1:string)=>{return "<a href='https://euphoria.io/room/"+p1+"'>"+match+"</a>"});
-  data = data.replaceAll(/(((http|https):\/\/)((([a-z0-9\-]+\.)+([a-z]{2,}))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=\-_~:@/?]*)?)(\s+|$))/gmiu, 
-    (match:string, p1:string)=>{return "<a href='"+match+"'>"+match+"</a>"})
-  data = data.replaceAll(/(((([a-z0-9\-]+\.)+([a-z]{2,}))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=\-_~:@/?]*)?)(\s+|$))/gmiu, 
-    (match:string, p1:string)=>{return "<a href='https://"+match+"'>"+match+"</a>"})
+  
+  data = linkifyHtml(data);
+  // data = data.replaceAll(/([-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/igmu, 
+    // (match:string, p1:string)=>{return "<a href='https://"+match+"'>"+match+"</a>"})
   
   for (let i=0; i<replacements.length; i++){
     data = data.replaceAll(replacements[i].from, "<span class='material-symbols-outlined'>"+replacements[i].to+"</span>")

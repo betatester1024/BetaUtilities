@@ -31,6 +31,7 @@ var import_server = require("./server");
 var import_database = require("./database");
 var escape = require("escape-html");
 var bcrypt = require("bcrypt");
+const linkifyHtml = require("linkify-html");
 const path = require("path");
 const fs = require("fs");
 const EXPIRY = 1e3 * 60 * 60 * 24;
@@ -325,18 +326,7 @@ function format(obj3) {
   data = data.replaceAll(/\&amp;([0-9a-zA-Z]+)/gm, (match, p1) => {
     return "<a href='https://euphoria.io/room/" + p1 + "'>" + match + "</a>";
   });
-  data = data.replaceAll(
-    /(((http|https):\/\/)((([a-z0-9\-]+\.)+([a-z]{2,}))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=\-_~:@/?]*)?)(\s+|$))/gmiu,
-    (match, p1) => {
-      return "<a href='" + match + "'>" + match + "</a>";
-    }
-  );
-  data = data.replaceAll(
-    /(((([a-z0-9\-]+\.)+([a-z]{2,}))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=\-_~:@/?]*)?)(\s+|$))/gmiu,
-    (match, p1) => {
-      return "<a href='https://" + match + "'>" + match + "</a>";
-    }
-  );
+  data = linkifyHtml(data);
   for (let i = 0; i < import_replacements.replacements.length; i++) {
     data = data.replaceAll(import_replacements.replacements[i].from, "<span class='material-symbols-outlined'>" + import_replacements.replacements[i].to + "</span>");
   }

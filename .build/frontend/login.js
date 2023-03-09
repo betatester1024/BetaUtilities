@@ -12,9 +12,9 @@ let CURRUSER = "";
 let CURRACCNAME = "";
 let CURRPERMS = "";
 let LOADEDQ = false;
+let TODOCT = 0;
 function newUser(e, accessclass) {
   let id = e.target.id;
-  console.log(id);
   if (id != "loginBTN")
     return;
   validateLogin("add", escapeHtml(accessclass));
@@ -42,9 +42,25 @@ function validateLogin(action = "login", extData) {
   let pass = document.getElementById("passINP");
   let confirm = document.getElementById("passINPCONF");
   let CMD = document.getElementById("command");
+  if (action == "acquireTodo" && extData == "") {
+    if (!document.cookie.match("__Secure-session=[0-9.]+"))
+      window.open("/signup?redirect=todo", "_self");
+    validateLogin("acquireTodo", "OK");
+    return;
+  }
+  let match2 = action.match("updateTODO([0-9]+)");
+  let match3 = action.match("completeTODO([0-9]+)");
+  let inp;
+  if (match2 || match3) {
+    inp = document.getElementById("todo" + (match2 ? match2[1] : match3[1]));
+    if (match2) {
+      inp.style.cursor = "pointer";
+      inp.readOnly = true;
+      inp.style.border = "2px solid #eee";
+    }
+  }
   if (action != "login" && action != "add" && action != "signup" || user.value.match("^[a-zA-Z0-9_]+$") && pass.value.length !== 0) {
     if (confirm && (action == "add" || action == "signup") && confirm.value != pass.value) {
-      console.log("Nomatch");
       alertDialog("Error: Your passwords do not match", () => {
         location.reload();
       });
@@ -64,17 +80,22 @@ function validateLogin(action = "login", extData) {
       CMD.value = "";
     } else if (action == "sendMsg") {
       params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData);
-      let match2 = extData.match("!renick @([a-zA-Z_0-9]+)");
-      if (match2) {
-        params = "token=" + sessionID + "&action=renick&user=" + encodeURIComponent(match2[1]);
+      let match4 = extData.match("!renick @([a-zA-Z_0-9]+)");
+      if (match4) {
+        params = "token=" + sessionID + "&action=renick&user=" + encodeURIComponent(match4[1]);
         renickQ = true;
       }
     } else
       params = "user=&pass=&action=" + action + "&token=" + sessionID;
+    if (action == "acquireTodo" && extData == "OK") {
+      params = "action=acquireTodo&token=" + sessionID;
+    }
+    if (match2 || match3)
+      params = "user=" + encodeURIComponent(inp.value) + "&action=" + action + "&token=" + sessionID;
+    if (action == "addTODO")
+      params = "user=&action=addTODO&token=" + sessionID;
     if (pass)
       pass.value = "";
-    if (action != "refresh" && action != "refresh_log")
-      console.log("SENDING " + params);
     var xhr = new XMLHttpRequest();
     let m = document.URL.match("redirect=(.*)");
     let redirectTo = m ? m[1] : "/";
@@ -89,7 +110,6 @@ function validateLogin(action = "login", extData) {
         let ele = document.getElementById("overlay");
         if (ele)
           ele.className = "";
-        console.log("action:" + action);
         ele = document.getElementById("h1");
         if (ele)
           ele.className = "beforeoverload";
@@ -97,10 +117,32 @@ function validateLogin(action = "login", extData) {
           if (res == "ERROR" || res == "NOACTIVE" || res == "ACCESS") {
             if (document.URL.match("betatester1024.repl.co/?$")) {
               validateLogin("logout", "");
-            } else
+            } else if (res == "NOACTIVE")
               alertDialog("Your login session is invalid!", () => {
                 validateLogin("logout", document.URL);
               });
+            else
+              alertDialog("You're not logged in!", () => {
+                window.open("/login?redirect=" + document.URL), "_self";
+              });
+            return;
+          }
+          if (action == "acquireTodo") {
+            let todoDiv = document.getElementById("todo");
+            todoDiv.innerHTML = "";
+            let todoList = res;
+            for (let i = 0; i < todoList.length; i++) {
+              let update = `<p> 
+          <span class="material-symbols-outlined" onclick="complete(${i})">task_alt</span>
+          <input class="todo" id="todo${i}" value="${todoList[i]}" onchange="modify(-1); validateLogin('updateTODO${i}', '')" readonly onclick="modify(${i})"/>
+          
+          <span id="span${i}" class="material-symbols-outlined" onclick="modify(${i})">edit</span>
+        </p>`;
+              todoDiv.innerHTML += update;
+              TODOCT = res.length;
+            }
+            modify();
+            resetAlertDiv();
             return;
           }
           if (renickQ && res != "ERROR") {
@@ -186,6 +228,14 @@ function validateLogin(action = "login", extData) {
             alertDialog("This username is already taken!", () => {
             });
           } else {
+            if (match2 || match3 || action == "addTODO") {
+              if (match3)
+                alertDialog("Task complete!", () => {
+                  validateLogin("acquireTodo", "OK");
+                });
+              validateLogin("acquireTodo", "OK");
+              return;
+            }
             alertDialog("Action complete!", () => {
               if (action == "signup")
                 window.open(redirectTo, "_self");
@@ -203,7 +253,6 @@ function validateLogin(action = "login", extData) {
           CURRACCNAME = user.value;
           CURRPERMS = "2";
           deleteAllCookies();
-          console.log(document.cookie);
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
           if (!match && action == "login")
@@ -213,7 +262,6 @@ function validateLogin(action = "login", extData) {
           CURRACCNAME = user.value;
           CURRPERMS = "3";
           deleteAllCookies();
-          console.log(document.cookie);
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
           alertDialog("Welcome, betatester1024.", () => {
@@ -226,7 +274,6 @@ function validateLogin(action = "login", extData) {
           CURRACCNAME = user.value;
           CURRPERMS = "1";
           deleteAllCookies();
-          console.log(document.cookie);
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
           alertDialog("Welcome, " + user.value + "!", () => {
@@ -290,5 +337,42 @@ function updateTextArea(msgs) {
   let scrollHt = ele.scrollTop;
   ele.innerHTML = msgs;
   ele.scrollTop = scrollHt;
+}
+let MODIFYN = -1;
+function modify(n = MODIFYN) {
+  MODIFYN = n;
+  for (let i = 0; i < TODOCT; i++) {
+    let inp = document.getElementById("todo" + i);
+    let spn = document.getElementById("span" + i);
+    if (i == n && inp && spn) {
+      inp.style.cursor = "text";
+      inp.readOnly = false;
+      inp.style.border = "2px solid #0a84ff";
+      inp.focus({ preventScroll: true });
+      spn.onclick = () => {
+        modify(-1);
+        validateLogin("updateTODO" + i, "");
+      };
+    } else if (inp && spn) {
+      inp.style.cursor = "pointer";
+      inp.readOnly = true;
+      inp.style.border = "2px solid #eee";
+      inp.blur();
+      spn.onclick = () => {
+        modify(i);
+      };
+    }
+  }
+}
+function complete(n) {
+  validateLogin("completeTODO" + n, "");
+}
+function add() {
+  validateLogin("addTODO", "");
+  MODIFYN = TODOCT;
+}
+function resetAlertDiv() {
+  let div = document.getElementById("alert");
+  div.onclick = clearalert;
 }
 //# sourceMappingURL=login.js.map

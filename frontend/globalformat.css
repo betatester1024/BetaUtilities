@@ -285,7 +285,7 @@ div#overlay {
   100% { top: 100vh}
 }
 
-#alerttxt {
+#alerttxt, input#pwd {
   width:100%;
   height: 2.25em;
   text-align: center;

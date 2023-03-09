@@ -39,7 +39,7 @@ const DB = import_database.database.collection("SystemAUTH");
 const DB2 = import_database.database.collection("SupportMessaging");
 const DB3 = import_database.database.collection("BetaUtilities");
 function validate(user, pwd, action, access, callback, token = "") {
-  if (action != "refresh" && action != "refresh_log" && action != "sendMsg" && action != "bMsg" && action != "checkAccess_A" && action != "checkAccess" && action != "userReq")
+  if (action != "refresh" && action != "refresh_log" && action != "sendMsg" && action != "bMsg" && action != "checkAccess_A" && action != "checkAccess" && action != "userReq" && action != "acquireTodo")
     (0, import_misc.systemLog)("Validating as " + user + " with action " + action + " (token " + token + ")");
   if (!token || !token.match("[0-9]+") || (!user || user && action != "CMD" && action != "sendMsg" && !user.match("^[a-zA-Z0-9_]+$")) || (!pwd || action != "CMD" && pwd.length <= 0)) {
     if (action == "add" || action == "login") {
@@ -65,7 +65,9 @@ function validate(user, pwd, action, access, callback, token = "") {
     callback.end(JSON.stringify("SUCCESS"));
     return;
   }
-  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log" || action == "userReq" || action == "renick" || action == "delete") {
+  let todoMatch = action.match("updateTODO([0-9]+)");
+  let todoMatch2 = action.match("completeTODO([0-9]+)");
+  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log" || action == "userReq" || action == "renick" || action == "delete" || action == "acquireTodo" || todoMatch || todoMatch2 || action == "addTODO") {
     DB.findOne({ fieldName: "TOKEN", token: { $eq: token } }).then(
       (obj) => {
         if (obj == null) {
@@ -108,6 +110,35 @@ function validate(user, pwd, action, access, callback, token = "") {
                 $currentDate: { lastModified: true }
               }, { upsert: true });
               callback.end(JSON.stringify(escape(user)));
+              return;
+            }
+            if (action == "acquireTodo" || todoMatch || todoMatch2 || action == "addTODO") {
+              if (!obj2.todo)
+                obj2.todo = [];
+              if (action == "acquireTodo")
+                callback.end(JSON.stringify(obj2.todo ? obj2.todo : ""));
+              else {
+                if (todoMatch) {
+                  if (todoMatch[1] < obj2.todo.length)
+                    obj2.todo[todoMatch[1]] = user;
+                }
+                if (todoMatch2) {
+                  if (obj2.todo.length > todoMatch2[1])
+                    obj2.todo.splice(todoMatch2[1], 1);
+                }
+                if (action == "addTODO") {
+                  obj2.todo.push(user);
+                }
+                DB.updateOne({ fieldName: "UserData", user: obj.associatedUser }, {
+                  $set: {
+                    todo: obj2.todo
+                  },
+                  $currentDate: { lastModified: true }
+                }, { upsert: true }).then(() => {
+                  callback.end(JSON.stringify("SUCCESS"));
+                });
+                return;
+              }
               return;
             }
             if (action == "userReq") {

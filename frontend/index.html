@@ -33,7 +33,7 @@
         overflow-y: scroll;  
       }
       button {
-        width: 5.5em;
+        width: min(5.5em, max(5.5em, 33%));
         height: 2.5em;
         border-radius: 0.3em;
         font-size: 2.5em;
@@ -53,7 +53,17 @@
       .full {
         display: inline-block;
         max-width: 16.5em;
-        width: min(16.5em, 100%)
+        width: min(16.5em, max(5.5em, 80%))
+      }
+      .half {
+        display: inline-block;
+        max-width: 8.25em;
+        width: min(8.25em, max(5.5em, 45%))
+      }
+      .two-thirds {
+        display: inline-block;
+        max-width: 10.25em;
+        width: min(10.25em, max(5.5em, 63%))
       }
     </style>
   </head>
@@ -80,14 +90,24 @@
         Support
         <hr class="btnHr"></hr>
       </button><br>
-      <button onclick="log()">
+      <button onclick="log()" class="half">
         <span class="material-symbols-outlined">security</span>
         SysLog
         <hr class="btnHr"></hr>
       </button>
-      <button onclick="window.open('./about')" >
+      <button onclick="window.open('/todo', '_self');" class="half">
+        <span class="material-symbols-outlined">checklist</span>
+        To do
+        <hr class="btnHr"></hr>
+      </button><br>
+      <button onclick="window.open('/404', '_self');">
+        <span class="material-symbols-outlined">schedule</span>
+        Pending
+        <hr class="btnHr"></hr>
+      </button>
+      <button onclick="window.open('./about')" class="two-thirds">
         <span class="material-symbols-outlined">info</span>
-        About
+        About the Site
         <hr class="btnHr"></hr>
       </button>
     </div>

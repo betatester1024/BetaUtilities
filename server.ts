@@ -136,7 +136,7 @@ export async function updateServer() {
   });
 
   app.get('*.js.map', (req:any, res:any)=> {
-    res.sendFile(path.join( __dirname, '../.build', req.url));
+    res.end();
   })
   
   app.get('/*', (req:any, res:any) => {

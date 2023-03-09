@@ -127,7 +127,7 @@ async function updateServer() {
     res.sendFile(path.join(__dirname, "../frontend", "contact.html"));
   });
   app.get("*.js.map", (req, res) => {
-    res.sendFile(path.join(__dirname, "../.build", req.url));
+    res.end();
   });
   app.get("/*", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "404.html"));

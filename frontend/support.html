@@ -30,10 +30,10 @@
         source.addEventListener('message', message => {
           // console.log('Got', message);
 
-          
-          document.getElementById("msgArea").innerHTML+=message.data;
           ele = document.getElementById("msgArea");
           let scrDistOKQ =  (ele.scrollTop) >= (ele.scrollHeight-ele.offsetHeight - 100)
+          document.getElementById("msgArea").innerHTML+=message.data;
+          
           if (!LOADEDQ2 || scrDistOKQ)
           {
             ele.scrollTop = ele.scrollHeight;
@@ -74,6 +74,8 @@
 /*         display: block; */
         color: #000;
         overflow-wrap: break-word;
+/*         animation-name: newMsg; */
+/*         animation-duration: 10s; */
       }
       hr {
         margin-top: 5px !important;
@@ -130,16 +132,21 @@
       b {
         background-color: #eee;
       }
+
+      @keyframes newMsg {
+        0% {background-color: rgba(0, 200, 0, 1);}
+        100% {background-color: rgba(0, 200, 0, 0);}
+      }
       
     </style>
   </head>
   
   
-  <body onload = "onLoad(); setTimeout(()=>{document.getElementById('textINP').focus({ preventScroll: true });}, 500);">
+  <body onload = "onLoad(); setTimeout(()=>{document.getElementById('textINP').focus({ preventScroll: true });}, 500);" onkeyup="document.getElementById('textINP').focus()">
     <div id = "mainDiv">
       <h1>BetaOS Support</h1>
       <hr class="rounded"></hr>
-      <div id="msgArea" onclick="document.getElementById('textINP').focus()">
+      <div id="msgArea">
         <b>Retrieving your messages...</b>
         <hr class="btnHr"></hr>
       </div>

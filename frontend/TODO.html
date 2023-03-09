@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>BetaOS TODO</title>
+    <meta name="viewport" content="width=device-width">
+    <script src="../login.js">
+    </script>
+    <script>
+      function onLoad() {
+        validateLogin("acquireTodo", "");
+      }
+    </script>
+     <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      p {
+        display: block;
+        width: unset;
+        margin: 0 auto;
+      }
+      input {
+          -webkit-transition : border 500ms ease-out;
+        -moz-transition : border 500ms ease-out;
+        -o-transition : border 500ms ease-out;
+        transition : border 500ms ease-out;
+        border: 2px solid #eee;
+        border-radius: 10px;
+        font-family: NotoSansDisplay;
+        color: #0a84ff;
+      }
+      .todo {
+        height: 1.2em !important;
+        font-size: 1em;
+        
+        width: calc(100% - 3.5em);
+        cursor: pointer;
+      }
+      span {
+        font-size: 1.25em !important;
+        position: relative;
+        top: 10px;
+        cursor: pointer;
+      }
+    </style>
+   
+  </head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <body onload = "onLoad();">
+    <div id = "mainDiv">
+      <h1>To do list</h1>
+      <hr class="rounded"></hr>
+      <div id="todo">
+        <p> 
+          <span class="material-symbols-outlined" onclick="complete(1)">task_alt</span>
+          <input class="todo" value="Loading..." onchange="validateLogin" readonly onclick="modify(1)">
+<!--           <hr class="inpHr"></hr> -->
+          <span class="material-symbols-outlined" onclick="modify(1)">edit</span>
+          <span class="material-symbols-outlined" onclick="complete(1)">task_alt</span>
+          <input class="todo" value="Task goes here." onchange="validateLogin" readonly onclick="modify(1)">
+<!--           <hr class="inpHr"></hr> -->
+          <span class="material-symbols-outlined" onclick="modify(1)">edit</span>
+          <span class="material-symbols-outlined" onclick="complete(1)">task_alt</span>
+          <input class="todo" value="Sorry, this is taking longer than expected." onchange="validateLogin" readonly onclick="modify(1)">
+<!--           <hr class="inpHr"></hr> -->
+          <span class="material-symbols-outlined" onclick="modify(1)">edit</span>
+        </p>
+        
+        
+      </div>
+      <button onclick="add()">
+        <span class="material-symbols-outlined">add</span>
+        Add a task!<br>
+        <hr class="btnHr"></hr>
+      </button>
+      <button class="HOME" onclick="window.open('../', '_self');">&#x00AB Return to home<br><hr class="btnHr"></hr></button>
+    </div>
+    <h1 class="beforeoverload" id="h1">We're having a bit of trouble saving your tasks. 
+      <br>
+      <a href = './todo'>Refresh?</a>
+    </h1>
+    <div id="alert">
+      <p id="alerttxt" style="width: 90%"></p>
+<!--       <input type="password" id="pwd" onchange="clearalert()" placeholder="Password..."> -->
+    <button onclick="clearalert()" style="position: relative; top: 50vh; height: 4em;"><u>> Continue <</u></button></div>
+    <div id="overlay"></div>
+  </body>
+ </html>

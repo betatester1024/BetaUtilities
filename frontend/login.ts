@@ -12,10 +12,10 @@ let CURRUSER = "";
 let CURRACCNAME = "";
 let CURRPERMS = "";
 let LOADEDQ = false;
-
+let TODOCT = 0;
 function newUser(e: Event, accessclass: string) {
   let id = (e.target as HTMLElement).id;
-  console.log(id);
+  // console.log(id);
   if (id != "loginBTN")
     return;
   validateLogin("add", escapeHtml(accessclass));
@@ -49,12 +49,34 @@ function validateLogin(action: string = "login", extData: string) {
   let pass = document.getElementById("passINP") as HTMLInputElement;
   let confirm = document.getElementById("passINPCONF") as HTMLInputElement;
   // console.log(confirm.value);
+  // let todoPwd = document.getElementById("pwd") as HTMLInputElement;
   let CMD = document.getElementById("command") as HTMLInputElement;
+  if (action == "acquireTodo" && extData == "") {
+    // setTimeout(()=>{todoPwd.focus({preventScroll: true})}, 500);
+    if (!document.cookie.match("__Secure-session=[0-9.]+")) window.open("/signup?redirect=todo", "_self");
+    // alertDialog("Please enter your password.", ()=> {
+      validateLogin("acquireTodo", "OK");
+    // })
+    return;
+  }
 
+  let match2 = action.match("updateTODO([0-9]+)");
+  let match3 = action.match("completeTODO([0-9]+)");
+  let inp:HTMLInputElement;
+  
+  if (match2 || match3) {
+    inp = document.getElementById("todo"+(match2?match2[1]:match3[1])) as HTMLInputElement;
+    if (match2){
+      inp.style.cursor = "pointer";
+      inp.readOnly = true;
+      inp.style.border="2px solid #eee";
+    } 
+  }
+  
 
   if ((action != "login" && action != "add" && action != "signup") || (user.value.match("^[a-zA-Z0-9_]+$") && pass.value.length !== 0)) {
     if (confirm && (action == "add" || action == "signup") && confirm.value != pass.value) {
-      console.log("Nomatch");
+      // console.log("Nomatch");
       alertDialog("Error: Your passwords do not match", () => { location.reload(); });
       return;
     }
@@ -87,9 +109,17 @@ function validateLogin(action: string = "login", extData: string) {
       // ele.scrollTop = ele.scrollHeight;
     }
     else params = "user=&pass=&action="+action+"&token=" + sessionID;
+    if (action == "acquireTodo" && extData == "OK"){
+      params = "action=acquireTodo&token="+sessionID;
+    }
+    // this one is for updating the todo entry.
+    if (match2 || match3) params = "user="+encodeURIComponent(inp.value)+"&action="+action+"&token="+sessionID;
+    if (action == "addTODO") params = "user=&action=addTODO"+"&token="+sessionID;
     if (pass) pass.value = "";
-    if (action != "refresh" && action != "refresh_log") console.log("SENDING " + params);
+    // if (action != "refresh" && action != "refresh_log") console.log("SENDING " + params);
+     
     var xhr = new XMLHttpRequest();
+    
     let m = document.URL.match("redirect=(.*)");
     let redirectTo = m?m[1]:"/";
     // console.log(redirectTo);
@@ -103,7 +133,7 @@ function validateLogin(action: string = "login", extData: string) {
         let ele = document.getElementById('overlay');
         if (ele) ele.className = "";
         // console.log(res);
-        console.log("action:"+action);
+        // console.log("action:"+action);
         ele = document.getElementById('h1');
         if (ele) ele.className = "beforeoverload";
         if (action != "login") {
@@ -112,7 +142,32 @@ function validateLogin(action: string = "login", extData: string) {
             if (document.URL.match("betatester1024.repl.co/?$")) {
               validateLogin("logout", "");
             }
-            else alertDialog("Your login session is invalid!", () => { validateLogin("logout", ""); });
+            else if (res == "NOACTIVE") alertDialog("Your login session is invalid!", () => { validateLogin("logout", document.URL); });
+            else alertDialog("You're not logged in!", ()=>{window.open("/login?redirect="+document.URL), "_self"})
+            return;
+          }
+          if (action == "acquireTodo") {
+            
+            // todoPwd.style.display="none";
+            let todoDiv = document.getElementById("todo") as HTMLDivElement;
+            todoDiv.innerHTML = "";
+            let todoList = res as unknown as string[]; // it's actually a string array.
+            // but we're not supposed to know that. so nasty hack >:(
+            for (let i=0; i<todoList.length; i++ ) {
+              let update = `<p> 
+          <span class="material-symbols-outlined" onclick="complete(${i})">task_alt</span>
+          <input class="todo" id="todo${i}" value="${todoList[i]}" onchange="modify(-1); validateLogin('updateTODO${i}', '')" readonly onclick="modify(${i})"/>
+          
+          <span id="span${i}" class="material-symbols-outlined" onclick="modify(${i})">edit</span>
+        </p>`;
+              todoDiv.innerHTML += update;
+              // console.log(update);
+              TODOCT = res.length;
+              
+            }
+            // console.log(res.length);
+            modify();
+            resetAlertDiv();
             return;
           }
           if (renickQ && res != "ERROR") {
@@ -185,6 +240,7 @@ function validateLogin(action: string = "login", extData: string) {
           else if (action == "logout") {
             // alert("Logging out");
             document.cookie = "__Secure-session=; Secure;";
+            if (extData) window.open("/login?redirect="+extData, "_self");
             alertDialog("You've been logged out", () => { window.open(redirectTo, "_self") });
           }
           else if (res == "ERROR") {
@@ -194,8 +250,16 @@ function validateLogin(action: string = "login", extData: string) {
             alertDialog("This username is already taken!", () => { });
           }
           else {
+            if (match2 || match3 || action == "addTODO") {
+              if (match3) alertDialog("Task complete!", ()=> {
+                validateLogin("acquireTodo", "OK"); // already have password with us.
+              })
+              validateLogin("acquireTodo", "OK");
+              return;
+            }
             alertDialog("Action complete!", () => { if (action == "signup") window.open(redirectTo, "_self") });
             if (!match && action == "signup") document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
+            
           }
           return;
         } // not login
@@ -205,7 +269,7 @@ function validateLogin(action: string = "login", extData: string) {
           CURRACCNAME = user.value;
           CURRPERMS = "2";
           deleteAllCookies();
-          console.log(document.cookie);
+          // console.log(document.cookie);
           
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
@@ -216,7 +280,7 @@ function validateLogin(action: string = "login", extData: string) {
           CURRACCNAME = user.value;
           CURRPERMS = "3";
           deleteAllCookies();
-          console.log(document.cookie);
+          // console.log(document.cookie);
           
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
@@ -228,7 +292,7 @@ function validateLogin(action: string = "login", extData: string) {
           CURRACCNAME = user.value;
           CURRPERMS = "1";
           deleteAllCookies();
-          console.log(document.cookie);
+          // console.log(document.cookie);
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
           alertDialog("Welcome, " + user.value + "!", () => { window.open(redirectTo, "_self"); });
@@ -297,4 +361,43 @@ function updateTextArea(msgs:string) {
   
   ele.scrollTop = scrollHt;
   
+}
+let MODIFYN = -1;
+function modify(n:number=MODIFYN) {
+  // console.log("Modifying "+n)
+  MODIFYN = n;
+  // console.log(n);
+  for (let i=0; i<TODOCT; i++) {
+    let inp = document.getElementById("todo"+i) as HTMLInputElement;
+    let spn = document.getElementById("span"+i) as HTMLSpanElement
+    if (i==n && inp && spn) {
+      inp.style.cursor = "text";
+      inp.readOnly = false;
+      inp.style.border="2px solid #0a84ff";
+      inp.focus({preventScroll:true});
+      spn.onclick=()=>{modify(-1); validateLogin('updateTODO'+i, "")};
+    }
+    else if (inp && spn) {
+      inp.style.cursor = "pointer";
+      inp.readOnly = true;
+      inp.style.border="2px solid #eee";
+      inp.blur();
+      spn.onclick=()=>{modify(i)};
+    }
+  }
+}
+
+function complete(n:number) {
+  // console.log("Modifying "+n)
+  validateLogin("completeTODO"+n, "");
+}
+
+function add() {
+  validateLogin("addTODO", "");
+  MODIFYN = TODOCT;
+}
+
+function resetAlertDiv() {
+  let div = document.getElementById("alert") as HTMLDivElement;
+  div.onclick=clearalert;
 }

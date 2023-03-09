@@ -3,6 +3,7 @@ var escape = require('escape-html');
 import {currHandler} from './initialiser';
 // import { hashSync, compareSync} from 
 var bcrypt = require("bcrypt");
+const linkifyHtml = require("linkify-html");
 const path = require('path');
 import { updateUser } from "./updateuser";
 import {systemLog} from './misc';
@@ -19,7 +20,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
   if (action != "refresh" && action != "refresh_log"
       && action != "sendMsg" && action != "bMsg" && 
      action != "checkAccess_A" && action != "checkAccess" &&
-      action != "userReq") systemLog("Validating as "+user+" with action "+action +" (token "+token+")");
+      action != "userReq" && action != "acquireTodo") systemLog("Validating as "+user+" with action "+action +" (token "+token+")");
   if (!token || !token.match("[0-9]+") || 
      (!user || user && action !="CMD" && action !="sendMsg" && !user.match("^[a-zA-Z0-9_]+$")) || 
      (!pwd || action != "CMD" && pwd.length<=0)) 
@@ -31,7 +32,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       return;
     } 
   }
-
+  
   if (action == "bMsg") {
     DB2.insertOne({
       fieldName: "MSG", 
@@ -52,11 +53,15 @@ export function validate(user:string, pwd:string, action:string, access:string, 
   }
 
   // attempt to add user or run commands or access support (REQUIRE PERMLEVELS)
+  let todoMatch = action.match("updateTODO([0-9]+)");
+  let todoMatch2 = action.match("completeTODO([0-9]+)");
   if (action=="add" || action=="CMD" || 
       action == "checkAccess" || action == "sendMsg"||
      action == "refresh" || action == "checkAccess_A" || 
      action == "refresh_log" || action == "userReq" || 
-     action == "renick" || action == "delete") {
+     action == "renick" || action == "delete" || 
+      action == "acquireTodo" ||todoMatch || 
+      todoMatch2 || action == "addTODO") {
     DB.findOne({fieldName: "TOKEN", token:{$eq:token}}).then(
     (obj:{associatedUser:string, expiry:number})=>{
       if (obj == null) {
@@ -82,7 +87,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       }
       
       DB.findOne({fieldName:"UserData", user:obj.associatedUser}).then(
-      (obj2:{permLevel:number, alias:string|null})=>{
+      (obj2:{permLevel:number, alias:string|null, todo:string[]})=>{
         if (!obj2) {callback.end(JSON.stringify("ERROR")); return;}
         let perms = obj2.permLevel;
         if (action == "renick" && perms >= 1)
@@ -104,6 +109,36 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           callback.end(JSON.stringify(escape(user)));
           return;
         } // renick 
+        // console.log(action);
+        if (action == "acquireTodo" || todoMatch 
+        || todoMatch2 || action == "addTODO") {
+          // if (pwd == process.env['TODOPwd']) {
+            // console.log(obj2.todo);
+            if (!obj2.todo) obj2.todo = [];
+            if (action == "acquireTodo") callback.end(JSON.stringify(obj2.todo?obj2.todo:""));
+            else {
+              // console.log(user);
+              if (todoMatch) 
+                if (todoMatch[1] < obj2.todo.length)
+                  obj2.todo[todoMatch[1]] = user;
+              if (todoMatch2) 
+                if (obj2.todo.length > todoMatch2[1]) 
+                  obj2.todo.splice(todoMatch2[1], 1);
+              if (action == "addTODO") {
+                obj2.todo.push(user);
+              }
+              // console.log(obj2.todo);
+              DB.updateOne({fieldName:"UserData", user: obj.associatedUser}, {
+                $set: {
+                  todo:obj2.todo
+                },
+                $currentDate: { lastModified: true }
+              }, {upsert:true}).then(()=>{callback.end(JSON.stringify("SUCCESS"));});
+              return;
+            }
+          // }
+          return;
+        }
         if (action == "userReq") {
           callback.end(JSON.stringify(obj.associatedUser+" "+obj2.permLevel));
           return;
@@ -325,10 +360,10 @@ function format(obj:{permLevel:number, data:string, sender:string}) {
   data = data.replaceAll("<", "&lt;");
   data = data.replaceAll("\\n", "<br>");
   data = data.replaceAll(/\&amp;([0-9a-zA-Z]+)/gm, (match:string, p1:string)=>{return "<a href='https://euphoria.io/room/"+p1+"'>"+match+"</a>"});
-  data = data.replaceAll(/(((http|https):\/\/)((([a-z0-9\-]+\.)+([a-z]{2,}))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=\-_~:@/?]*)?)(\s+|$))/gmiu, 
-    (match:string, p1:string)=>{return "<a href='"+match+"'>"+match+"</a>"})
-  data = data.replaceAll(/(((([a-z0-9\-]+\.)+([a-z]{2,}))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=\-_~:@/?]*)?)(\s+|$))/gmiu, 
-    (match:string, p1:string)=>{return "<a href='https://"+match+"'>"+match+"</a>"})
+  
+  data = linkifyHtml(data);
+  // data = data.replaceAll(/([-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/igmu, 
+    // (match:string, p1:string)=>{return "<a href='https://"+match+"'>"+match+"</a>"})
   
   for (let i=0; i<replacements.length; i++){
     data = data.replaceAll(replacements[i].from, "<span class='material-symbols-outlined'>"+replacements[i].to+"</span>")

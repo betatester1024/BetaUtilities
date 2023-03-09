@@ -135,6 +135,10 @@ export async function updateServer() {
     res.sendFile(path.join( __dirname, '../frontend', 'contact.html' ));
   });
 
+  app.get('*.js.map', (req:any, res:any)=> {
+    res.sendFile(path.join( __dirname, '../.build', req.url));
+  })
+  
   app.get('/*', (req:any, res:any) => {
     res.sendFile(path.join( __dirname, '../frontend', '404.html' ));
   });

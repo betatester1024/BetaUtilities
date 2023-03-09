@@ -1,2 +1,12 @@
 (OnlineSUPPORT)[BetaOS] heyo
 (OnlineSUPPORT)[BetaOS] !uptime @BetaOS_System
+(OnlineSUPPORT)[BetaOS] !wordle
+(OnlineSUPPORT)[BetaOS] chase
+(OnlineSUPPORT)[BetaOS] party
+(OnlineSUPPORT)[BetaOS] chess
+(OnlineSUPPORT)[BetaOS] stand
+(OnlineSUPPORT)[BetaOS] spant
+(OnlineSUPPORT)[BetaOS] stant
+(OnlineSUPPORT)[BetaOS] slant
+(OnlineSUPPORT)[BetaOS] !antispam @BetaOS_System
+(OnlineSUPPORT)[BetaOS] 8685

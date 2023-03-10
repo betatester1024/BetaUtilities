@@ -6,6 +6,13 @@
     <script src="/login.js">
     </script>
     <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      #loginBTN {
+        border: none !important;
+        width: 89vw;
+        border-radius: 3vh;
+      }
+    </style>
   </head>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,6 +38,10 @@
           <input type="password" id="passINPCONF" placeholder="Confirm password"/>
           <hr class="inpHr"></hr>
         </div>
+        <button onclick="window.open(document.URL.replace('signup', 'login'), '_self')" type="button">
+          Log in instead<br>
+          <hr class="btnHr"></hr>
+        </button>
         <button type="submit" id="loginBTN" onclick="validateLogin('signup', '')">Sign up<br><hr class="btnHr"></hr></button>
       </div>
       </form>

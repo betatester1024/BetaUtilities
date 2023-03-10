@@ -21,9 +21,9 @@ function onLoad(e) {
     let statusele = document.getElementById("statStr");
     if (data)
       statusele.innerHTML = data;
-    if (!data || data && data.match("ERROR")) {
-      statusele.innerHTML = "ServiceFAIL<br>";
+    if (!data || data && data.match("Rooms failed")) {
       statusele.style.color = "#ee0000";
+      statusele.className += "ERROR";
       let thing = document.getElementById("h_one");
       thing.innerHTML = "ERROR";
       thing.style.color = "#ee0000";

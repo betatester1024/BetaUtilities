@@ -20,10 +20,11 @@ function onLoad(e:any) {
     let statusele = document.getElementById("statStr") as HTMLParagraphElement;
     if (data) statusele.innerHTML = data;
     // console.log(data);
-    if (!data || data && data.match("ERROR")) 
+    if (!data || data && data.match("Rooms failed")) 
     {
-      statusele.innerHTML="ServiceFAIL<br>";
+      // statusele.innerHTML="ServiceFAIL<br>";
       statusele.style.color="#ee0000";
+      statusele.className+="ERROR";
       let thing = document.getElementById("h_one") as HTMLHeadingElement;
       thing.innerHTML = "ERROR";
       thing.style.color="#ee0000";

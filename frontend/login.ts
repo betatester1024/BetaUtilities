@@ -73,7 +73,7 @@ function validateLogin(action: string = "login", extData: string) {
     } 
   }
   
-
+  if (action == "refresh") extData =document.URL.match("\\?room=([0-9a-zA-Z\\-_]+)$")[1];
   if ((action != "login" && action != "add" && action != "signup") || (user.value.match("^[a-zA-Z0-9_]+$") && pass.value.length !== 0)) {
     if (confirm && (action == "add" || action == "signup") && confirm.value != pass.value) {
       // console.log("Nomatch");
@@ -85,7 +85,7 @@ function validateLogin(action: string = "login", extData: string) {
     let match = document.cookie.match("__Secure-session=([0-9.]+)");
     let sessionID = match ? match[1] : window.crypto.getRandomValues(arr);
     // ONLY USE THE sessionID WHEN ADDING A NEW session
-
+    
     let renickQ = false;
     // alert/(document.cookie);
     let params;
@@ -97,10 +97,10 @@ function validateLogin(action: string = "login", extData: string) {
       CMD.value = "";
     }
     else if (action == "sendMsg") {
-      params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData);
+      params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData)+"&access="+document.URL.match("\\?room=([0-9a-zA-Z\\-_]+)$")[1];;
       let match = extData.match("!renick @([a-zA-Z_0-9]+)");
       if (match) {
-        params = "token="+sessionID+"&action=renick&user="+encodeURIComponent(match[1]);
+        params = "token="+sessionID+"&action=renick&user="+encodeURIComponent(match[1])+"&access="+document.URL.match("\\?room=([0-9a-zA-Z\\-_]+)$")[1];
         renickQ = true;
       }
       // // temporarily add this message to the div (until refresh handles it)
@@ -108,7 +108,7 @@ function validateLogin(action: string = "login", extData: string) {
       // ele.innerHTML += `<p><b class='${CURRPERMS=="2"?"admin":(CURRPERMS=="3"?"beta":"")}''>${CURRUSER} [SendingAWAIT]:</b> ${extData}</p><br>`;
       // ele.scrollTop = ele.scrollHeight;
     }
-    else params = "user=&pass=&action="+action+"&token=" + sessionID;
+    else if (action != "refresh" && action != "sendMsg") params = "user=&pass=&action="+action+"&token=" + sessionID;
     if (action == "acquireTodo" && extData == "OK"){
       params = "action=acquireTodo&token="+sessionID;
     }
@@ -116,13 +116,12 @@ function validateLogin(action: string = "login", extData: string) {
     if (match2 || match3) params = "user="+encodeURIComponent(inp.value)+"&action="+action+"&token="+sessionID;
     if (action == "addTODO") params = "user=&action=addTODO"+"&token="+sessionID;
     if (pass) pass.value = "";
-    // if (action != "refresh" && action != "refresh_log") console.log("SENDING " + params);
+     console.log("SENDING " + params);
      
     var xhr = new XMLHttpRequest();
     
     let m = document.URL.match("redirect=(.*)");
     let redirectTo = m?m[1]:"/";
-    // console.log(redirectTo);
     xhr.open("POST", "login", true);
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhr.onreadystatechange = function() {

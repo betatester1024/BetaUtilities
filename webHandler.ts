@@ -95,7 +95,7 @@ export class WebH
   }
 
   sendMsg(msg:string, user:string) {
-    validate(msg, "", "bMsg", "", null, "");
+    validate(msg, "", "bMsg", this.roomName.match('\\|(.*)$')[1], null, "");
     this.incrRunCt();
   }
   
@@ -214,9 +214,10 @@ export class WebH
   }
 
   
-  constructor() {
+  constructor(roomName: string) {
     this.nick = "BetaOS_System";
     this.replyMessage = replyMessage;
-    this.roomName = "OnlineSUPPORT";
+    this.roomName = "OnlineSUPPORT|"+roomName;
+    updateActive(this.roomName, true);
   }
 }

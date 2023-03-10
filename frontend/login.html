@@ -8,8 +8,9 @@
      <link rel="stylesheet" href="/globalformat.css">
     <style>
       #loginBTN {
-        width: 80%;
-        border: none;
+        width: 89vw;
+        border-radius: 3vh;
+        border: none !important;
       }
     </style>
    
@@ -33,7 +34,14 @@
           <input type="password" id="passINP" placeholder="Password"/>
           <hr class="inpHr"></hr>
         </div>
-        <button id="loginBTN" type="submit">Log into BetaOS Services<br><hr class="btnHr"></hr></button>
+        <button onclick="window.open(document.URL.replace('login', 'signup'), '_self')" type="button">
+          Sign up instead<br>
+          <hr class="btnHr"></hr>
+        </button>
+        <button id="loginBTN" type="submit">
+          Log into BetaOS Services<br>
+          <hr class="btnHr"></hr>
+        </button>
       </div>
     </form>
       <button class="HOME" onclick="window.open('../', '_self');">&#x00AB Return to home<br><hr class="btnHr"></hr></button>

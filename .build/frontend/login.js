@@ -59,6 +59,8 @@ function validateLogin(action = "login", extData) {
       inp.style.border = "2px solid #eee";
     }
   }
+  if (action == "refresh")
+    extData = document.URL.match("\\?room=([0-9a-zA-Z\\-_]+)$")[1];
   if (action != "login" && action != "add" && action != "signup" || user.value.match("^[a-zA-Z0-9_]+$") && pass.value.length !== 0) {
     if (confirm && (action == "add" || action == "signup") && confirm.value != pass.value) {
       alertDialog("Error: Your passwords do not match", () => {
@@ -79,13 +81,14 @@ function validateLogin(action = "login", extData) {
       params = "user=" + encodeURIComponent(CMD.value) + "&action=CMD&token=" + sessionID;
       CMD.value = "";
     } else if (action == "sendMsg") {
-      params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData);
+      params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]+)$")[1];
+      ;
       let match4 = extData.match("!renick @([a-zA-Z_0-9]+)");
       if (match4) {
-        params = "token=" + sessionID + "&action=renick&user=" + encodeURIComponent(match4[1]);
+        params = "token=" + sessionID + "&action=renick&user=" + encodeURIComponent(match4[1]) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]+)$")[1];
         renickQ = true;
       }
-    } else
+    } else if (action != "refresh" && action != "sendMsg")
       params = "user=&pass=&action=" + action + "&token=" + sessionID;
     if (action == "acquireTodo" && extData == "OK") {
       params = "action=acquireTodo&token=" + sessionID;
@@ -96,6 +99,7 @@ function validateLogin(action = "login", extData) {
       params = "user=&action=addTODO&token=" + sessionID;
     if (pass)
       pass.value = "";
+    console.log("SENDING " + params);
     var xhr = new XMLHttpRequest();
     let m = document.URL.match("redirect=(.*)");
     let redirectTo = m ? m[1] : "/";

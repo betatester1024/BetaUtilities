@@ -18,6 +18,7 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var server_exports = {};
 __export(server_exports, {
+  pushEvents: () => pushEvents,
   sendMsgAllRooms: () => sendMsgAllRooms,
   updateServer: () => updateServer
 });
@@ -25,6 +26,7 @@ module.exports = __toCommonJS(server_exports);
 var import_messageHandle = require("./messageHandle");
 var import_accessControl = require("./accessControl");
 var import_misc = require("./misc");
+var import_initialiser = require("./initialiser");
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
@@ -79,17 +81,22 @@ async function updateServer() {
       res.end(JSON.stringify("ACCESS"));
     (0, import_accessControl.validate)(decodeURIComponent(req.body.user), decodeURIComponent(req.body.pass), req.body.action, req.body.access, res, req.body.token);
   });
-  app.get("/stream", async (req, res) => {
+  app.get("/stream?*", async (req, res) => {
     res.set({
       "Cache-Control": "no-cache",
       "Content-Type": "text/event-stream",
       "Connection": "keep-alive"
     });
     res.flushHeaders();
-    pushEvents.push(res);
     res.write("retry:500\n\n");
+    let roomIdx = import_initialiser.sysRooms.indexOf(req.query.room);
+    if (roomIdx < 0) {
+      res.end();
+      return;
+    }
+    pushEvents[roomIdx].push(res);
     res.on("close", () => {
-      pushEvents.splice(pushEvents.indexOf(res), 1);
+      pushEvents[roomIdx].splice(pushEvents[roomIdx].indexOf(res), 1);
       res.end();
     });
   });
@@ -97,13 +104,24 @@ async function updateServer() {
     res.sendFile(path.join(__dirname, "../frontend", "support_v2.html"));
   });
   app.get("/status", (req, res) => {
-    let str = "BetaUtilities is in: <a href='/support'>Online Support</a>";
-    for (let j = 0; j < import_messageHandle.rooms.length - 1; j++) {
-      str += `, <a href="https://euphoria.io/room/${import_messageHandle.rooms[j]}">&${import_messageHandle.rooms[j]}</a>`;
+    let str = "BetaUtilities is in: ";
+    let prefixedRms = [];
+    let euphRooms = 0;
+    for (let i = 0; i < import_messageHandle.rooms.length; i++) {
+      if (!import_messageHandle.rooms[i].match("\\|")) {
+        euphRooms++;
+        prefixedRms.push(`<a href="https://euphoria.io/room/${import_messageHandle.rooms[i]}">&${import_messageHandle.rooms[i]}</a>`);
+      } else {
+        let roomName = import_messageHandle.rooms[i].match("\\|(.+)")[1];
+        prefixedRms.push(`<a href="/support?room=${roomName}">#${roomName}</a>`);
+      }
     }
-    str += ` ${import_messageHandle.rooms.length > 1 ? "and " : ""}<a href="https://euphoria.io/room/${import_messageHandle.rooms[import_messageHandle.rooms.length - 1]}">&${import_messageHandle.rooms[import_messageHandle.rooms.length - 1]}</a>!  `;
-    if (import_messageHandle.rooms.length == 0) {
-      str = "ERROR";
+    for (let j = 0; j < prefixedRms.length - 1; j++) {
+      str += prefixedRms[j] + ", ";
+    }
+    str += (prefixedRms.length > 1 ? "and " : "") + prefixedRms[prefixedRms.length - 1] + "!";
+    if (euphRooms == 0) {
+      str += "<br> ERROR: Rooms failed on <a href='https://euphoria.io'>euphoria</a>";
     }
     fs.writeFileSync("frontend/status_raw.html", str);
     res.sendFile(path.join(__dirname, "../frontend", "status.html"));
@@ -112,6 +130,10 @@ async function updateServer() {
     res.sendFile(path.join(__dirname, "../frontend", "globalformat.css"));
   });
   app.get("/support", (req, res) => {
+    let roomIdx = import_initialiser.sysRooms.indexOf(req.query.room);
+    if (roomIdx < 0) {
+      res.sendFile(path.join(__dirname, "../frontend", "403.html"));
+    }
     res.sendFile(path.join(__dirname, "../frontend", "support.html"));
   });
   app.get("/todo", (req, res) => {
@@ -136,13 +158,19 @@ async function updateServer() {
     (0, import_misc.systemLog)(`Front-end is running on ${port}.`);
   });
 }
-function sendMsgAllRooms(msg) {
-  for (let i = 0; i < pushEvents.length; i++) {
-    pushEvents[i].write("data:" + msg + "\n\n");
+function sendMsgAllRooms(room, msg) {
+  let roomId = import_initialiser.sysRooms.indexOf(room);
+  if (roomId < 0) {
+    console.log("invalidROOM:" + room);
+    return;
+  }
+  for (let i = 0; i < pushEvents[roomId].length; i++) {
+    pushEvents[roomId][i].write("data:" + msg + "\n\n");
   }
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  pushEvents,
   sendMsgAllRooms,
   updateServer
 });

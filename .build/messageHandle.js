@@ -288,10 +288,18 @@ function replyMessage(msg, sender, data) {
   }
   if (msg == "!activerooms @" + this.nick.toLowerCase()) {
     let str = "/me is in: ";
-    for (let j = 0; j < rooms.length - 1; j++) {
-      str += "&" + rooms[j] + ", ";
+    let euphRooms = [];
+    for (let i = 0; i < rooms.length; i++) {
+      if (!rooms[i].match("\\|"))
+        euphRooms.push("&" + rooms[i]);
+      else {
+        euphRooms.push("#" + rooms[i].match("\\|(.+)")[1]);
+      }
     }
-    str += (rooms.length > 1 ? "and " : "") + "&" + rooms[rooms.length - 1] + "!";
+    for (let j = 0; j < euphRooms.length - 1; j++) {
+      str += euphRooms[j] + ", ";
+    }
+    str += (euphRooms.length > 1 ? "and " : "") + euphRooms[euphRooms.length - 1] + "!";
     return str;
   }
   if (msg == "!pong" || msg == "!pong @" + this.nick.toLowerCase()) {

@@ -23,9 +23,11 @@
       let LOADEDQ2 = false;
       async function initClient()
       {
+        
         try {
         console.log("Starting client.")
-        const source = new EventSource('/stream');
+        const source = new EventSource('/stream?room='+
+                                       document.URL.match("\\?room=([0-9a-zA-Z\\-_]+)$")[1]);
 
         source.addEventListener('message', message => {
           // console.log('Got', message);
@@ -42,8 +44,8 @@
           }
         });
         } catch (e) {
-          console.log("Restarting client ("+e+")")
-          initClient();
+          console.log("Restartng client ("+e+")")
+          setTimeout(initClient, 0);
         }
       } // initClient();
       initClient();

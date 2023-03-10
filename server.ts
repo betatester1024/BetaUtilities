@@ -13,7 +13,9 @@ import {systemLog} from './misc';
 
 var RateLimit = require('express-rate-limit');
 
-let pushEvents: any[] = [];
+export let pushEvents: any[][] = [];
+import {sysRooms} from './initialiser';
+
 
 export async function updateServer() { 
   systemLog("");
@@ -73,7 +75,7 @@ export async function updateServer() {
    
   });
 
-  app.get("/stream", async (req:any, res:any) => {
+  app.get("/stream?*", async (req:any, res:any) => {
     res.set({
       'Cache-Control': 'no-cache',
       'Content-Type': 'text/event-stream',
@@ -82,11 +84,19 @@ export async function updateServer() {
     res.flushHeaders();
 
     // Tell the client to retry every 10 seconds if connectivity is lost
-    pushEvents.push(res);
+    
     res.write("retry:500\n\n");
-    // console.log("Added stream")
+    // console.log(req.query.room)
+    
+    let roomIdx = sysRooms.indexOf(req.query.room);
+    if (roomIdx < 0) {
+      res.end();
+      return;
+    }
+    // console.log(roomIdx);
+    pushEvents[roomIdx].push(res);
     res.on("close", () => {
-      pushEvents.splice(pushEvents.indexOf(res), 1);
+      pushEvents[roomIdx].splice(pushEvents[roomIdx].indexOf(res), 1);
       res.end();
       // console.log("Removed stream");
     });
@@ -97,13 +107,23 @@ export async function updateServer() {
   })
 
   app.get('/status', (req:any, res:any) => {
-    let str = "BetaUtilities is in: <a href='/support'>Online Support</a>";
-    for (let j = 0; j < rooms.length - 1; j++) { 
-      str += `, <a href="https://euphoria.io/room/${rooms[j]}">&${rooms[j]}</a>` ; 
+    let str = "BetaUtilities is in: ";
+    let prefixedRms = [];
+    let euphRooms = 0;
+    for (let i=0; i<rooms.length; i++) {
+      if (!rooms[i].match("\\|")) {
+        euphRooms++;
+        prefixedRms.push(`<a href="https://euphoria.io/room/${rooms[i]}">&${rooms[i]}</a>`);
+      }
+      else {
+        let roomName = rooms[i].match("\\|(.+)")[1];
+        prefixedRms.push(`<a href="/support?room=${roomName}">#${roomName}</a>`);
+      }
     }
-    str += ` ${rooms.length>1?"and ":""}<a href="https://euphoria.io/room/${rooms[rooms.length-1]}">&${rooms[rooms.length-1]}</a>!  `;
-    if (rooms.length == 0) {
-      str = "ERROR";
+    for (let j = 0; j < prefixedRms.length - 1; j++) { str += prefixedRms[j] + ", "; }
+    str += (prefixedRms.length>1?"and ":"")+prefixedRms[prefixedRms.length - 1] + "!";
+    if (euphRooms == 0) {
+      str += "<br> ERROR: Rooms failed on <a href='https://euphoria.io'>euphoria</a>";
     } // rooms failed
     fs.writeFileSync("frontend/status_raw.html",str);
     res.sendFile(path.join( __dirname, '../frontend', 'status.html' ));
@@ -114,7 +134,9 @@ export async function updateServer() {
   }); 
 
   app.get("/support", (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'support.html' ));
+    let roomIdx = sysRooms.indexOf(req.query.room);
+    if (roomIdx < 0) {res.sendFile(path.join( __dirname, '../frontend', '403.html'))}
+    res.sendFile(path.join( __dirname, '../frontend', 'support.html'));
     // validate("", "", "checkAccess", "", res, req.query.token)
   })
 
@@ -153,9 +175,15 @@ export async function updateServer() {
   });
 }
 
-export function sendMsgAllRooms(msg:string) {
-  for (let i=0; i<pushEvents.length; i++) {
-    // console.log("Writing "+msg);
-    pushEvents[i].write("data:"+msg+"\n\n");
+export function sendMsgAllRooms(room:string, msg:string) {
+  let roomId = sysRooms.indexOf(room);
+  if (roomId<0) {
+    console.log("invalidROOM:"+room)
+    return;
+  }
+  for (let i=0; i<pushEvents[roomId].length; i++) {
+    // console.log("Writing "+msg+" to roomID"+roomId);
+    
+    pushEvents[roomId][i].write("data:"+msg+"\n\n");
   }
 }

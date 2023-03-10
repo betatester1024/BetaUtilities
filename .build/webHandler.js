@@ -113,7 +113,7 @@ class WebH {
     this.incrRunCt();
   }
   sendMsg(msg, user) {
-    (0, import_accessControl.validate)(msg, "", "bMsg", "", null, "");
+    (0, import_accessControl.validate)(msg, "", "bMsg", this.roomName.match("\\|(.*)$")[1], null, "");
     this.incrRunCt();
   }
   onOpen() {
@@ -199,10 +199,11 @@ class WebH {
   onClose(event) {
     (0, import_misc.systemLog)("Closed");
   }
-  constructor() {
+  constructor(roomName) {
     this.nick = "BetaOS_System";
     this.replyMessage = import_messageHandle.replyMessage;
-    this.roomName = "OnlineSUPPORT";
+    this.roomName = "OnlineSUPPORT|" + roomName;
+    (0, import_messageHandle2.updateActive)(this.roomName, true);
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

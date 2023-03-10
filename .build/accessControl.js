@@ -53,10 +53,11 @@ function validate(user, pwd, action, access, callback, token = "") {
       fieldName: "MSG",
       sender: "BetaOS_System",
       data: user,
+      room: access,
       permLevel: 3,
       expiry: Date.now() + EXPIRY
     });
-    (0, import_server.sendMsgAllRooms)(format({ permLevel: 3, data: user, sender: "BetaOS_System" }));
+    (0, import_server.sendMsgAllRooms)(access, format({ permLevel: 3, data: user, sender: "BetaOS_System" }));
     return;
   }
   if (action == "logout") {
@@ -225,16 +226,18 @@ function validate(user, pwd, action, access, callback, token = "") {
                 fieldName: "MSG",
                 sender: snd,
                 data: user,
+                room: access,
                 permLevel: perms,
                 expiry: Date.now() + EXPIRY
               });
               callback.end(JSON.stringify("SUCCESS"));
-              (0, import_server.sendMsgAllRooms)(format({ permLevel: perms, data: user, sender: snd }));
-              if (import_initialiser.currHandler)
-                import_initialiser.currHandler.onMessage(user, snd);
+              (0, import_server.sendMsgAllRooms)(access, format({ permLevel: perms, data: user, sender: snd }));
+              let idx = import_initialiser.sysRooms.indexOf(access);
+              if (idx >= 0 && import_initialiser.webHandlers[idx])
+                import_initialiser.webHandlers[idx].onMessage(user, snd);
               return;
             } else if (action == "refresh" && perms >= 1) {
-              DB2.find({ fieldName: "MSG" }).toArray().then((objs) => {
+              DB2.find({ fieldName: "MSG", room: { $eq: access } }).toArray().then((objs) => {
                 let out = "";
                 for (let i = 0; i < objs.length; i++) {
                   out += format(objs[i]);
@@ -356,6 +359,9 @@ function format(obj3) {
   data = data.replaceAll("\\n", "<br>");
   data = data.replaceAll(/\&amp;([0-9a-zA-Z]+)/gm, (match, p1) => {
     return "<a href='https://euphoria.io/room/" + p1 + "'>" + match + "</a>";
+  });
+  data = data.replaceAll(/#([0-9a-zA-Z_\\-]+)/gm, (match, p1) => {
+    return "<a href='/support?room=" + p1 + "'>" + match + "</a>";
   });
   data = linkifyHtml(data);
   for (let i = 0; i < import_replacements.replacements.length; i++) {

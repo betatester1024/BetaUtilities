@@ -1,6 +1,6 @@
 import { WS } from "./wsHandler";
 var escape = require('escape-html');
-import {currHandler} from './initialiser';
+import {webHandlers, sysRooms} from './initialiser';
 // import { hashSync, compareSync} from 
 var bcrypt = require("bcrypt");
 const linkifyHtml = require("linkify-html");
@@ -38,10 +38,11 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       fieldName: "MSG", 
       sender:"BetaOS_System", 
       data:user, 
+      room: access,
       permLevel:3, 
       expiry:Date.now()+EXPIRY});
    
-    sendMsgAllRooms(format({permLevel:3, data:user, sender:"BetaOS_System"}));
+    sendMsgAllRooms(access, format({permLevel:3, data:user, sender:"BetaOS_System"}));
     return;
   }
    // data validation complete
@@ -221,25 +222,28 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           return;
         }
         else if (action == "sendMsg" && perms >= 1) {
-          // systemLog("adding message: "+user);
+          // console.log("sending message in room"+access);
           const snd = obj2.alias?obj2.alias:obj.associatedUser;
           DB2.insertOne({
             fieldName: "MSG", 
             sender:snd, 
             data:user, 
+            room: access,
             permLevel:perms, 
             expiry:Date.now()+EXPIRY})
           callback.end(JSON.stringify("SUCCESS"));
           // console.log("Sending message:"+user);
-          sendMsgAllRooms(format({permLevel:perms, data:user, sender:snd}));
-          if (currHandler) currHandler.onMessage(user, snd);
+          sendMsgAllRooms(access, format({permLevel:perms, data:user, sender:snd}));
+          let idx = sysRooms.indexOf(access);
+          if (idx>=0 && webHandlers[idx]) webHandlers[idx].onMessage(user, snd);
           return;
         }
         
         else if (action == "refresh" && perms >= 1) {
           
           // let cursor = DB2.find({fieldName:"MSG"});
-          DB2.find({fieldName:"MSG"}).toArray().then((objs:{sender:string, data:string, permLevel:number}[])=>{
+          // console.log(access);
+          DB2.find({fieldName:"MSG", room:{$eq:access}}).toArray().then((objs:{sender:string, data:string, permLevel:number}[])=>{
             let out = "";
             // console.log(objs)
             for (let i=0; i<objs.length; i++) {
@@ -360,6 +364,7 @@ function format(obj:{permLevel:number, data:string, sender:string}) {
   data = data.replaceAll("<", "&lt;");
   data = data.replaceAll("\\n", "<br>");
   data = data.replaceAll(/\&amp;([0-9a-zA-Z]+)/gm, (match:string, p1:string)=>{return "<a href='https://euphoria.io/room/"+p1+"'>"+match+"</a>"});
+  data = data.replaceAll(/#([0-9a-zA-Z_\\-]+)/gm, (match:string, p1:string)=>{return "<a href='/support?room="+p1+"'>"+match+"</a>"});
   
   data = linkifyHtml(data);
   // data = data.replaceAll(/([-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/igmu, 

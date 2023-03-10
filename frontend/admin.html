@@ -15,8 +15,9 @@
       button {
         height: 100%;
       }
-      .HOME, #del, #userLoginBTN {
+      .HOME, #del, #userLoginBTN, .fixBtnHeight {
         height: 3em;
+/*         width: unset; */
       }
     </style>
     
@@ -51,10 +52,16 @@
           </select><br>
           <hr class="btnHr"></hr>
         </div><br>
-        <button id="userLoginBTN" onclick="newUser(event, 1)" hidden>Update user
+        <button id="userLoginBTN" onclick="newUser(event, 1)" hidden>Change your password
          <hr class="btnHr"></hr></button>
-         <button id="del" onclick="validateLogin('delete')">Delete user
+      
+        <button class="fixBtnHeight" onclick="validateLogin('logout', '')" type="button">
+          Logout<br>
+          <hr class="btnHr"></hr>
+        </button>
+        <button id="del" onclick="validateLogin('delete')">Delete this account
          <hr class="btnHr"></hr></button>
+        
         <div id="danger" onclick="document.getElementById('command').focus();">
           <input type="input" id="command" placeholder="Enter commands here..." onchange="validateLogin('CMD')"/>
           <hr class="inpHr"></hr>

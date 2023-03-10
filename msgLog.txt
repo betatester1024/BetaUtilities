@@ -10,3 +10,109 @@
 (OnlineSUPPORT)[BetaOS] slant
 (OnlineSUPPORT)[BetaOS] !antispam @BetaOS_System
 (OnlineSUPPORT)[BetaOS] 8685
+(OnlineSUPPORT)[morenewuser] hey
+(OnlineSUPPORT)[test] moerenewuser
+(OnlineSUPPORT)[morenewuser] test
+(OnlineSUPPORT)[BetaOS] !uptime @BetaOS_System
+(OnlineSUPPORT)[BetaOS] very good uptime
+(OnlineSUPPORT)[BetaOS] #otherroom
+(OnlineSUPPORT)[BetaOS] !uptime @BetaOS_System
+(OnlineSUPPORT)[BetaOS] EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEe
+(OnlineSUPPORT)[BetaOS] HEY EVEYRONE
+(OnlineSUPPORT)[BetaOS] message
+(OnlineSUPPORT)[BetaOS] hey
+(OnlineSUPPORT)[BetaOS] message
+(OnlineSUPPORT)[BetaOS] hey
+(OnlineSUPPORT)[BetaOS] messaging
+(OnlineSUPPORT)[BetaOS] eEY
+(OnlineSUPPORT)[BetaOS] nonexistentroom
+(OnlineSUPPORT)[BetaOS] main_support
+(OnlineSUPPORT)[BetaOS] main_support
+(OnlineSUPPORT)[BetaOS] main_support
+(OnlineSUPPORT)[BetaOS] main_support
+(OnlineSUPPORT)[BetaOS] main_support
+(OnlineSUPPORT)[BetaOS] main_support
+(OnlineSUPPORT)[BetaOS] okay
+(OnlineSUPPORT)[BetaOS] what
+(OnlineSUPPORT)[BetaOS] it's sending
+(OnlineSUPPORT)[BetaOS] i'm not getting notified
+(OnlineSUPPORT)[BetaOS] e
+(OnlineSUPPORT)[BetaOS] e message
+(OnlineSUPPORT)[BetaOS] please notify me
+(OnlineSUPPORT)[BetaOS] what
+(OnlineSUPPORT)[BetaOS] not working
+(OnlineSUPPORT)[BetaOS] a
+(OnlineSUPPORT)[BetaOS]  such a bloody bother
+(OnlineSUPPORT)[BetaOS] finally
+(OnlineSUPPORT)[BetaOS] !uptime @BetaOS_Systems
+(OnlineSUPPORT)[BetaOS] DAMNIT
+(OnlineSUPPORT)[BetaOS_System] woo
+(OnlineSUPPORT)[BetaOS_System] sending
+(OnlineSUPPORT)[BetaOS_System] veyr nice
+(OnlineSUPPORT)[BetaOS] wahey
+(OnlineSUPPORT)[BetaOS] yeaah
+(OnlineSUPPORT)[test] bcccdeee
+(OnlineSUPPORT)[test] message load
+(OnlineSUPPORT)[test] hey ya receive this?
+(OnlineSUPPORT)[test] ehy
+(OnlineSUPPORT)[test] why hello
+(OnlineSUPPORT)[test] more people
+(OnlineSUPPORT)[test] !alias @BetaOS_System
+(OnlineSUPPORT)[BetaOS] oi
+(OnlineSUPPORT)[BetaOS] hi there
+(OnlineSUPPORT|main_support)[BetaOS] !ping
+(OnlineSUPPORT|main_support)[BetaOS] !ping
+(OnlineSUPPORT|main_support)[BetaOS] !ping
+(OnlineSUPPORT|main_support)[BetaOS] !uptime @BetaOS_System
+(OnlineSUPPORT|secondary_support)[BetaOS] !ping
+(OnlineSUPPORT|secondary_support)[BetaOS] !uptime @BetaOS_System
+(OnlineSUPPORT|secondary_support)[BetaOS] !activerooms
+(OnlineSUPPORT|secondary_support)[BetaOS] !activerooms @BetaOS_System
+(OnlineSUPPORT|secondary_support)[BetaOS] !activerooms @BetaOS_System
+(OnlineSUPPORT|secondary_support)[BetaOS] !activerooms @BetaOS_System
+(OnlineSUPPORT|main_support)[BetaOS] !activerooms @BetaOS_System
+(OnlineSUPPORT|main_support)[betatester1024] hey
+(OnlineSUPPORT|main_support)[betatester1024] anyone home
+(OnlineSUPPORT|secondary_support)[betatester1024] anyone home
+(OnlineSUPPORT|secondary_support)[betatester1024] abcde
+(OnlineSUPPORT|secondary_support)[betatester1024] fgh
+(OnlineSUPPORT|secondary_support)[betatester1024] ehh
+(OnlineSUPPORT|main_support)[user] &room3
+(OnlineSUPPORT|main_support)[user] #room3
+(OnlineSUPPORT|main_support)[user] !help
+(OnlineSUPPORT|main_support)[user] !help @BetaOS_System
+(OnlineSUPPORT|main_support)[user] 1
+(OnlineSUPPORT|main_support)[user] 9
+(OnlineSUPPORT|main_support)[user] e
+(OnlineSUPPORT|main_support)[user] live updates
+(OnlineSUPPORT|main_support)[user] 2
+(OnlineSUPPORT|main_support)[user] 2
+(OnlineSUPPORT|main_support)[user] abcde
+(OnlineSUPPORT|main_support)[user] 1
+(OnlineSUPPORT|main_support)[user] !wordle
+(OnlineSUPPORT|main_support)[user] chase
+(OnlineSUPPORT|main_support)[user] leaps
+(OnlineSUPPORT|main_support)[user] slate
+(OnlineSUPPORT|main_support)[user] !restore @BetaOS_System
+(OnlineSUPPORT|main_support)[user] !antispam @BetaOS_System
+(OnlineSUPPORT|main_support)[user] 5858
+(OnlineSUPPORT|main_support)[user] !wordle
+(OnlineSUPPORT|room3)[user] oi
+(OnlineSUPPORT|room3)[user] this is
+(OnlineSUPPORT|room3)[user] finally working
+(OnlineSUPPORT|room3)[user] !ping @BetaOS_System
+(OnlineSUPPORT|room3)[user] excellent
+(OnlineSUPPORT|room3)[user] :confirm::warn:
+(OnlineSUPPORT|room3)[user] #:confirm:
+(OnlineSUPPORT|room3)[user] #:test
+(OnlineSUPPORT|room3)[user] #test
+(OnlineSUPPORT|room3)[user] hey
+(OnlineSUPPORT|some_more_rooms)[user] hey more rooms
+(OnlineSUPPORT|main_support)[admin] failure boomer farts
+(OnlineSUPPORT|main_support)[admin] !ping
+(OnlineSUPPORT|main_support)[admin] !punch @BetaOS_System
+(OnlineSUPPORT|main_support)[admin] !wordle
+(OnlineSUPPORT|main_support)[admin] assas
+(OnlineSUPPORT|main_support)[admin] 2
+(OnlineSUPPORT|main_support)[admin] 12345
+(OnlineSUPPORT|main_support)[admin] 67890

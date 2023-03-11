@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Where to find support?</title>
+    <meta name="viewport" content="width=device-width">
+    <script src="/login.js">
+    </script><script>
+      function onLoad() {
+        validateLogin("ROOMLISTING", "")
+        validateLogin("userReq", "")
+      }
+    </script>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      button {
+        max-width: 10em;
+      }
+      #mainDiv {
+        overflow-y: scroll;
+        max-height: 95vh;
+        width: calc(100vw - 10px);
+        text-align: center;
+      }
+      .unsetWidth{
+        width: 10em;
+      }
+      input {
+        text-align: center;
+        width: 10em;
+      }
+      #newRoom {
+        width: unset;
+      }
+      form {
+        width: 20em;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
+  <body onload = "onLoad();">
+    <div id = "mainDiv">
+      <h1>Support rooms</h1>
+      <hr class="rounded"></hr>
+      <form action = "javascript:validateLogin('newRoom', '');"> 
+        <div class="inputDiv">
+          <input id="enterRoomInp" placeholder="Enter room-name">
+          <hr class="inpHr">
+        </div>
+        <button type="submit">
+          Enter room<br>
+          <hr class="btnHr"></hr>
+        </button>
+      </form>
+      <div id="innerDiv"></div>
+      <div id="newRoom" hidden>
+        <br><br>
+        <h2>Administrative tools</h2>
+        <hr class="rounded"></hr>
+        <form action = "javascript:validateLogin('newRoom', '');"> 
+          <div class="inputDiv">
+            <input id="newroominp" placeholder="Create a new room...">
+            <hr class="inpHr">
+          </div>
+          <button type="submit">
+            Create room!<br>
+            <hr class="btnHr"></hr>
+          </button>
+        </form>
+      </div>
+      <button class="HOME" onclick="window.open('../', '_self');">&#x00AB Return to home<br><hr class="btnHr"></hr></button>
+    </div>
+    <h1 class="beforeoverload" id="h1">Sorry, this is taking longer than expected. 
+      <br>
+      <a href = '/'> Return to home</a>
+    </h1>
+     <div id="alert" onclick = "clearalert()" onkeydown="clearalert()"><p id="alerttxt" style="width: 90%"></p><button style="position: relative; top: 50vh; height: 4em;"><u>> Continue <</u></button></div>
+    <div id="overlay"></div>
+  </body>
+ </html>

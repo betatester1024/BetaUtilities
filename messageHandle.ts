@@ -17,11 +17,16 @@ let workingUsers:string[] = [];
 let leetlentCt= 1;
 let wordleCt = 1;
 let STARTTIME = Date.now();
-export let rooms:string[] = [];
+import {sysRooms} from './initialiser';
+import {pushEvents} from './server';
+// export let rooms:string[] = [];
 export function updateActive(roomID:string, activeQ:boolean) {
-  let idx = rooms.indexOf(roomID)
-  if (idx<0 && activeQ) rooms.push(roomID);
-  else if (idx>=0 && !activeQ) rooms.splice(idx, 1); // remove at idx. (supposedly.)
+  let idx = sysRooms.indexOf(roomID)
+  if (idx<0 && activeQ) {
+    sysRooms.push(roomID);
+    pushEvents.push([]);
+  }
+  else if (idx>=0 && !activeQ) sysRooms.splice(idx, 1); // remove at idx. (supposedly.)
 }
 
 export function replyMessage(this:WS, msg:string, sender:string, data:any):string {
@@ -35,10 +40,12 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   }
   if (msg == "!conjure @" + this.nick.toLowerCase()) {
     if (this.socket) setTimeout(()=>{this.socket.close()}, 120);
+    else this.delaySendMsg("/me reboots", data, 200)
     return "/me rölls bÿ and spontaneously combusts";
   }
   if (msg == "!reboot @" + this.nick.toLowerCase()) {
     if (this.socket) setTimeout(()=>{this.socket.close()}, 120);
+    else this.delaySendMsg("/me reboots", data, 200)
     return "/me is rebooting";
   }
   if (msg.match(/!testfeature/gimu)) return "@" + sender;
@@ -223,7 +230,7 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   if (match2) {
     systemLog(match2);
     let newNick = match2[2]==null?"BetaUtilities":match2[2];
-    if (rooms.indexOf(match2[1])>=0) return "We're already in this room!";
+    if (sysRooms.indexOf(match2[1])>=0) return "We're already in this room!";
     try  {new WS("wss://euphoria.io/room/" + match2[1] + "/ws", newNick, match2[1], false);}
     catch (e) {systemLog((e))}
     updateActive(match2[1], true);
@@ -261,15 +268,16 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   }
   if (msg.match("^!die$")) {
     if (this.socket) setTimeout(()=>{this.socket.close()}, 120);
+    else this.delaySendMsg("/me reboots", data, 200)
     this.delaySendMsg("/me crashes", data, 100)
     return "aaaaghhh! death! blood! i'm dying!";
   }
   if (msg == "!activerooms @"+this.nick.toLowerCase()) {
     let str = "/me is in: ";
     let euphRooms = [];
-    for (let i=0; i<rooms.length; i++) {
-      if (!rooms[i].match("\\|")) euphRooms.push("&"+rooms[i]);
-      else {euphRooms.push("#"+rooms[i].match("\\|(.+)")[1]);}
+    for (let i=0; i<sysRooms.length; i++) {
+      if (!sysRooms[i].match("\\|")) euphRooms.push("&"+sysRooms[i]);
+      else if (!data) {euphRooms.push("#"+sysRooms[i].match("\\|(.+)")[1]);}
     }
     for (let j = 0; j < euphRooms.length - 1; j++) { str += euphRooms[j] + ", "; }
     str += (euphRooms.length>1?"and ":"")+euphRooms[euphRooms.length - 1] + "!";
@@ -446,6 +454,7 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   if (this.callStatus == 5 && (msg == "one" || msg == "1" || msg == ":one:")) {
     this.clearCallReset();
     if (this.socket) setTimeout(()=>{this.socket.close()}, 120);
+    else this.delaySendMsg("/me reboots", data, 200)
     return "/me reboots";
   }
   if (msg == "!wordle"||this.callStatus == 5 && (msg == "two" || msg == "2" || msg == ":two:")) {

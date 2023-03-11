@@ -132,6 +132,7 @@ class WebH {
     msg = msg.trim().toLowerCase();
     if (msg == "!kill @" + this.nick.toLowerCase()) {
       this.sendMsg("/me crashes", data);
+      this.delaySendMsg("/me restarts", data, 200);
     } else if (this.pausedQ && msg == "!restore @" + this.nick.toLowerCase()) {
       this.sendMsg("/me has been unpaused", data);
       (0, import_messageHandle2.updateActive)(this.roomName, true);

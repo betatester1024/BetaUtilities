@@ -73,7 +73,7 @@ function validateLogin(action: string = "login", extData: string) {
     } 
   }
   
-  if (action == "refresh") extData =document.URL.match("\\?room=([0-9a-zA-Z\\-_]+)$")[1];
+  if (action == "refresh") extData =document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
   if ((action != "login" && action != "add" && action != "signup") || (user.value.match("^[a-zA-Z0-9_]+$") && pass.value.length !== 0)) {
     if (confirm && (action == "add" || action == "signup") && confirm.value != pass.value) {
       // console.log("Nomatch");
@@ -97,10 +97,10 @@ function validateLogin(action: string = "login", extData: string) {
       CMD.value = "";
     }
     else if (action == "sendMsg") {
-      params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData)+"&access="+document.URL.match("\\?room=([0-9a-zA-Z\\-_]+)$")[1];;
+      params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData)+"&access="+document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];;
       let match = extData.match("!renick @([a-zA-Z_0-9]+)");
       if (match) {
-        params = "token="+sessionID+"&action=renick&user="+encodeURIComponent(match[1])+"&access="+document.URL.match("\\?room=([0-9a-zA-Z\\-_]+)$")[1];
+        params = "token="+sessionID+"&action=renick&user="+encodeURIComponent(match[1])+"&access="+document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
         renickQ = true;
       }
       // // temporarily add this message to the div (until refresh handles it)
@@ -108,7 +108,12 @@ function validateLogin(action: string = "login", extData: string) {
       // ele.innerHTML += `<p><b class='${CURRPERMS=="2"?"admin":(CURRPERMS=="3"?"beta":"")}''>${CURRUSER} [SendingAWAIT]:</b> ${extData}</p><br>`;
       // ele.scrollTop = ele.scrollHeight;
     }
-    else if (action != "refresh" && action != "sendMsg") params = "user=&pass=&action="+action+"&token=" + sessionID;
+    else params = "user=&pass=&action="+action+"&token=" + sessionID;
+    let newRoomInp = document.getElementById("newroominp") as HTMLInputElement;
+    if (action == "newRoom") {
+      params = "user="+newRoomInp.value+"&action=newRoom&token="+sessionID;
+      newRoomInp.value = "";
+    }
     if (action == "acquireTodo" && extData == "OK"){
       params = "action=acquireTodo&token="+sessionID;
     }
@@ -136,13 +141,30 @@ function validateLogin(action: string = "login", extData: string) {
         ele = document.getElementById('h1');
         if (ele) ele.className = "beforeoverload";
         if (action != "login") {
-          if (res == "ERROR" || res == "NOACTIVE" || res == "ACCESS") {
+          if (action == "newRoom") {
+            alertDialog("Room creation: "+res, ()=>{validateLogin("ROOMLISTING", "")});
+            return;
+          }
+          if (action != "userReq" && (res == "ERROR" || res == "NOACTIVE" || res == "ACCESS")) {
             // console.log("what?")
             if (document.URL.match("betatester1024.repl.co/?$")) {
               validateLogin("logout", "");
             }
+            else if (res == "ERROR") alertDialog("Unknown error occurred.", ()=> {location.reload()});
             else if (res == "NOACTIVE") alertDialog("Your login session is invalid!", () => { validateLogin("logout", document.URL); });
             else alertDialog("You're not logged in!", ()=>{window.open("/login?redirect="+document.URL), "_self"})
+            return;
+          }
+          if (action == "ROOMLISTING") {
+            res = res as unknown as string[];
+            let mainDiv = document.getElementById("innerDiv") as HTMLDivElement;
+            mainDiv.innerHTML = "";
+            for (let i=0; i<res.length; i++) {
+              let match = res[i].match("OnlineSUPPORT\\|(.*)");
+              // let name = "";
+              // if (match) name = match[1];
+              if (match) mainDiv.innerHTML+=`<button class="unsetWidth" onclick="window.open('/support?room=${match[1]}', '_self')"><kbd>${match[1]}</kbd><hr class="btnHr"></hr></button>`
+            }
             return;
           }
           if (action == "acquireTodo") {
@@ -169,6 +191,7 @@ function validateLogin(action: string = "login", extData: string) {
             resetAlertDiv();
             return;
           }
+          
           if (renickQ && res != "ERROR") {
             CURRUSER = res;
             alertDialog("Renicked successfully to @"+CURRUSER, ()=>{});
@@ -190,18 +213,26 @@ function validateLogin(action: string = "login", extData: string) {
                 ele.innerHTML = "Welcome, "+res.split(" ")[0]+"!";
               else ele.innerHTML = "Welcome to BetaOS Services!"
             } else {
-              switch(res.split(" ")[1]) {
-                case "1": 
-                  (document.getElementById("sel") as HTMLSelectElement).hidden=true;
-                  (document.getElementById('loginDIV') as HTMLDivElement).hidden=true;
-                  (document.getElementById("userLoginBTN")as HTMLButtonElement).hidden=false;
-                  let userinp=document.getElementById("userINP") as HTMLInputElement;
-                  userinp.value = res.split(" ")[0];
-                  (document.getElementById("userDiv") as HTMLDivElement).hidden=true;
-                  (document.getElementById("danger") as HTMLDivElement).hidden=true;
-                break;
-              }
+              ele = document.getElementById("newRoom") as HTMLDivElement;
+              if (!ele) {
+                switch(res.split(" ")[1]) {
+                  case "1": 
+                    (document.getElementById("sel") as HTMLSelectElement).hidden=true;
+                    (document.getElementById('loginDIV') as HTMLDivElement).hidden=true;
+                    (document.getElementById("userLoginBTN")as HTMLButtonElement).hidden=false;
+                    let userinp=document.getElementById("userINP") as HTMLInputElement;
+                    userinp.value = res.split(" ")[0];
+                    (document.getElementById("userDiv") as HTMLDivElement).hidden=true;
+                    (document.getElementById("danger") as HTMLDivElement).hidden=true;
+                  break;
+                }
+              } else {
+                ele.hidden = !CURRPERMS || Number(CURRPERMS)<2;
+                // console.log(ele.hidden);
+              } // add the newroom ment not hisde
+              
             } // admin page
+            
             return;
           }
           if (action == "delete" && res != "NOACTIVE" && res !="EXPIRE" && res != "ACCESS" && res != "ERROR") {

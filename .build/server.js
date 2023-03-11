@@ -23,10 +23,9 @@ __export(server_exports, {
   updateServer: () => updateServer
 });
 module.exports = __toCommonJS(server_exports);
-var import_messageHandle = require("./messageHandle");
+var import_initialiser = require("./initialiser");
 var import_accessControl = require("./accessControl");
 var import_misc = require("./misc");
-var import_initialiser = require("./initialiser");
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
@@ -89,9 +88,10 @@ async function updateServer() {
     });
     res.flushHeaders();
     res.write("retry:500\n\n");
-    let roomIdx = import_initialiser.sysRooms.indexOf(req.query.room);
+    let roomIdx = import_initialiser.sysRooms.indexOf("OnlineSUPPORT|" + req.query.room);
     if (roomIdx < 0) {
       res.end();
+      console.log("Invalid room: " + req.query.room);
       return;
     }
     pushEvents[roomIdx].push(res);
@@ -107,12 +107,12 @@ async function updateServer() {
     let str = "BetaUtilities is in: ";
     let prefixedRms = [];
     let euphRooms = 0;
-    for (let i = 0; i < import_messageHandle.rooms.length; i++) {
-      if (!import_messageHandle.rooms[i].match("\\|")) {
+    for (let i = 0; i < import_initialiser.sysRooms.length; i++) {
+      if (!import_initialiser.sysRooms[i].match("\\|")) {
         euphRooms++;
-        prefixedRms.push(`<a href="https://euphoria.io/room/${import_messageHandle.rooms[i]}">&${import_messageHandle.rooms[i]}</a>`);
+        prefixedRms.push(`<a href="https://euphoria.io/room/${import_initialiser.sysRooms[i]}">&${import_initialiser.sysRooms[i]}</a>`);
       } else {
-        let roomName = import_messageHandle.rooms[i].match("\\|(.+)")[1];
+        let roomName = import_initialiser.sysRooms[i].match("\\|(.+)")[1];
         prefixedRms.push(`<a href="/support?room=${roomName}">#${roomName}</a>`);
       }
     }
@@ -130,11 +130,13 @@ async function updateServer() {
     res.sendFile(path.join(__dirname, "../frontend", "globalformat.css"));
   });
   app.get("/support", (req, res) => {
-    let roomIdx = import_initialiser.sysRooms.indexOf(req.query.room);
-    if (roomIdx < 0) {
-      res.sendFile(path.join(__dirname, "../frontend", "403.html"));
-    }
-    res.sendFile(path.join(__dirname, "../frontend", "support.html"));
+    let roomIdx = import_initialiser.sysRooms.indexOf("OnlineSUPPORT|" + req.query.room);
+    if (roomIdx < 0 && req.query.room) {
+      res.sendFile(path.join(__dirname, "../frontend", "roomNotFound.html"));
+    } else if (req.query.room)
+      res.sendFile(path.join(__dirname, "../frontend", "support.html"));
+    else
+      res.sendFile(path.join(__dirname, "../frontend", "supportIndex.html"));
   });
   app.get("/todo", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "TODO.html"));
@@ -159,7 +161,7 @@ async function updateServer() {
   });
 }
 function sendMsgAllRooms(room, msg) {
-  let roomId = import_initialiser.sysRooms.indexOf(room);
+  let roomId = import_initialiser.sysRooms.indexOf("OnlineSUPPORT|" + room);
   if (roomId < 0) {
     console.log("invalidROOM:" + room);
     return;

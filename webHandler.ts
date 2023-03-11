@@ -121,7 +121,7 @@ export class WebH
       // !kill
       if (msg == "!kill @" + this.nick.toLowerCase()) {
         this.sendMsg("/me crashes", data);
-        
+        this.delaySendMsg("/me restarts", data, 200);
       }
         
       // !restore

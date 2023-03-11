@@ -60,7 +60,7 @@ function validateLogin(action = "login", extData) {
     }
   }
   if (action == "refresh")
-    extData = document.URL.match("\\?room=([0-9a-zA-Z\\-_]+)$")[1];
+    extData = document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
   if (action != "login" && action != "add" && action != "signup" || user.value.match("^[a-zA-Z0-9_]+$") && pass.value.length !== 0) {
     if (confirm && (action == "add" || action == "signup") && confirm.value != pass.value) {
       alertDialog("Error: Your passwords do not match", () => {
@@ -81,15 +81,20 @@ function validateLogin(action = "login", extData) {
       params = "user=" + encodeURIComponent(CMD.value) + "&action=CMD&token=" + sessionID;
       CMD.value = "";
     } else if (action == "sendMsg") {
-      params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]+)$")[1];
+      params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
       ;
       let match4 = extData.match("!renick @([a-zA-Z_0-9]+)");
       if (match4) {
-        params = "token=" + sessionID + "&action=renick&user=" + encodeURIComponent(match4[1]) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]+)$")[1];
+        params = "token=" + sessionID + "&action=renick&user=" + encodeURIComponent(match4[1]) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
         renickQ = true;
       }
-    } else if (action != "refresh" && action != "sendMsg")
+    } else
       params = "user=&pass=&action=" + action + "&token=" + sessionID;
+    let newRoomInp = document.getElementById("newroominp");
+    if (action == "newRoom") {
+      params = "user=" + newRoomInp.value + "&action=newRoom&token=" + sessionID;
+      newRoomInp.value = "";
+    }
     if (action == "acquireTodo" && extData == "OK") {
       params = "action=acquireTodo&token=" + sessionID;
     }
@@ -118,10 +123,20 @@ function validateLogin(action = "login", extData) {
         if (ele)
           ele.className = "beforeoverload";
         if (action != "login") {
-          if (res == "ERROR" || res == "NOACTIVE" || res == "ACCESS") {
+          if (action == "newRoom") {
+            alertDialog("Room creation: " + res, () => {
+              validateLogin("ROOMLISTING", "");
+            });
+            return;
+          }
+          if (action != "userReq" && (res == "ERROR" || res == "NOACTIVE" || res == "ACCESS")) {
             if (document.URL.match("betatester1024.repl.co/?$")) {
               validateLogin("logout", "");
-            } else if (res == "NOACTIVE")
+            } else if (res == "ERROR")
+              alertDialog("Unknown error occurred.", () => {
+                location.reload();
+              });
+            else if (res == "NOACTIVE")
               alertDialog("Your login session is invalid!", () => {
                 validateLogin("logout", document.URL);
               });
@@ -129,6 +144,17 @@ function validateLogin(action = "login", extData) {
               alertDialog("You're not logged in!", () => {
                 window.open("/login?redirect=" + document.URL), "_self";
               });
+            return;
+          }
+          if (action == "ROOMLISTING") {
+            res = res;
+            let mainDiv = document.getElementById("innerDiv");
+            mainDiv.innerHTML = "";
+            for (let i = 0; i < res.length; i++) {
+              let match4 = res[i].match("OnlineSUPPORT\\|(.*)");
+              if (match4)
+                mainDiv.innerHTML += `<button class="unsetWidth" onclick="window.open('/support?room=${match4[1]}', '_self')"><kbd>${match4[1]}</kbd><hr class="btnHr"></hr></button>`;
+            }
             return;
           }
           if (action == "acquireTodo") {
@@ -171,16 +197,21 @@ function validateLogin(action = "login", extData) {
               else
                 ele2.innerHTML = "Welcome to BetaOS Services!";
             } else {
-              switch (res.split(" ")[1]) {
-                case "1":
-                  document.getElementById("sel").hidden = true;
-                  document.getElementById("loginDIV").hidden = true;
-                  document.getElementById("userLoginBTN").hidden = false;
-                  let userinp = document.getElementById("userINP");
-                  userinp.value = res.split(" ")[0];
-                  document.getElementById("userDiv").hidden = true;
-                  document.getElementById("danger").hidden = true;
-                  break;
+              ele2 = document.getElementById("newRoom");
+              if (!ele2) {
+                switch (res.split(" ")[1]) {
+                  case "1":
+                    document.getElementById("sel").hidden = true;
+                    document.getElementById("loginDIV").hidden = true;
+                    document.getElementById("userLoginBTN").hidden = false;
+                    let userinp = document.getElementById("userINP");
+                    userinp.value = res.split(" ")[0];
+                    document.getElementById("userDiv").hidden = true;
+                    document.getElementById("danger").hidden = true;
+                    break;
+                }
+              } else {
+                ele2.hidden = !CURRPERMS || Number(CURRPERMS) < 2;
               }
             }
             return;

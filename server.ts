@@ -7,15 +7,15 @@ const bodyParser = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({ extended: false })  
 const app = express();
 const port = 4000;
-import {rooms} from './messageHandle';
+import {sysRooms} from './initialiser';
 import { validate } from './accessControl';
 import {systemLog} from './misc';
 
 var RateLimit = require('express-rate-limit');
 
 export let pushEvents: any[][] = [];
-import {sysRooms} from './initialiser';
-
+// import {pushEvents} from './initialiser';
+// 
 
 export async function updateServer() { 
   systemLog("");
@@ -88,9 +88,10 @@ export async function updateServer() {
     res.write("retry:500\n\n");
     // console.log(req.query.room)
     
-    let roomIdx = sysRooms.indexOf(req.query.room);
+    let roomIdx = sysRooms.indexOf("OnlineSUPPORT|"+req.query.room);
     if (roomIdx < 0) {
       res.end();
+      console.log("Invalid room: "+req.query.room);
       return;
     }
     // console.log(roomIdx);
@@ -110,13 +111,13 @@ export async function updateServer() {
     let str = "BetaUtilities is in: ";
     let prefixedRms = [];
     let euphRooms = 0;
-    for (let i=0; i<rooms.length; i++) {
-      if (!rooms[i].match("\\|")) {
+    for (let i=0; i<sysRooms.length; i++) {
+      if (!sysRooms[i].match("\\|")) {
         euphRooms++;
-        prefixedRms.push(`<a href="https://euphoria.io/room/${rooms[i]}">&${rooms[i]}</a>`);
+        prefixedRms.push(`<a href="https://euphoria.io/room/${sysRooms[i]}">&${sysRooms[i]}</a>`);
       }
       else {
-        let roomName = rooms[i].match("\\|(.+)")[1];
+        let roomName = sysRooms[i].match("\\|(.+)")[1];
         prefixedRms.push(`<a href="/support?room=${roomName}">#${roomName}</a>`);
       }
     }
@@ -134,9 +135,11 @@ export async function updateServer() {
   }); 
 
   app.get("/support", (req:any, res:any) => {
-    let roomIdx = sysRooms.indexOf(req.query.room);
-    if (roomIdx < 0) {res.sendFile(path.join( __dirname, '../frontend', '403.html'))}
-    res.sendFile(path.join( __dirname, '../frontend', 'support.html'));
+    let roomIdx = sysRooms.indexOf("OnlineSUPPORT|"+req.query.room);
+    // console.log(roomIdx, req.query.room)
+    if (roomIdx < 0 && req.query.room) {res.sendFile(path.join( __dirname, '../frontend', 'roomNotFound.html'))}
+    else if(req.query.room) res.sendFile(path.join( __dirname, '../frontend', 'support.html'));
+    else res.sendFile(path.join( __dirname, '../frontend', 'supportIndex.html'));
     // validate("", "", "checkAccess", "", res, req.query.token)
   })
 
@@ -176,7 +179,7 @@ export async function updateServer() {
 }
 
 export function sendMsgAllRooms(room:string, msg:string) {
-  let roomId = sysRooms.indexOf(room);
+  let roomId = sysRooms.indexOf("OnlineSUPPORT|"+room);
   if (roomId<0) {
     console.log("invalidROOM:"+room)
     return;

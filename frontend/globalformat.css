@@ -55,7 +55,7 @@ button, select, #loginDIV {
   width: 89vw;
   height: 2.5em;
   border: none;
-  border-radius: 3vh;
+  border-radius: 15px;
   font-size: 2em;
   background-color: #eee; 
   color: #0a84ff;
@@ -92,6 +92,7 @@ hr.btnHr {
 #pwdDiv:hover > hr.inpHr,
 #pwdDiv2:hover > hr.inpHr,
 #danger:hover > hr.inpHr,
+.inputDiv:hover > hr.inpHr,
 input:focus + hr{
   position: relative;
 /*         right: auto; */
@@ -300,4 +301,7 @@ div#overlay {
   'wght' 500,
   'GRAD' 0,
   'opsz' 48
+}
+button {
+  cursor: pointer;
 }

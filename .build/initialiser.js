@@ -30,7 +30,6 @@ var import_messageHandle = require("./messageHandle");
 var import_updateuser = require("./updateuser");
 var import_webHandler = require("./webHandler");
 var import_database = require("./database");
-var import_server2 = require("./server");
 var import_accessControl = require("./accessControl");
 let rooms = ["xkcd", "test", "bots", "ai", "room", "srs", "memes"];
 let nicks = [
@@ -53,13 +52,12 @@ function init() {
   (0, import_updateuser.initUsers)();
   for (let i = 0; i < rooms.length; i++) {
     sockets.push(new import_wsHandler.WS("wss://euphoria.io/room/" + rooms[i] + "/ws", nicks[i], rooms[i], i == 0));
+    webHandlers.push(null);
     (0, import_messageHandle.updateActive)(rooms[i], true);
   }
   import_database.DB.findOne({ fieldName: "ROOMS" }).then((obj) => {
-    sysRooms = obj.rooms;
-    for (let i = 0; i < sysRooms.length; i++) {
-      import_server2.pushEvents.push([]);
-      webHandlers[i] = new import_webHandler.WebH(sysRooms[i]);
+    for (let i = 0; i < obj.rooms.length; i++) {
+      webHandlers[i] = new import_webHandler.WebH(obj.rooms[i]);
     }
     console.log("WebHandlers loaded. Sysrooms:", sysRooms);
   });

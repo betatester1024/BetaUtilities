@@ -116,3 +116,130 @@
 (OnlineSUPPORT|main_support)[admin] 2
 (OnlineSUPPORT|main_support)[admin] 12345
 (OnlineSUPPORT|main_support)[admin] 67890
+(OnlineSUPPORT|main_support)[admin] qwert
+(OnlineSUPPORT|main_support)[admin] r1asd
+(OnlineSUPPORT|main_support)[admin] !kick @BetaOS_System
+(OnlineSUPPORT|main_support)[admin] !ping
+(OnlineSUPPORT|main_support)[admin] !ping
+(OnlineSUPPORT|main_support)[admin] !ping
+(OnlineSUPPORT|main_support)[admin] sjdhf
+(OnlineSUPPORT|main_support)[admin] shjdf
+(OnlineSUPPORT|main_support)[admin] ssssskksssksksksksk
+(OnlineSUPPORT|main_support)[user] heyo
+(OnlineSUPPORT|main_support)[user] betaos here
+(OnlineSUPPORT|main_support)[user] enter !renick to rename your user
+(OnlineSUPPORT|main_support)[user] alternatively, create another admin in betatester1024.repl.co/admin with your username
+(OnlineSUPPORT|main_support)[user] haven't got @-mentions here yet
+(OnlineSUPPORT|main_support)[user] abcde\\n\\n
+(OnlineSUPPORT|main_support)[user] abcde\n testing \n
+(OnlineSUPPORT|main_support)[user] there's multi-line stuff yes
+(OnlineSUPPORT|room3)[user] valid room yes yes?
+(OnlineSUPPORT|main_support)[user] some streaming seemed to be screwed over but it's functional now
+(OnlineSUPPORT|main_support)[admin] !renick
+(OnlineSUPPORT|main_support)[pou] hj
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] s
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] s
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] s
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] s
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] s
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] s
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] s
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] s
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] s
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] s
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] s
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] s
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] 
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] 
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] 
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] 
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] 
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] 
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] 
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] 
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] 
+(OnlineSUPPORT|main_support)[SSSSSSSSSSSSSSS] uhh
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] llol
+(OnlineSUPPORT|main_support)[Sarah] !pig
+(OnlineSUPPORT|main_support)[Sarah] !ping
+(OnlineSUPPORT|main_support)[Sarah] !ping
+(OnlineSUPPORT|main_support)[Sarah] !PiNg
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] hhhhhhhh
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[Sarah] 
+(OnlineSUPPORT|main_support)[user] waho
+(OnlineSUPPORT|main_support)[user] what are you doing
+(OnlineSUPPORT|main_support)[betatester1024] betatester1024 here
+(OnlineSUPPORT|main_support)[betatester1024] how's it goin'
+(OnlineSUPPORT|main_support)[betatester1024] any lag?
+(OnlineSUPPORT|room3)[SeaGrapes] sup
+(OnlineSUPPORT|main_support)[betatester1024] ah
+(OnlineSUPPORT|main_support)[betatester1024] whoa redirects
+(OnlineSUPPORT|main_support)[BetaOS] !uptime @BetaOS_System
+(OnlineSUPPORT|main_support)[BetaOS] !uptime @BetaOS_System
+(OnlineSUPPORT|Speech)[BetaOS] there
+(OnlineSUPPORT|Speech)[BetaOS] !ping @BetaOS_System
+(OnlineSUPPORT|Speech)[BetaOS] !ping @BetaOS_System
+(OnlineSUPPORT|Speech)[BetaOS] !ping @b
+(OnlineSUPPORT|Speech)[BetaOS] !ping @BetaOS_System
+(OnlineSUPPORT|Speech)[BetaOS] !ping @BetaOS_System
+(OnlineSUPPORT|Speech)[BetaOS] !ping 
+(OnlineSUPPORT|Speech)[BetaOS] !ping @BetaOS_System
+(OnlineSUPPORT|main_support)[BetaOS] !ping @BetaOS_System
+(OnlineSUPPORT|main_support)[BetaOS] good
+(OnlineSUPPORT|main_support)[BetaOS] !activerooms @BetaOS_System
+(OnlineSUPPORT|main_support)[BetaOS] !ping @BetaOS_System
+(OnlineSUPPORT|main_support)[BetaOS] !ping
+(OnlineSUPPORT|main_support)[BetaOS] !activerooms @BetaOS_System
+(OnlineSUPPORT|forgot-to-Reload)[BetaOS] hey
+(OnlineSUPPORT|forgot-to-Reload)[BetaOS] !ping
+(OnlineSUPPORT|forgot-to-Reload)[BetaOS] !activerooms @BetaOS_System
+(OnlineSUPPORT|12345678901234567890)[BetaOS] okay
+(OnlineSUPPORT|12345678901234567890)[BetaOS] !ping @BetaOS_System
+(OnlineSUPPORT|12345678901234567890)[BetaOS] !uptime @BetaOS_System
+(OnlineSUPPORT|12345678901234567890)[BetaOS] &abc
+(OnlineSUPPORT|12345678901234567890)[BetaOS] !activerooms @BetaOS_System
+(OnlineSUPPORT|222222222222222)[BetaOS] !ping
+(OnlineSUPPORT|222222222222222)[BetaOS] !ping @BetaOS_System
+(OnlineSUPPORT|222222222222222)[BetaOS] !kill @BetaOS_System
+(OnlineSUPPORT|222222222222222)[BetaOS] !ping
+(OnlineSUPPORT|222222222222222)[BetaOS] !kill @BetaOS_System
+(OnlineSUPPORT|BetaOS)[BetaOS] !ping @BetaOS_System
+(OnlineSUPPORT|BetaOS)[BetaOS] /me tests
+(OnlineSUPPORT|BetaOS)[BetaOS] very nice
+(OnlineSUPPORT|xkcd)[BetaOS] !ping
+(OnlineSUPPORT|xkcd)[BetaOS] !activerooms
+(OnlineSUPPORT|xkcd)[BetaOS] !activerooms @BetaOS_System

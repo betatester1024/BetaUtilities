@@ -27,7 +27,7 @@
         try {
         console.log("Starting client.")
         const source = new EventSource('/stream?room='+
-                                       document.URL.match("\\?room=([0-9a-zA-Z\\-_]+)$")[1]);
+                                       document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1]);
 
         source.addEventListener('message', message => {
           // console.log('Got', message);
@@ -128,7 +128,7 @@
         font-style: italic;
       }
       .slashMe > b {
-        font-style: initial;
+        font-style: italic;
       }
       
       b {
@@ -168,7 +168,12 @@
       <br>
       <a href = '/'> Return to home</a>
     </h1>
-    <div id="alert" onclick = "clearalert()" onkeydown="clearalert()"><p id="alerttxt" style="width: 90%; font-size: 1.8em; color:#0a84ff;"></p><button style="position: relative; top: 50vh; height: 4em;"><u>> Continue <</u></button></div>
+    <div id="alert" onclick = "clearalert()" onkeydown="clearalert()">
+      <p id="alerttxt" style="width: 90%; font-size: 1.8em; color:#0a84ff;">
+      </p><button style="position: relative; top: 50vh; height: 4em;">
+        <u>> Continue <</u>
+      </button>
+    </div>
     <div id="overlay"></div>
   </body>
  </html>

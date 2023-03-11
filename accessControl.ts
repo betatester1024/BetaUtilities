@@ -15,12 +15,14 @@ import {database} from './database';
   const DB = database.collection('SystemAUTH');
   const DB2 = database.collection('SupportMessaging');
   const DB3 = database.collection('BetaUtilities');
+import { WebH } from "./webHandler";
 
 export function validate(user:string, pwd:string, action:string, access:string, callback:any, token:string="") {
   if (action != "refresh" && action != "refresh_log"
       && action != "sendMsg" && action != "bMsg" && 
      action != "checkAccess_A" && action != "checkAccess" &&
-      action != "userReq" && action != "acquireTodo") systemLog("Validating as "+user+" with action "+action +" (token "+token+")");
+      action != "userReq" && action != "acquireTodo" && 
+     action != "ROOMLISTING") systemLog("Validating as "+user+" with action "+action +" (token "+token+")");
   if (!token || !token.match("[0-9]+") || 
      (!user || user && action !="CMD" && action !="sendMsg" && !user.match("^[a-zA-Z0-9_]+$")) || 
      (!pwd || action != "CMD" && pwd.length<=0)) 
@@ -32,7 +34,9 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       return;
     } 
   }
-  
+  if (action == "ROOMLISTING") {
+    callback.end(JSON.stringify(sysRooms))
+  }
   if (action == "bMsg") {
     DB2.insertOne({
       fieldName: "MSG", 
@@ -41,7 +45,6 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       room: access,
       permLevel:3, 
       expiry:Date.now()+EXPIRY});
-   
     sendMsgAllRooms(access, format({permLevel:3, data:user, sender:"BetaOS_System"}));
     return;
   }
@@ -62,7 +65,8 @@ export function validate(user:string, pwd:string, action:string, access:string, 
      action == "refresh_log" || action == "userReq" || 
      action == "renick" || action == "delete" || 
       action == "acquireTodo" ||todoMatch || 
-      todoMatch2 || action == "addTODO") {
+      todoMatch2 || action == "addTODO" ||
+     action == "newRoom") {
     DB.findOne({fieldName: "TOKEN", token:{$eq:token}}).then(
     (obj:{associatedUser:string, expiry:number})=>{
       if (obj == null) {
@@ -234,8 +238,12 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           callback.end(JSON.stringify("SUCCESS"));
           // console.log("Sending message:"+user);
           sendMsgAllRooms(access, format({permLevel:perms, data:user, sender:snd}));
-          let idx = sysRooms.indexOf(access);
-          if (idx>=0 && webHandlers[idx]) webHandlers[idx].onMessage(user, snd);
+          let handler = findHandler("OnlineSUPPORT|"+access);
+          if (handler) {
+            handler.onMessage(user, snd);
+            // console.log("Message received?")
+          }
+          else console.log("ROOMINVALID")
           return;
         }
         
@@ -266,7 +274,28 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           callback.sendFile(path.join( __dirname, '../frontend', '403.html' ));
           return;
         }
-        
+        else if (action == "newRoom" && perms >= 2) {
+          if (user.match("^[0-9a-zA-Z_\\-]{1,20}$")) {
+            DB3.findOne({fieldName:"ROOMS"}).then((obj4:{rooms:string[]})=>{
+              if (obj4.rooms.indexOf(user)<0) {
+                obj4.rooms.push(user);
+                // now add betautilities to this room
+                webHandlers.push(new WebH(user));
+                // sysRooms.push(user);
+                DB3.updateOne({fieldName:"ROOMS"}, {
+                  $set: {
+                    rooms: obj4.rooms
+                  },
+                  $currentDate: { lastModified: true }
+                }, {upsert:true}).then(()=>{
+                  callback.end(JSON.stringify("SUCCESS"));
+                });
+              }
+              else callback.end(JSON.stringify("ERROR"));
+            }) 
+          }
+          else callback.end(JSON.stringify("ERROR"))
+        }
         else {
           systemLog("No perms!")
           callback.end(JSON.stringify("ACCESS"));
@@ -364,7 +393,7 @@ function format(obj:{permLevel:number, data:string, sender:string}) {
   data = data.replaceAll("<", "&lt;");
   data = data.replaceAll("\\n", "<br>");
   data = data.replaceAll(/\&amp;([0-9a-zA-Z]+)/gm, (match:string, p1:string)=>{return "<a href='https://euphoria.io/room/"+p1+"'>"+match+"</a>"});
-  data = data.replaceAll(/#([0-9a-zA-Z_\\-]+)/gm, (match:string, p1:string)=>{return "<a href='/support?room="+p1+"'>"+match+"</a>"});
+  data = data.replaceAll(/#([0-9a-zA-Z_\\-]{1,20})/gm, (match:string, p1:string)=>{return "<a href='/support?room="+p1+"'>"+match+"</a>"});
   
   data = linkifyHtml(data);
   // data = data.replaceAll(/([-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/igmu, 
@@ -374,7 +403,9 @@ function format(obj:{permLevel:number, data:string, sender:string}) {
     data = data.replaceAll(replacements[i].from, "<span class='material-symbols-outlined'>"+replacements[i].to+"</span>")
   }
   let cls_w = ""
+  let slashMe = false;
   if (data.match("^/me")){
+    slashMe = true;
     cls_w += " slashMe"
     data = data.replace("/me", ""); 
   }
@@ -383,5 +414,13 @@ function format(obj:{permLevel:number, data:string, sender:string}) {
     // extraText = " [SYSTEM]";
   // }
   cls_w += " "+cls_n;
-  return `<p class=\"${cls_w}\""><b class='${cls_n}'>${obj.sender}${extraText}:</b> ${data} </p><br>`;
+  return `<p class=\"${cls_w}\""><b class='${cls_n}'>${obj.sender}${extraText}${slashMe?"":":"}</b> ${data} </p><br>`;
+}
+
+function findHandler(name:string)
+{
+  for (let i=0; i<webHandlers.length; i++) {
+    if (webHandlers[i].roomName == name) return webHandlers[i];
+  }
+  return null;
 }

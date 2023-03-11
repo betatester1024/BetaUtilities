@@ -19,7 +19,6 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var messageHandle_exports = {};
 __export(messageHandle_exports, {
   replyMessage: () => replyMessage,
-  rooms: () => rooms,
   updateActive: () => updateActive
 });
 module.exports = __toCommonJS(messageHandle_exports);
@@ -27,6 +26,8 @@ var import_wsHandler = require("./wsHandler");
 var import_misc = require("./misc");
 var import_wordListHandle = require("./wordListHandle");
 var import_database = require("./database");
+var import_initialiser = require("./initialiser");
+var import_server = require("./server");
 const fs = require("fs");
 const serviceKey = process.env["serviceKey"];
 const DB_USERS = import_database.database.collection("SystemAUTH");
@@ -39,13 +40,13 @@ let workingUsers = [];
 let leetlentCt = 1;
 let wordleCt = 1;
 let STARTTIME = Date.now();
-let rooms = [];
 function updateActive(roomID, activeQ) {
-  let idx = rooms.indexOf(roomID);
-  if (idx < 0 && activeQ)
-    rooms.push(roomID);
-  else if (idx >= 0 && !activeQ)
-    rooms.splice(idx, 1);
+  let idx = import_initialiser.sysRooms.indexOf(roomID);
+  if (idx < 0 && activeQ) {
+    import_initialiser.sysRooms.push(roomID);
+    import_server.pushEvents.push([]);
+  } else if (idx >= 0 && !activeQ)
+    import_initialiser.sysRooms.splice(idx, 1);
 }
 function replyMessage(msg, sender, data) {
   msg = msg.toLowerCase();
@@ -61,6 +62,8 @@ function replyMessage(msg, sender, data) {
       setTimeout(() => {
         this.socket.close();
       }, 120);
+    else
+      this.delaySendMsg("/me reboots", data, 200);
     return "/me r\xF6lls b\xFF and spontaneously combusts";
   }
   if (msg == "!reboot @" + this.nick.toLowerCase()) {
@@ -68,6 +71,8 @@ function replyMessage(msg, sender, data) {
       setTimeout(() => {
         this.socket.close();
       }, 120);
+    else
+      this.delaySendMsg("/me reboots", data, 200);
     return "/me is rebooting";
   }
   if (msg.match(/!testfeature/gimu))
@@ -237,7 +242,7 @@ function replyMessage(msg, sender, data) {
   if (match2) {
     (0, import_misc.systemLog)(match2);
     let newNick = match2[2] == null ? "BetaUtilities" : match2[2];
-    if (rooms.indexOf(match2[1]) >= 0)
+    if (import_initialiser.sysRooms.indexOf(match2[1]) >= 0)
       return "We're already in this room!";
     try {
       new import_wsHandler.WS("wss://euphoria.io/room/" + match2[1] + "/ws", newNick, match2[1], false);
@@ -283,17 +288,19 @@ function replyMessage(msg, sender, data) {
       setTimeout(() => {
         this.socket.close();
       }, 120);
+    else
+      this.delaySendMsg("/me reboots", data, 200);
     this.delaySendMsg("/me crashes", data, 100);
     return "aaaaghhh! death! blood! i'm dying!";
   }
   if (msg == "!activerooms @" + this.nick.toLowerCase()) {
     let str = "/me is in: ";
     let euphRooms = [];
-    for (let i = 0; i < rooms.length; i++) {
-      if (!rooms[i].match("\\|"))
-        euphRooms.push("&" + rooms[i]);
-      else {
-        euphRooms.push("#" + rooms[i].match("\\|(.+)")[1]);
+    for (let i = 0; i < import_initialiser.sysRooms.length; i++) {
+      if (!import_initialiser.sysRooms[i].match("\\|"))
+        euphRooms.push("&" + import_initialiser.sysRooms[i]);
+      else if (!data) {
+        euphRooms.push("#" + import_initialiser.sysRooms[i].match("\\|(.+)")[1]);
       }
     }
     for (let j = 0; j < euphRooms.length - 1; j++) {
@@ -473,6 +480,8 @@ function replyMessage(msg, sender, data) {
       setTimeout(() => {
         this.socket.close();
       }, 120);
+    else
+      this.delaySendMsg("/me reboots", data, 200);
     return "/me reboots";
   }
   if (msg == "!wordle" || this.callStatus == 5 && (msg == "two" || msg == "2" || msg == ":two:")) {
@@ -567,7 +576,6 @@ function norm(str) {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   replyMessage,
-  rooms,
   updateActive
 });
 //# sourceMappingURL=messageHandle.js.map

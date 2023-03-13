@@ -35,7 +35,8 @@ function sendMsg() {
   let inp = document.getElementById("textINP");
   let msg = inp.value;
   inp.value = "";
-  validateLogin("sendMsg", msg);
+  if (msg)
+    validateLogin("sendMsg", msg);
 }
 function validateLogin(action = "login", extData) {
   let user = document.getElementById("userINP");

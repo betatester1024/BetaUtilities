@@ -50,6 +50,7 @@ function validateLogin(action = "login", extData) {
   }
   let match2 = action.match("updateTODO([0-9]+)");
   let match3 = action.match("completeTODO([0-9]+)");
+  let match4 = action.match("deleteTODO([0-9]+)");
   let inp;
   if (match2 || match3) {
     inp = document.getElementById("todo" + (match2 ? match2[1] : match3[1]));
@@ -83,9 +84,9 @@ function validateLogin(action = "login", extData) {
     } else if (action == "sendMsg") {
       params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
       ;
-      let match4 = extData.match("!renick @([a-zA-Z_0-9]+)");
-      if (match4) {
-        params = "token=" + sessionID + "&action=renick&user=" + encodeURIComponent(match4[1]) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
+      let match5 = extData.match("!renick @([a-zA-Z_0-9]+)");
+      if (match5) {
+        params = "token=" + sessionID + "&action=renick&user=" + encodeURIComponent(match5[1]) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
         renickQ = true;
       }
     } else
@@ -154,9 +155,9 @@ function validateLogin(action = "login", extData) {
             let mainDiv = document.getElementById("innerDiv");
             mainDiv.innerHTML = "";
             for (let i = 0; i < res.length; i++) {
-              let match4 = res[i].match("OnlineSUPPORT\\|(.*)");
-              if (match4)
-                mainDiv.innerHTML += `<button class="unsetWidth" onclick="window.open('/support?room=${match4[1]}', '_self')"><kbd>${match4[1]}</kbd><hr class="btnHr"></hr></button>`;
+              let match5 = res[i].match("OnlineSUPPORT\\|(.*)");
+              if (match5)
+                mainDiv.innerHTML += `<button class="unsetWidth" onclick="window.open('/support?room=${match5[1]}', '_self')"><kbd>${match5[1]}</kbd><hr class="btnHr"></hr></button>`;
             }
             return;
           }
@@ -170,7 +171,7 @@ function validateLogin(action = "login", extData) {
           <input class="todo" id="todo${i}" value="${todoList[i].replaceAll('"', "&quot;")}" onchange="modify(-1); validateLogin('updateTODO${i}', '')" readonly onclick="modify(${i})"/>
           
           <span id="span${i}" class="material-symbols-outlined" onclick="modify(${i})">edit</span>
-          <span class="material-symbols-outlined" onclick="delete(${i})">delete</span>
+          <span class="material-symbols-outlined" onclick="del(${i})">delete</span>
         </p>`;
               todoDiv.innerHTML += update;
               TODOCT = res.length;
@@ -234,8 +235,10 @@ function validateLogin(action = "login", extData) {
               location.reload();
             }
             ele = document.getElementById("msgArea");
+            if (action == "refresh_log")
+              ele = ele;
             let scrDistOKQ = Math.abs(ele.scrollTop - ele.scrollHeight) < 1e3;
-            updateTextArea(res);
+            updateTextArea(res, action == "refresh_log");
             if (!LOADEDQ || extData == "send" || scrDistOKQ) {
               ele.scrollTop = ele.scrollHeight;
               LOADEDQ = true;
@@ -267,9 +270,9 @@ function validateLogin(action = "login", extData) {
             alertDialog("This username is already taken!", () => {
             });
           } else {
-            if (match2 || match3 || action == "addTODO") {
-              if (match3)
-                alertDialog("Task complete!", () => {
+            if (match2 || match3 || match4 || action == "addTODO") {
+              if (match3 || match4)
+                alertDialog(match3 ? "Task complete!" : "Task deleted!", () => {
                   validateLogin("acquireTodo", "OK");
                 });
               validateLogin("acquireTodo", "OK");
@@ -374,10 +377,13 @@ function clearalert() {
     cbk = null;
   }
 }
-function updateTextArea(msgs) {
+function updateTextArea(msgs, textAreaQ) {
   let ele = document.getElementById("msgArea");
   let scrollHt = ele.scrollTop;
-  ele.innerHTML = msgs;
+  if (textAreaQ)
+    ele.innerText = msgs.replaceAll("<br>", "\n");
+  else
+    ele.innerHTML = msgs;
   ele.scrollTop = scrollHt;
 }
 let MODIFYN = -1;
@@ -412,6 +418,9 @@ function complete(n) {
 function add() {
   validateLogin("addTODO", "");
   MODIFYN = TODOCT;
+}
+function del(n) {
+  validateLogin("deleteTODO" + n, "");
 }
 function resetAlertDiv() {
   let div = document.getElementById("alert");

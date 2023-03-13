@@ -72,7 +72,8 @@ function validate(user, pwd, action, access, callback, token = "") {
   }
   let todoMatch = action.match("updateTODO([0-9]+)");
   let todoMatch2 = action.match("completeTODO([0-9]+)");
-  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log" || action == "userReq" || action == "renick" || action == "delete" || action == "acquireTodo" || todoMatch || todoMatch2 || action == "addTODO" || action == "newRoom") {
+  let todoMatch3 = action.match("deleteTODO([0-9]+)");
+  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log" || action == "userReq" || action == "renick" || action == "delete" || action == "acquireTodo" || todoMatch || todoMatch2 || action == "addTODO" || action == "newRoom" || todoMatch3) {
     DB.findOne({ fieldName: "TOKEN", token: { $eq: token } }).then(
       (obj) => {
         if (obj == null) {
@@ -117,7 +118,7 @@ function validate(user, pwd, action, access, callback, token = "") {
               callback.end(JSON.stringify(escape(user)));
               return;
             }
-            if (action == "acquireTodo" || todoMatch || todoMatch2 || action == "addTODO") {
+            if (action == "acquireTodo" || todoMatch || todoMatch2 || action == "addTODO" || todoMatch3) {
               if (!obj2.todo)
                 obj2.todo = [];
               if (action == "acquireTodo")
@@ -127,9 +128,9 @@ function validate(user, pwd, action, access, callback, token = "") {
                   if (todoMatch[1] < obj2.todo.length)
                     obj2.todo[todoMatch[1]] = user;
                 }
-                if (todoMatch2) {
-                  if (obj2.todo.length > todoMatch2[1])
-                    obj2.todo.splice(todoMatch2[1], 1);
+                if (todoMatch2 || todoMatch3) {
+                  if (obj2.todo.length > (todoMatch2 ? todoMatch2[1] : todoMatch3[1]))
+                    obj2.todo.splice(todoMatch2 ? todoMatch2[1] : todoMatch3[1], 1);
                 }
                 if (action == "addTODO") {
                   obj2.todo.push(user);

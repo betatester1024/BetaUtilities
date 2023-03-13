@@ -8,7 +8,7 @@ import {WebH} from './webHandler';
 import { DB } from './database';
 import {pushEvents, hidEvents} from './server';
 import {DBGarbageCollect} from './accessControl'
-let rooms = ["xkcd", "test", "bots", "ai", "room", "srs", "memes"];
+let rooms = ["xkcd", "test", "bots", "ai", "room", "srs", "memes", "music"];
 let nicks = ["BetaUtilities", "BetaUtilities_TEST", 
              "BetaUtilities", "BetaOS_Systems", 
              "BetaUtilities", "BetaUtilities", 

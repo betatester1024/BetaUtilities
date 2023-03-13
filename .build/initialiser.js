@@ -33,7 +33,7 @@ var import_webHandler = require("./webHandler");
 var import_database = require("./database");
 var import_server2 = require("./server");
 var import_accessControl = require("./accessControl");
-let rooms = ["xkcd", "test", "bots", "ai", "room", "srs", "memes"];
+let rooms = ["xkcd", "test", "bots", "ai", "room", "srs", "memes", "music"];
 let nicks = [
   "BetaUtilities",
   "BetaUtilities_TEST",

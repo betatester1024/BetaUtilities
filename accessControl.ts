@@ -59,6 +59,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
   // attempt to add user or run commands or access support (REQUIRE PERMLEVELS)
   let todoMatch = action.match("updateTODO([0-9]+)");
   let todoMatch2 = action.match("completeTODO([0-9]+)");
+  let todoMatch3 = action.match("deleteTODO([0-9]+)");
   if (action=="add" || action=="CMD" || 
       action == "checkAccess" || action == "sendMsg"||
      action == "refresh" || action == "checkAccess_A" || 
@@ -66,7 +67,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
      action == "renick" || action == "delete" || 
       action == "acquireTodo" ||todoMatch || 
       todoMatch2 || action == "addTODO" ||
-     action == "newRoom") {
+     action == "newRoom" || todoMatch3) {
     DB.findOne({fieldName: "TOKEN", token:{$eq:token}}).then(
     (obj:{associatedUser:string, expiry:number})=>{
       if (obj == null) {
@@ -116,7 +117,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
         } // renick 
         // console.log(action);
         if (action == "acquireTodo" || todoMatch 
-        || todoMatch2 || action == "addTODO") {
+        || todoMatch2 || action == "addTODO" || todoMatch3) {
           // if (pwd == process.env['TODOPwd']) {
             // console.log(obj2.todo);
             if (!obj2.todo) obj2.todo = [];
@@ -126,9 +127,9 @@ export function validate(user:string, pwd:string, action:string, access:string, 
               if (todoMatch) 
                 if (todoMatch[1] < obj2.todo.length)
                   obj2.todo[todoMatch[1]] = user;
-              if (todoMatch2) 
-                if (obj2.todo.length > todoMatch2[1]) 
-                  obj2.todo.splice(todoMatch2[1], 1);
+              if (todoMatch2 || todoMatch3) 
+                if (obj2.todo.length > (todoMatch2?todoMatch2[1]:todoMatch3[1])) 
+                  obj2.todo.splice(todoMatch2?todoMatch2[1]:todoMatch3[1], 1);
               if (action == "addTODO") {
                 obj2.todo.push(user);
               }

@@ -158,14 +158,16 @@
         <hr class="btnHr"></hr>
       </div>
       <div>
-        <div id="textDiv">
-          <input id="textINP" type="text" onchange="sendMsg()">
-          <hr class="inpHr"></hr>
-        </div>
-        <button id="send" onclick="sendMsg();">
-          <span class="material-symbols-outlined">send</span><br>
-<!--           <hr class="btnHr"></hr> -->
-        </button>
+        <form>
+          <div id="textDiv">
+            <input id="textINP" type="text">
+            <hr class="inpHr"></hr>
+          </div>
+          <button id="send" type="submit" onclick="sendMsg();">
+            <span class="material-symbols-outlined">send</span><br>
+  <!--           <hr class="btnHr"></hr> -->
+          </button>
+        </form>
       </div>
       <button class="HOME" onclick="window.open('../', '_self');">&#x00AB Return to home<br><hr class="btnHr"></hr></button>
     </div>

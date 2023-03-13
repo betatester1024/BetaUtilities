@@ -62,6 +62,7 @@ function validateLogin(action: string = "login", extData: string) {
 
   let match2 = action.match("updateTODO([0-9]+)");
   let match3 = action.match("completeTODO([0-9]+)");
+  let match4 = action.match("deleteTODO([0-9]+)");
   let inp:HTMLInputElement;
   
   if (match2 || match3) {
@@ -182,7 +183,7 @@ function validateLogin(action: string = "login", extData: string) {
           <input class="todo" id="todo${i}" value="${todoList[i].replaceAll("\"", "&quot;")}" onchange="modify(-1); validateLogin('updateTODO${i}', '')" readonly onclick="modify(${i})"/>
           
           <span id="span${i}" class="material-symbols-outlined" onclick="modify(${i})">edit</span>
-          <span class="material-symbols-outlined" onclick="delete(${i})">delete</span>
+          <span class="material-symbols-outlined" onclick="del(${i})">delete</span>
         </p>`;
               todoDiv.innerHTML += update;
               // console.log(update);
@@ -249,9 +250,10 @@ function validateLogin(action: string = "login", extData: string) {
               location.reload();
             }
             ele = document.getElementById("msgArea") as HTMLDivElement;
+            if (action == "refresh_log") ele = ele as HTMLTextAreaElement;
             // console.log(ele.scrollTop - ele.scrollHeight)
             let scrDistOKQ =     Math.abs(ele.scrollTop - ele.scrollHeight) < 1000;
-            updateTextArea(res);
+            updateTextArea(res, action == "refresh_log");
             
             if (!LOADEDQ || extData == "send" || scrDistOKQ)
             {
@@ -283,8 +285,8 @@ function validateLogin(action: string = "login", extData: string) {
             alertDialog("This username is already taken!", () => { });
           }
           else {
-            if (match2 || match3 || action == "addTODO") {
-              if (match3) alertDialog("Task complete!", ()=> {
+            if (match2 || match3 ||match4|| action == "addTODO") {
+              if (match3 ||match4) alertDialog(match3?"Task complete!":"Task deleted!", ()=> {
                 validateLogin("acquireTodo", "OK"); // already have password with us.
               })
               validateLogin("acquireTodo", "OK");
@@ -389,11 +391,12 @@ function clearalert() {
   }
 }
 
-function updateTextArea(msgs:string) {
+function updateTextArea(msgs:string, textAreaQ:boolean) {
   
   let ele = document.getElementById("msgArea") as HTMLDivElement;
   let scrollHt = ele.scrollTop;
-  ele.innerHTML = msgs;
+  if (textAreaQ) ele.innerText = msgs.replaceAll("<br>", "\n");
+  else ele.innerHTML = msgs;
   
   ele.scrollTop = scrollHt;
   
@@ -431,6 +434,10 @@ function complete(n:number) {
 function add() {
   validateLogin("addTODO", "");
   MODIFYN = TODOCT;
+}
+
+function del(n:number) {
+  validateLogin("deleteTODO"+n, "");
 }
 
 function resetAlertDiv() {

@@ -275,3 +275,8 @@
 (HIDDEN|hidroom1)[BetaOS] !activerooms @BetaOS_System
 (HIDDEN|more-room)[BetaOS] aha
 (HIDDEN|more-room)[BetaOS] what
+(OnlineSUPPORT|main_support)[BetaOS] https://bigrat.monster/media/bigrat.png
+(OnlineSUPPORT|xkcd)[c] a
+(OnlineSUPPORT|main_support)[c] ock
+(OnlineSUPPORT|main_support)[c] ock
+(OnlineSUPPORT|main_support)[c] ock

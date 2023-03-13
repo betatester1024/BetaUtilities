@@ -167,9 +167,10 @@ function validateLogin(action = "login", extData) {
             for (let i = 0; i < todoList.length; i++) {
               let update = `<p> 
           <span class="material-symbols-outlined" onclick="complete(${i})">task_alt</span>
-          <input class="todo" id="todo${i}" value="${todoList[i]}" onchange="modify(-1); validateLogin('updateTODO${i}', '')" readonly onclick="modify(${i})"/>
+          <input class="todo" id="todo${i}" value="${todoList[i].replaceAll('"', "&quot;")}" onchange="modify(-1); validateLogin('updateTODO${i}', '')" readonly onclick="modify(${i})"/>
           
           <span id="span${i}" class="material-symbols-outlined" onclick="modify(${i})">edit</span>
+          <span class="material-symbols-outlined" onclick="delete(${i})">delete</span>
         </p>`;
               todoDiv.innerHTML += update;
               TODOCT = res.length;

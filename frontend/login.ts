@@ -318,7 +318,7 @@ function validateLogin(action: string = "login", extData: string) {
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
           document.cookie = `__Secure-session=${sessionID}; SameSite=None; Secure;`;
-          alertDialog("Welcome, betatester1024.", () => { window.open(redirectTo, "_self") });
+          alertDialog("Welcome, "+user.value+"! | Super-administrative access granted.", () => { window.open(redirectTo, "_self") });
           if (!match && action == "login") document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         }
         else if (res == "1") {

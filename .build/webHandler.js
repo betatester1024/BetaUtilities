@@ -34,6 +34,7 @@ class WebH {
   nick;
   pausedQ = false;
   roomName;
+  hiddenQ;
   pauser = null;
   failedQ = false;
   callTimes = [];
@@ -135,13 +136,15 @@ class WebH {
       this.delaySendMsg("/me restarts", data, 200);
     } else if (this.pausedQ && msg == "!restore @" + this.nick.toLowerCase()) {
       this.sendMsg("/me has been unpaused", data);
-      (0, import_messageHandle2.updateActive)(this.roomName, true);
+      if (!this.hiddenQ)
+        (0, import_messageHandle2.updateActive)(this.roomName, true);
       this.pauser = null;
       this.callTimes = [];
       this.pausedQ = false;
     } else if (msg == "!pause @" + this.nick.toLowerCase()) {
       this.sendMsg("/me has been paused", data);
-      (0, import_messageHandle2.updateActive)(this.roomName, false);
+      if (!this.hiddenQ)
+        (0, import_messageHandle2.updateActive)(this.roomName, false);
       let reply = "Enter !kill @" + this.nick + " to kill this bot, or enter !restore @" + this.nick + " to restore it.";
       this.sendMsg(reply, data);
       this.pauser = snd;
@@ -191,22 +194,26 @@ class WebH {
     setTimeout(() => {
       this.changeNick(this.nick);
       this.incrRunCt();
-      (0, import_messageHandle2.updateActive)(this.roomName, true);
+      if (!this.hiddenQ)
+        (0, import_messageHandle2.updateActive)(this.roomName, true);
       this.failedQ = false;
     }, 5e3);
-    (0, import_messageHandle2.updateActive)(this.roomName, false);
+    if (!this.hiddenQ)
+      (0, import_messageHandle2.updateActive)(this.roomName, false);
   }
   static resetTime = 1e3;
   onClose(event) {
     (0, import_misc.systemLog)("Closed");
   }
-  constructor(roomName) {
+  constructor(roomName, hiddenQ = false) {
     this.nick = "BetaOS_System";
     this.replyMessage = import_messageHandle.replyMessage;
+    this.hiddenQ = hiddenQ;
     if (roomName.length > 21)
       return;
-    this.roomName = "OnlineSUPPORT|" + roomName;
-    (0, import_messageHandle2.updateActive)(this.roomName, true);
+    this.roomName = (hiddenQ ? "HIDDEN|" : "OnlineSUPPORT|") + roomName;
+    if (!hiddenQ)
+      (0, import_messageHandle2.updateActive)(this.roomName, true);
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

@@ -243,7 +243,15 @@ export function validate(user:string, pwd:string, action:string, access:string, 
             handler.onMessage(user, snd);
             // console.log("Message received?")
           }
-          else console.log("ROOMINVALID")
+          
+          else {
+            handler = findHandler("HIDDEN|"+access);
+            if (handler) {
+              handler.onMessage(user, snd);
+            }
+            else console.log("ROOMINVALID")
+          }
+          
           return;
         }
         
@@ -251,6 +259,14 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           
           // let cursor = DB2.find({fieldName:"MSG"});
           // console.log(access);
+          DB2.find({fieldName:"MSG", room:{$eq:access}}).toArray().then((objs:{sender:string, data:string, permLevel:number}[])=>{
+            let out = "";
+            // console.log(objs)
+            for (let i=0; i<objs.length; i++) {
+              out += format(objs[i]);
+            }
+            callback.end(JSON.stringify(out));
+          });
           DB2.find({fieldName:"MSG", room:{$eq:access}}).toArray().then((objs:{sender:string, data:string, permLevel:number}[])=>{
             let out = "";
             // console.log(objs)
@@ -276,8 +292,8 @@ export function validate(user:string, pwd:string, action:string, access:string, 
         }
         else if (action == "newRoom" && perms >= 2) {
           if (user.match("^[0-9a-zA-Z_\\-]{1,20}$")) {
-            DB3.findOne({fieldName:"ROOMS"}).then((obj4:{rooms:string[]})=>{
-              if (obj4.rooms.indexOf(user)<0) {
+            DB3.findOne({fieldName:"ROOMS"}).then((obj4:{rooms:string[], hidRooms:string[]})=>{
+              if (obj4.rooms.indexOf(user)<0 && obj4.hidRooms.indexOf(user) < 0) {
                 obj4.rooms.push(user);
                 // now add betautilities to this room
                 webHandlers.push(new WebH(user));

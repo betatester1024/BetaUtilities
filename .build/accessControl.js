@@ -239,10 +239,22 @@ function validate(user, pwd, action, access, callback, token = "") {
               let handler = findHandler("OnlineSUPPORT|" + access);
               if (handler) {
                 handler.onMessage(user, snd);
-              } else
-                console.log("ROOMINVALID");
+              } else {
+                handler = findHandler("HIDDEN|" + access);
+                if (handler) {
+                  handler.onMessage(user, snd);
+                } else
+                  console.log("ROOMINVALID");
+              }
               return;
             } else if (action == "refresh" && perms >= 1) {
+              DB2.find({ fieldName: "MSG", room: { $eq: access } }).toArray().then((objs) => {
+                let out = "";
+                for (let i = 0; i < objs.length; i++) {
+                  out += format(objs[i]);
+                }
+                callback.end(JSON.stringify(out));
+              });
               DB2.find({ fieldName: "MSG", room: { $eq: access } }).toArray().then((objs) => {
                 let out = "";
                 for (let i = 0; i < objs.length; i++) {
@@ -262,7 +274,7 @@ function validate(user, pwd, action, access, callback, token = "") {
             } else if (action == "newRoom" && perms >= 2) {
               if (user.match("^[0-9a-zA-Z_\\-]{1,20}$")) {
                 DB3.findOne({ fieldName: "ROOMS" }).then((obj4) => {
-                  if (obj4.rooms.indexOf(user) < 0) {
+                  if (obj4.rooms.indexOf(user) < 0 && obj4.hidRooms.indexOf(user) < 0) {
                     obj4.rooms.push(user);
                     import_initialiser.webHandlers.push(new import_webHandler.WebH(user));
                     DB3.updateOne({ fieldName: "ROOMS" }, {

@@ -18,6 +18,7 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var server_exports = {};
 __export(server_exports, {
+  hidEvents: () => hidEvents,
   pushEvents: () => pushEvents,
   sendMsgAllRooms: () => sendMsgAllRooms,
   updateServer: () => updateServer
@@ -35,6 +36,7 @@ const app = express();
 const port = 4e3;
 var RateLimit = require("express-rate-limit");
 let pushEvents = [];
+let hidEvents = [];
 async function updateServer() {
   (0, import_misc.systemLog)("");
   (0, import_misc.systemLog)("Server active!");
@@ -89,14 +91,21 @@ async function updateServer() {
     res.flushHeaders();
     res.write("retry:500\n\n");
     let roomIdx = import_initialiser.sysRooms.indexOf("OnlineSUPPORT|" + req.query.room);
-    if (roomIdx < 0) {
+    let roomIdx2 = import_initialiser.hidRooms.indexOf("HIDDEN|" + req.query.room);
+    if (roomIdx < 0 && roomIdx2 < 0) {
       res.end();
       console.log("Invalid room: " + req.query.room);
       return;
     }
-    pushEvents[roomIdx].push(res);
+    if (roomIdx >= 0)
+      pushEvents[roomIdx].push(res);
+    else
+      hidEvents[roomIdx2].push(res);
     res.on("close", () => {
-      pushEvents[roomIdx].splice(pushEvents[roomIdx].indexOf(res), 1);
+      if (roomIdx >= 0)
+        pushEvents[roomIdx].splice(pushEvents[roomIdx].indexOf(res), 1);
+      else
+        hidEvents[roomIdx2].splice(hidEvents[roomIdx2].indexOf(res), 1);
       res.end();
     });
   });
@@ -131,7 +140,8 @@ async function updateServer() {
   });
   app.get("/support", (req, res) => {
     let roomIdx = import_initialiser.sysRooms.indexOf("OnlineSUPPORT|" + req.query.room);
-    if (roomIdx < 0 && req.query.room) {
+    let roomIdx2 = import_initialiser.hidRooms.indexOf("HIDDEN|" + req.query.room);
+    if (roomIdx < 0 && roomIdx2 < 0 && req.query.room) {
       res.sendFile(path.join(__dirname, "../frontend", "roomNotFound.html"));
     } else if (req.query.room)
       res.sendFile(path.join(__dirname, "../frontend", "support.html"));
@@ -162,16 +172,20 @@ async function updateServer() {
 }
 function sendMsgAllRooms(room, msg) {
   let roomId = import_initialiser.sysRooms.indexOf("OnlineSUPPORT|" + room);
-  if (roomId < 0) {
+  let roomId2 = import_initialiser.hidRooms.indexOf("HIDDEN|" + room);
+  if (roomId < 0 && roomId2 < 0) {
     console.log("invalidROOM:" + room);
     return;
-  }
-  for (let i = 0; i < pushEvents[roomId].length; i++) {
-    pushEvents[roomId][i].write("data:" + msg + "\n\n");
-  }
+  } else if (roomId >= 0)
+    for (let i = 0; i < pushEvents[roomId].length; i++)
+      pushEvents[roomId][i].write("data:" + msg + "\n\n");
+  else
+    for (let i = 0; i < hidEvents[roomId2].length; i++)
+      hidEvents[roomId2][i].write("data:" + msg + "\n\n");
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  hidEvents,
   pushEvents,
   sendMsgAllRooms,
   updateServer

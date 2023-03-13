@@ -6,7 +6,7 @@ import { updateActive } from './messageHandle';
 import { initUsers} from './updateuser';
 import {WebH} from './webHandler';
 import { DB } from './database';
-import {pushEvents} from './server';
+import {pushEvents, hidEvents} from './server';
 import {DBGarbageCollect} from './accessControl'
 let rooms = ["xkcd", "test", "bots", "ai", "room", "srs", "memes"];
 let nicks = ["BetaUtilities", "BetaUtilities_TEST", 
@@ -16,6 +16,7 @@ let nicks = ["BetaUtilities", "BetaUtilities_TEST",
              "BetaUtilities", "BetaUtilities",
              "BetaUtilities"]
 export let sysRooms:string[] = [];//["main_support", "secondary_support","room3"];
+export let hidRooms:string[] = [];
 export function init() {
   
   let sockets = [];
@@ -26,15 +27,21 @@ export function init() {
     webHandlers.push(null);
     updateActive(rooms[i], true);
   }
-  DB.findOne({fieldName:"ROOMS"}).then((obj:{rooms:string[]})=>{
+  DB.findOne({fieldName:"ROOMS"}).then((obj:{rooms:string[], hidRooms:string[]})=>{
     // sysRooms = obj.rooms;
-    for (let i=0; i<obj.rooms.length; i++) {
-      // pushEvents.push([]);
+    let i=0;
+    for (; i<obj.rooms.length; i++) {
       webHandlers[i] = new WebH(obj.rooms[i]);
     }
-    console.log("WebHandlers loaded. Sysrooms:", sysRooms)
+    for (let j=0; j<obj.hidRooms.length; j++) {
+      hidRooms.push("HIDDEN|"+obj.hidRooms[j])
+      hidEvents.push([]);
+      // console.log("thing")
+      webHandlers[i+j] = new WebH(obj.hidRooms[j], true);
+    }
+    // hidRooms = obj.hidRooms;
+    console.log("WebHandlers loaded. Sysrooms:", sysRooms, "hidden rooms:", hidRooms)
   });
-  console.log("WSHandlers loaded.");
   // cnc();
   loopy();
   setInterval(()=>{DBGarbageCollect()}, 10000);

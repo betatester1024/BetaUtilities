@@ -267,3 +267,11 @@
 (OnlineSUPPORT|main_support)[BetaOS] !uptime @BetaOS_System
 (OnlineSUPPORT|main_support)[BetaOS] !ping
 (OnlineSUPPORT|main_support)[BetaOS] !issue
+(HIDDEN|hidroom1)[BetaOS] !ping
+(HIDDEN|hidroom1)[BetaOS] !uptime
+(HIDDEN|hidroom1)[BetaOS] abcde
+(HIDDEN|hidroom1)[BetaOS] fghik
+(HIDDEN|hidroom1)[BetaOS] WHOA
+(HIDDEN|hidroom1)[BetaOS] !activerooms @BetaOS_System
+(HIDDEN|more-room)[BetaOS] aha
+(HIDDEN|more-room)[BetaOS] what

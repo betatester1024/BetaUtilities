@@ -7,13 +7,14 @@ const bodyParser = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({ extended: false })  
 const app = express();
 const port = 4000;
-import {sysRooms} from './initialiser';
+import {sysRooms, hidRooms} from './initialiser';
 import { validate } from './accessControl';
 import {systemLog} from './misc';
 
 var RateLimit = require('express-rate-limit');
 
 export let pushEvents: any[][] = [];
+export let hidEvents: any[][] = [];
 // import {pushEvents} from './initialiser';
 // 
 
@@ -89,15 +90,19 @@ export async function updateServer() {
     // console.log(req.query.room)
     
     let roomIdx = sysRooms.indexOf("OnlineSUPPORT|"+req.query.room);
-    if (roomIdx < 0) {
+    let roomIdx2 = hidRooms.indexOf("HIDDEN|"+req.query.room);
+    // console.log(roomIdx2);
+    if (roomIdx < 0 && roomIdx2 < 0) {
       res.end();
       console.log("Invalid room: "+req.query.room);
       return;
     }
     // console.log(roomIdx);
-    pushEvents[roomIdx].push(res);
+    if (roomIdx >= 0) pushEvents[roomIdx].push(res);
+    else hidEvents[roomIdx2].push(res);
     res.on("close", () => {
-      pushEvents[roomIdx].splice(pushEvents[roomIdx].indexOf(res), 1);
+      if (roomIdx >= 0) pushEvents[roomIdx].splice(pushEvents[roomIdx].indexOf(res), 1);
+      else hidEvents[roomIdx2].splice(hidEvents[roomIdx2].indexOf(res), 1);
       res.end();
       // console.log("Removed stream");
     });
@@ -136,8 +141,9 @@ export async function updateServer() {
 
   app.get("/support", (req:any, res:any) => {
     let roomIdx = sysRooms.indexOf("OnlineSUPPORT|"+req.query.room);
+    let roomIdx2 = hidRooms.indexOf("HIDDEN|"+req.query.room);
     // console.log(roomIdx, req.query.room)
-    if (roomIdx < 0 && req.query.room) {res.sendFile(path.join( __dirname, '../frontend', 'roomNotFound.html'))}
+    if (roomIdx < 0 && roomIdx2 < 0 && req.query.room) {res.sendFile(path.join( __dirname, '../frontend', 'roomNotFound.html'))}
     else if(req.query.room) res.sendFile(path.join( __dirname, '../frontend', 'support.html'));
     else res.sendFile(path.join( __dirname, '../frontend', 'supportIndex.html'));
     // validate("", "", "checkAccess", "", res, req.query.token)
@@ -180,13 +186,15 @@ export async function updateServer() {
 
 export function sendMsgAllRooms(room:string, msg:string) {
   let roomId = sysRooms.indexOf("OnlineSUPPORT|"+room);
-  if (roomId<0) {
+  let roomId2 = hidRooms.indexOf("HIDDEN|"+room);
+  if (roomId<0 && roomId2<0) {
     console.log("invalidROOM:"+room)
     return;
   }
-  for (let i=0; i<pushEvents[roomId].length; i++) {
-    // console.log("Writing "+msg+" to roomID"+roomId);
-    
-    pushEvents[roomId][i].write("data:"+msg+"\n\n");
-  }
+  else if (roomId >= 0) 
+    for (let i=0; i<pushEvents[roomId].length; i++) 
+      pushEvents[roomId][i].write("data:"+msg+"\n\n");
+  else 
+    for (let i=0; i<hidEvents[roomId2].length; i++) 
+      hidEvents[roomId2][i].write("data:"+msg+"\n\n");
 }

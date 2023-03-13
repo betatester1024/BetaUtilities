@@ -304,7 +304,7 @@ function validateLogin(action = "login", extData) {
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
           document.cookie = `__Secure-session=${sessionID}; SameSite=None; Secure;`;
-          alertDialog("Welcome, betatester1024.", () => {
+          alertDialog("Welcome, " + user.value + "! | Super-administrative access granted.", () => {
             window.open(redirectTo, "_self");
           });
           if (!match && action == "login")

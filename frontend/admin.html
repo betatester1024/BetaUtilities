@@ -8,6 +8,11 @@
     <script> 
     function onLoad() {
       validateLogin("userReq", "");
+      let match = document.cookie.match("__Secure-session=[0-9.]+");
+      console.log("Current session: " + match);
+      if (!match && document.URL.match("admin")) {
+        alertDialog("You're not logged in!", () => { window.open("/login?redirect="+document.URL, "_self"); });
+      }
     }
     </script>
     <link rel="stylesheet" href="/globalformat.css">

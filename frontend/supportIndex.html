@@ -44,7 +44,7 @@
     <div id = "mainDiv">
       <h1>Support rooms</h1>
       <hr class="rounded"></hr>
-      <form action = "javascript:validateLogin('newRoom', '');"> 
+      <form action = "javascript:window.open('/support?room='+document.getElementById('enterRoomInp').value, '_self');"> 
         <div class="inputDiv">
           <input id="enterRoomInp" placeholder="Enter room-name">
           <hr class="inpHr">

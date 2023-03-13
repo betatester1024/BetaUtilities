@@ -1,8 +1,8 @@
 function onLoad() {
   let match = document.cookie.match("__Secure-session=[0-9.]+");
   console.log("Current session: " + match);
-  if (!match && document.URL.match("admin")) {
-    alertDialog("You're not logged in!", () => { window.open("/signup", "_self"); });
+  if (!match && document.URL.match("\\/admin") && !document.URL.match("?redirect=(.*)\\/admin")) {
+    alertDialog("You're not logged in!", () => { window.open("/login?redirect="+document.URL, "_self"); });
   }
   // document.getElementById("alert").hidden=true;
   // document.getElementById("h1").hidden=true;
@@ -142,17 +142,19 @@ function validateLogin(action: string = "login", extData: string) {
         if (ele) ele.className = "beforeoverload";
         if (action != "login") {
           if (action == "newRoom") {
-            alertDialog("Room creation: "+res, ()=>{validateLogin("ROOMLISTING", "")});
+            alertDialog("Room creation: "+
+              ((res=="NOACTIVE"||res=="ACCESS")?"Access denied":res), 
+              ()=>{validateLogin("ROOMLISTING", "")});
             return;
           }
           if (action != "userReq" && (res == "ERROR" || res == "NOACTIVE" || res == "ACCESS")) {
             // console.log("what?")
-            if (document.URL.match("betatester1024.repl.co/?$")) {
-              validateLogin("logout", "");
+            if (document.URL.match("betatester1024\\.repl\\.co/?$")) {
+              validateLogin("logout", document.URL);
             }
             else if (res == "ERROR") alertDialog("Unknown error occurred.", ()=> {location.reload()});
-            else if (res == "NOACTIVE") alertDialog("Your login session is invalid!", () => { validateLogin("logout", document.URL); });
-            else alertDialog("You're not logged in!", ()=>{window.open("/login?redirect="+document.URL), "_self"})
+            else if (res == "NOACTIVE") alertDialog("You are not logged in.", () => { validateLogin("logout", document.URL); });
+            else alertDialog("Access denied!", ()=>{window.open("/login?redirect="+document.URL), "_self"})
             return;
           }
           if (action == "ROOMLISTING") {
@@ -265,13 +267,13 @@ function validateLogin(action: string = "login", extData: string) {
             alertDialog("Error: Your login session has expired!", () => { validateLogin("logout", "") });
           else if (res == "NOACTIVE") {
             
-            alertDialog("Error: Your login session is invalid!", () => {validateLogin("logout", "");});
+            alertDialog("Error: You are not logged in!", () => {validateLogin("logout", document.URL);});
           }
           else if (action == "logout") {
             // alert("Logging out");
             document.cookie = "__Secure-session=; Secure;";
             if (extData) window.open("/login?redirect="+extData, "_self");
-            alertDialog("You've been logged out", () => { window.open(redirectTo, "_self") });
+            alertDialog("You've been logged out", () => { window.open("/login?redirect=/", "_self") });
           }
           else if (res == "ERROR") {
             alertDialog("Unknown error!", () => { });
@@ -303,6 +305,7 @@ function validateLogin(action: string = "login", extData: string) {
           
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
+          document.cookie = `__Secure-session=${sessionID}; SameSite=None; Secure;`;
           if (!match && action == "login") document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         }
         else if (res == "3") {
@@ -314,6 +317,7 @@ function validateLogin(action: string = "login", extData: string) {
           
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
+          document.cookie = `__Secure-session=${sessionID}; SameSite=None; Secure;`;
           alertDialog("Welcome, betatester1024.", () => { window.open(redirectTo, "_self") });
           if (!match && action == "login") document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         }
@@ -325,6 +329,7 @@ function validateLogin(action: string = "login", extData: string) {
           // console.log(document.cookie);
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
+          document.cookie = `__Secure-session=${sessionID}; SameSite=None; Secure;`;
           alertDialog("Welcome, " + user.value + "!", () => { window.open(redirectTo, "_self"); });
           if (!match && action == "login") document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         }

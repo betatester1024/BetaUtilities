@@ -385,10 +385,20 @@ function format(obj3) {
   data = data.replaceAll(/\&amp;([0-9a-zA-Z]+)/gm, (match, p1) => {
     return "<a href='https://euphoria.io/room/" + p1 + "'>" + match + "</a>";
   });
-  data = data.replaceAll(/#([0-9a-zA-Z_\\-]{1,20})/gm, (match, p1) => {
+  data = data.replaceAll(/#([0-9a-zA-Z_\-]{1,20})/gm, (match, p1) => {
     return "<a href='/support?room=" + p1 + "'>" + match + "</a>";
   });
-  data = linkifyHtml(data);
+  data = data.replaceAll(
+    /.+\.(jpg|jpeg|png|gif|mp4)(\?.*)?$/gm,
+    (match, p1) => {
+      return `<img onclick='window.open("` + match + `")'src='` + match + "'></img>";
+    }
+  );
+  data = linkifyHtml(data, {
+    target: {
+      url: "_blank"
+    }
+  });
   for (let i = 0; i < import_replacements.replacements.length; i++) {
     data = data.replaceAll(import_replacements.replacements[i].from, "<span class='material-symbols-outlined'>" + import_replacements.replacements[i].to + "</span>");
   }
@@ -400,7 +410,7 @@ function format(obj3) {
     data = data.replace("/me", "");
   }
   cls_w += " " + cls_n;
-  return `<p class="${cls_w}""><b class='${cls_n}'>${obj3.sender}${extraText}${slashMe ? "" : ""}</b> ${data} </p><br>`;
+  return `<p class="${cls_w}""><b class='${cls_n}'>${obj3.sender}${extraText}${slashMe ? "" : ":"}</b> ${data} </p><br>`;
 }
 function findHandler(name) {
   for (let i = 0; i < import_initialiser.webHandlers.length; i++) {

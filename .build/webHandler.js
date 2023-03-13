@@ -203,6 +203,8 @@ class WebH {
   constructor(roomName) {
     this.nick = "BetaOS_System";
     this.replyMessage = import_messageHandle.replyMessage;
+    if (roomName.length > 21)
+      return;
     this.roomName = "OnlineSUPPORT|" + roomName;
     (0, import_messageHandle2.updateActive)(this.roomName, true);
   }

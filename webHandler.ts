@@ -217,6 +217,7 @@ export class WebH
   constructor(roomName: string) {
     this.nick = "BetaOS_System";
     this.replyMessage = replyMessage;
+    if (roomName.length > 21) return;
     this.roomName = "OnlineSUPPORT|"+roomName;
     updateActive(this.roomName, true);
   }

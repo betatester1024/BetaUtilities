@@ -2,9 +2,9 @@
 function onLoad() {
   let match = document.cookie.match("__Secure-session=[0-9.]+");
   console.log("Current session: " + match);
-  if (!match && document.URL.match("admin")) {
+  if (!match && document.URL.match("\\/admin") && !document.URL.match("?redirect=(.*)\\/admin")) {
     alertDialog("You're not logged in!", () => {
-      window.open("/signup", "_self");
+      window.open("/login?redirect=" + document.URL, "_self");
     });
   }
 }
@@ -124,24 +124,27 @@ function validateLogin(action = "login", extData) {
           ele.className = "beforeoverload";
         if (action != "login") {
           if (action == "newRoom") {
-            alertDialog("Room creation: " + res, () => {
-              validateLogin("ROOMLISTING", "");
-            });
+            alertDialog(
+              "Room creation: " + (res == "NOACTIVE" || res == "ACCESS" ? "Access denied" : res),
+              () => {
+                validateLogin("ROOMLISTING", "");
+              }
+            );
             return;
           }
           if (action != "userReq" && (res == "ERROR" || res == "NOACTIVE" || res == "ACCESS")) {
-            if (document.URL.match("betatester1024.repl.co/?$")) {
-              validateLogin("logout", "");
+            if (document.URL.match("betatester1024\\.repl\\.co/?$")) {
+              validateLogin("logout", document.URL);
             } else if (res == "ERROR")
               alertDialog("Unknown error occurred.", () => {
                 location.reload();
               });
             else if (res == "NOACTIVE")
-              alertDialog("Your login session is invalid!", () => {
+              alertDialog("You are not logged in.", () => {
                 validateLogin("logout", document.URL);
               });
             else
-              alertDialog("You're not logged in!", () => {
+              alertDialog("Access denied!", () => {
                 window.open("/login?redirect=" + document.URL), "_self";
               });
             return;
@@ -246,15 +249,15 @@ function validateLogin(action = "login", extData) {
               validateLogin("logout", "");
             });
           else if (res == "NOACTIVE") {
-            alertDialog("Error: Your login session is invalid!", () => {
-              validateLogin("logout", "");
+            alertDialog("Error: You are not logged in!", () => {
+              validateLogin("logout", document.URL);
             });
           } else if (action == "logout") {
             document.cookie = "__Secure-session=; Secure;";
             if (extData)
               window.open("/login?redirect=" + extData, "_self");
             alertDialog("You've been logged out", () => {
-              window.open(redirectTo, "_self");
+              window.open("/login?redirect=/", "_self");
             });
           } else if (res == "ERROR") {
             alertDialog("Unknown error!", () => {
@@ -290,6 +293,7 @@ function validateLogin(action = "login", extData) {
           deleteAllCookies();
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
+          document.cookie = `__Secure-session=${sessionID}; SameSite=None; Secure;`;
           if (!match && action == "login")
             document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         } else if (res == "3") {
@@ -299,6 +303,7 @@ function validateLogin(action = "login", extData) {
           deleteAllCookies();
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
+          document.cookie = `__Secure-session=${sessionID}; SameSite=None; Secure;`;
           alertDialog("Welcome, betatester1024.", () => {
             window.open(redirectTo, "_self");
           });
@@ -311,6 +316,7 @@ function validateLogin(action = "login", extData) {
           deleteAllCookies();
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
+          document.cookie = `__Secure-session=${sessionID}; SameSite=None; Secure;`;
           alertDialog("Welcome, " + user.value + "!", () => {
             window.open(redirectTo, "_self");
           });

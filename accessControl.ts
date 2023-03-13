@@ -393,9 +393,16 @@ function format(obj:{permLevel:number, data:string, sender:string}) {
   data = data.replaceAll("<", "&lt;");
   data = data.replaceAll("\\n", "<br>");
   data = data.replaceAll(/\&amp;([0-9a-zA-Z]+)/gm, (match:string, p1:string)=>{return "<a href='https://euphoria.io/room/"+p1+"'>"+match+"</a>"});
-  data = data.replaceAll(/#([0-9a-zA-Z_\\-]{1,20})/gm, (match:string, p1:string)=>{return "<a href='/support?room="+p1+"'>"+match+"</a>"});
-  
-  data = linkifyHtml(data);
+  data = data.replaceAll(/#([0-9a-zA-Z_\-]{1,20})/gm, (match:string, p1:string)=>{return "<a href='/support?room="+p1+"'>"+match+"</a>"});
+  data = data.replaceAll(/.+\.(jpg|jpeg|png|gif|mp4)(\?.*)?$/gm, (match:string, p1:string)=>
+    {
+      return "<img onclick='window.open(\""+match+"\")'src='"+match+"'></img>"}
+                      );
+  data = linkifyHtml(data, {
+    target: {
+      url: "_blank",
+    },
+  });
   // data = data.replaceAll(/([-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/igmu, 
     // (match:string, p1:string)=>{return "<a href='https://"+match+"'>"+match+"</a>"})
   

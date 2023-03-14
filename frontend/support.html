@@ -18,6 +18,8 @@
         match = document.cookie.match("__Secure-perms=([0-9]+)");
         // console.log(match[1]);
         if (match) CURRPERMS = match[1];
+        document.getElementById("header").innerHTML = "Support: #"+
+          document.URL.match("\\?room=(.*)")[1];
       }
       // system refresh auto!
       let LOADEDQ2 = false;
@@ -48,7 +50,6 @@
           setTimeout(initClient, 0);
         }
       } // initClient();
-      initClient();
       
     </script>
     <link rel="stylesheet" href="/globalformat.css">
@@ -103,7 +104,7 @@
       }
       #msgArea {
         overflow-y: scroll;
-        height: 60vh;
+        height: 70vh;
         margin-left: 5%;
         text-align: left;
         overflow-x: clip;
@@ -116,12 +117,18 @@
         color: #0a84ff; 
 /*         text-shadow: 0px 0px 1px #FBBC05; */
       }
+      .beta{
+        color: #00ee00;
+/*         text-shadow: 0px 0px 1px #00ee00;  */
+      }
       p.beta {
         color: #0a84ff; 
       }
-      b.beta {
-        color: #00ee00;
-/*         text-shadow: 0px 0px 1px #00ee00;  */
+      
+
+      i.beta {
+        color: #00e000;
+        font-weight: 600;
       }
       .slashMe{
 /*         background-color: #c9c9c9; */
@@ -139,30 +146,41 @@
         0% {background-color: rgba(0, 200, 0, 1);}
         100% {background-color: rgba(0, 200, 0, 0);}
       }
-      
+      img {
+        max-width: 200px;
+        max-height: 200px;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      .HOME {
+        width: 45vw;
+      }
     </style>
   </head>
   
   
-  <body onload = "onLoad(); setTimeout(()=>{document.getElementById('textINP').focus({ preventScroll: true });}, 500);" onkeyup="document.getElementById('textINP').focus()">
+  <body onload = "onLoad(); initClient(); setTimeout(()=>{document.getElementById('textINP').focus({ preventScroll: true });}, 500);" onkeyup="document.getElementById('textINP').focus()">
     <div id = "mainDiv">
-      <h1>BetaOS Support</h1>
+      <h2 id="header">BetaOS Support</h2>
       <hr class="rounded"></hr>
       <div id="msgArea">
         <b>Retrieving your messages...</b>
         <hr class="btnHr"></hr>
       </div>
       <div>
-        <div id="textDiv">
-          <input id="textINP" type="text" onchange="sendMsg()">
-          <hr class="inpHr"></hr>
-        </div>
-        <button id="send" onclick="sendMsg();">
-          <span class="material-symbols-outlined">send</span><br>
-<!--           <hr class="btnHr"></hr> -->
-        </button>
+        <form action="javascript:sendMsg()">
+          <div id="textDiv" >
+            <input id="textINP" type="text" placeholder="Enter a message...">
+            <hr class="inpHr"></hr>
+          </div>
+          <button id="send" type="button" onclick="sendMsg();">
+            <span class="material-symbols-outlined">send</span><br>
+  <!--           <hr class="btnHr"></hr> -->
+          </button>
+        </form>
       </div>
       <button class="HOME" onclick="window.open('../', '_self');">&#x00AB Return to home<br><hr class="btnHr"></hr></button>
+      <button class="HOME" onclick="window.open('/support', '_self');">&#x00AB Room listing<br><hr class="btnHr"></hr></button>
     </div>
     <h1 class="beforeoverload" id="h1">Sorry, this is taking longer than expected. 
       <br>

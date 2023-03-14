@@ -568,7 +568,7 @@ function replyMessage(msg, sender, data) {
     return "";
 }
 function norm(str) {
-  str = str.replaceAll(/[^a-zA-Z0-9_!@#$%^&*().]/gm, "");
+  str = str.replaceAll(/ /gm, "");
   str = str.replaceAll(/\\/gm, "\\\\");
   str = str.replaceAll(/"/gm, '\\"');
   return str.replaceAll(" ", "");

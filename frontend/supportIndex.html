@@ -35,6 +35,13 @@
         width: 20em;
         margin: 0 auto;
       }
+      .hazard{
+        color: #ee0000;
+        border: 2px solid #ee0000;
+      }
+      .hazard > hr {
+        border: 2px solid #ee0000;
+      }
     </style>
   </head>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,7 +51,7 @@
     <div id = "mainDiv">
       <h1>Support rooms</h1>
       <hr class="rounded"></hr>
-      <form action = "javascript:validateLogin('newRoom', '');"> 
+      <form action = "javascript:window.open('/support?room='+document.getElementById('enterRoomInp').value, '_self');"> 
         <div class="inputDiv">
           <input id="enterRoomInp" placeholder="Enter room-name">
           <hr class="inpHr">
@@ -61,11 +68,15 @@
         <hr class="rounded"></hr>
         <form action = "javascript:validateLogin('newRoom', '');"> 
           <div class="inputDiv">
-            <input id="newroominp" placeholder="Create a new room...">
+            <input id="newroominp" placeholder="Room name...">
             <hr class="inpHr">
           </div>
           <button type="submit">
             Create room!<br>
+            <hr class="btnHr"></hr>
+          </button>
+          <button type="button" class="hazard" onclick="validateLogin('delRoom', '');">
+            Delete room<br>
             <hr class="btnHr"></hr>
           </button>
         </form>

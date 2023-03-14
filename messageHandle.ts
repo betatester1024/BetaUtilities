@@ -533,7 +533,7 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
 }
 
 function norm(str:string) {
-  str = str.replaceAll(/[^a-zA-Z0-9_!@#$%^&*().]/gm, "");
+  str = str.replaceAll(/ /gm, "");
   str = str.replaceAll(/\\/gm, "\\\\");
   str = str.replaceAll(/"/gm, "\\\"");
   

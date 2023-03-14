@@ -2,9 +2,9 @@
 function onLoad() {
   let match = document.cookie.match("__Secure-session=[0-9.]+");
   console.log("Current session: " + match);
-  if (!match && document.URL.match("admin")) {
+  if (!match && document.URL.match("\\/admin") && !document.URL.match("?redirect=(.*)\\/admin")) {
     alertDialog("You're not logged in!", () => {
-      window.open("/signup", "_self");
+      window.open("/login?redirect=" + document.URL, "_self");
     });
   }
 }
@@ -35,7 +35,8 @@ function sendMsg() {
   let inp = document.getElementById("textINP");
   let msg = inp.value;
   inp.value = "";
-  validateLogin("sendMsg", msg);
+  if (msg)
+    validateLogin("sendMsg", msg);
 }
 function validateLogin(action = "login", extData) {
   let user = document.getElementById("userINP");
@@ -50,6 +51,7 @@ function validateLogin(action = "login", extData) {
   }
   let match2 = action.match("updateTODO([0-9]+)");
   let match3 = action.match("completeTODO([0-9]+)");
+  let match4 = action.match("deleteTODO([0-9]+)");
   let inp;
   if (match2 || match3) {
     inp = document.getElementById("todo" + (match2 ? match2[1] : match3[1]));
@@ -83,16 +85,16 @@ function validateLogin(action = "login", extData) {
     } else if (action == "sendMsg") {
       params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
       ;
-      let match4 = extData.match("!renick @([a-zA-Z_0-9]+)");
-      if (match4) {
-        params = "token=" + sessionID + "&action=renick&user=" + encodeURIComponent(match4[1]) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
+      let match5 = extData.match("!renick @([a-zA-Z_0-9]+)");
+      if (match5) {
+        params = "token=" + sessionID + "&action=renick&user=" + encodeURIComponent(match5[1]) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
         renickQ = true;
       }
     } else
       params = "user=&pass=&action=" + action + "&token=" + sessionID;
     let newRoomInp = document.getElementById("newroominp");
-    if (action == "newRoom") {
-      params = "user=" + newRoomInp.value + "&action=newRoom&token=" + sessionID;
+    if (action == "newRoom" || action == "delRoom") {
+      params = "user=" + newRoomInp.value + "&action=" + action + "&token=" + sessionID;
       newRoomInp.value = "";
     }
     if (action == "acquireTodo" && extData == "OK") {
@@ -123,25 +125,28 @@ function validateLogin(action = "login", extData) {
         if (ele)
           ele.className = "beforeoverload";
         if (action != "login") {
-          if (action == "newRoom") {
-            alertDialog("Room creation: " + res, () => {
-              validateLogin("ROOMLISTING", "");
-            });
+          if (action == "newRoom" || action == "delRoom") {
+            alertDialog(
+              "Room " + (action == "newRoom" ? "creation: " : "deletion: ") + (res == "NOACTIVE" || res == "ACCESS" ? "Access denied" : res),
+              () => {
+                validateLogin("ROOMLISTING", "");
+              }
+            );
             return;
           }
           if (action != "userReq" && (res == "ERROR" || res == "NOACTIVE" || res == "ACCESS")) {
-            if (document.URL.match("betatester1024.repl.co/?$")) {
-              validateLogin("logout", "");
+            if (document.URL.match("betatester1024\\.repl\\.co/?$")) {
+              validateLogin("logout", document.URL);
             } else if (res == "ERROR")
               alertDialog("Unknown error occurred.", () => {
                 location.reload();
               });
             else if (res == "NOACTIVE")
-              alertDialog("Your login session is invalid!", () => {
+              alertDialog("You are not logged in.", () => {
                 validateLogin("logout", document.URL);
               });
             else
-              alertDialog("You're not logged in!", () => {
+              alertDialog("Access denied!", () => {
                 window.open("/login?redirect=" + document.URL), "_self";
               });
             return;
@@ -151,9 +156,9 @@ function validateLogin(action = "login", extData) {
             let mainDiv = document.getElementById("innerDiv");
             mainDiv.innerHTML = "";
             for (let i = 0; i < res.length; i++) {
-              let match4 = res[i].match("OnlineSUPPORT\\|(.*)");
-              if (match4)
-                mainDiv.innerHTML += `<button class="unsetWidth" onclick="window.open('/support?room=${match4[1]}', '_self')"><kbd>${match4[1]}</kbd><hr class="btnHr"></hr></button>`;
+              let match5 = res[i].match("OnlineSUPPORT\\|(.*)");
+              if (match5)
+                mainDiv.innerHTML += `<button class="unsetWidth" onclick="window.open('/support?room=${match5[1]}', '_self')"><kbd>${match5[1]}</kbd><hr class="btnHr"></hr></button>`;
             }
             return;
           }
@@ -164,9 +169,10 @@ function validateLogin(action = "login", extData) {
             for (let i = 0; i < todoList.length; i++) {
               let update = `<p> 
           <span class="material-symbols-outlined" onclick="complete(${i})">task_alt</span>
-          <input class="todo" id="todo${i}" value="${todoList[i]}" onchange="modify(-1); validateLogin('updateTODO${i}', '')" readonly onclick="modify(${i})"/>
+          <input class="todo" id="todo${i}" value="${todoList[i].replaceAll('"', "&quot;")}" onchange="modify(-1); validateLogin('updateTODO${i}', '')" readonly onclick="modify(${i})"/>
           
           <span id="span${i}" class="material-symbols-outlined" onclick="modify(${i})">edit</span>
+          <span class="material-symbols-outlined" onclick="del(${i})">delete</span>
         </p>`;
               todoDiv.innerHTML += update;
               TODOCT = res.length;
@@ -230,8 +236,18 @@ function validateLogin(action = "login", extData) {
               location.reload();
             }
             ele = document.getElementById("msgArea");
+            if (action == "refresh_log")
+              ele = ele;
             let scrDistOKQ = Math.abs(ele.scrollTop - ele.scrollHeight) < 1e3;
-            updateTextArea(res);
+            if (action == "refresh")
+              res += `
+            <br><p class="beta"><i class="beta">Welcome to BetaOS Services support! Enter any message
+            in the box below. Automated response services and utilities are provided
+            by BetaOS System. Activate it using the commands <a class="beta" href="/commands?nick=BetaOS_System" target="blank">here</a>.
+            Enter </i><kbd class="beta">!renick @[NEWNICK]</kbd><i class="beta"> to rename yourself in all support rooms. This is linked to your account.
+            <br>Thank you for using BetaOS Systems!</i></p><br>
+            `;
+            updateTextArea(res, action == "refresh_log");
             if (!LOADEDQ || extData == "send" || scrDistOKQ) {
               ele.scrollTop = ele.scrollHeight;
               LOADEDQ = true;
@@ -246,15 +262,15 @@ function validateLogin(action = "login", extData) {
               validateLogin("logout", "");
             });
           else if (res == "NOACTIVE") {
-            alertDialog("Error: Your login session is invalid!", () => {
-              validateLogin("logout", "");
+            alertDialog("Error: You are not logged in!", () => {
+              validateLogin("logout", document.URL);
             });
           } else if (action == "logout") {
             document.cookie = "__Secure-session=; Secure;";
             if (extData)
               window.open("/login?redirect=" + extData, "_self");
             alertDialog("You've been logged out", () => {
-              window.open(redirectTo, "_self");
+              window.open("/login?redirect=/", "_self");
             });
           } else if (res == "ERROR") {
             alertDialog("Unknown error!", () => {
@@ -263,9 +279,9 @@ function validateLogin(action = "login", extData) {
             alertDialog("This username is already taken!", () => {
             });
           } else {
-            if (match2 || match3 || action == "addTODO") {
-              if (match3)
-                alertDialog("Task complete!", () => {
+            if (match2 || match3 || match4 || action == "addTODO") {
+              if (match3 || match4)
+                alertDialog(match3 ? "Task complete!" : "Task deleted!", () => {
                   validateLogin("acquireTodo", "OK");
                 });
               validateLogin("acquireTodo", "OK");
@@ -290,6 +306,7 @@ function validateLogin(action = "login", extData) {
           deleteAllCookies();
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
+          document.cookie = `__Secure-session=${sessionID}; SameSite=None; Secure;`;
           if (!match && action == "login")
             document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         } else if (res == "3") {
@@ -299,7 +316,8 @@ function validateLogin(action = "login", extData) {
           deleteAllCookies();
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
-          alertDialog("Welcome, betatester1024.", () => {
+          document.cookie = `__Secure-session=${sessionID}; SameSite=None; Secure;`;
+          alertDialog("Welcome, " + user.value + "! | Super-administrative access granted.", () => {
             window.open(redirectTo, "_self");
           });
           if (!match && action == "login")
@@ -311,6 +329,7 @@ function validateLogin(action = "login", extData) {
           deleteAllCookies();
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
+          document.cookie = `__Secure-session=${sessionID}; SameSite=None; Secure;`;
           alertDialog("Welcome, " + user.value + "!", () => {
             window.open(redirectTo, "_self");
           });
@@ -367,10 +386,13 @@ function clearalert() {
     cbk = null;
   }
 }
-function updateTextArea(msgs) {
+function updateTextArea(msgs, textAreaQ) {
   let ele = document.getElementById("msgArea");
   let scrollHt = ele.scrollTop;
-  ele.innerHTML = msgs;
+  if (textAreaQ)
+    ele.innerText = msgs.replaceAll("<br>", "\n");
+  else
+    ele.innerHTML = msgs;
   ele.scrollTop = scrollHt;
 }
 let MODIFYN = -1;
@@ -405,6 +427,9 @@ function complete(n) {
 function add() {
   validateLogin("addTODO", "");
   MODIFYN = TODOCT;
+}
+function del(n) {
+  validateLogin("deleteTODO" + n, "");
 }
 function resetAlertDiv() {
   let div = document.getElementById("alert");

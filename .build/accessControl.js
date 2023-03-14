@@ -72,7 +72,8 @@ function validate(user, pwd, action, access, callback, token = "") {
   }
   let todoMatch = action.match("updateTODO([0-9]+)");
   let todoMatch2 = action.match("completeTODO([0-9]+)");
-  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log" || action == "userReq" || action == "renick" || action == "delete" || action == "acquireTodo" || todoMatch || todoMatch2 || action == "addTODO" || action == "newRoom") {
+  let todoMatch3 = action.match("deleteTODO([0-9]+)");
+  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log" || action == "userReq" || action == "renick" || action == "delete" || action == "acquireTodo" || todoMatch || todoMatch2 || action == "addTODO" || action == "newRoom" || todoMatch3 || action == "delRoom") {
     DB.findOne({ fieldName: "TOKEN", token: { $eq: token } }).then(
       (obj) => {
         if (obj == null) {
@@ -117,7 +118,7 @@ function validate(user, pwd, action, access, callback, token = "") {
               callback.end(JSON.stringify(escape(user)));
               return;
             }
-            if (action == "acquireTodo" || todoMatch || todoMatch2 || action == "addTODO") {
+            if (action == "acquireTodo" || todoMatch || todoMatch2 || action == "addTODO" || todoMatch3) {
               if (!obj2.todo)
                 obj2.todo = [];
               if (action == "acquireTodo")
@@ -127,9 +128,9 @@ function validate(user, pwd, action, access, callback, token = "") {
                   if (todoMatch[1] < obj2.todo.length)
                     obj2.todo[todoMatch[1]] = user;
                 }
-                if (todoMatch2) {
-                  if (obj2.todo.length > todoMatch2[1])
-                    obj2.todo.splice(todoMatch2[1], 1);
+                if (todoMatch2 || todoMatch3) {
+                  if (obj2.todo.length > (todoMatch2 ? todoMatch2[1] : todoMatch3[1]))
+                    obj2.todo.splice(todoMatch2 ? todoMatch2[1] : todoMatch3[1], 1);
                 }
                 if (action == "addTODO") {
                   obj2.todo.push(user);
@@ -239,10 +240,22 @@ function validate(user, pwd, action, access, callback, token = "") {
               let handler = findHandler("OnlineSUPPORT|" + access);
               if (handler) {
                 handler.onMessage(user, snd);
-              } else
-                console.log("ROOMINVALID");
+              } else {
+                handler = findHandler("HIDDEN|" + access);
+                if (handler) {
+                  handler.onMessage(user, snd);
+                } else
+                  console.log("ROOMINVALID");
+              }
               return;
             } else if (action == "refresh" && perms >= 1) {
+              DB2.find({ fieldName: "MSG", room: { $eq: access } }).toArray().then((objs) => {
+                let out = "";
+                for (let i = 0; i < objs.length; i++) {
+                  out += format(objs[i]);
+                }
+                callback.end(JSON.stringify(out));
+              });
               DB2.find({ fieldName: "MSG", room: { $eq: access } }).toArray().then((objs) => {
                 let out = "";
                 for (let i = 0; i < objs.length; i++) {
@@ -259,22 +272,34 @@ function validate(user, pwd, action, access, callback, token = "") {
             } else if (action == "refresh_log" || action == "refresh" || action == "checkAccess_A") {
               callback.sendFile(path.join(__dirname, "../frontend", "403.html"));
               return;
-            } else if (action == "newRoom" && perms >= 2) {
+            } else if ((action == "newRoom" || action == "delRoom") && perms >= 2) {
               if (user.match("^[0-9a-zA-Z_\\-]{1,20}$")) {
                 DB3.findOne({ fieldName: "ROOMS" }).then((obj4) => {
-                  if (obj4.rooms.indexOf(user) < 0) {
+                  let idx = obj4.rooms.indexOf(user);
+                  if (action == "newRoom" && idx < 0) {
                     obj4.rooms.push(user);
                     import_initialiser.webHandlers.push(new import_webHandler.WebH(user));
-                    DB3.updateOne({ fieldName: "ROOMS" }, {
-                      $set: {
-                        rooms: obj4.rooms
-                      },
-                      $currentDate: { lastModified: true }
-                    }, { upsert: true }).then(() => {
-                      callback.end(JSON.stringify("SUCCESS"));
-                    });
+                  } else if (action == "delRoom" && idx >= 0) {
+                    if (idx >= 0)
+                      obj4.rooms.splice(idx, 1);
                   } else
                     callback.end(JSON.stringify("ERROR"));
+                  DB3.updateOne({ fieldName: "ROOMS" }, {
+                    $set: {
+                      rooms: obj4.rooms
+                    },
+                    $currentDate: { lastModified: true }
+                  }, { upsert: true }).then(() => {
+                    if (action != "delRoom")
+                      callback.end(JSON.stringify("SUCCESS"));
+                  });
+                  if (action == "delRoom" && idx >= 0) {
+                    import_initialiser.sysRooms.splice(import_initialiser.sysRooms.indexOf("OnlineSUPPORT|" + user), 1);
+                    DB2.deleteMany({ room: user }).then(() => {
+                      console.log("DONE");
+                      callback.end(JSON.stringify("SUCCESS"));
+                    });
+                  }
                 });
               } else
                 callback.end(JSON.stringify("ERROR"));
@@ -382,13 +407,23 @@ function format(obj3) {
   data = data.replaceAll(">", "&gt;");
   data = data.replaceAll("<", "&lt;");
   data = data.replaceAll("\\n", "<br>");
+  data = data.replaceAll(/(.+\.(jpg|jpeg|png|gif|mp4))(\?.*)?$/gm, (match, p1) => {
+    match = match.replaceAll("'", "\\'");
+    match = match.replaceAll('"', '\\"');
+    match = match.replaceAll("&amp;", "&");
+    return `<img onclick='window.open("` + encodeURI(match) + `")'src='` + encodeURI(match) + "'></img>";
+  });
   data = data.replaceAll(/\&amp;([0-9a-zA-Z]+)/gm, (match, p1) => {
     return "<a href='https://euphoria.io/room/" + p1 + "'>" + match + "</a>";
   });
-  data = data.replaceAll(/#([0-9a-zA-Z_\\-]{1,20})/gm, (match, p1) => {
+  data = data.replaceAll(/#([0-9a-zA-Z_\-]{1,20})/gm, (match, p1) => {
     return "<a href='/support?room=" + p1 + "'>" + match + "</a>";
   });
-  data = linkifyHtml(data);
+  data = linkifyHtml(data, {
+    target: {
+      url: "_blank"
+    }
+  });
   for (let i = 0; i < import_replacements.replacements.length; i++) {
     data = data.replaceAll(import_replacements.replacements[i].from, "<span class='material-symbols-outlined'>" + import_replacements.replacements[i].to + "</span>");
   }
@@ -400,7 +435,7 @@ function format(obj3) {
     data = data.replace("/me", "");
   }
   cls_w += " " + cls_n;
-  return `<p class="${cls_w}""><b class='${cls_n}'>${obj3.sender}${extraText}${slashMe ? "" : ""}</b> ${data} </p><br>`;
+  return `<p class="${cls_w}""><b class='${cls_n}'>${obj3.sender}${extraText}${slashMe ? "" : ":"}</b> ${data} </p><br>`;
 }
 function findHandler(name) {
   for (let i = 0; i < import_initialiser.webHandlers.length; i++) {

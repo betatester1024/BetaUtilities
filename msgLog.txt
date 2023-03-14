@@ -243,3 +243,114 @@
 (OnlineSUPPORT|xkcd)[BetaOS] !ping
 (OnlineSUPPORT|xkcd)[BetaOS] !activerooms
 (OnlineSUPPORT|xkcd)[BetaOS] !activerooms @BetaOS_System
+(OnlineSUPPORT|main_support)[BetaOS] !uptime @BetaOS_System
+(OnlineSUPPORT|BetaOS)[user] sending message
+(OnlineSUPPORT|BetaOS)[user] message message
+(OnlineSUPPORT|main_support)[BetaOS] @BetaOS_System !mitoseTo &roomeeee as @BetaUtilities
+(OnlineSUPPORT|main_support)[BetaOS] hey
+(OnlineSUPPORT|xkcd)[BetaOS] connections
+(OnlineSUPPORT|xkcd)[BetaOS] !ping @BetaOS_System
+(OnlineSUPPORT|main_support)[BetaOS] @BetaOS_System !mitoseTo &rpg as @Betautilities
+(OnlineSUPPORT|xkcd)[BetaOS] !Ping
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[BetaOS] !ping
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[BetaOS] :egg:
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[BetaOS] !pan
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[BetaOS] !egg
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[BetaOS] !potato
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[BetaOS] !die
+(OnlineSUPPORT|main_support)[user] retrying
+(OnlineSUPPORT|main_support)[BetaOS] abc.jpg
+(OnlineSUPPORT|main_support)[BetaOS] abc.jpg
+(OnlineSUPPORT|main_support)[BetaOS] https://imgs.xkcd.com/comics/standards_2x.png
+(OnlineSUPPORT|main_support)[BetaOS] goddamnit
+(OnlineSUPPORT|secondary_support)[BetaOS] hey?
+(OnlineSUPPORT|main_support)[BetaOS] !uptime @BetaOS_System
+(OnlineSUPPORT|main_support)[BetaOS] !ping
+(OnlineSUPPORT|main_support)[BetaOS] !issue
+(HIDDEN|hidroom1)[BetaOS] !ping
+(HIDDEN|hidroom1)[BetaOS] !uptime
+(HIDDEN|hidroom1)[BetaOS] abcde
+(HIDDEN|hidroom1)[BetaOS] fghik
+(HIDDEN|hidroom1)[BetaOS] WHOA
+(HIDDEN|hidroom1)[BetaOS] !activerooms @BetaOS_System
+(HIDDEN|more-room)[BetaOS] aha
+(HIDDEN|more-room)[BetaOS] what
+(OnlineSUPPORT|main_support)[BetaOS] https://bigrat.monster/media/bigrat.png
+(OnlineSUPPORT|xkcd)[c] a
+(OnlineSUPPORT|main_support)[c] ock
+(OnlineSUPPORT|main_support)[c] ock
+(OnlineSUPPORT|main_support)[c] ock
+(OnlineSUPPORT|main_support)[c] ock
+(OnlineSUPPORT|secondary_support)[c] ock
+(OnlineSUPPORT|secondary_support)[c] ock
+(OnlineSUPPORT|secondary_support)[c] mmmmm
+(OnlineSUPPORT|System_Updates)[BetaOS] :confirm: ISSUEFIX
+(OnlineSUPPORT|main_support)[BetaOS] mm
+(OnlineSUPPORT|main_support)[BetaOS] 
+(OnlineSUPPORT|main_support)[BetaOS] what
+(OnlineSUPPORT|main_support)[BetaOS] 
+(OnlineSUPPORT|main_support)[BetaOS] 
+(OnlineSUPPORT|main_support)[BetaOS] no
+(OnlineSUPPORT|main_support)[BetaOS] oi
+(OnlineSUPPORT|main_support)[BetaOS] aaaa
+(OnlineSUPPORT|main_support)[BetaOS] okay good
+(OnlineSUPPORT|main_support)[BetaOS] sent
+(OnlineSUPPORT|main_support)[BetaOS] very nice
+(OnlineSUPPORT|main_support)[BetaOS] 
+(OnlineSUPPORT|main_support)[BetaOS] 
+(OnlineSUPPORT|main_support)[BetaOS] 
+(OnlineSUPPORT|main_support)[BetaOS] eh?
+(OnlineSUPPORT|main_support)[BetaOS] no sending empty messages
+(OnlineSUPPORT|main_support)[BetaOS] oh, okay
+(OnlineSUPPORT|main_support)[BetaOS] 
+(OnlineSUPPORT|main_support)[BetaOS] 
+(OnlineSUPPORT|main_support)[BetaOS] 
+(OnlineSUPPORT|main_support)[BetaOS] 
+(OnlineSUPPORT|main_support)[BetaOS] empty
+(OnlineSUPPORT|main_support)[BetaOS] not empty
+(OnlineSUPPORT|main_support)[BetaOS]  
+(OnlineSUPPORT|main_support)[BetaOS] empty but spac
+(OnlineSUPPORT|main_support)[BetaOS] !ping
+(OnlineSUPPORT|somethingfourfive)[BetaOS] hey
+(OnlineSUPPORT|xkcd)[BetaOS] zbc
+(OnlineSUPPORT|xkcd)[BetaOS] defghhh
+(OnlineSUPPORT|xkcd)[BetaOS] ghhgghhghghgg
+(OnlineSUPPORT|xkcd)[BetaOS] room created
+(OnlineSUPPORT|xkcd)[BetaOS] wwhat
+(OnlineSUPPORT|xkcd)[BetaOS] huh
+(OnlineSUPPORT|xkcd)[BetaOS] mmmmmmmmmmmmmmmmmm
+(OnlineSUPPORT|main_support)[BetaOS] aha
+(OnlineSUPPORT|main_support)[BetaOS] abc
+(OnlineSUPPORT|main_support)[BetaOS] why so laggy
+(OnlineSUPPORT|main_support)[BetaOS] a
+(OnlineSUPPORT|main_support)[BetaOS] a
+(OnlineSUPPORT|main_support)[BetaOS] a
+(OnlineSUPPORT|main_support)[BetaOS] a
+(OnlineSUPPORT|main_support)[BetaOS] a
+(OnlineSUPPORT|main_support)[BetaOS] a
+(OnlineSUPPORT|main_support)[BetaOS] aa
+(OnlineSUPPORT|main_support)[BetaOS] a
+(OnlineSUPPORT|main_support)[BetaOS] a
+(OnlineSUPPORT|main_support)[BetaOS] a
+(OnlineSUPPORT|main_support)[BetaOS] a
+(OnlineSUPPORT|main_support)[BetaOS] a
+(HIDDEN|hidroom1)[BetaOS] still goin
+(HIDDEN|hidroom1)[BetaOS] !ping
+(HIDDEN|hidroom1)[BetaOS] xkcd
+(HIDDEN|hidroom1)[BetaOS] mmm
+(HIDDEN|hidroom1)[BetaOS] good
+(HIDDEN|hidroom1)[BetaOS] !uptime @BetaOS_System
+(HIDDEN|hidroom1)[BetaOS] abcde
+(OnlineSUPPORT|betatester1024)[BetaOS] https://media.discordapp.net/attachments/959625798107664474/1084998200127143967/hKgZjQj.png?width=377&height=640
+(OnlineSUPPORT|betatester1024)[BetaOS] damnit
+(OnlineSUPPORT|betatester1024)[BetaOS] https://media.discordapp.net/attachments/959625798107664474/1084998200127143967/hKgZjQj.png
+(HIDDEN|hidroom1)[BetaOS] https://replit.com/cdn-cgi/image/width=64,quality=80,format=auto/https://storage.googleapis.com/replit/images/1676128786793_05742239d9758e337dd63d9c08c9be5e.png
+(OnlineSUPPORT|secondary_support)[BetaOS] https://replit.com/cdn-cgi/image/width=64,quality=80,format=auto/https://storage.googleapis.com/replit/images/1676128786793_05742239d9758e337dd63d9c08c9be5e.png
+(OnlineSUPPORT|secondary_support)[BetaOS] https://bigrat.monster/media/bigrat.png
+(OnlineSUPPORT|secondary_support)[BetaOS] on nice
+(OnlineSUPPORT|betatester1024)[BetaOS] betatester1025@protonmail.com
+(OnlineSUPPORT|betatester1024)[BetaOS] abc.jpg?randomshit
+(OnlineSUPPORT|betatester1024)[BetaOS] https://abc.com/a.jpg?randomshit
+(OnlineSUPPORT|secondary_support)[BetaOS] !uptime @BetaOS_System
+(OnlineSUPPORT|-----_-_-_-)[BetaOS] !uptime @BetaOS_System
+(OnlineSUPPORT|-----_-_-_-)[BetaOS] !ping

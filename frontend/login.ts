@@ -1,8 +1,8 @@
 function onLoad() {
   let match = document.cookie.match("__Secure-session=[0-9.]+");
   console.log("Current session: " + match);
-  if (!match && document.URL.match("admin")) {
-    alertDialog("You're not logged in!", () => { window.open("/signup", "_self"); });
+  if (!match && document.URL.match("\\/admin") && !document.URL.match("?redirect=(.*)\\/admin")) {
+    alertDialog("You're not logged in!", () => { window.open("/login?redirect="+document.URL, "_self"); });
   }
   // document.getElementById("alert").hidden=true;
   // document.getElementById("h1").hidden=true;
@@ -41,7 +41,7 @@ function sendMsg() {
   let inp = document.getElementById("textINP") as HTMLInputElement;
   let msg = inp.value;
   inp.value = "";
-  validateLogin("sendMsg", msg);
+  if (msg) validateLogin("sendMsg", msg);
 }
 
 function validateLogin(action: string = "login", extData: string) {
@@ -62,6 +62,7 @@ function validateLogin(action: string = "login", extData: string) {
 
   let match2 = action.match("updateTODO([0-9]+)");
   let match3 = action.match("completeTODO([0-9]+)");
+  let match4 = action.match("deleteTODO([0-9]+)");
   let inp:HTMLInputElement;
   
   if (match2 || match3) {
@@ -110,8 +111,8 @@ function validateLogin(action: string = "login", extData: string) {
     }
     else params = "user=&pass=&action="+action+"&token=" + sessionID;
     let newRoomInp = document.getElementById("newroominp") as HTMLInputElement;
-    if (action == "newRoom") {
-      params = "user="+newRoomInp.value+"&action=newRoom&token="+sessionID;
+    if (action == "newRoom" || action == "delRoom") {
+      params = "user="+newRoomInp.value+"&action="+action+"&token="+sessionID;
       newRoomInp.value = "";
     }
     if (action == "acquireTodo" && extData == "OK"){
@@ -141,18 +142,20 @@ function validateLogin(action: string = "login", extData: string) {
         ele = document.getElementById('h1');
         if (ele) ele.className = "beforeoverload";
         if (action != "login") {
-          if (action == "newRoom") {
-            alertDialog("Room creation: "+res, ()=>{validateLogin("ROOMLISTING", "")});
+          if (action == "newRoom" || action == "delRoom") {
+            alertDialog("Room "+(action=="newRoom"?"creation: ":"deletion: ")+
+              ((res=="NOACTIVE"||res=="ACCESS")?"Access denied":res), 
+              ()=>{validateLogin("ROOMLISTING", "")});
             return;
           }
           if (action != "userReq" && (res == "ERROR" || res == "NOACTIVE" || res == "ACCESS")) {
             // console.log("what?")
-            if (document.URL.match("betatester1024.repl.co/?$")) {
-              validateLogin("logout", "");
+            if (document.URL.match("betatester1024\\.repl\\.co/?$")) {
+              validateLogin("logout", document.URL);
             }
             else if (res == "ERROR") alertDialog("Unknown error occurred.", ()=> {location.reload()});
-            else if (res == "NOACTIVE") alertDialog("Your login session is invalid!", () => { validateLogin("logout", document.URL); });
-            else alertDialog("You're not logged in!", ()=>{window.open("/login?redirect="+document.URL), "_self"})
+            else if (res == "NOACTIVE") alertDialog("You are not logged in.", () => { validateLogin("logout", document.URL); });
+            else alertDialog("Access denied!", ()=>{window.open("/login?redirect="+document.URL), "_self"})
             return;
           }
           if (action == "ROOMLISTING") {
@@ -177,9 +180,10 @@ function validateLogin(action: string = "login", extData: string) {
             for (let i=0; i<todoList.length; i++ ) {
               let update = `<p> 
           <span class="material-symbols-outlined" onclick="complete(${i})">task_alt</span>
-          <input class="todo" id="todo${i}" value="${todoList[i]}" onchange="modify(-1); validateLogin('updateTODO${i}', '')" readonly onclick="modify(${i})"/>
+          <input class="todo" id="todo${i}" value="${todoList[i].replaceAll("\"", "&quot;")}" onchange="modify(-1); validateLogin('updateTODO${i}', '')" readonly onclick="modify(${i})"/>
           
           <span id="span${i}" class="material-symbols-outlined" onclick="modify(${i})">edit</span>
+          <span class="material-symbols-outlined" onclick="del(${i})">delete</span>
         </p>`;
               todoDiv.innerHTML += update;
               // console.log(update);
@@ -246,9 +250,17 @@ function validateLogin(action: string = "login", extData: string) {
               location.reload();
             }
             ele = document.getElementById("msgArea") as HTMLDivElement;
+            if (action == "refresh_log") ele = ele as HTMLTextAreaElement;
             // console.log(ele.scrollTop - ele.scrollHeight)
             let scrDistOKQ =     Math.abs(ele.scrollTop - ele.scrollHeight) < 1000;
-            updateTextArea(res);
+            if (action == "refresh") res += `
+            <br><p class="beta"><i class="beta">Welcome to BetaOS Services support! Enter any message
+            in the box below. Automated response services and utilities are provided
+            by BetaOS System. Activate it using the commands <a class="beta" href="/commands?nick=BetaOS_System" target="blank">here</a>.
+            Enter </i><kbd class="beta">!renick @[NEWNICK]</kbd><i class="beta"> to rename yourself in all support rooms. This is linked to your account.
+            <br>Thank you for using BetaOS Systems!</i></p><br>
+            `
+            updateTextArea(res, action == "refresh_log");
             
             if (!LOADEDQ || extData == "send" || scrDistOKQ)
             {
@@ -265,13 +277,13 @@ function validateLogin(action: string = "login", extData: string) {
             alertDialog("Error: Your login session has expired!", () => { validateLogin("logout", "") });
           else if (res == "NOACTIVE") {
             
-            alertDialog("Error: Your login session is invalid!", () => {validateLogin("logout", "");});
+            alertDialog("Error: You are not logged in!", () => {validateLogin("logout", document.URL);});
           }
           else if (action == "logout") {
             // alert("Logging out");
             document.cookie = "__Secure-session=; Secure;";
             if (extData) window.open("/login?redirect="+extData, "_self");
-            alertDialog("You've been logged out", () => { window.open(redirectTo, "_self") });
+            alertDialog("You've been logged out", () => { window.open("/login?redirect=/", "_self") });
           }
           else if (res == "ERROR") {
             alertDialog("Unknown error!", () => { });
@@ -280,8 +292,8 @@ function validateLogin(action: string = "login", extData: string) {
             alertDialog("This username is already taken!", () => { });
           }
           else {
-            if (match2 || match3 || action == "addTODO") {
-              if (match3) alertDialog("Task complete!", ()=> {
+            if (match2 || match3 ||match4|| action == "addTODO") {
+              if (match3 ||match4) alertDialog(match3?"Task complete!":"Task deleted!", ()=> {
                 validateLogin("acquireTodo", "OK"); // already have password with us.
               })
               validateLogin("acquireTodo", "OK");
@@ -303,6 +315,7 @@ function validateLogin(action: string = "login", extData: string) {
           
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
+          document.cookie = `__Secure-session=${sessionID}; SameSite=None; Secure;`;
           if (!match && action == "login") document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         }
         else if (res == "3") {
@@ -314,7 +327,8 @@ function validateLogin(action: string = "login", extData: string) {
           
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
-          alertDialog("Welcome, betatester1024.", () => { window.open(redirectTo, "_self") });
+          document.cookie = `__Secure-session=${sessionID}; SameSite=None; Secure;`;
+          alertDialog("Welcome, "+user.value+"! | Super-administrative access granted.", () => { window.open(redirectTo, "_self") });
           if (!match && action == "login") document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         }
         else if (res == "1") {
@@ -325,6 +339,7 @@ function validateLogin(action: string = "login", extData: string) {
           // console.log(document.cookie);
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
+          document.cookie = `__Secure-session=${sessionID}; SameSite=None; Secure;`;
           alertDialog("Welcome, " + user.value + "!", () => { window.open(redirectTo, "_self"); });
           if (!match && action == "login") document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         }
@@ -383,11 +398,12 @@ function clearalert() {
   }
 }
 
-function updateTextArea(msgs:string) {
+function updateTextArea(msgs:string, textAreaQ:boolean) {
   
   let ele = document.getElementById("msgArea") as HTMLDivElement;
   let scrollHt = ele.scrollTop;
-  ele.innerHTML = msgs;
+  if (textAreaQ) ele.innerText = msgs.replaceAll("<br>", "\n");
+  else ele.innerHTML = msgs;
   
   ele.scrollTop = scrollHt;
   
@@ -425,6 +441,10 @@ function complete(n:number) {
 function add() {
   validateLogin("addTODO", "");
   MODIFYN = TODOCT;
+}
+
+function del(n:number) {
+  validateLogin("deleteTODO"+n, "");
 }
 
 function resetAlertDiv() {

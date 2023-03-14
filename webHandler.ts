@@ -17,6 +17,7 @@ export class WebH
   nick:string;
   pausedQ=false;
   roomName:string;
+  hiddenQ: boolean;
   pauser:string|null = null;
   failedQ = false;
   callTimes:number[]=[];
@@ -127,7 +128,7 @@ export class WebH
       // !restore
       else if (this.pausedQ && msg == "!restore @" + this.nick.toLowerCase()) {
         this.sendMsg("/me has been unpaused", data);   
-        updateActive(this.roomName, true);
+        if (!this.hiddenQ) updateActive(this.roomName, true);
         this.pauser = null;
         this.callTimes = [];
         this.pausedQ = false;
@@ -136,7 +137,7 @@ export class WebH
       // !pause
       else if (msg == "!pause @" + this.nick.toLowerCase()) {
         this.sendMsg("/me has been paused", data)
-        updateActive(this.roomName, false);
+        if (!this.hiddenQ) updateActive(this.roomName, false);
         let reply = "Enter !kill @"+this.nick+" to kill this bot, "+
           "or enter !restore @"+this.nick+" to restore it.";
         this.sendMsg(reply, data);
@@ -202,10 +203,10 @@ export class WebH
     setTimeout(() => {
       this.changeNick(this.nick)
       this.incrRunCt();
-      updateActive(this.roomName, true);
+      if (!this.hiddenQ) updateActive(this.roomName, true);
       this.failedQ = false;
     }, 5000);
-    updateActive(this.roomName, false);
+    if (!this.hiddenQ) updateActive(this.roomName, false);
   } // socketclose
 
   static resetTime = 1000;
@@ -214,10 +215,12 @@ export class WebH
   }
 
   
-  constructor(roomName: string) {
+  constructor(roomName: string, hiddenQ = false) {
     this.nick = "BetaOS_System";
     this.replyMessage = replyMessage;
-    this.roomName = "OnlineSUPPORT|"+roomName;
-    updateActive(this.roomName, true);
+    this.hiddenQ = hiddenQ;
+    if (roomName.length > 21) return;
+    this.roomName = (hiddenQ?"HIDDEN|":"OnlineSUPPORT|")+roomName;
+    if (!hiddenQ) updateActive(this.roomName, true);
   }
 }

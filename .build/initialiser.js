@@ -18,6 +18,7 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var initialiser_exports = {};
 __export(initialiser_exports, {
+  hidRooms: () => hidRooms,
   init: () => init,
   sysRooms: () => sysRooms,
   webHandlers: () => webHandlers
@@ -30,8 +31,9 @@ var import_messageHandle = require("./messageHandle");
 var import_updateuser = require("./updateuser");
 var import_webHandler = require("./webHandler");
 var import_database = require("./database");
+var import_server2 = require("./server");
 var import_accessControl = require("./accessControl");
-let rooms = ["xkcd", "test", "bots", "ai", "room", "srs", "memes"];
+let rooms = ["xkcd", "test", "bots", "ai", "room", "srs", "memes", "music"];
 let nicks = [
   "BetaUtilities",
   "BetaUtilities_TEST",
@@ -46,6 +48,7 @@ let nicks = [
   "BetaUtilities"
 ];
 let sysRooms = [];
+let hidRooms = [];
 function init() {
   let sockets = [];
   (0, import_server.updateServer)();
@@ -56,12 +59,17 @@ function init() {
     (0, import_messageHandle.updateActive)(rooms[i], true);
   }
   import_database.DB.findOne({ fieldName: "ROOMS" }).then((obj) => {
-    for (let i = 0; i < obj.rooms.length; i++) {
+    let i = 0;
+    for (; i < obj.rooms.length; i++) {
       webHandlers[i] = new import_webHandler.WebH(obj.rooms[i]);
     }
-    console.log("WebHandlers loaded. Sysrooms:", sysRooms);
+    for (let j = 0; j < obj.hidRooms.length; j++) {
+      hidRooms.push("HIDDEN|" + obj.hidRooms[j]);
+      import_server2.hidEvents.push([]);
+      webHandlers[i + j] = new import_webHandler.WebH(obj.hidRooms[j], true);
+    }
+    console.log("WebHandlers loaded. Sysrooms:", sysRooms, "hidden rooms:", hidRooms);
   });
-  console.log("WSHandlers loaded.");
   (0, import_wordListHandle.loopy)();
   setInterval(() => {
     (0, import_accessControl.DBGarbageCollect)();
@@ -71,6 +79,7 @@ let webHandlers = [];
 init();
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  hidRooms,
   init,
   sysRooms,
   webHandlers

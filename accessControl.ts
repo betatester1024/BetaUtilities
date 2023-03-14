@@ -67,7 +67,8 @@ export function validate(user:string, pwd:string, action:string, access:string, 
      action == "renick" || action == "delete" || 
       action == "acquireTodo" ||todoMatch || 
       todoMatch2 || action == "addTODO" ||
-     action == "newRoom" || todoMatch3) {
+     action == "newRoom" || todoMatch3 || 
+      action == "delRoom") {
     DB.findOne({fieldName: "TOKEN", token:{$eq:token}}).then(
     (obj:{associatedUser:string, expiry:number})=>{
       if (obj == null) {
@@ -291,24 +292,37 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           callback.sendFile(path.join( __dirname, '../frontend', '403.html' ));
           return;
         }
-        else if (action == "newRoom" && perms >= 2) {
+        else if ((action == "newRoom" || action == "delRoom") && perms >= 2) {
           if (user.match("^[0-9a-zA-Z_\\-]{1,20}$")) {
-            DB3.findOne({fieldName:"ROOMS"}).then((obj4:{rooms:string[], hidRooms:string[]})=>{
-              if (obj4.rooms.indexOf(user)<0 && obj4.hidRooms.indexOf(user) < 0) {
+            DB3.findOne({fieldName:"ROOMS"}).then((obj4:{rooms:string[]})=>{
+              let idx = obj4.rooms.indexOf(user);
+              if (action == "newRoom" && idx<0) {
                 obj4.rooms.push(user);
                 // now add betautilities to this room
                 webHandlers.push(new WebH(user));
                 // sysRooms.push(user);
-                DB3.updateOne({fieldName:"ROOMS"}, {
-                  $set: {
-                    rooms: obj4.rooms
-                  },
-                  $currentDate: { lastModified: true }
-                }, {upsert:true}).then(()=>{
-                  callback.end(JSON.stringify("SUCCESS"));
-                });
+
+              }
+              else if (action == "delRoom" && idx>=0) {
+                if (idx>=0) obj4.rooms.splice(idx, 1);
               }
               else callback.end(JSON.stringify("ERROR"));
+              DB3.updateOne({fieldName:"ROOMS"}, {
+                $set: {
+                  rooms: obj4.rooms
+                },
+                $currentDate: { lastModified: true }
+              }, {upsert:true}).then(()=>{
+                if (action != "delRoom") callback.end(JSON.stringify("SUCCESS"));
+              });
+              if (action == "delRoom" && idx >= 0) {
+                sysRooms.splice(sysRooms.indexOf("OnlineSUPPORT|"+user), 1)
+                DB2.deleteMany({room: user}).then(()=>{
+                  console.log("DONE")
+                  callback.end(JSON.stringify("SUCCESS"))
+                });
+              }
+              // else callback.end(JSON.stringify("ERROR"))
             }) 
           }
           else callback.end(JSON.stringify("ERROR"))
@@ -404,17 +418,23 @@ function format(obj:{permLevel:number, data:string, sender:string}) {
     case 3: cls_n="beta"; extraText = " [SYSTEM]"; break;
   }
   let data = obj.data;
-  
+
+
   data = data.replaceAll("&", "&amp;");
   data = data.replaceAll(">", "&gt;");
   data = data.replaceAll("<", "&lt;");
   data = data.replaceAll("\\n", "<br>");
+  data = data.replaceAll(/(.+\.(jpg|jpeg|png|gif|mp4))(\?.*)?$/gm, (match:string, p1:string)=>
+  {
+      match = match.replaceAll("'", "\\'")
+      match = match.replaceAll("\"", "\\\"");
+      match = match.replaceAll("&amp;", "&");
+      // console.log("<img onclick='window.open(\""+encodeURI(match)+"\")'src='"+encodeURI(match)+"'></img>");
+      return "<img onclick='window.open(\""+encodeURI(match)+"\")'src='"+encodeURI(match)+"'></img>";
+  });
   data = data.replaceAll(/\&amp;([0-9a-zA-Z]+)/gm, (match:string, p1:string)=>{return "<a href='https://euphoria.io/room/"+p1+"'>"+match+"</a>"});
   data = data.replaceAll(/#([0-9a-zA-Z_\-]{1,20})/gm, (match:string, p1:string)=>{return "<a href='/support?room="+p1+"'>"+match+"</a>"});
-  data = data.replaceAll(/.+\.(jpg|jpeg|png|gif|mp4)(\?.*)?$/gm, (match:string, p1:string)=>
-    {
-      return "<img onclick='window.open(\""+match+"\")'src='"+match+"'></img>"}
-                      );
+  
   data = linkifyHtml(data, {
     target: {
       url: "_blank",

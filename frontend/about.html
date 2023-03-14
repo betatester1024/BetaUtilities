@@ -93,57 +93,13 @@
           <br>
           <hr class="btnHr"></hr>
         </button>
-        <h2><span class="material-symbols-outlined">build</span>
-          About BetaUtilities</h2>
-        <p>
-          BetaUtilities is a bot that connects to the online discussion site 
-          <a href="https://euphoria.io">Euphoria</a>'s "rooms". It automatically responds
-          to commands such as <kbd>!help</kbd> and provides a variety of features:<br>
-          (The bot sometimes appears as a different username according to the room 
-          it is currently in.)<br>
-          <kbd>!ping</kbd>/<kbd>!ping @BetaUtilities</kbd> - Checks if BetaUtilities is online. <br>
-          <kbd>!help @BetaUtilities</kbd>/<kbd>!contact @BetaUtilities</kbd> - Displays a telephone-button style menu for accessing 
-          almost all features in the bot. Enter numbers, the english form of the letter or the emoji
-          :short-code: for the choice you would like to make to interact with the menu. Call ends 
-          after around 30 seconds.<br>
-          <kbd>!kill @BetaUtilities</kbd> - Disconnects BetaUtilities from the room. <br>
-          <kbd>!pause @BetaUtilities</kbd> - Deactivates BetaUtilities without disconnecting it from
-          the current room. BetaUtilities will no longer respond to your commands until you run:<br>
-          <kbd>!restore @BetaUtilities</kbd> - Re-activates BetaUtilities. <br>
-          <kbd>!uptime @BetaUtilities</kbd> - Displays how long the current instance has been up. <br>
-          <kbd>!wordle</kbd> - Plays wordle with you! BetaUtilities comes with a built-in word-list so
-          you can't just enter sequences of five letters. <br>
-          <kbd>!leetlen't</kbd> - Plays a BetaOS version of <a href="https://leet.nu/leetle">Leetle</a>
-          with you - it works the same as Wordle but you can enter any sequences of 5 alphanumeric
-          characters.<br>
-          <kbd>!unblock [link]</kbd> - Sends your link through a proxy to un-block it for school networks. <br>
-          <kbd>!src @BetaUtilities</kbd> - Sends you a link to the source-code. <br>
-          <kbd>!runStats @BetaUtilities</kbd> - Shows you statistics on how many times BetaUtilities has been run,
-          and how many times it has been @-mentionned. <br>
-          <kbd>!creatorInfo</kbd>,<kbd>!version</kbd> - Pretty self-explanatory. <br>
-          <kbd>!instant</kbd> - Get the <a href="instant.leet.nu">Instant</a> room of the same name.
-          <kbd>!leet</kbd> - See this room in <a href="euphoria.leet.nu">EuphLeet</a>!
-          <kbd>!status @BetaUtilities</kbd> - Sends this site to the room.<br>
-          <kbd>!issue/!bug/!feature/!syslog/!support</kbd> - Sends a link to the respective features on the site.<br>
-          <kbd>!activeRooms @BetaUtilities</kbd> - Shows all the rooms BetaUtilities is active in. <br>
-          <kbd>!enable/disableLogging @BetaUtilities</kbd> - Enables/disables message logging in the room.<br>
-          <kbd>@BetaUtilities !mitoseTo &[ROOM] as @[NAME]</kbd> - Sends BetaUtilities to a new room as another username.<br>
-          <kbd>!rating @BetaUtilities</kbd> - Accesses the current call satisfaction rating for BetaUtilities.
-          You can rate us by using the help-menu.<br>
-          <kbd>!work</kbd>/<kbd>!work @user</kbd>/<kbd>!sleep</kbd>/<kbd>!sleep @user</kbd> - 
-          Screams at you or any user to GO TO SLEEP or GET TO WORK.<br>
-          <kbd>!wake</kbd>/<kbd>!wake @user</kbd>/<kbd>!play</kbd>/<kbd>!play @user</kbd> - 
-          Stops screaming at you or any user. <br>
-          <kbd>!issue</kbd>/<kbd>!bug</kbd>/<kbd>!feature</kbd> - File an issue/bug/feature request 
-          (same <a href="https://github.com/betatester1024/BetaUtilities/issues/new/choose">link</a>)
-          <kbd>!antispam</kbd> - Configures AntiSpam activation. Requires a code entry.<br>
-          <kbd>!remindme of [MSG] in [1d2h3m4s] </kbd> - Reminds you of whatever you want after a specified time. 
-          Pretty lenient with spaces.<br>
-          <kbd>!about @[USER] </kbd> - Retrieves that user's about-message.<br>
-          <kbd>!about set [MSG]</kbd> - Sets your about-message. Introduce yourself!<br>
-          <b>Some features are hidden! <a href="/contact">ask BetaOS</a> about them, or find
-          us in <a href="https://euphoria.io/room/xkcd">&xkcd</a> to ask about the features!</b>
-        </p>
+        <button onclick="window.open('/commands?nick=BetaUtilities')">
+          <span class="material-symbols-outlined">build</span> 
+          BetaUtilities commands
+          <br>
+          <hr class="btnHr"></hr>
+        </button>
+
         <h2><span class="material-symbols-outlined">speed</span>
           AntiSpam Feature</h2><p>
           BetaUtilities detects automatically when it has been triggered too many times in 5 minutes

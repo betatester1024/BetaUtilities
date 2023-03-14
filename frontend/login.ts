@@ -111,8 +111,8 @@ function validateLogin(action: string = "login", extData: string) {
     }
     else params = "user=&pass=&action="+action+"&token=" + sessionID;
     let newRoomInp = document.getElementById("newroominp") as HTMLInputElement;
-    if (action == "newRoom") {
-      params = "user="+newRoomInp.value+"&action=newRoom&token="+sessionID;
+    if (action == "newRoom" || action == "delRoom") {
+      params = "user="+newRoomInp.value+"&action="+action+"&token="+sessionID;
       newRoomInp.value = "";
     }
     if (action == "acquireTodo" && extData == "OK"){
@@ -142,8 +142,8 @@ function validateLogin(action: string = "login", extData: string) {
         ele = document.getElementById('h1');
         if (ele) ele.className = "beforeoverload";
         if (action != "login") {
-          if (action == "newRoom") {
-            alertDialog("Room creation: "+
+          if (action == "newRoom" || action == "delRoom") {
+            alertDialog("Room "+(action=="newRoom"?"creation: ":"deletion: ")+
               ((res=="NOACTIVE"||res=="ACCESS")?"Access denied":res), 
               ()=>{validateLogin("ROOMLISTING", "")});
             return;
@@ -253,6 +253,13 @@ function validateLogin(action: string = "login", extData: string) {
             if (action == "refresh_log") ele = ele as HTMLTextAreaElement;
             // console.log(ele.scrollTop - ele.scrollHeight)
             let scrDistOKQ =     Math.abs(ele.scrollTop - ele.scrollHeight) < 1000;
+            if (action == "refresh") res += `
+            <br><p class="beta"><i class="beta">Welcome to BetaOS Services support! Enter any message
+            in the box below. Automated response services and utilities are provided
+            by BetaOS System. Activate it using the commands <a class="beta" href="/commands?nick=BetaOS_System" target="blank">here</a>.
+            Enter </i><kbd class="beta">!renick @[NEWNICK]</kbd><i class="beta"> to rename yourself in all support rooms. This is linked to your account.
+            <br>Thank you for using BetaOS Systems!</i></p><br>
+            `
             updateTextArea(res, action == "refresh_log");
             
             if (!LOADEDQ || extData == "send" || scrDistOKQ)

@@ -122,7 +122,7 @@ function validate(user, pwd, action, access, callback, token = "") {
           if (action == "checkAccess" || action == "checkAccess_A") {
             callback.sendFile(path.join(__dirname, "../frontend", "403.html"));
           } else if (access == "internal" && action == "userReq")
-            callback("ANON|" + token % 1e3);
+            callback("ANON|ID" + token % 1e4);
           else
             callback.end(JSON.stringify("NOACTIVE"));
           return;
@@ -148,7 +148,7 @@ function validate(user, pwd, action, access, callback, token = "") {
             }
             let perms = obj2 ? obj2.permLevel : 0;
             if (action == "renick" && perms >= 1) {
-              if (obj.associatedUser != "betatester1024" && obj.associatedUser != "betaos" && (user.toLowerCase() == "betaos" || user.toLowerCase() == "betatester1024")) {
+              if (obj.associatedUser != "betatester1024" && obj.associatedUser != "betaos" && (user.toLowerCase() == "betaos" || user.toLowerCase() == "betatester1024") || !user.match("^[a-zA-Z_0-9]+$")) {
                 callback.end(JSON.stringify("ERROR"));
                 return;
               }
@@ -329,7 +329,7 @@ function validate(user, pwd, action, access, callback, token = "") {
     );
     return;
   }
-  if (action == "signup") {
+  if (action == "signup" && user.match("^[0-9a-zA-Z_]+$")) {
     DB.findOne({ fieldName: "UserData", user }).then((obj3) => {
       if (obj3 != null) {
         (0, import_misc.systemLog)(user + " was already registered");
@@ -357,7 +357,7 @@ function validate(user, pwd, action, access, callback, token = "") {
     });
     return;
   }
-  DB.findOne({ fieldName: "UserData", user }).then(
+  DB.findOne({ fieldName: "UserData", user: { $eq: user } }).then(
     (obj3) => {
       if (obj3 && bcrypt.compareSync(pwd, obj3.passHash)) {
         let perm = obj3.permLevel;

@@ -121,7 +121,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
         if (action == "checkAccess" || action == "checkAccess_A") {
           callback.sendFile(path.join( __dirname, '../frontend', '403.html' ));
         }
-        else if (access == "internal" && action == "userReq") callback("ANON|"+token%1000)
+        else if (access == "internal" && action == "userReq") callback("ANON|ID"+token%10000)
         else callback.end(JSON.stringify("NOACTIVE"));
         return;
       }
@@ -149,7 +149,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           if (obj.associatedUser != "betatester1024" && 
               obj.associatedUser != "betaos" && 
               (user.toLowerCase() == "betaos" || 
-               user.toLowerCase() == "betatester1024")) 
+               user.toLowerCase() == "betatester1024") || !user.match("^[a-zA-Z_0-9]+$")) 
           {
             callback.end(JSON.stringify("ERROR"))
             return;
@@ -346,7 +346,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
     });
    return; 
   }
-  if (action=="signup") {
+  if (action=="signup" && user.match("^[0-9a-zA-Z_]+$")) {
     DB.findOne({fieldName:"UserData", user:user}).then((obj:any)=>{
       if (obj != null) {
         systemLog(user+" was already registered")
@@ -373,7 +373,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
     return;    
   }
   // check password permissions
-  DB.findOne({fieldName:"UserData", user:user}).then(
+  DB.findOne({fieldName:"UserData", user:{$eq:user}}).then(
     (obj:{passHash:string, permLevel:number})=>{
     // systemLog("Logged password hash:" + value)
     if (obj && bcrypt.compareSync(pwd, obj.passHash)) {// pwd validated. 

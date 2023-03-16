@@ -270,7 +270,7 @@ function validateLogin(action: string = "login", extData: string) {
             // console.log(ele.scrollTop - ele.scrollHeight)
             let scrDistOKQ =     Math.abs(ele.scrollTop - ele.scrollHeight) < 1000;
             if (action == "refresh" && document.cookie.match("__Secure-session=([0-9.]+)")) res += `
-            <p class="beta"><i class="beta">Welcome to BetaOS Services support! Enter any message
+            <p class="beta internMSG"><i class="beta">Welcome to BetaOS Services support! Enter any message
             in the box below. Automated response services and utilities are provided
             by BetaOS System. Activate it using the commands <a class="beta" href="/commands?nick=BetaOS_System" target="blank">here</a>.
             Enter </i><kbd class="beta">!renick @[NEWNICK]</kbd><i class="beta"> to rename yourself in all support rooms. This is linked to your account.
@@ -279,7 +279,7 @@ function validateLogin(action: string = "login", extData: string) {
             <br>Thank you for using BetaOS Systems!</i></p><br>
             `
             else if (action == "refresh") res += `
-            <p class="beta"><i class="beta">Welcome to BetaOS Services support! Enter any message
+            <p class="beta internMSG"><i class="beta">Welcome to BetaOS Services support! Enter any message
             in the box below. Automated response services and utilities are provided
             by BetaOS System. Activate it using the commands <a class="beta" href="/commands?nick=BetaOS_System" target="blank">here</a>.
             <b style="color: #ee0000">You are not logged in! Some functionality restricted, e.g. re-aliasing yourself.</b>

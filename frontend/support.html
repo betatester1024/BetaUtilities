@@ -107,6 +107,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!--     <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap">  -->
     <style>
+
+
+      
+      #mainDiv {
+/*         animation: rotate 0.5s infinite; */
+      }
+      
+      @keyframes rotate {
+        0% {
+          transform: rotate(0deg)
+        }
+        100% {
+          transform: rotate(360deg)
+        }
+      }
+      
       h1 {
         font-size: 3.7em;
       }
@@ -121,7 +137,7 @@
       a {
         font-size: 1em;
         color: #0a84ff;
-        
+        width: 87vw;
       }
       p {
         width: 87vw;
@@ -129,6 +145,7 @@
 /*         display: block; */
         color: #000;
         overflow-wrap: break-word;
+        inline-size: 87vw;
 /*         animation-name: newMsg; */
 /*         animation-duration: 10s; */
       }
@@ -161,12 +178,15 @@
         overflow-y: scroll;
         height: 70vh;
         text-align: left;
-        overflow-x: clip;
+        overflow-x: scroll;
         width: 79vw;
         position: relative;
         left: 0vw;
         margin-left: 0px;
         display: inline-block;
+      }
+      .internMSG{
+        width: 100%;
       }
       b {
         color: #000;
@@ -187,6 +207,7 @@
 
       i.beta {
         color: #00e000;
+        width: 100%;
         font-weight: 600;
       }
       .slashMe{
@@ -196,7 +217,6 @@
       .slashMe > b {
         font-style: italic;
       }
-      
       b {
         background-color: #eee;
       }

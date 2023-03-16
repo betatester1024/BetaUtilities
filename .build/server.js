@@ -144,8 +144,7 @@ async function updateServer() {
       }, req.query.token);
     } else {
       hidEvents[roomIdx2].push(res);
-      hidUserEvents[roomIdx].push(res);
-      console.log("User joined stream " + req.query.room);
+      hidUserEvents[roomIdx2].push(res);
       (0, import_accessControl.validate)("", "", "userReq", "internal", (id) => {
         sendMsgAllRooms(req.query.room, "+" + id + "\\n");
         if (roomIdx >= 0)

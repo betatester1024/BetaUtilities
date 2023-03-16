@@ -147,8 +147,8 @@ export async function updateServer() {
     }
     else {
       hidEvents[roomIdx2].push(res);
-      hidUserEvents[roomIdx].push(res);
-      console.log("User joined stream "+req.query.room)
+      hidUserEvents[roomIdx2].push(res);
+      // console.log("User joined stream "+req.query.room)
       validate("", "", "userReq", "internal", (id:string)=>{
         sendMsgAllRooms(req.query.room, "+"+id+"\\n")
         if (roomIdx >= 0) users[roomIdx].push(id);
@@ -159,7 +159,7 @@ export async function updateServer() {
       if (roomIdx >= 0) pushEvents[roomIdx].splice(pushEvents[roomIdx].indexOf(res), 1);
       else hidEvents[roomIdx2].splice(hidEvents[roomIdx2].indexOf(res), 1);
       res.end();
-      console.log("Removed stream "+req.query.room);
+      // console.log("Removed stream "+req.query.room);
       validate("", "", "userReq", "internal", (id:string)=>{
         if (roomIdx >= 0) {
           let idx = users[roomIdx].indexOf(id);

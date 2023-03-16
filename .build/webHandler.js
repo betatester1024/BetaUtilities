@@ -136,15 +136,11 @@ class WebH {
       this.delaySendMsg("/me restarts", data, 200);
     } else if (this.pausedQ && msg == "!restore @" + this.nick.toLowerCase()) {
       this.sendMsg("/me has been unpaused", data);
-      if (!this.hiddenQ)
-        (0, import_messageHandle2.updateActive)(this.roomName, true);
       this.pauser = null;
       this.callTimes = [];
       this.pausedQ = false;
     } else if (msg == "!pause @" + this.nick.toLowerCase()) {
       this.sendMsg("/me has been paused", data);
-      if (!this.hiddenQ)
-        (0, import_messageHandle2.updateActive)(this.roomName, false);
       let reply = "Enter !kill @" + this.nick + " to kill this bot, or enter !restore @" + this.nick + " to restore it.";
       this.sendMsg(reply, data);
       this.pauser = snd;

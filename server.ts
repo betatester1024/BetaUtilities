@@ -170,6 +170,14 @@ export async function updateServer() {
     res.sendFile(path.join( __dirname, '../frontend', 'contact.html' ));
   });
 
+  app.get('/screwit', (req:any, res:any) => {
+    res.sendFile(path.join( __dirname, '../frontend', 'bothered.html' ));
+  });
+
+  app.get('/screwit.js', (req:any, res:any) => {
+    res.sendFile(path.join( __dirname, '../frontend', 'bothered.js' ));
+  });
+
   app.get('*.js.map', (req:any, res:any)=> {
     res.end();
   })

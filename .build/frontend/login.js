@@ -1,8 +1,8 @@
 "use strict";
 function onLoad() {
-  let match = document.cookie.match("__Secure-session=[0-9.]+");
-  console.log("Current session: " + match);
-  if (!match && document.URL.match("\\/admin") && !document.URL.match("?redirect=(.*)\\/admin")) {
+  let match2 = document.cookie.match("__Secure-session=[0-9.]+");
+  console.log("Current session: " + match2);
+  if (!match2 && document.URL.match("\\/admin") && !document.URL.match("?redirect=(.*)\\/admin")) {
     alertDialog("You're not logged in!", () => {
       window.open("/login?redirect=" + document.URL, "_self");
     });
@@ -13,6 +13,9 @@ let CURRACCNAME = "";
 let CURRPERMS = "";
 let LOADEDQ = false;
 let TODOCT = 0;
+let arr = new BigUint64Array(1);
+let match = document.cookie.match("__Secure-session=([0-9.]+)");
+let sessionID = match ? match[1] : window.crypto.getRandomValues(arr);
 function newUser(e, accessclass) {
   let id = e.target.id;
   if (id != "loginBTN")
@@ -72,9 +75,7 @@ function validateLogin(action = "login", extData) {
     }
     if (confirm)
       confirm.value = "";
-    let arr = new BigUint64Array(1);
-    let match = document.cookie.match("__Secure-session=([0-9.]+)");
-    let sessionID = match ? match[1] : window.crypto.getRandomValues(arr);
+    let match5 = document.cookie.match("__Secure-session=([0-9.]+)");
     let renickQ = false;
     let params;
     if (action != "logout" && action != "CMD" && action != "sendMsg" && action != "userReq")
@@ -85,10 +86,17 @@ function validateLogin(action = "login", extData) {
     } else if (action == "sendMsg") {
       params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
       ;
-      let match5 = extData.match("!renick @([a-zA-Z_0-9]+)");
-      if (match5) {
-        params = "token=" + sessionID + "&action=renick&user=" + encodeURIComponent(match5[1]) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
+      let match6 = extData.match("!renick @([a-zA-Z_0-9]+)");
+      if (match6) {
+        params = "token=" + sessionID + "&action=renick&user=" + encodeURIComponent(match6[1]) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
         renickQ = true;
+        if (!document.cookie.match("__Secure-session=([0-9.]+)")) {
+          let ele = document.getElementById("msgArea");
+          ele.innerHTML += `<p style="color: #ee0000;">Error: You are not logged in. 
+          You cannot re-alias yourself as an anomymous account.</p>`;
+          ele.scrollTop = ele.scrollHeight;
+          return;
+        }
       }
     } else
       params = "user=&pass=&action=" + action + "&token=" + sessionID;
@@ -156,9 +164,9 @@ function validateLogin(action = "login", extData) {
             let mainDiv = document.getElementById("innerDiv");
             mainDiv.innerHTML = "";
             for (let i = 0; i < res.length; i++) {
-              let match5 = res[i].match("OnlineSUPPORT\\|(.*)");
-              if (match5)
-                mainDiv.innerHTML += `<button class="unsetWidth" onclick="window.open('/support?room=${match5[1]}', '_self')"><kbd>${match5[1]}</kbd><hr class="btnHr"></hr></button>`;
+              let match6 = res[i].match("OnlineSUPPORT\\|(.*)");
+              if (match6)
+                mainDiv.innerHTML += `<button class="unsetWidth" onclick="window.open('/support?room=${match6[1]}', '_self')"><kbd>${match6[1]}</kbd><hr class="btnHr"></hr></button>`;
             }
             return;
           }
@@ -291,7 +299,7 @@ function validateLogin(action = "login", extData) {
               if (action == "signup")
                 window.open(redirectTo, "_self");
             });
-            if (!match && action == "signup")
+            if (!match5 && action == "signup")
               document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
           }
           return;
@@ -307,7 +315,7 @@ function validateLogin(action = "login", extData) {
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
           document.cookie = `__Secure-session=${sessionID}; SameSite=None; Secure;`;
-          if (!match && action == "login")
+          if (!match5 && action == "login")
             document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         } else if (res == "3") {
           CURRUSER = user.value;
@@ -320,7 +328,7 @@ function validateLogin(action = "login", extData) {
           alertDialog("Welcome, " + user.value + "! | Super-administrative access granted.", () => {
             window.open(redirectTo, "_self");
           });
-          if (!match && action == "login")
+          if (!match5 && action == "login")
             document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         } else if (res == "1") {
           CURRUSER = user.value;
@@ -333,7 +341,7 @@ function validateLogin(action = "login", extData) {
           alertDialog("Welcome, " + user.value + "!", () => {
             window.open(redirectTo, "_self");
           });
-          if (!match && action == "login")
+          if (!match5 && action == "login")
             document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         } else {
           alertDialog("Error: Invalid login credentials", () => {

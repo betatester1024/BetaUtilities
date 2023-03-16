@@ -163,6 +163,12 @@ async function updateServer() {
   app.get("/contact", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "contact.html"));
   });
+  app.get("/screwit", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "bothered.html"));
+  });
+  app.get("/screwit.js", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "bothered.js"));
+  });
   app.get("*.js.map", (req, res) => {
     res.end();
   });

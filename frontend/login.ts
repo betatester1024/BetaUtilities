@@ -13,6 +13,11 @@ let CURRACCNAME = "";
 let CURRPERMS = "";
 let LOADEDQ = false;
 let TODOCT = 0;
+
+let arr = new BigUint64Array(1);
+let match = document.cookie.match("__Secure-session=([0-9.]+)");
+let sessionID = match ? match[1] : window.crypto.getRandomValues(arr);
+
 function newUser(e: Event, accessclass: string) {
   let id = (e.target as HTMLElement).id;
   // console.log(id);
@@ -82,9 +87,7 @@ function validateLogin(action: string = "login", extData: string) {
       return;
     }
     if (confirm) confirm.value = "";
-    let arr = new BigUint64Array(1);
     let match = document.cookie.match("__Secure-session=([0-9.]+)");
-    let sessionID = match ? match[1] : window.crypto.getRandomValues(arr);
     // ONLY USE THE sessionID WHEN ADDING A NEW session
     
     let renickQ = false;
@@ -100,9 +103,17 @@ function validateLogin(action: string = "login", extData: string) {
     else if (action == "sendMsg") {
       params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData)+"&access="+document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];;
       let match = extData.match("!renick @([a-zA-Z_0-9]+)");
+      
       if (match) {
         params = "token="+sessionID+"&action=renick&user="+encodeURIComponent(match[1])+"&access="+document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
         renickQ = true;
+        if (!document.cookie.match("__Secure-session=([0-9.]+)")) {
+          let ele = document.getElementById("msgArea") as HTMLDivElement;
+          ele.innerHTML += `<p style="color: #ee0000;">Error: You are not logged in. 
+          You cannot re-alias yourself as an anomymous account.</p>`
+          ele.scrollTop = ele.scrollHeight;
+          return;
+        }
       }
       // // temporarily add this message to the div (until refresh handles it)
       // let ele = document.getElementById('msgArea') as HTMLDivElement;

@@ -48,6 +48,29 @@ export function validate(user:string, pwd:string, action:string, access:string, 
     sendMsgAllRooms(access, format({permLevel:3, data:user, sender:"BetaOS_System"}));
     return;
   }
+  if (action == "whois") {
+    // console.log(user);
+    DB.find({fieldName:"UserData", user:{$eq:user}}).toArray().then((obj:{alias:string}[])=>{
+      // callback.end(JSON.stringify(obj?obj.user:"[None found]"));
+      // console.log(obj, user)
+      let out = "";
+      if (obj)
+      for (let i=0; i<obj.length; i++) {
+        out += obj[i].alias?obj[i].alias:obj[i].user;
+      }
+      sendMessage("[WHOIS SERVICE]", "Aliases for "+user+": "+(out?out:"[NONE FOUND]"), access, 3);
+    })
+    DB.find({fieldName:"UserData", alias:{$eq:user}}).toArray().then((obj:{user:string, permLevel:string}[])=>{
+      // callback.end(JSON.stringify(obj?obj.user:"[None found]"));
+      let out = "";
+      if (obj)
+      for (let i=0; i<obj.length; i++) {
+        out += obj[i].user+(obj[i].permLevel>2?"[Super-admin]":(obj[i].permLevel==2?"[Admin]":"[User]"));
+      }
+      sendMessage("[WHOIS SERVICE]", "BetaOS System Account for alias "+user+": "+(out?out:"[NONE FOUND]"), access, 3);
+    })
+    return;
+  }
    // data validation complete
   if (action=="logout") {
     systemLog("Logging out "+token)
@@ -68,10 +91,33 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       action == "acquireTodo" ||todoMatch || 
       todoMatch2 || action == "addTODO" ||
      action == "newRoom" || todoMatch3 || 
-      action == "delRoom") {
+      action == "delRoom" || action == "whois") {
     DB.findOne({fieldName: "TOKEN", token:{$eq:token}}).then(
     (obj:{associatedUser:string, expiry:number})=>{
-      if (obj == null) {
+      if (action == "refresh") {
+          
+          // let cursor = DB2.find({fieldName:"MSG"});
+          // console.log(access);
+          DB2.find({fieldName:"MSG", room:{$eq:access}}).toArray().then((objs:{sender:string, data:string, permLevel:number}[])=>{
+            let out = "";
+            // console.log(objs)
+            for (let i=0; i<objs.length; i++) {
+              out += format(objs[i]);
+            }
+            callback.end(JSON.stringify(out));
+          });
+          DB2.find({fieldName:"MSG", room:{$eq:access}}).toArray().then((objs:{sender:string, data:string, permLevel:number}[])=>{
+            let out = "";
+            // console.log(objs)
+            for (let i=0; i<objs.length; i++) {
+              out += format(objs[i]);
+            }
+            callback.end(JSON.stringify(out));
+          });
+          return;
+      } // fiiine. you can have your refreshy.
+      
+      if (obj == null && action != "sendMsg") {
         systemLog("No active session");
         if (action == "checkAccess" || action == "checkAccess_A") {
           callback.sendFile(path.join( __dirname, '../frontend', '403.html' ));
@@ -79,11 +125,12 @@ export function validate(user:string, pwd:string, action:string, access:string, 
         else callback.end(JSON.stringify("NOACTIVE"));
         return;
       }
-      let expiryTime = obj.expiry;
-      let tokenUser = obj.associatedUser;
+      let expiryTime = obj?obj.expiry:9e99;
+      let tokenUser = obj?obj.associatedUser:"";
       if (action != "refresh" && action != "refresh_log"
          && action != "sendMsg" && action != "checkAccess_A" &&
-         action != "userReq" && action !="checkAccess") systemLog("Logged in as "+tokenUser+" | Expiring in: "+(expiryTime-Date.now()) + " ms");
+         action != "userReq" && action !="checkAccess" && action != "whois"
+        ) systemLog("Logged in as "+tokenUser+" | Expiring in: "+(expiryTime-Date.now()) + " ms");
       if (expiryTime<Date.now()) {
         systemLog("Token expired. Logged out user.")
         DB.deleteOne({fieldName:"TOKEN", token:{$eq:token}});
@@ -93,10 +140,10 @@ export function validate(user:string, pwd:string, action:string, access:string, 
         return;
       }
       
-      DB.findOne({fieldName:"UserData", user:obj.associatedUser}).then(
+      DB.findOne({fieldName:"UserData", user:tokenUser}).then(
       (obj2:{permLevel:number, alias:string|null, todo:string[]})=>{
-        if (!obj2) {callback.end(JSON.stringify("ERROR")); return;}
-        let perms = obj2.permLevel;
+        if (!obj2 && action != "sendMsg") {callback.end(JSON.stringify("ERROR")); return;}
+        let perms = obj2?obj2.permLevel:0;
         if (action == "renick" && perms >= 1)
         {
           if (obj.associatedUser != "betatester1024" && 
@@ -227,58 +274,20 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           callback.sendFile(path.join( __dirname, '../frontend', 'sysLog.html' ));
           return;
         }
-        else if (action == "sendMsg" && perms >= 1) {
+        else if (action == "sendMsg") {
           // console.log("sending message in room"+access);
-          const snd = obj2.alias?obj2.alias:obj.associatedUser;
-          DB2.insertOne({
-            fieldName: "MSG", 
-            sender:snd, 
-            data:user, 
-            room: access,
-            permLevel:perms, 
-            expiry:Date.now()+EXPIRY})
+          const snd = obj2?(obj2.alias?obj2.alias:obj.associatedUser):"ANON|ID"+token%10000;
+          sendMessage(snd, user, access, perms);
+          let match6 = user.match("^!whois @([0-9a-zA-Z_]+)");
+          // console.log(match6);
+          if (match6) validate(match6[1], pwd, "whois", access, callback, token);
           callback.end(JSON.stringify("SUCCESS"));
-          // console.log("Sending message:"+user);
-          sendMsgAllRooms(access, format({permLevel:perms, data:user, sender:snd}));
-          let handler = findHandler("OnlineSUPPORT|"+access);
-          if (handler) {
-            handler.onMessage(user, snd);
-            // console.log("Message received?")
-          }
-          
-          else {
-            handler = findHandler("HIDDEN|"+access);
-            if (handler) {
-              handler.onMessage(user, snd);
-            }
-            else console.log("ROOMINVALID")
-          }
+
           
           return;
         }
         
-        else if (action == "refresh" && perms >= 1) {
-          
-          // let cursor = DB2.find({fieldName:"MSG"});
-          // console.log(access);
-          DB2.find({fieldName:"MSG", room:{$eq:access}}).toArray().then((objs:{sender:string, data:string, permLevel:number}[])=>{
-            let out = "";
-            // console.log(objs)
-            for (let i=0; i<objs.length; i++) {
-              out += format(objs[i]);
-            }
-            callback.end(JSON.stringify(out));
-          });
-          DB2.find({fieldName:"MSG", room:{$eq:access}}).toArray().then((objs:{sender:string, data:string, permLevel:number}[])=>{
-            let out = "";
-            // console.log(objs)
-            for (let i=0; i<objs.length; i++) {
-              out += format(objs[i]);
-            }
-            callback.end(JSON.stringify(out));
-          });
-          return;
-        }
+        
         else if (action == "refresh_log" && perms >=2 ) {
           DB3.findOne({fieldName:"SYSTEMLOG"}).then((obj:{data:string})=> {
             callback.end(JSON.stringify(obj.data.replaceAll("\n","<br>")));
@@ -467,4 +476,29 @@ function findHandler(name:string)
     if (webHandlers[i].roomName == name) return webHandlers[i];
   }
   return null;
+}
+
+function sendMessage(snd:string, user:string, access:string, perms:number) {
+  DB2.insertOne({
+    fieldName: "MSG", 
+    sender:snd, 
+    data:user, 
+    room: access,
+    permLevel:perms?perms:0, 
+    expiry:Date.now()+EXPIRY})
+  
+  // console.log("Sending message:"+user);
+  sendMsgAllRooms(access, format({permLevel:perms, data:user, sender:snd}));
+  let handler = findHandler("OnlineSUPPORT|"+access);
+  if (handler) {
+    handler.onMessage(user, snd);
+    // console.log("Message received?")
+  }
+  else {
+    handler = findHandler("HIDDEN|"+access);
+    if (handler) {
+      handler.onMessage(user, snd);
+    }
+    else console.log("ROOMINVALID")
+  }
 }

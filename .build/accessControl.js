@@ -64,6 +64,25 @@ function validate(user, pwd, action, access, callback, token = "") {
     (0, import_server.sendMsgAllRooms)(access, format({ permLevel: 3, data: user, sender: "BetaOS_System" }));
     return;
   }
+  if (action == "whois") {
+    DB.find({ fieldName: "UserData", user: { $eq: user } }).toArray().then((obj3) => {
+      let out = "";
+      if (obj3)
+        for (let i = 0; i < obj3.length; i++) {
+          out += obj3[i].alias ? obj3[i].alias : obj3[i].user;
+        }
+      sendMessage("[WHOIS SERVICE]", "Aliases for " + user + ": " + (out ? out : "[NONE FOUND]"), access, 3);
+    });
+    DB.find({ fieldName: "UserData", alias: { $eq: user } }).toArray().then((obj3) => {
+      let out = "";
+      if (obj3)
+        for (let i = 0; i < obj3.length; i++) {
+          out += obj3[i].user + (obj3[i].permLevel > 2 ? "[Super-admin]" : obj3[i].permLevel == 2 ? "[Admin]" : "[User]");
+        }
+      sendMessage("[WHOIS SERVICE]", "BetaOS3 System Account for alias " + user + ": " + (out ? out : "[NONE FOUND]"), access, 3);
+    });
+    return;
+  }
   if (action == "logout") {
     (0, import_misc.systemLog)("Logging out " + token);
     DB.deleteOne({ fieldName: "TOKEN", token: { $eq: token } });
@@ -73,20 +92,44 @@ function validate(user, pwd, action, access, callback, token = "") {
   let todoMatch = action.match("updateTODO([0-9]+)");
   let todoMatch2 = action.match("completeTODO([0-9]+)");
   let todoMatch3 = action.match("deleteTODO([0-9]+)");
-  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log" || action == "userReq" || action == "renick" || action == "delete" || action == "acquireTodo" || todoMatch || todoMatch2 || action == "addTODO" || action == "newRoom" || todoMatch3 || action == "delRoom") {
+  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log" || action == "userReq" || action == "renick" || action == "delete" || action == "acquireTodo" || todoMatch || todoMatch2 || action == "addTODO" || action == "newRoom" || todoMatch3 || action == "delRoom" || action == "whois" || action == "refresh_users") {
     DB.findOne({ fieldName: "TOKEN", token: { $eq: token } }).then(
       (obj) => {
-        if (obj == null) {
+        if (action == "refresh") {
+          let startime = Date.now();
+          DB2.find({ fieldName: "MSG", room: { $eq: access } }).toArray().then((objs) => {
+            let out = "";
+            for (let i = 0; i < objs.length; i++) {
+              out += format(objs[i]);
+            }
+            callback.end(JSON.stringify(out));
+          });
+          return;
+        }
+        if (action == "refresh_users") {
+          let roomIdx = import_initialiser.sysRooms.indexOf("OnlineSUPPORT|" + access);
+          let roomIdx2 = import_initialiser.hidRooms.indexOf("HIDDEN|" + access);
+          if (roomIdx >= 0)
+            callback.end(JSON.stringify(import_server.users[roomIdx]));
+          else if (roomIdx2 >= 0)
+            callback.end(JSON.stringify(import_server.hidUsers[roomIdx2]));
+          else
+            callback.end(JSON.stringify("ERROR"));
+          return;
+        }
+        if (obj == null && action != "sendMsg") {
           (0, import_misc.systemLog)("No active session");
           if (action == "checkAccess" || action == "checkAccess_A") {
             callback.sendFile(path.join(__dirname, "../frontend", "403.html"));
-          } else
+          } else if (access == "internal" && action == "userReq")
+            callback("ANON|ID" + token % 1e4);
+          else
             callback.end(JSON.stringify("NOACTIVE"));
           return;
         }
-        let expiryTime = obj.expiry;
-        let tokenUser = obj.associatedUser;
-        if (action != "refresh" && action != "refresh_log" && action != "sendMsg" && action != "checkAccess_A" && action != "userReq" && action != "checkAccess")
+        let expiryTime = obj ? obj.expiry : 9e99;
+        let tokenUser = obj ? obj.associatedUser : "";
+        if (action != "refresh" && action != "refresh_log" && action != "sendMsg" && action != "checkAccess_A" && action != "userReq" && action != "checkAccess" && action != "whois")
           (0, import_misc.systemLog)("Logged in as " + tokenUser + " | Expiring in: " + (expiryTime - Date.now()) + " ms");
         if (expiryTime < Date.now()) {
           (0, import_misc.systemLog)("Token expired. Logged out user.");
@@ -97,15 +140,15 @@ function validate(user, pwd, action, access, callback, token = "") {
             callback.end(JSON.stringify("EXPIRE"));
           return;
         }
-        DB.findOne({ fieldName: "UserData", user: obj.associatedUser }).then(
+        DB.findOne({ fieldName: "UserData", user: tokenUser }).then(
           (obj2) => {
-            if (!obj2) {
+            if (!obj2 && action != "sendMsg") {
               callback.end(JSON.stringify("ERROR"));
               return;
             }
-            let perms = obj2.permLevel;
+            let perms = obj2 ? obj2.permLevel : 0;
             if (action == "renick" && perms >= 1) {
-              if (obj.associatedUser != "betatester1024" && obj.associatedUser != "betaos" && (user.toLowerCase() == "betaos" || user.toLowerCase() == "betatester1024")) {
+              if (obj.associatedUser != "betatester1024" && obj.associatedUser != "betaos" && (user.toLowerCase() == "betaos" || user.toLowerCase() == "betatester1024") || !user.match("^[a-zA-Z_0-9]+$")) {
                 callback.end(JSON.stringify("ERROR"));
                 return;
               }
@@ -148,7 +191,10 @@ function validate(user, pwd, action, access, callback, token = "") {
               return;
             }
             if (action == "userReq") {
-              callback.end(JSON.stringify(obj.associatedUser + " " + obj2.permLevel));
+              if (access == "internal")
+                callback(obj.associatedUser);
+              else
+                callback.end(JSON.stringify(obj.associatedUser + " " + obj2.permLevel));
               return;
             }
             if (action == "add" || action == "delete") {
@@ -225,44 +271,13 @@ function validate(user, pwd, action, access, callback, token = "") {
             } else if (action == "checkAccess_A" && perms >= 2) {
               callback.sendFile(path.join(__dirname, "../frontend", "sysLog.html"));
               return;
-            } else if (action == "sendMsg" && perms >= 1) {
-              const snd = obj2.alias ? obj2.alias : obj.associatedUser;
-              DB2.insertOne({
-                fieldName: "MSG",
-                sender: snd,
-                data: user,
-                room: access,
-                permLevel: perms,
-                expiry: Date.now() + EXPIRY
-              });
+            } else if (action == "sendMsg") {
+              const snd = obj2 ? obj2.alias ? obj2.alias : obj.associatedUser : "ANON|ID" + token % 1e4;
+              sendMessage(snd, user, access, perms);
+              let match6 = user.match("^!whois @([0-9a-zA-Z_]+)");
+              if (match6)
+                validate(match6[1], pwd, "whois", access, callback, token);
               callback.end(JSON.stringify("SUCCESS"));
-              (0, import_server.sendMsgAllRooms)(access, format({ permLevel: perms, data: user, sender: snd }));
-              let handler = findHandler("OnlineSUPPORT|" + access);
-              if (handler) {
-                handler.onMessage(user, snd);
-              } else {
-                handler = findHandler("HIDDEN|" + access);
-                if (handler) {
-                  handler.onMessage(user, snd);
-                } else
-                  console.log("ROOMINVALID");
-              }
-              return;
-            } else if (action == "refresh" && perms >= 1) {
-              DB2.find({ fieldName: "MSG", room: { $eq: access } }).toArray().then((objs) => {
-                let out = "";
-                for (let i = 0; i < objs.length; i++) {
-                  out += format(objs[i]);
-                }
-                callback.end(JSON.stringify(out));
-              });
-              DB2.find({ fieldName: "MSG", room: { $eq: access } }).toArray().then((objs) => {
-                let out = "";
-                for (let i = 0; i < objs.length; i++) {
-                  out += format(objs[i]);
-                }
-                callback.end(JSON.stringify(out));
-              });
               return;
             } else if (action == "refresh_log" && perms >= 2) {
               DB3.findOne({ fieldName: "SYSTEMLOG" }).then((obj3) => {
@@ -314,7 +329,7 @@ function validate(user, pwd, action, access, callback, token = "") {
     );
     return;
   }
-  if (action == "signup") {
+  if (action == "signup" && user.match("^[0-9a-zA-Z_]+$")) {
     DB.findOne({ fieldName: "UserData", user }).then((obj3) => {
       if (obj3 != null) {
         (0, import_misc.systemLog)(user + " was already registered");
@@ -342,7 +357,7 @@ function validate(user, pwd, action, access, callback, token = "") {
     });
     return;
   }
-  DB.findOne({ fieldName: "UserData", user }).then(
+  DB.findOne({ fieldName: "UserData", user: { $eq: user } }).then(
     (obj3) => {
       if (obj3 && bcrypt.compareSync(pwd, obj3.passHash)) {
         let perm = obj3.permLevel;
@@ -443,6 +458,27 @@ function findHandler(name) {
       return import_initialiser.webHandlers[i];
   }
   return null;
+}
+function sendMessage(snd, user2, access2, perms2) {
+  DB2.insertOne({
+    fieldName: "MSG",
+    sender: snd,
+    data: user2,
+    room: access2,
+    permLevel: perms2 ? perms2 : 0,
+    expiry: Date.now() + EXPIRY
+  });
+  (0, import_server.sendMsgAllRooms)(access2, format({ permLevel: perms2, data: user2, sender: snd }));
+  let handler = findHandler("OnlineSUPPORT|" + access2);
+  if (handler) {
+    handler.onMessage(user2, snd);
+  } else {
+    handler = findHandler("HIDDEN|" + access2);
+    if (handler) {
+      handler.onMessage(user2, snd);
+    } else
+      console.log("ROOMINVALID");
+  }
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

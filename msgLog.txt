@@ -354,3 +354,619 @@
 (OnlineSUPPORT|secondary_support)[BetaOS] !uptime @BetaOS_System
 (OnlineSUPPORT|-----_-_-_-)[BetaOS] !uptime @BetaOS_System
 (OnlineSUPPORT|-----_-_-_-)[BetaOS] !ping
+(OnlineSUPPORT|betatester1024)[Credential2] good night.
+(OnlineSUPPORT|secondary_support)[user] !uptime @BetaOS_System
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] OI
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] ghod
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] that was hard
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] phew
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] !ping
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] !testfeature
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] ayyy
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] lowerer effort
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] god damn
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] you know the pain i went through to give you this feature
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] !activerooms @BetaOS_System
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] good thing I don't see where I can change my nick
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] !pause @BetaOS_System
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] Test.
+(OnlineSUPPORT|xkcd)[ANONYMOUS] !activerooms @BetaOS_System
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] !restore @BetaOS_System
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] uhhhh
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] uhhhh
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] !restore @BetaOS_System
+(OnlineSUPPORT|secondary_support)[Credential2] !renick
+(OnlineSUPPORT|secondary_support)[Credential] Perfect.
+(OnlineSUPPORT|secondary_support)[Credential] Goodbye.
+(OnlineSUPPORT|some_more_rooms)[ANONYMOUS] !pause @BetaOS_System
+(OnlineSUPPORT|secondary_support)[c] s
+(OnlineSUPPORT|some_more_rooms)[ANONYMOUS] !restore @BetaOS_System
+(OnlineSUPPORT|some_more_rooms)[ANONYMOUS] what
+(OnlineSUPPORT|secondary_support)[c] ock
+(OnlineSUPPORT|secondary_support)[c] ock
+(OnlineSUPPORT|secondary_support)[c] waick
+(OnlineSUPPORT|secondary_support)[c] !renick
+(OnlineSUPPORT|secondary_support)[c] ??
+(OnlineSUPPORT|secondary_support)[c] !renick "
+(OnlineSUPPORT|secondary_support)[c] !renick a
+(OnlineSUPPORT|secondary_support)[a] a
+(OnlineSUPPORT|secondary_support)[a] ?
+(OnlineSUPPORT|secondary_support)[a] what
+(OnlineSUPPORT|secondary_support)[a] why can't i send anythign
+(OnlineSUPPORT|secondary_support)[BetaOS] what
+(OnlineSUPPORT|secondary_support)[BetaOS] you are indeed sending stuff
+(OnlineSUPPORT|secondary_support)[BetaOS] we can see what you're sending
+(OnlineSUPPORT|secondary_support)[cock] cock
+(OnlineSUPPORT|secondary_support)[cock] ??????
+(OnlineSUPPORT|secondary_support)[BetaOS] oh ghod
+(OnlineSUPPORT|secondary_support)[BetaOS] damnit
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] heeloo
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] no anon?
+(OnlineSUPPORT|secondary_support)[BetaOS] hi
+(OnlineSUPPORT|secondary_support)[BetaOS] anonymous user
+(OnlineSUPPORT|secondary_support)[cock] suck
+(OnlineSUPPORT|secondary_support)[BetaOS] goddamnit
+(OnlineSUPPORT|secondary_support)[BetaOS] you bastard
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] heeloo (again (2 (two (eletric bogolago)))))
+(OnlineSUPPORT|secondary_support)[cock] D'
+(OnlineSUPPORT|secondary_support)[cock] !help
+(OnlineSUPPORT|secondary_support)[cock] !KILL
+(OnlineSUPPORT|secondary_support)[cock] !kill
+(OnlineSUPPORT|secondary_support)[cock] !kill @BetaOS_System
+(OnlineSUPPORT|secondary_support)[cock] !kill @BetaOS_System
+(OnlineSUPPORT|secondary_support)[cock] !kill @BetaOS_System
+(OnlineSUPPORT|secondary_support)[cock] !kill @BetaOS_System
+(OnlineSUPPORT|secondary_support)[cock] !kill @BetaOS_System
+(OnlineSUPPORT|secondary_support)[cock] !kill @BetaOS_System
+(OnlineSUPPORT|secondary_support)[cock] DIE DIE DIE DIE DIE
+(OnlineSUPPORT|secondary_support)[cock] !kill @BetaOS_System
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] uhm
+(OnlineSUPPORT|secondary_support)[notcock] hey
+(OnlineSUPPORT|secondary_support)[notcock] howsyt
+(OnlineSUPPORT|secondary_support)[Credential] !wake
+(OnlineSUPPORT|secondary_support)[notcock] !!
+(OnlineSUPPORT|secondary_support)[notcock]  
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] why the multiple attempted bot murders? lol
+(OnlineSUPPORT|secondary_support)[Credential] !sleep @ANONYMOUS
+(OnlineSUPPORT|secondary_support)[notcock] !sleep @BetaOS_System
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] uhm
+(OnlineSUPPORT|secondary_support)[notcock] !sleep @BetaOS_System [SYSTEM]
+(OnlineSUPPORT|secondary_support)[Credential] I am being impersonated!
+(OnlineSUPPORT|secondary_support)[Credential] That is not me!
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] !wake @ANONYMOUS
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] !uptime @BetaOS_System
+(HIDDEN|hidroom1)[ANONYMOUS] betatester1024
+(HIDDEN|hidroom1)[ANONYMOUS] test
+(HIDDEN|hidroom1)[ANONYMOUS] abc
+(HIDDEN|hidroom1)[ANONYMOUS] !pause @BetaOS_System
+(HIDDEN|hidroom1)[ANONYMOUS] abc
+(HIDDEN|hidroom1)[ANONYMOUS] defgh
+(HIDDEN|hidroom1)[ANONYMOUS] !restore @BetaOS_System
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] !pause @BetaOS_System
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] !restore @BetaOS_System
+(OnlineSUPPORT|secondary_support)[ANONYMOUS] good
+(OnlineSUPPORT|secondary_support)[ANON_|2800] okay
+(OnlineSUPPORT|secondary_support)[ANON_|4480] this is something
+(OnlineSUPPORT|secondary_support)[ANON_|3888] mmmm
+(OnlineSUPPORT|secondary_support)[ANON_|1136] that is an issue, too.
+(OnlineSUPPORT|secondary_support)[ANON_|4832] every time a new token?
+(OnlineSUPPORT|secondary_support)[ANON|ID4576] abcde
+(OnlineSUPPORT|secondary_support)[ANON|ID4576] fghij
+(OnlineSUPPORT|secondary_support)[ANON|ID4576] very good
+(OnlineSUPPORT|some_more_rooms)[ANON|ID9984] hey
+(OnlineSUPPORT|some_more_rooms)[ANON|ID9984] good
+(OnlineSUPPORT|some_more_rooms)[ANON|ID3488] dddd
+(OnlineSUPPORT|secondary_support)[ANON|ID1696] !whois @BetaOS
+(OnlineSUPPORT|secondary_support)[ANON|ID1776] !whois @BetaOS
+(OnlineSUPPORT|secondary_support)[ANON|ID1776] !whois @betaos
+(OnlineSUPPORT|secondary_support)[ANON|ID2992] !whois @betaos
+(OnlineSUPPORT|secondary_support)[ANON|ID800] !whois @betaos
+(OnlineSUPPORT|some_more_rooms)[ANON|ID9760] !whois @betaos
+(OnlineSUPPORT|some_more_rooms)[ANON|ID9760] !uptime @BetaOS_System
+(OnlineSUPPORT|some_more_rooms)[ANON|ID9760] !whois @betaos
+(OnlineSUPPORT|some_more_rooms)[ANON|ID7472] !whois @betaos
+(OnlineSUPPORT|some_more_rooms)[ANON|ID3872] !whois @betaos
+(OnlineSUPPORT|some_more_rooms)[ANON|ID3872] !whois @betaos
+(OnlineSUPPORT|some_more_rooms)[ANON|ID3872] !whois @betaos
+(OnlineSUPPORT|some_more_rooms)[ANON|ID3872] !whois @betaos
+(OnlineSUPPORT|some_more_rooms)[ANON|ID3872] !whois @betaos
+(OnlineSUPPORT|some_more_rooms)[ANON|ID3872] !whois @betaos
+(OnlineSUPPORT|some_more_rooms)[BetaOS] !whois @betaos
+(OnlineSUPPORT|some_more_rooms)[[WHOIS SERVICE]] Aliases for betaos:NONE FOUND
+(OnlineSUPPORT|some_more_rooms)[BetaOS] !whois @BetaOS
+(OnlineSUPPORT|some_more_rooms)[[WHOIS SERVICE]] Aliases for BetaOS:NONE FOUND
+(OnlineSUPPORT|secondary_support)[ANON|ID6544] !whois @betaos
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] Aliases for betaos:NONE FOUND
+(OnlineSUPPORT|secondary_support)[ANON|ID6544] !whois @betatester1024
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] Aliases for betatester1024:NONE FOUND
+(OnlineSUPPORT|secondary_support)[ANON|ID6544] well goddamn
+(OnlineSUPPORT|secondary_support)[ANON|ID1872] !whois @betaos
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] Aliases for betaos:betaos
+(OnlineSUPPORT|secondary_support)[ANON|ID1872] !whois @BetaOS
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] Aliases for BetaOS:NONE FOUND
+(OnlineSUPPORT|secondary_support)[ANON|ID1872] !whois @betatester1024
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] Aliases for betatester1024:betatester1024
+(OnlineSUPPORT|-----_-_-_-)[ANON|ID5184] !whois @betaos
+(OnlineSUPPORT|-----_-_-_-)[ANON|ID5184] !whois @betaos
+(OnlineSUPPORT|-----_-_-_-)[ANON|ID5440] !whois @betaos
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betaos:
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for betaos:[object Object]
+(OnlineSUPPORT|-----_-_-_-)[ANON|ID5440] !whois @betaos
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betaos:
+(OnlineSUPPORT|-----_-_-_-)[ANON|ID5440] !whois @betaos
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betaos:
+(OnlineSUPPORT|-----_-_-_-)[ANON|ID5440] !whois @betaos! @betaos
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for betaos:BetaOS
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betaos:
+(OnlineSUPPORT|-----_-_-_-)[ANON|ID5440] !whois @BetaOS
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias BetaOS:betaos
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for BetaOS:
+(OnlineSUPPORT|-----_-_-_-)[ANON|ID5264] !whois @BetaOS
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias BetaOS: betaos
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for BetaOS: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[ANON|ID5264] !whois @betaos
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for betaos: BetaOS
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betaos: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[ANON|ID5264] !whois @c
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias c: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for c: notcock
+(OnlineSUPPORT|-----_-_-_-)[ANON|ID5264] !whois @j
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias j: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for j: [NONE FOUND]
+(OnlineSUPPORT|secondary_support)[BetaOS] !whois @c
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] BetaOS System Account for alias c: [NONE FOUND]
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] Aliases for c: notcock
+(OnlineSUPPORT|secondary_support)[c] !whois @c
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] Aliases for c: notcock
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] BetaOS System Account for alias c: betaos
+(OnlineSUPPORT|secondary_support)[c] good
+(OnlineSUPPORT|secondary_support)[betaos] !whois @betaos
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] Aliases for betaos: betaos
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] BetaOS System Account for alias betaos: betaos
+(OnlineSUPPORT|secondary_support)[betaos] good
+(OnlineSUPPORT|secondary_support)[betaos] !whois @betatester1024
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] Aliases for betatester1024: undefined
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: [NONE FOUND]
+(OnlineSUPPORT|secondary_support)[betaos] !whois @betatester1024
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: [NONE FOUND]
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] Aliases for betatester1024: undefined
+(OnlineSUPPORT|secondary_support)[betaos] !whois @betatester1024
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] Aliases for betatester1024: undefined
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: [NONE FOUND]
+(OnlineSUPPORT|secondary_support)[betaos] !whois @betaos
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] Aliases for betaos: betaos
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] BetaOS System Account for alias betaos: betaos[Admin]
+(OnlineSUPPORT|secondary_support)[betaos] !whois @c
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] Aliases for c: notcock
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] BetaOS System Account for alias c: [NONE FOUND]
+(OnlineSUPPORT|secondary_support)[betaos] !whois @notcock
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] Aliases for notcock: [NONE FOUND]
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] BetaOS System Account for alias notcock: c[User]
+(OnlineSUPPORT|secondary_support)[betaos] hmmm
+(OnlineSUPPORT|secondary_support)[betaos] !whois @betatester1024
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: [NONE FOUND]
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] Aliases for betatester1024: undefined
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[betaos] !whois @betatester1024
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: [NONE FOUND]
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] Aliases for betatester1024: undefined
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[betaos] !whois @betatester1024
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: [NONE FOUND]
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] Aliases for betatester1024: undefined
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[betaos] !whois @betatester1024
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: 
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] Aliases for betatester1024: undefined
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[betaos] !whois @betatester1024
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: 
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[betaos] !whois @betatester1024
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: 
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[betaos] !whois @betatester1024
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: 
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[betaos] !whois @betaos
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] Aliases for betaos: betaos
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betaos: betaos[Admin]
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[betaos] !whois @betatester1024
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: 
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] Aliases for betatester1024: betatester1024
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[betaos] !whois @betatester1024
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] Aliases for betatester1024: betatester1024
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: 
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[betaos] !whois @betatester1024
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: 
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] Aliases for betatester1024: betatester1024
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[betaos] !whois @betatester1024
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: 
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] Aliases for betatester1024: betatester1024
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[betaos] !whois @betatester1024
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: 
+(OnlineSUPPORT|creatednEWROOM_-_-_-)[[WHOIS SERVICE]] Aliases for betatester1024: betatester1024
+(OnlineSUPPORT|-----_-_-_-)[betatester1024] what
+(OnlineSUPPORT|-----_-_-_-)[betatester1024] !whois @betatester1024
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for betatester1024: betatester1024
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: 
+(OnlineSUPPORT|-----_-_-_-)[betatester1024] !whois @betatester1024
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: 
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for betatester1024: betatester1024
+(OnlineSUPPORT|-----_-_-_-)[betatester1024] !whois @betatester1024
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for betatester1024: betatester1024
+(OnlineSUPPORT|-----_-_-_-)[betatester1024] !whois @betatester1024
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for betatester1024: betatester1024
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias betatester1024: betatester1024[Super-admin]
+(OnlineSUPPORT|-----_-_-_-)[betatester1024] !whois @c
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for c: notcock
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias c: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[betatester1024] !whois @notcock
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias notcock: c[User]
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for notcock: 
+(OnlineSUPPORT|-----_-_-_-)[betatester1024] !whois @john
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for john: 
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias john: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[betatester1024] !whois @twentyfour
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for twentyfour: 
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias twentyfour: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[betatester1024] !whois @TWENTYFOUR
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias TWENTYFOUR: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for TWENTYFOUR: TWENTYFOUR
+(OnlineSUPPORT|-----_-_-_-)[betatester1024] !whois @TWENTYFOUR
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias TWENTYFOUR: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for TWENTYFOUR: TWENTYFOUR
+(OnlineSUPPORT|-----_-_-_-)[betatester1024] !whois @test
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for test: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias test: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[betatester1024] !whois @ab
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias ab: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for ab: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[betatester1024] !whois @abc
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for abc: abc
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias abc: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[betatester1024] !whois @abcdeeeee
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] BetaOS System Account for alias abcdeeeee: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[[WHOIS SERVICE]] Aliases for abcdeeeee: [NONE FOUND]
+(OnlineSUPPORT|-----_-_-_-)[betatester1024] !whois @[WHOIS SERVICE]
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] as
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] d
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] asd
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] da
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] d
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] as
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] d
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] sd
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] af
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8352]  
+(OnlineSUPPORT|secondary_support)[ANON|ID8352] ra
+(OnlineSUPPORT|secondary_support)[ANON|ID8352]  
+(OnlineSUPPORT|secondary_support)[ANON|ID8352]  
+(OnlineSUPPORT|secondary_support)[ANON|ID8352]  
+(OnlineSUPPORT|secondary_support)[ANON|ID8352]  
+(OnlineSUPPORT|secondary_support)[ANON|ID8352]  
+(OnlineSUPPORT|secondary_support)[ANON|ID8352]  
+(OnlineSUPPORT|secondary_support)[ANON|ID8352]  
+(OnlineSUPPORT|secondary_support)[ANON|ID8352]  
+(OnlineSUPPORT|secondary_support)[ANON|ID6720] a
+(OnlineSUPPORT|secondary_support)[ANON|ID6720] a
+(OnlineSUPPORT|secondary_support)[ANON|ID6720] a
+(OnlineSUPPORT|secondary_support)[ANON|ID6720] a
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] mea
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] a
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] a
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] a
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] aa
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] a
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] a
+(OnlineSUPPORT|secondary_support)[ANON|ID4400]  am
+(OnlineSUPPORT|secondary_support)[ANON|ID4400]  ma
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] me
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] ma
+(OnlineSUPPORT|secondary_support)[ANON|ID4400]  m
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] emmmc
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] wmm
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] mm
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] mm
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] m
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] m
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] mm
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] m
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] m
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] m
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] m
+(OnlineSUPPORT|secondary_support)[ANON|ID4400] !renick hfua
+(OnlineSUPPORT|secondary_support)[ANON|ID6144] aa
+(OnlineSUPPORT|secondary_support)[ANON|ID6144] a
+(OnlineSUPPORT|secondary_support)[ANON|ID6144] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] aa
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8640]  
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] ea 
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] re
+(OnlineSUPPORT|secondary_support)[ANON|ID8640]  
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] d
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] da
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] f
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8640] fa
+(OnlineSUPPORT|secondary_support)[ANON|ID9424] Oh nice
+(OnlineSUPPORT|secondary_support)[ANON|ID9424] No threading though :(
+(OnlineSUPPORT|secondary_support)[ANON|ID9424] <b>b?</b>
+(OnlineSUPPORT|secondary_support)[ANON|ID9424] asd
+(OnlineSUPPORT|secondary_support)[ANON|ID9424] Heh, the "user" field of the POST request contains the message contents
+(OnlineSUPPORT|secondary_support)[ANON|ID9024] !uptime @BetaOS_System
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] a
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] a
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] a
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] a
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] a
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] aaaa
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] a
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] d
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] d
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] d
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] d
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] d
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] d
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] ee
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] e
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] e
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] f
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] g
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] g
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] g
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] g
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] h
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] h
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] j
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] j
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] j
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] j
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] j
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] j
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] jj
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] j
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] k
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] jkj
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] jj
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] j
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] j
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] j
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] j
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] j
+(OnlineSUPPORT|secondary_support)[ANON|ID1136] j
+(OnlineSUPPORT|secondary_support)[ANON|ID8720] asd
+(OnlineSUPPORT|secondary_support)[ANON|ID8720] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8720] d
+(OnlineSUPPORT|secondary_support)[ANON|ID8720] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8720] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8720] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8720] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8720] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8720] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8720] aa
+(OnlineSUPPORT|secondary_support)[ANON|ID8720] a
+(OnlineSUPPORT|secondary_support)[ANON|ID8720] aa
+(OnlineSUPPORT|main_support)[ANON|ID624] hey
+(OnlineSUPPORT|main_support)[ANON|ID624] what
+(OnlineSUPPORT|main_support)[ANON|ID624] hey
+(OnlineSUPPORT|main_support)[ANON|ID624] !uptime @betaOS_System
+(OnlineSUPPORT|secondary_support)[betatester1024] !ping
+(OnlineSUPPORT|secondary_support)[betatester1024] !uptime @BetaOS_System
+(OnlineSUPPORT|secondary_support)[betatester1024] aaaa
+(OnlineSUPPORT|secondary_support)[betatester1024] !kill @BetaOS_System
+(OnlineSUPPORT|secondary_support)[betatester1024] !pause @betaOS_System
+(OnlineSUPPORT|secondary_support)[betatester1024] !ping @betaOS_System
+(OnlineSUPPORT|secondary_support)[betatester1024] !help @betaos_system
+(OnlineSUPPORT|secondary_support)[betatester1024] !help
+(OnlineSUPPORT|secondary_support)[betatester1024] !testfeature
+(OnlineSUPPORT|secondary_support)[ANON|ID4864] !uptime @BetaOS_System
+(OnlineSUPPORT|secondary_support)[ANON|ID7024] 300 msgs
+(OnlineSUPPORT|secondary_support)[ANON|ID7024] a
+(OnlineSUPPORT|secondary_support)[ANON|ID7024] a
+(OnlineSUPPORT|secondary_support)[ANON|ID7024] a
+(OnlineSUPPORT|secondary_support)[ANON|ID7024] a
+(OnlineSUPPORT|secondary_support)[ANON|ID7024] a
+(OnlineSUPPORT|secondary_support)[ANON|ID7024] aa
+(OnlineSUPPORT|secondary_support)[ANON|ID7024] a
+(OnlineSUPPORT|secondary_support)[ANON|ID7024] a
+(OnlineSUPPORT|secondary_support)[ANON|ID7024] a
+(OnlineSUPPORT|secondary_support)[ANON|ID3504] abc
+(OnlineSUPPORT|secondary_support)[ANON|ID3968] +user
+(OnlineSUPPORT|secondary_support)[ANON|ID3968] +user
+(OnlineSUPPORT|secondary_support)[ANON|ID3968] +user2
+(OnlineSUPPORT|secondary_support)[ANON|ID3968] oh no
+(OnlineSUPPORT|secondary_support)[ANON|ID3968] +2222
+(OnlineSUPPORT|secondary_support)[ANON|ID3968] -2222
+(OnlineSUPPORT|secondary_support)[ANON|ID3968] -user2
+(OnlineSUPPORT|secondary_support)[ANON|ID3968] -user
+(OnlineSUPPORT|secondary_support)[ANON|ID3968] -user
+(OnlineSUPPORT|secondary_support)[ANON|ID6480] https://betatester1024.repl.co/support?room=secondary_support
+(OnlineSUPPORT|secondary_support)[ANON|ID6480] https://betatester1024.repl.co/support?room=secondary_support
+(OnlineSUPPORT|secondary_support)[ANON|ID6480] well there go the users
+(OnlineSUPPORT|secondary_support)[ANON|ID7648] -user
+(OnlineSUPPORT|secondary_support)[ANON|ID7648] +user
+(OnlineSUPPORT|secondary_support)[ANON|ID5824] +user
+(OnlineSUPPORT|secondary_support)[ANON|ID5824] +user
+(OnlineSUPPORT|secondary_support)[ANON|ID5824] +user
+(OnlineSUPPORT|secondary_support)[ANON|ID5824] -user
+(OnlineSUPPORT|secondary_support)[ANON|ID5824] *user
+(OnlineSUPPORT|secondary_support)[ANON|ID5824] -testing
+(OnlineSUPPORT|secondary_support)[ANON|ID5824] +thing
+(OnlineSUPPORT|secondary_support)[ANON|ID5824] <b>
+(OnlineSUPPORT|secondary_support)[ANON|ID976] !uptime @BetaOS_System
+(OnlineSUPPORT|secondary_support)[betaos] okay okay
+(OnlineSUPPORT|secondary_support)[betaos] interesting
+(OnlineSUPPORT|secondary_support)[betaos] very interesting
+(OnlineSUPPORT|secondary_support)[notcock] the
+(OnlineSUPPORT|secondary_support)[notcock] wait
+(OnlineSUPPORT|secondary_support)[notcock] why is it still called that
+(OnlineSUPPORT|secondary_support)[not] what
+(OnlineSUPPORT|secondary_support)[ANON|ID8672] what
+(OnlineSUPPORT|secondary_support)[ANON|ID8672] !alias @not
+(OnlineSUPPORT|secondary_support)[ANON|ID8672] !whois @not
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] Aliases for not: [NONE FOUND]
+(OnlineSUPPORT|secondary_support)[[WHOIS SERVICE]] BetaOS3 System Account for alias not: c[User]
+(OnlineSUPPORT|secondary_support)[not] !kill @c
+(OnlineSUPPORT|secondary_support)[not] !kill @not
+(OnlineSUPPORT|secondary_support)[not] !kill @betaos_system
+(OnlineSUPPORT|secondary_support)[not] !ban @betaos_system
+(OnlineSUPPORT|secondary_support)[ANON|ID9936] #secondary_support
+(OnlineSUPPORT|secondary_support)[ANON|ID9936] what
+(OnlineSUPPORT|secondary_support)[ANON|ID4512] uhhh
+(OnlineSUPPORT|secondary_support)[ANON|ID4512] #secondary-support
+(OnlineSUPPORT|secondary_support)[not] #what
+(OnlineSUPPORT|secondary_support)[ANON|ID8880] #heyo
+(OnlineSUPPORT|secondary_support)[not] #!kill
+(OnlineSUPPORT|secondary_support)[not] #<
+(OnlineSUPPORT|secondary_support)[not] #<>
+(OnlineSUPPORT|secondary_support)[not] &asf
+(OnlineSUPPORT|secondary_support)[not] &#adsf
+(OnlineSUPPORT|secondary_support)[not] ????
+(OnlineSUPPORT|secondary_support)[not] &#
+(OnlineSUPPORT|secondary_support)[not] #&
+(OnlineSUPPORT|secondary_support)[not] #&a
+(OnlineSUPPORT|secondary_support)[not] ‮?
+(OnlineSUPPORT|secondary_support)[not] ???s
+(OnlineSUPPORT|secondary_support)[not] -
+(OnlineSUPPORT|secondary_support)[not] D
+(OnlineSUPPORT|secondary_support)[not] !renick @)
+(OnlineSUPPORT|secondary_support)[not] :(
+(OnlineSUPPORT|secondary_support)[not] ????
+(OnlineSUPPORT|secondary_support)[ANON|ID8672] !renick @[user]
+(OnlineSUPPORT|secondary_support)[ANON|ID8672] with restrictions
+(OnlineSUPPORT|secondary_support)[ANON|ID8672] so you don't screw me over
+(OnlineSUPPORT|secondary_support)[not] !renick @@
+(HIDDEN|hidroom1)[ANON|ID5008] aghhhh
+(OnlineSUPPORT|secondary_support)[not] asd
+(OnlineSUPPORT|secondary_support)[a] at
+(OnlineSUPPORT|secondary_support)[a] ???
+(OnlineSUPPORT|secondary_support)[a] ?earw
+(OnlineSUPPORT|secondary_support)[a] how
+(OnlineSUPPORT|secondary_support)[a] why
+(OnlineSUPPORT|secondary_support)[a] where
+(OnlineSUPPORT|secondary_support)[a] when
+(OnlineSUPPORT|secondary_support)[a] fish is in the air
+(OnlineSUPPORT|secondary_support)[a] it stank
+(OnlineSUPPORT|secondary_support)[a] <style>*{color:red !important}</style>
+(OnlineSUPPORT|secondary_support)[a] aaw
+(OnlineSUPPORT|secondary_support)[a] i liked it bertter before
+(OnlineSUPPORT|secondary_support)[a] test
+(OnlineSUPPORT|secondary_support)[<style>*{color:red !important}</style>] a
+(OnlineSUPPORT|secondary_support)[<style>*{color:red !important}</style>] AHHAHAH
+(OnlineSUPPORT|secondary_support)[<style>*{color:red !important}</style>] CSS: INJECTED 
+(OnlineSUPPORT|secondary_support)[a] >:D
+(OnlineSUPPORT|secondary_support)[<] .
+(OnlineSUPPORT|secondary_support)[<script>alert("test")</script>] hm
+(OnlineSUPPORT|secondary_support)[<style>filter:invert(100)</style>] test
+(OnlineSUPPORT|secondary_support)[<style>*{filter:invert(100)}</style>] huh
+(OnlineSUPPORT|secondary_support)[<style>*{filter:invert(100)}</style>] i kinda like this theme better tbh
+(OnlineSUPPORT|secondary_support)[ANON|ID2624] :O this is getting a dark theme XSSed :D
+(OnlineSUPPORT|secondary_support)[ANON|ID2624] :D :D
+(OnlineSUPPORT|secondary_support)[<style>*{transform:translateX(42px)}</style>] move everything to the side
+(OnlineSUPPORT|secondary_support)[<style>*{transform:translateX(42px)}</style>] hehehe
+(OnlineSUPPORT|secondary_support)[<style>*{transform: rotate(29deg);}</style>] ROTATE
+(OnlineSUPPORT|secondary_support)[ANON|ID5248] oh no
+(OnlineSUPPORT|secondary_support)[ANON|ID5248] oh no
+(OnlineSUPPORT|secondary_support)[ANON|ID5248] OH NO
+(OnlineSUPPORT|secondary_support)[<style>*{transform: rotate(29deg);}</style>] SUFFFER
+(OnlineSUPPORT|secondary_support)[<style>*{filter:blur(2px)}</style>] BLUR
+(OnlineSUPPORT|secondary_support)[<style>*{filter:invert(100)}</style>] INVERT
+(OnlineSUPPORT|secondary_support)[<style>*{filter:invert(100),blur(2px)}</style>] MOAR!!!
+(OnlineSUPPORT|secondary_support)[<style>*{filter:invert(100) blur(2px)}</style>] MOOOAARRRR!!
+(OnlineSUPPORT|betatester1024)[ANON|ID5936] !renick @[invalid]
+(OnlineSUPPORT|secondary_support)[<iframe src="https://nest.place"></iframe>] HMMM
+(OnlineSUPPORT|secondary_support)[<iframe src="https://nest.place"></iframe>] huyh
+(OnlineSUPPORT|secondary_support)[badALIAS] hmmm
+(OnlineSUPPORT|secondary_support)[ANON|ID2432] this is great
+(OnlineSUPPORT|secondary_support)[ANON|ID2432] :D
+(OnlineSUPPORT|betatester1024)[betatester1024] *sigh*
+(OnlineSUPPORT|secondary_support)[badALIAS] hmm
+(OnlineSUPPORT|secondary_support)[badALIAS] hmm
+(OnlineSUPPORT|secondary_support)[badALIAS] hm
+(OnlineSUPPORT|secondary_support)[badALIAS] ah
+(OnlineSUPPORT|betatester1024)[m] heh
+(OnlineSUPPORT|secondary_support)[badALIAS] ok
+(OnlineSUPPORT|betatester1024)[test] mmm
+(OnlineSUPPORT|betatester1024)[test] not working
+(OnlineSUPPORT|secondary_support)[badALIAS] :(
+(OnlineSUPPORT|secondary_support)[a] test
+(OnlineSUPPORT|secondary_support)[a] test
+(OnlineSUPPORT|secondary_support)[a] huh
+(OnlineSUPPORT|secondary_support)[aa] test
+(OnlineSUPPORT|secondary_support)[aa] so you just strip all '<' characters
+(OnlineSUPPORT|secondary_support)[aa] that's one way to do it i guess ^-^
+(OnlineSUPPORT|secondary_support)[<style>*{filter:invert(100)}</style>] LMAO
+(OnlineSUPPORT|secondary_support)[<style>*{filter:invert(100)}</style>] YOU STILL HAVENT FIXED. IT
+(OnlineSUPPORT|secondary_support)[<style>*{filter:invert(100)}</style>] :D :D :D :D :D 
+(OnlineSUPPORT|betatester1024)[<script>window.location = "https://music.youtube.com/watch?v=lYBUbBu4W08"</script>] bla
+(OnlineSUPPORT|secondary_support)[<style>* {
+  animation: mymove 5s infinite !important;
+}
+
+@keyframes mymove {
+  from {transform: rotate(0deg);}
+  to {transform: rotate(180deg);}
+}</style>] BURN
+(OnlineSUPPORT|secondary_support)[<style>* {
+  animation: mymove 5s infinite !important;
+}
+
+@keyframes mymove {
+  from {transform: rotate(0deg);}
+  to {transform: rotate(180deg);}
+}</style>] BURN IT ALL
+(OnlineSUPPORT|xkcd)[alsdhflkjshegkjqyhk] test
+(OnlineSUPPORT|xkcd)[alsdhflkjshegkjqyhk] uh
+(OnlineSUPPORT|secondary_support)[alsdhflkjshegkjqyhk] :(
+(OnlineSUPPORT|secondary_support)[ANON|ID6496] :(
+(OnlineSUPPORT|secondary_support)[asdf] MACHINE
+(OnlineSUPPORT|secondary_support)[asdf] MUST
+(OnlineSUPPORT|secondary_support)[asdf] WASH
+(OnlineSUPPORT|secondary_support)[asdf] SPIN
+(OnlineSUPPORT|secondary_support)[asdf] PIIIIN
+(OnlineSUPPORT|secondary_support)[asdf] :(
+(OnlineSUPPORT|secondary_support)[s] :(
+(OnlineSUPPORT|secondary_support)[s] what
+(OnlineSUPPORT|secondary_support)[s] sad
+(OnlineSUPPORT|secondary_support)[s] a
+(OnlineSUPPORT|secondary_support)[aodsigfuyil] there is no spin :(
+(OnlineSUPPORT|secondary_support)[ANON|ID7824] boo?
+(OnlineSUPPORT|secondary_support)[ANON|ID7824] <style>*{animation:1s ease-in 1s infinite wash}@keyframes wash{from {transform: rotateZ(0deg)}to{transform: rotateZ(360deg)}}</style>

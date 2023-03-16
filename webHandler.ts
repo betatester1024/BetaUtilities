@@ -128,7 +128,7 @@ export class WebH
       // !restore
       else if (this.pausedQ && msg == "!restore @" + this.nick.toLowerCase()) {
         this.sendMsg("/me has been unpaused", data);   
-        if (!this.hiddenQ) updateActive(this.roomName, true);
+        // if (!this.hiddenQ) updateActive(this.roomName, true);
         this.pauser = null;
         this.callTimes = [];
         this.pausedQ = false;
@@ -137,7 +137,7 @@ export class WebH
       // !pause
       else if (msg == "!pause @" + this.nick.toLowerCase()) {
         this.sendMsg("/me has been paused", data)
-        if (!this.hiddenQ) updateActive(this.roomName, false);
+        // if (!this.hiddenQ) updateActive(this.roomName, false);
         let reply = "Enter !kill @"+this.nick+" to kill this bot, "+
           "or enter !restore @"+this.nick+" to restore it.";
         this.sendMsg(reply, data);

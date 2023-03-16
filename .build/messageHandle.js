@@ -45,6 +45,8 @@ function updateActive(roomID, activeQ) {
   if (idx < 0 && activeQ) {
     import_initialiser.sysRooms.push(roomID);
     import_server.pushEvents.push([]);
+    import_server.pushUserEvents.push([]);
+    import_server.users.push([]);
   } else if (idx >= 0 && !activeQ)
     import_initialiser.sysRooms.splice(idx, 1);
 }

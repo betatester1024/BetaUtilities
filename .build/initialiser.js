@@ -66,6 +66,8 @@ function init() {
     for (let j = 0; j < obj.hidRooms.length; j++) {
       hidRooms.push("HIDDEN|" + obj.hidRooms[j]);
       import_server2.hidEvents.push([]);
+      import_server2.hidUserEvents.push([]);
+      import_server2.hidUsers.push([]);
       webHandlers[i + j] = new import_webHandler.WebH(obj.hidRooms[j], true);
     }
     console.log("WebHandlers loaded. Sysrooms:", sysRooms, "hidden rooms:", hidRooms);

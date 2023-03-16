@@ -1,8 +1,8 @@
 "use strict";
 function onLoad() {
-  let match = document.cookie.match("__Secure-session=[0-9.]+");
-  console.log("Current session: " + match);
-  if (!match && document.URL.match("\\/admin") && !document.URL.match("?redirect=(.*)\\/admin")) {
+  let match2 = document.cookie.match("__Secure-session=[0-9.]+");
+  console.log("Current session: " + match2);
+  if (!match2 && document.URL.match("\\/admin") && !document.URL.match("?redirect=(.*)\\/admin")) {
     alertDialog("You're not logged in!", () => {
       window.open("/login?redirect=" + document.URL, "_self");
     });
@@ -13,6 +13,9 @@ let CURRACCNAME = "";
 let CURRPERMS = "";
 let LOADEDQ = false;
 let TODOCT = 0;
+let arr = new BigUint64Array(1);
+let match = document.cookie.match("__Secure-session=([0-9.]+)");
+let sessionID = match ? match[1] : window.crypto.getRandomValues(arr);
 function newUser(e, accessclass) {
   let id = e.target.id;
   if (id != "loginBTN")
@@ -61,7 +64,7 @@ function validateLogin(action = "login", extData) {
       inp.style.border = "2px solid #eee";
     }
   }
-  if (action == "refresh")
+  if (action == "refresh" || action == "refresh_users")
     extData = document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
   if (action != "login" && action != "add" && action != "signup" || user.value.match("^[a-zA-Z0-9_]+$") && pass.value.length !== 0) {
     if (confirm && (action == "add" || action == "signup") && confirm.value != pass.value) {
@@ -72,9 +75,7 @@ function validateLogin(action = "login", extData) {
     }
     if (confirm)
       confirm.value = "";
-    let arr = new BigUint64Array(1);
-    let match = document.cookie.match("__Secure-session=([0-9.]+)");
-    let sessionID = match ? match[1] : window.crypto.getRandomValues(arr);
+    let match5 = document.cookie.match("__Secure-session=([0-9.]+)");
     let renickQ = false;
     let params;
     if (action != "logout" && action != "CMD" && action != "sendMsg" && action != "userReq")
@@ -85,10 +86,17 @@ function validateLogin(action = "login", extData) {
     } else if (action == "sendMsg") {
       params = "token=" + sessionID + "&action=sendMsg&user=" + encodeURIComponent(extData) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
       ;
-      let match5 = extData.match("!renick @([a-zA-Z_0-9]+)");
-      if (match5) {
-        params = "token=" + sessionID + "&action=renick&user=" + encodeURIComponent(match5[1]) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
+      let match6 = extData.match("!renick @([a-zA-Z_0-9]+)");
+      if (match6) {
+        params = "token=" + sessionID + "&action=renick&user=" + encodeURIComponent(match6[1]) + "&access=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
         renickQ = true;
+        if (!document.cookie.match("__Secure-session=([0-9.]+)")) {
+          let ele = document.getElementById("msgArea");
+          ele.innerHTML += `<p style="color: #ee0000;">Error: You are not logged in. 
+          You cannot re-alias yourself as an anomymous account.</p>`;
+          ele.scrollTop = ele.scrollHeight;
+          return;
+        }
       }
     } else
       params = "user=&pass=&action=" + action + "&token=" + sessionID;
@@ -156,9 +164,9 @@ function validateLogin(action = "login", extData) {
             let mainDiv = document.getElementById("innerDiv");
             mainDiv.innerHTML = "";
             for (let i = 0; i < res.length; i++) {
-              let match5 = res[i].match("OnlineSUPPORT\\|(.*)");
-              if (match5)
-                mainDiv.innerHTML += `<button class="unsetWidth" onclick="window.open('/support?room=${match5[1]}', '_self')"><kbd>${match5[1]}</kbd><hr class="btnHr"></hr></button>`;
+              let match6 = res[i].match("OnlineSUPPORT\\|(.*)");
+              if (match6)
+                mainDiv.innerHTML += `<button class="unsetWidth" onclick="window.open('/support?room=${match6[1]}', '_self')"><kbd>${match6[1]}</kbd><hr class="btnHr"></hr></button>`;
             }
             return;
           }
@@ -231,22 +239,36 @@ function validateLogin(action = "login", extData) {
               validateLogin("logout", "");
             return;
           }
-          if (action == "refresh" || action == "refresh_log") {
+          if (action == "refresh" || action == "refresh_log" || action == "refresh_users") {
             if (res == "ACCESS" || res == "EXPIRE" || res == "NOACTIVE" || res == "ERROR") {
               location.reload();
             }
             ele = document.getElementById("msgArea");
+            if (action == "refresh_users") {
+              ele = document.getElementById("users");
+              ele.innerHTML = "Active users: <br>" + res.join("<br>") + "<br>";
+              return;
+            }
             if (action == "refresh_log")
               ele = ele;
             let scrDistOKQ = Math.abs(ele.scrollTop - ele.scrollHeight) < 1e3;
-            if (action == "refresh")
+            if (action == "refresh" && document.cookie.match("__Secure-session=([0-9.]+)"))
               res += `
-            <br><p class="beta"><i class="beta">Welcome to BetaOS Services support! Enter any message
+            <p class="beta internMSG"><i class="beta">Welcome to BetaOS Services support! Enter any message
             in the box below. Automated response services and utilities are provided
             by BetaOS System. Activate it using the commands <a class="beta" href="/commands?nick=BetaOS_System" target="blank">here</a>.
             Enter </i><kbd class="beta">!renick @[NEWNICK]</kbd><i class="beta"> to rename yourself in all support rooms. This is linked to your account.
+            <br> Enter </i><kbd class="beta">!whois @[USER]</kbd><i class="beta"> to enquire about
+            the identity of any user, online or not.
             <br>Thank you for using BetaOS Systems!</i></p><br>
             `;
+            else if (action == "refresh")
+              res += `
+            <p class="beta internMSG"><i class="beta">Welcome to BetaOS Services support! Enter any message
+            in the box below. Automated response services and utilities are provided
+            by BetaOS System. Activate it using the commands <a class="beta" href="/commands?nick=BetaOS_System" target="blank">here</a>.
+            <b style="color: #ee0000">You are not logged in! Some functionality restricted, e.g. re-aliasing yourself.</b>
+            <br>Thank you for using BetaOS Systems!</i></p><br>`;
             updateTextArea(res, action == "refresh_log");
             if (!LOADEDQ || extData == "send" || scrDistOKQ) {
               ele.scrollTop = ele.scrollHeight;
@@ -291,7 +313,7 @@ function validateLogin(action = "login", extData) {
               if (action == "signup")
                 window.open(redirectTo, "_self");
             });
-            if (!match && action == "signup")
+            if (!match5 && action == "signup")
               document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
           }
           return;
@@ -307,7 +329,7 @@ function validateLogin(action = "login", extData) {
           document.cookie = `__Secure-user=${CURRUSER}; SameSite=None; Secure;`;
           document.cookie = `__Secure-perms=${CURRPERMS}; SameSite=None; Secure;`;
           document.cookie = `__Secure-session=${sessionID}; SameSite=None; Secure;`;
-          if (!match && action == "login")
+          if (!match5 && action == "login")
             document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         } else if (res == "3") {
           CURRUSER = user.value;
@@ -320,7 +342,7 @@ function validateLogin(action = "login", extData) {
           alertDialog("Welcome, " + user.value + "! | Super-administrative access granted.", () => {
             window.open(redirectTo, "_self");
           });
-          if (!match && action == "login")
+          if (!match5 && action == "login")
             document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         } else if (res == "1") {
           CURRUSER = user.value;
@@ -333,7 +355,7 @@ function validateLogin(action = "login", extData) {
           alertDialog("Welcome, " + user.value + "!", () => {
             window.open(redirectTo, "_self");
           });
-          if (!match && action == "login")
+          if (!match5 && action == "login")
             document.cookie = "__Secure-session=" + sessionID + "; SameSite=None; Secure;";
         } else {
           alertDialog("Error: Invalid login credentials", () => {
@@ -343,7 +365,7 @@ function validateLogin(action = "login", extData) {
       }
     };
     xhr.send(params);
-    if (action != "sendMsg" && action != "refresh" && action != "refreshLog") {
+    if (action != "sendMsg" && action != "refresh" && action != "refreshLog" && action != "refresh_users") {
       let ele = document.getElementById("overlay");
       if (ele)
         ele.className += "active";

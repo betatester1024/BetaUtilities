@@ -19,9 +19,13 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var server_exports = {};
 __export(server_exports, {
   hidEvents: () => hidEvents,
+  hidUserEvents: () => hidUserEvents,
+  hidUsers: () => hidUsers,
   pushEvents: () => pushEvents,
+  pushUserEvents: () => pushUserEvents,
   sendMsgAllRooms: () => sendMsgAllRooms,
-  updateServer: () => updateServer
+  updateServer: () => updateServer,
+  users: () => users
 });
 module.exports = __toCommonJS(server_exports);
 var import_initialiser = require("./initialiser");
@@ -37,6 +41,10 @@ const port = 4e3;
 var RateLimit = require("express-rate-limit");
 let pushEvents = [];
 let hidEvents = [];
+let pushUserEvents = [];
+let hidUserEvents = [];
+let users = [];
+let hidUsers = [];
 async function updateServer() {
   (0, import_misc.systemLog)("");
   (0, import_misc.systemLog)("Server active!");
@@ -82,7 +90,7 @@ async function updateServer() {
       res.end(JSON.stringify("ACCESS"));
     (0, import_accessControl.validate)(decodeURIComponent(req.body.user), decodeURIComponent(req.body.pass), req.body.action, req.body.access, res, req.body.token);
   });
-  app.get("/stream?*", async (req, res) => {
+  app.get("/users?*", async (req, res) => {
     res.set({
       "Cache-Control": "no-cache",
       "Content-Type": "text/event-stream",
@@ -98,15 +106,72 @@ async function updateServer() {
       return;
     }
     if (roomIdx >= 0)
-      pushEvents[roomIdx].push(res);
+      pushUserEvents[roomIdx].push(res);
     else
+      hidUserEvents[roomIdx2].push(res);
+    res.on("close", () => {
+      if (roomIdx >= 0)
+        pushUserEvents[roomIdx].splice(pushUserEvents[roomIdx].indexOf(res), 1);
+      else
+        hidUserEvents[roomIdx2].splice(hidUserEvents[roomIdx2].indexOf(res), 1);
+      res.end();
+    });
+  });
+  app.get("/stream?*", async (req, res) => {
+    res.set({
+      "Cache-Control": "no-cache",
+      "Content-Type": "text/event-stream",
+      "Connection": "keep-alive"
+    });
+    res.flushHeaders();
+    res.write("retry:500\n\n");
+    let roomIdx = import_initialiser.sysRooms.indexOf("OnlineSUPPORT|" + req.query.room);
+    let roomIdx2 = import_initialiser.hidRooms.indexOf("HIDDEN|" + req.query.room);
+    if (roomIdx < 0 && roomIdx2 < 0) {
+      res.end();
+      console.log("Invalid room: " + req.query.room);
+      return;
+    }
+    if (roomIdx >= 0) {
+      pushEvents[roomIdx].push(res);
+      pushUserEvents[roomIdx].push(res);
+      (0, import_accessControl.validate)("", "", "userReq", "internal", (id) => {
+        sendMsgAllRooms(req.query.room, "+" + id + "\\n");
+        if (roomIdx >= 0)
+          users[roomIdx].push(id);
+        else
+          hidUsers[roomIdx2].push(id);
+      }, req.query.token);
+    } else {
       hidEvents[roomIdx2].push(res);
+      hidUserEvents[roomIdx2].push(res);
+      (0, import_accessControl.validate)("", "", "userReq", "internal", (id) => {
+        sendMsgAllRooms(req.query.room, "+" + id + "\\n");
+        if (roomIdx >= 0)
+          users[roomIdx].push(id);
+        else
+          hidUsers[roomIdx2].push(id);
+      }, req.query.token);
+    }
     res.on("close", () => {
       if (roomIdx >= 0)
         pushEvents[roomIdx].splice(pushEvents[roomIdx].indexOf(res), 1);
       else
         hidEvents[roomIdx2].splice(hidEvents[roomIdx2].indexOf(res), 1);
       res.end();
+      console.log("Removed stream " + req.query.room);
+      (0, import_accessControl.validate)("", "", "userReq", "internal", (id) => {
+        if (roomIdx >= 0) {
+          let idx = users[roomIdx].indexOf(id);
+          if (idx >= 0)
+            users[roomIdx].splice(idx, 1);
+        } else {
+          let idx = hidUsers[roomIdx2].indexOf(id);
+          if (idx >= 0)
+            hidUsers[roomIdx2].splice(idx, 1);
+        }
+        sendMsgAllRooms(req.query.room, "-" + id + "\\n");
+      }, req.query.token);
     });
   });
   app.get("/testevents", (req, res) => {
@@ -163,6 +228,12 @@ async function updateServer() {
   app.get("/contact", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "contact.html"));
   });
+  app.get("/screwit", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "bothered.html"));
+  });
+  app.get("/screwit.js", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "bothered.js"));
+  });
   app.get("*.js.map", (req, res) => {
     res.end();
   });
@@ -189,8 +260,12 @@ function sendMsgAllRooms(room, msg) {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   hidEvents,
+  hidUserEvents,
+  hidUsers,
   pushEvents,
+  pushUserEvents,
   sendMsgAllRooms,
-  updateServer
+  updateServer,
+  users
 });
 //# sourceMappingURL=server.js.map

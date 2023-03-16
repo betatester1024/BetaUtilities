@@ -18,13 +18,15 @@ let leetlentCt= 1;
 let wordleCt = 1;
 let STARTTIME = Date.now();
 import {sysRooms} from './initialiser';
-import {pushEvents} from './server';
+import {pushEvents, pushUserEvents, users} from './server';
 // export let rooms:string[] = [];
 export function updateActive(roomID:string, activeQ:boolean) {
   let idx = sysRooms.indexOf(roomID)
   if (idx<0 && activeQ) {
     sysRooms.push(roomID);
     pushEvents.push([]);
+    pushUserEvents.push([]);
+    users.push([]);
   }
   else if (idx>=0 && !activeQ) sysRooms.splice(idx, 1); // remove at idx. (supposedly.)
 }

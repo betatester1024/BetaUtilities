@@ -33,7 +33,7 @@ body {
   position: relative;
   top: 0vh;
   animation-duration: 0.2s;
-  width: 95vw;
+  width: 99vw;
   opacity: 1;
   overflow-y:auto;
   overflow-x:hidden;
@@ -55,9 +55,9 @@ button, select, #loginDIV {
   width: 89vw;
   min-height: 2.5em;
   padding: 20px;
-  padding-left: 0px;
-  padding-right: 0px;
-  padding-bottom: 15px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 5px;
 /*   margin: 0px; */
   border: none;
   border-radius: 15px;

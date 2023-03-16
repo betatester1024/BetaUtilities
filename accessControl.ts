@@ -1,6 +1,7 @@
+
 import { WS } from "./wsHandler";
 var escape = require('escape-html');
-import {webHandlers, sysRooms} from './initialiser';
+import {webHandlers, sysRooms, hidRooms} from './initialiser';
 // import { hashSync, compareSync} from 
 var bcrypt = require("bcrypt");
 const linkifyHtml = require("linkify-html");
@@ -10,7 +11,7 @@ import {systemLog} from './misc';
 import {replacements} from './replacements'
 const fs = require("fs");
 const EXPIRY = 1000*60*60*24;
-import { sendMsgAllRooms } from "./server";
+import { sendMsgAllRooms, users, hidUsers} from "./server";
 import {database} from './database';
   const DB = database.collection('SystemAUTH');
   const DB2 = database.collection('SupportMessaging');
@@ -48,6 +49,29 @@ export function validate(user:string, pwd:string, action:string, access:string, 
     sendMsgAllRooms(access, format({permLevel:3, data:user, sender:"BetaOS_System"}));
     return;
   }
+  if (action == "whois") {
+    // console.log(user);
+    DB.find({fieldName:"UserData", user:{$eq:user}}).toArray().then((obj:{alias:string}[])=>{
+      // callback.end(JSON.stringify(obj?obj.user:"[None found]"));
+      // console.log(obj, user)
+      let out = "";
+      if (obj)
+      for (let i=0; i<obj.length; i++) {
+        out += obj[i].alias?obj[i].alias:obj[i].user;
+      }
+      sendMessage("[WHOIS SERVICE]", "Aliases for "+user+": "+(out?out:"[NONE FOUND]"), access, 3);
+    })
+    DB.find({fieldName:"UserData", alias:{$eq:user}}).toArray().then((obj:{user:string, permLevel:string}[])=>{
+      // callback.end(JSON.stringify(obj?obj.user:"[None found]"));
+      let out = "";
+      if (obj)
+      for (let i=0; i<obj.length; i++) {
+        out += obj[i].user+(obj[i].permLevel>2?"[Super-admin]":(obj[i].permLevel==2?"[Admin]":"[User]"));
+      }
+      sendMessage("[WHOIS SERVICE]", "BetaOS3 System Account for alias "+user+": "+(out?out:"[NONE FOUND]"), access, 3);
+    })
+    return;
+  }
    // data validation complete
   if (action=="logout") {
     systemLog("Logging out "+token)
@@ -68,22 +92,45 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       action == "acquireTodo" ||todoMatch || 
       todoMatch2 || action == "addTODO" ||
      action == "newRoom" || todoMatch3 || 
-      action == "delRoom") {
+      action == "delRoom" || action == "whois" ||
+     action == "refresh_users") {
     DB.findOne({fieldName: "TOKEN", token:{$eq:token}}).then(
     (obj:{associatedUser:string, expiry:number})=>{
-      if (obj == null) {
+      if (action == "refresh") {
+        let startime = Date.now();
+        DB2.find({fieldName:"MSG", room:{$eq:access}}).toArray().then((objs:{sender:string, data:string, permLevel:number}[])=>{
+          let out = "";
+          for (let i=0; i<objs.length; i++) {
+            out += format(objs[i]);
+          }
+          callback.end(JSON.stringify(out));
+        });
+        return;
+      } // fiiine. you can have your refreshy.
+      if (action == "refresh_users") {
+        let roomIdx = sysRooms.indexOf("OnlineSUPPORT|"+access);
+        let roomIdx2 = hidRooms.indexOf("HIDDEN|"+access);
+        if (roomIdx >= 0) callback.end(JSON.stringify(users[roomIdx]));
+        else if (roomIdx2 >= 0) callback.end(JSON.stringify(hidUsers[roomIdx2]));
+        else callback.end(JSON.stringify("ERROR"));
+          return;
+      } // fiiine. you can have your refreshy.
+      
+      if (obj == null && action != "sendMsg") {
         systemLog("No active session");
         if (action == "checkAccess" || action == "checkAccess_A") {
           callback.sendFile(path.join( __dirname, '../frontend', '403.html' ));
         }
+        else if (access == "internal" && action == "userReq") callback("ANON|ID"+token%10000)
         else callback.end(JSON.stringify("NOACTIVE"));
         return;
       }
-      let expiryTime = obj.expiry;
-      let tokenUser = obj.associatedUser;
+      let expiryTime = obj?obj.expiry:9e99;
+      let tokenUser = obj?obj.associatedUser:"";
       if (action != "refresh" && action != "refresh_log"
          && action != "sendMsg" && action != "checkAccess_A" &&
-         action != "userReq" && action !="checkAccess") systemLog("Logged in as "+tokenUser+" | Expiring in: "+(expiryTime-Date.now()) + " ms");
+         action != "userReq" && action !="checkAccess" && action != "whois"
+        ) systemLog("Logged in as "+tokenUser+" | Expiring in: "+(expiryTime-Date.now()) + " ms");
       if (expiryTime<Date.now()) {
         systemLog("Token expired. Logged out user.")
         DB.deleteOne({fieldName:"TOKEN", token:{$eq:token}});
@@ -93,16 +140,16 @@ export function validate(user:string, pwd:string, action:string, access:string, 
         return;
       }
       
-      DB.findOne({fieldName:"UserData", user:obj.associatedUser}).then(
+      DB.findOne({fieldName:"UserData", user:tokenUser}).then(
       (obj2:{permLevel:number, alias:string|null, todo:string[]})=>{
-        if (!obj2) {callback.end(JSON.stringify("ERROR")); return;}
-        let perms = obj2.permLevel;
+        if (!obj2 && action != "sendMsg") {callback.end(JSON.stringify("ERROR")); return;}
+        let perms = obj2?obj2.permLevel:0;
         if (action == "renick" && perms >= 1)
         {
           if (obj.associatedUser != "betatester1024" && 
               obj.associatedUser != "betaos" && 
               (user.toLowerCase() == "betaos" || 
-               user.toLowerCase() == "betatester1024")) 
+               user.toLowerCase() == "betatester1024") || !user.match("^[a-zA-Z_0-9]+$")) 
           {
             callback.end(JSON.stringify("ERROR"))
             return;
@@ -147,7 +194,8 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           return;
         }
         if (action == "userReq") {
-          callback.end(JSON.stringify(obj.associatedUser+" "+obj2.permLevel));
+          if (access == "internal") callback(obj.associatedUser)
+          else callback.end(JSON.stringify(obj.associatedUser+" "+obj2.permLevel));
           return;
         }
         if (action=="add" || action == "delete") {
@@ -227,58 +275,20 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           callback.sendFile(path.join( __dirname, '../frontend', 'sysLog.html' ));
           return;
         }
-        else if (action == "sendMsg" && perms >= 1) {
+        else if (action == "sendMsg") {
           // console.log("sending message in room"+access);
-          const snd = obj2.alias?obj2.alias:obj.associatedUser;
-          DB2.insertOne({
-            fieldName: "MSG", 
-            sender:snd, 
-            data:user, 
-            room: access,
-            permLevel:perms, 
-            expiry:Date.now()+EXPIRY})
+          const snd = obj2?(obj2.alias?obj2.alias:obj.associatedUser):"ANON|ID"+token%10000;
+          sendMessage(snd, user, access, perms);
+          let match6 = user.match("^!whois @([0-9a-zA-Z_]+)");
+          // console.log(match6);
+          if (match6) validate(match6[1], pwd, "whois", access, callback, token);
           callback.end(JSON.stringify("SUCCESS"));
-          // console.log("Sending message:"+user);
-          sendMsgAllRooms(access, format({permLevel:perms, data:user, sender:snd}));
-          let handler = findHandler("OnlineSUPPORT|"+access);
-          if (handler) {
-            handler.onMessage(user, snd);
-            // console.log("Message received?")
-          }
-          
-          else {
-            handler = findHandler("HIDDEN|"+access);
-            if (handler) {
-              handler.onMessage(user, snd);
-            }
-            else console.log("ROOMINVALID")
-          }
+
           
           return;
         }
         
-        else if (action == "refresh" && perms >= 1) {
-          
-          // let cursor = DB2.find({fieldName:"MSG"});
-          // console.log(access);
-          DB2.find({fieldName:"MSG", room:{$eq:access}}).toArray().then((objs:{sender:string, data:string, permLevel:number}[])=>{
-            let out = "";
-            // console.log(objs)
-            for (let i=0; i<objs.length; i++) {
-              out += format(objs[i]);
-            }
-            callback.end(JSON.stringify(out));
-          });
-          DB2.find({fieldName:"MSG", room:{$eq:access}}).toArray().then((objs:{sender:string, data:string, permLevel:number}[])=>{
-            let out = "";
-            // console.log(objs)
-            for (let i=0; i<objs.length; i++) {
-              out += format(objs[i]);
-            }
-            callback.end(JSON.stringify(out));
-          });
-          return;
-        }
+        
         else if (action == "refresh_log" && perms >=2 ) {
           DB3.findOne({fieldName:"SYSTEMLOG"}).then((obj:{data:string})=> {
             callback.end(JSON.stringify(obj.data.replaceAll("\n","<br>")));
@@ -336,7 +346,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
     });
    return; 
   }
-  if (action=="signup") {
+  if (action=="signup" && user.match("^[0-9a-zA-Z_]+$")) {
     DB.findOne({fieldName:"UserData", user:user}).then((obj:any)=>{
       if (obj != null) {
         systemLog(user+" was already registered")
@@ -363,7 +373,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
     return;    
   }
   // check password permissions
-  DB.findOne({fieldName:"UserData", user:user}).then(
+  DB.findOne({fieldName:"UserData", user:{$eq:user}}).then(
     (obj:{passHash:string, permLevel:number})=>{
     // systemLog("Logged password hash:" + value)
     if (obj && bcrypt.compareSync(pwd, obj.passHash)) {// pwd validated. 
@@ -467,4 +477,29 @@ function findHandler(name:string)
     if (webHandlers[i].roomName == name) return webHandlers[i];
   }
   return null;
+}
+
+function sendMessage(snd:string, user:string, access:string, perms:number) {
+  DB2.insertOne({
+    fieldName: "MSG", 
+    sender:snd, 
+    data:user, 
+    room: access,
+    permLevel:perms?perms:0, 
+    expiry:Date.now()+EXPIRY})
+  
+  // console.log("Sending message:"+user);
+  sendMsgAllRooms(access, format({permLevel:perms, data:user, sender:snd}));
+  let handler = findHandler("OnlineSUPPORT|"+access);
+  if (handler) {
+    handler.onMessage(user, snd);
+    // console.log("Message received?")
+  }
+  else {
+    handler = findHandler("HIDDEN|"+access);
+    if (handler) {
+      handler.onMessage(user, snd);
+    }
+    else console.log("ROOMINVALID")
+  }
 }

@@ -6,7 +6,7 @@ import { updateActive } from './messageHandle';
 import { initUsers} from './updateuser';
 import {WebH} from './webHandler';
 import { DB } from './database';
-import {pushEvents, hidEvents} from './server';
+import {pushEvents, hidEvents, pushUserEvents, hidUserEvents, users, hidUsers} from './server';
 import {DBGarbageCollect} from './accessControl'
 let rooms = ["xkcd", "test", "bots", "ai", "room", "srs", "memes", "music"];
 let nicks = ["BetaUtilities", "BetaUtilities_TEST", 
@@ -36,6 +36,8 @@ export function init() {
     for (let j=0; j<obj.hidRooms.length; j++) {
       hidRooms.push("HIDDEN|"+obj.hidRooms[j])
       hidEvents.push([]);
+      hidUserEvents.push([]);
+      hidUsers.push([])
       // console.log("thing")
       webHandlers[i+j] = new WebH(obj.hidRooms[j], true);
     }

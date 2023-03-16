@@ -15,6 +15,10 @@ var RateLimit = require('express-rate-limit');
 
 export let pushEvents: any[][] = [];
 export let hidEvents: any[][] = [];
+export let pushUserEvents: any[][] = [];
+export let hidUserEvents: any[][] = [];
+export let users: any[][] = [];
+export let hidUsers: any[][] = [];
 // import {pushEvents} from './initialiser';
 // 
 
@@ -76,6 +80,38 @@ export async function updateServer() {
    
   });
 
+  app.get("/users?*", async (req:any, res:any) => {
+    res.set({
+      'Cache-Control': 'no-cache',
+      'Content-Type': 'text/event-stream',
+      'Connection': 'keep-alive'
+    });
+    res.flushHeaders();
+
+    // Tell the client to retry every 10 seconds if connectivity is lost
+    
+    res.write("retry:500\n\n");
+    // console.log(req.query.room)
+    
+    let roomIdx = sysRooms.indexOf("OnlineSUPPORT|"+req.query.room);
+    let roomIdx2 = hidRooms.indexOf("HIDDEN|"+req.query.room);
+    // console.log(roomIdx2);
+    if (roomIdx < 0 && roomIdx2 < 0) {
+      res.end();
+      console.log("Invalid room: "+req.query.room);
+      return;
+    }
+    // console.log(roomIdx);
+    if (roomIdx >= 0) pushUserEvents[roomIdx].push(res);
+    else hidUserEvents[roomIdx2].push(res);
+    res.on("close", () => {
+      if (roomIdx >= 0) pushUserEvents[roomIdx].splice(pushUserEvents[roomIdx].indexOf(res), 1);
+      else hidUserEvents[roomIdx2].splice(hidUserEvents[roomIdx2].indexOf(res), 1);
+      res.end();
+      // console.log("Removed stream");
+    });
+  });
+
   app.get("/stream?*", async (req:any, res:any) => {
     res.set({
       'Cache-Control': 'no-cache',
@@ -98,13 +134,42 @@ export async function updateServer() {
       return;
     }
     // console.log(roomIdx);
-    if (roomIdx >= 0) pushEvents[roomIdx].push(res);
-    else hidEvents[roomIdx2].push(res);
+    if (roomIdx >= 0) {
+      pushEvents[roomIdx].push(res);
+      pushUserEvents[roomIdx].push(res);
+      
+      // console.log("User joined stream "+req.query.room)
+      validate("", "", "userReq", "internal", (id:string)=>{
+        sendMsgAllRooms(req.query.room, "+"+id+"\\n")
+        if (roomIdx >= 0) users[roomIdx].push(id);
+        else hidUsers[roomIdx2].push(id);
+      }, req.query.token);
+    }
+    else {
+      hidEvents[roomIdx2].push(res);
+      hidUserEvents[roomIdx].push(res);
+      console.log("User joined stream "+req.query.room)
+      validate("", "", "userReq", "internal", (id:string)=>{
+        sendMsgAllRooms(req.query.room, "+"+id+"\\n")
+        if (roomIdx >= 0) users[roomIdx].push(id);
+        else hidUsers[roomIdx2].push(id);
+      }, req.query.token);
+    }
     res.on("close", () => {
       if (roomIdx >= 0) pushEvents[roomIdx].splice(pushEvents[roomIdx].indexOf(res), 1);
       else hidEvents[roomIdx2].splice(hidEvents[roomIdx2].indexOf(res), 1);
       res.end();
-      // console.log("Removed stream");
+      console.log("Removed stream "+req.query.room);
+      validate("", "", "userReq", "internal", (id:string)=>{
+        if (roomIdx >= 0) {
+          let idx = users[roomIdx].indexOf(id);
+          if (idx >= 0) users[roomIdx].splice(idx, 1);
+        } else {
+          let idx = hidUsers[roomIdx2].indexOf(id);
+          if (idx >= 0) hidUsers[roomIdx2].splice(idx, 1);
+        }
+        sendMsgAllRooms(req.query.room, "-"+id+"\\n")
+      }, req.query.token);
     });
   });
 

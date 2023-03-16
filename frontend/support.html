@@ -8,11 +8,12 @@
     <script>
       function onLoad() {
         validateLogin("refresh", "");
+        validateLogin("refresh_users", "");
         // setInterval(()=>{validateLogin("refresh", "")}, 2500);
         document.getElementById("alert").hidden=true;
         document.getElementById("h1").hidden=true;
         // console.log(document.cookie);
-        let match = document.cookie.match("__Secure-user=([0-9a-zA-Z_]+)");
+        let match = document.cookie.match("__Secure-user=(.+)");
         // console.log(match[1]);
         if (match) CURRUSER = match[1];
         match = document.cookie.match("__Secure-perms=([0-9]+)");
@@ -29,14 +30,31 @@
         try {
         console.log("Starting client.")
         const source = new EventSource('/stream?room='+
-                                       document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1]);
-
+                                       document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1]+
+                                       "&token="+sessionID);
         source.addEventListener('message', message => {
-          // console.log('Got', message);
-
+          console.log('Got', message);
+          ele = document.getElementById("users");
+          let modif = message.data;
+          let removed = modif.match("^\\-(.+)\\\\n");
+          let added = modif.match("^\\+(.+)\\\\n");
+          while (removed || added) {
+            if (removed) {
+              ele.innerHTML= ele.innerHTML.replace(removed[1]+"<br>", "");
+              console.log("removed"+removed[1])
+            }
+            if (added) {
+              ele.innerHTML+= added[1]+"<br>";
+              console.log("added"+added[1]);
+            }
+            modif = modif.replaceAll(/^\-(.+)\\n/gm, "");
+            modif = modif.replaceAll(/^\+(.+)\\n/gm, "");
+            removed = modif.match("^\\-(.+)\\\\n");
+            added = modif.match("^\\+(.+)\\\\n");
+          }
           ele = document.getElementById("msgArea");
           let scrDistOKQ =  (ele.scrollTop) >= (ele.scrollHeight-ele.offsetHeight - 100)
-          document.getElementById("msgArea").innerHTML+=message.data;
+          document.getElementById("msgArea").innerHTML+=modif;
           
           if (!LOADEDQ2 || scrDistOKQ)
           {
@@ -44,12 +62,43 @@
             // console.log("Scrolling to bottom.")
             LOADEDQ2 = true;
           }
+
+          
         });
         } catch (e) {
           console.log("Restartng client ("+e+")")
           setTimeout(initClient, 0);
         }
       } // initClient();
+      
+      // async function initClient2()
+      // {
+        
+      //   try {
+      //   console.log("Starting userlist-watcher.")
+      //   // const source = new EventSource('/users?room='+
+      //                                  // document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1]);
+
+      //   source.addEventListener('message', message => {
+      //     // console.log('Got', message);
+
+      //     ele = document.getElementById("users");
+      //     let modif = message.data;
+      //     let removed = modif.match("-(.)");
+      //     let added = modif.match("-(.)");
+      //     if (removed) {
+      //       ele.innerHTML= ele.innerHTML.replace(removed[1]+"<br>", "");
+      //     }
+      //     if (added) {
+      //       ele.innerHTML+= added[1]+"<br>";
+      //     }
+          
+      //   });
+      //   } catch (e) {
+      //     console.log("Restarting userlist-watcher ("+e+")")
+      //     setTimeout(initClient2, 0);
+      //   }
+      // } // initClient();
       
     </script>
     <link rel="stylesheet" href="/globalformat.css">
@@ -60,6 +109,9 @@
     <style>
       h1 {
         font-size: 3.7em;
+      }
+      hr.rounded {
+        width: 97vw;
       }
       input {
         height: 1.8em;
@@ -93,6 +145,9 @@
         right: 0px;
         display: inline-block;
       }
+      #mainDiv {
+        white-space: nowrap;
+      }
       span {
         font-size: 1.4em !important;
         position: relative;
@@ -100,14 +155,18 @@
       }
       #textDiv {
         display: inline-block;
-        width: 80vw;
+        width: 85vw;
       }
       #msgArea {
         overflow-y: scroll;
         height: 70vh;
-        margin-left: 5%;
         text-align: left;
         overflow-x: clip;
+        width: 79vw;
+        position: relative;
+        left: 0vw;
+        margin-left: 0px;
+        display: inline-block;
       }
       b {
         color: #000;
@@ -155,6 +214,17 @@
       .HOME {
         width: 45vw;
       }
+      #users {
+        font-family: NotoSansDisplay;
+        color: #0a84ff;
+        text-align: left;
+        width: 15vw;
+        position: relative;
+        height: 70vh;
+/*         top: 0vw; */
+        display: inline-block;
+        vertical-align: top;
+      }
     </style>
   </head>
   
@@ -167,6 +237,7 @@
         <b>Retrieving your messages...</b>
         <hr class="btnHr"></hr>
       </div>
+      <div id="users">Active users:</div>
       <div>
         <form action="javascript:sendMsg()">
           <div id="textDiv" >

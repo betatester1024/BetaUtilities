@@ -1,6 +1,7 @@
+
 import { WS } from "./wsHandler";
 var escape = require('escape-html');
-import {webHandlers, sysRooms} from './initialiser';
+import {webHandlers, sysRooms, hidRooms} from './initialiser';
 // import { hashSync, compareSync} from 
 var bcrypt = require("bcrypt");
 const linkifyHtml = require("linkify-html");
@@ -10,7 +11,7 @@ import {systemLog} from './misc';
 import {replacements} from './replacements'
 const fs = require("fs");
 const EXPIRY = 1000*60*60*24;
-import { sendMsgAllRooms } from "./server";
+import { sendMsgAllRooms, users, hidUsers} from "./server";
 import {database} from './database';
   const DB = database.collection('SystemAUTH');
   const DB2 = database.collection('SupportMessaging');
@@ -67,7 +68,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       for (let i=0; i<obj.length; i++) {
         out += obj[i].user+(obj[i].permLevel>2?"[Super-admin]":(obj[i].permLevel==2?"[Admin]":"[User]"));
       }
-      sendMessage("[WHOIS SERVICE]", "BetaOS System Account for alias "+user+": "+(out?out:"[NONE FOUND]"), access, 3);
+      sendMessage("[WHOIS SERVICE]", "BetaOS3 System Account for alias "+user+": "+(out?out:"[NONE FOUND]"), access, 3);
     })
     return;
   }
@@ -91,29 +92,27 @@ export function validate(user:string, pwd:string, action:string, access:string, 
       action == "acquireTodo" ||todoMatch || 
       todoMatch2 || action == "addTODO" ||
      action == "newRoom" || todoMatch3 || 
-      action == "delRoom" || action == "whois") {
+      action == "delRoom" || action == "whois" ||
+     action == "refresh_users") {
     DB.findOne({fieldName: "TOKEN", token:{$eq:token}}).then(
     (obj:{associatedUser:string, expiry:number})=>{
       if (action == "refresh") {
-          
-          // let cursor = DB2.find({fieldName:"MSG"});
-          // console.log(access);
-          DB2.find({fieldName:"MSG", room:{$eq:access}}).toArray().then((objs:{sender:string, data:string, permLevel:number}[])=>{
-            let out = "";
-            // console.log(objs)
-            for (let i=0; i<objs.length; i++) {
-              out += format(objs[i]);
-            }
-            callback.end(JSON.stringify(out));
-          });
-          DB2.find({fieldName:"MSG", room:{$eq:access}}).toArray().then((objs:{sender:string, data:string, permLevel:number}[])=>{
-            let out = "";
-            // console.log(objs)
-            for (let i=0; i<objs.length; i++) {
-              out += format(objs[i]);
-            }
-            callback.end(JSON.stringify(out));
-          });
+        let startime = Date.now();
+        DB2.find({fieldName:"MSG", room:{$eq:access}}).toArray().then((objs:{sender:string, data:string, permLevel:number}[])=>{
+          let out = "";
+          for (let i=0; i<objs.length; i++) {
+            out += format(objs[i]);
+          }
+          callback.end(JSON.stringify(out));
+        });
+        return;
+      } // fiiine. you can have your refreshy.
+      if (action == "refresh_users") {
+        let roomIdx = sysRooms.indexOf("OnlineSUPPORT|"+access);
+        let roomIdx2 = hidRooms.indexOf("HIDDEN|"+access);
+        if (roomIdx >= 0) callback.end(JSON.stringify(users[roomIdx]));
+        else if (roomIdx2 >= 0) callback.end(JSON.stringify(hidUsers[roomIdx2]));
+        else callback.end(JSON.stringify("ERROR"));
           return;
       } // fiiine. you can have your refreshy.
       
@@ -122,6 +121,7 @@ export function validate(user:string, pwd:string, action:string, access:string, 
         if (action == "checkAccess" || action == "checkAccess_A") {
           callback.sendFile(path.join( __dirname, '../frontend', '403.html' ));
         }
+        else if (access == "internal" && action == "userReq") callback("ANON|"+token%1000)
         else callback.end(JSON.stringify("NOACTIVE"));
         return;
       }
@@ -194,7 +194,8 @@ export function validate(user:string, pwd:string, action:string, access:string, 
           return;
         }
         if (action == "userReq") {
-          callback.end(JSON.stringify(obj.associatedUser+" "+obj2.permLevel));
+          if (access == "internal") callback(obj.associatedUser)
+          else callback.end(JSON.stringify(obj.associatedUser+" "+obj2.permLevel));
           return;
         }
         if (action=="add" || action == "delete") {

@@ -79,7 +79,7 @@ function validateLogin(action: string = "login", extData: string) {
     } 
   }
   
-  if (action == "refresh") extData =document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
+  if (action == "refresh" || action == "refresh_users") extData =document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1];
   if ((action != "login" && action != "add" && action != "signup") || (user.value.match("^[a-zA-Z0-9_]+$") && pass.value.length !== 0)) {
     if (confirm && (action == "add" || action == "signup") && confirm.value != pass.value) {
       // console.log("Nomatch");
@@ -256,21 +256,34 @@ function validateLogin(action: string = "login", extData: string) {
             if (CURRACCNAME == res) validateLogin("logout", "");
             return;
           }
-          if (action == "refresh" || action== "refresh_log") {
+          if (action == "refresh" || action== "refresh_log" || action == "refresh_users") {
             if (res == "ACCESS" || res == "EXPIRE" || res == "NOACTIVE" || res == "ERROR") {
               location.reload();
             }
             ele = document.getElementById("msgArea") as HTMLDivElement;
+            if (action == "refresh_users") {
+              ele = document.getElementById("users") as HTMLDivElement;
+              ele.innerHTML = "Active users: <br>" + (res as unknown as string[]).join("<br>")+"<br>";
+              return;
+            }
             if (action == "refresh_log") ele = ele as HTMLTextAreaElement;
             // console.log(ele.scrollTop - ele.scrollHeight)
             let scrDistOKQ =     Math.abs(ele.scrollTop - ele.scrollHeight) < 1000;
-            if (action == "refresh") res += `
-            <br><p class="beta"><i class="beta">Welcome to BetaOS Services support! Enter any message
+            if (action == "refresh" && document.cookie.match("__Secure-session=([0-9.]+)")) res += `
+            <p class="beta"><i class="beta">Welcome to BetaOS Services support! Enter any message
             in the box below. Automated response services and utilities are provided
             by BetaOS System. Activate it using the commands <a class="beta" href="/commands?nick=BetaOS_System" target="blank">here</a>.
             Enter </i><kbd class="beta">!renick @[NEWNICK]</kbd><i class="beta"> to rename yourself in all support rooms. This is linked to your account.
+            <br> Enter </i><kbd class="beta">!whois @[USER]</kbd><i class="beta"> to enquire about
+            the identity of any user, online or not.
             <br>Thank you for using BetaOS Systems!</i></p><br>
             `
+            else if (action == "refresh") res += `
+            <p class="beta"><i class="beta">Welcome to BetaOS Services support! Enter any message
+            in the box below. Automated response services and utilities are provided
+            by BetaOS System. Activate it using the commands <a class="beta" href="/commands?nick=BetaOS_System" target="blank">here</a>.
+            <b style="color: #ee0000">You are not logged in! Some functionality restricted, e.g. re-aliasing yourself.</b>
+            <br>Thank you for using BetaOS Systems!</i></p><br>`;
             updateTextArea(res, action == "refresh_log");
             
             if (!LOADEDQ || extData == "send" || scrDistOKQ)
@@ -360,7 +373,7 @@ function validateLogin(action: string = "login", extData: string) {
       }
     }
     xhr.send(params);
-    if (action != 'sendMsg' && action != "refresh" && action != "refreshLog") {
+    if (action != 'sendMsg' && action != "refresh" && action != "refreshLog" && action != 'refresh_users') {
       let ele = document.getElementById('overlay');
       if (ele) ele.className += "active";
       ele = document.getElementById('h1');

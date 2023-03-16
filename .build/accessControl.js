@@ -79,7 +79,7 @@ function validate(user, pwd, action, access, callback, token = "") {
         for (let i = 0; i < obj3.length; i++) {
           out += obj3[i].user + (obj3[i].permLevel > 2 ? "[Super-admin]" : obj3[i].permLevel == 2 ? "[Admin]" : "[User]");
         }
-      sendMessage("[WHOIS SERVICE]", "BetaOS System Account for alias " + user + ": " + (out ? out : "[NONE FOUND]"), access, 3);
+      sendMessage("[WHOIS SERVICE]", "BetaOS3 System Account for alias " + user + ": " + (out ? out : "[NONE FOUND]"), access, 3);
     });
     return;
   }
@@ -92,17 +92,11 @@ function validate(user, pwd, action, access, callback, token = "") {
   let todoMatch = action.match("updateTODO([0-9]+)");
   let todoMatch2 = action.match("completeTODO([0-9]+)");
   let todoMatch3 = action.match("deleteTODO([0-9]+)");
-  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log" || action == "userReq" || action == "renick" || action == "delete" || action == "acquireTodo" || todoMatch || todoMatch2 || action == "addTODO" || action == "newRoom" || todoMatch3 || action == "delRoom" || action == "whois") {
+  if (action == "add" || action == "CMD" || action == "checkAccess" || action == "sendMsg" || action == "refresh" || action == "checkAccess_A" || action == "refresh_log" || action == "userReq" || action == "renick" || action == "delete" || action == "acquireTodo" || todoMatch || todoMatch2 || action == "addTODO" || action == "newRoom" || todoMatch3 || action == "delRoom" || action == "whois" || action == "refresh_users") {
     DB.findOne({ fieldName: "TOKEN", token: { $eq: token } }).then(
       (obj) => {
         if (action == "refresh") {
-          DB2.find({ fieldName: "MSG", room: { $eq: access } }).toArray().then((objs) => {
-            let out = "";
-            for (let i = 0; i < objs.length; i++) {
-              out += format(objs[i]);
-            }
-            callback.end(JSON.stringify(out));
-          });
+          let startime = Date.now();
           DB2.find({ fieldName: "MSG", room: { $eq: access } }).toArray().then((objs) => {
             let out = "";
             for (let i = 0; i < objs.length; i++) {
@@ -112,11 +106,24 @@ function validate(user, pwd, action, access, callback, token = "") {
           });
           return;
         }
+        if (action == "refresh_users") {
+          let roomIdx = import_initialiser.sysRooms.indexOf("OnlineSUPPORT|" + access);
+          let roomIdx2 = import_initialiser.hidRooms.indexOf("HIDDEN|" + access);
+          if (roomIdx >= 0)
+            callback.end(JSON.stringify(import_server.users[roomIdx]));
+          else if (roomIdx2 >= 0)
+            callback.end(JSON.stringify(import_server.hidUsers[roomIdx2]));
+          else
+            callback.end(JSON.stringify("ERROR"));
+          return;
+        }
         if (obj == null && action != "sendMsg") {
           (0, import_misc.systemLog)("No active session");
           if (action == "checkAccess" || action == "checkAccess_A") {
             callback.sendFile(path.join(__dirname, "../frontend", "403.html"));
-          } else
+          } else if (access == "internal" && action == "userReq")
+            callback("ANON|" + token % 1e3);
+          else
             callback.end(JSON.stringify("NOACTIVE"));
           return;
         }
@@ -184,7 +191,10 @@ function validate(user, pwd, action, access, callback, token = "") {
               return;
             }
             if (action == "userReq") {
-              callback.end(JSON.stringify(obj.associatedUser + " " + obj2.permLevel));
+              if (access == "internal")
+                callback(obj.associatedUser);
+              else
+                callback.end(JSON.stringify(obj.associatedUser + " " + obj2.permLevel));
               return;
             }
             if (action == "add" || action == "delete") {

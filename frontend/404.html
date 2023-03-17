@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Page not found</title>
+    <script> 
+    let t=-1;
+    function onLoad() {
+      t = setTimeout(()=>{window.open('./', '_self')}, 1500);
+      document.addEventListener('keydown', keyDown)
+    }
+    function keyDown(e) {
+      clearTimeout(t)
+    }
+    </script>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      h1 {
+        font-size: 4em;
+      }
+      #mainDiv{
+/*         text-align: center; */
+        display: inline-block;
+        animation-name: mainanim;
+        position: relative;
+        top: -600vh;
+        animation-duration: 2s;
+        width: 90vw;
+      }
+      div#overlay {
+        width: 100vw;
+        z-index: -1;
+        height: 100vh;
+        animation-name: overlayAnim;
+        animation-duration: 3s;
+        position: absolute;
+        top: 0px;
+        left:0px;
+        background-color: #ccc;
+      }
+      @keyframes mainanim {
+        0%   {top:100vh; opacity: 0;}
+        30% {top: 0vh; opacity: 1;}
+        80% {top: 0vh;}
+        100% {top:-600vh; opacity: 1;}
+      }
+     
+    </style>
+  </head>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!--   <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap">  -->
+  <body onload = "onLoad()">
+    <div id = "mainDiv">
+      <h1>Page not found!</h1>
+      <hr class="rounded"></hr>
+      <h1>Redirecting to home-page...</h1>
+    </div>
+    <h1 class="overload">Sorry, this is taking longer than expected. 
+      <br>
+      <a href = './'> Return to home</a>
+    </h1>
+    <div id="overlay"></div>
+  </body>
+ </html>

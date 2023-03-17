@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>404: Room not found!</title>
+    
+    <script src="/login.js"></script>
+    <script> 
+    // function onLoad() {
+    //   document.cookie = "__Secure-session=; Secure;";
+    // }
+    </script>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      p {
+        width: unset;
+      }
+      button.slogin {
+        width: 10em;
+        border-radius: 15px;
+      }
+    </style>
+  </head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
+  <body onload = "onLoad()">
+    <div id = "mainDiv">
+      <h1>Room not found!</h1>
+      <hr class="rounded"></hr>
+      <p style="text-align: center;">Try navigating to the room listing.<br>
+        If servers restarted in the last 5 seconds, try refreshing.
+      </p><br><br>
+      <button class="slogin" onclick="window.open('/support', '_self');">Support room listing<br><hr class="btnHr"></hr></button>
+      <button class="HOME" onclick="window.open('../', '_self');">&#x00AB Return to home<br><hr class="btnHr"></hr></button>
+    </div>
+     <div id="alert" onclick = "clearalert()" onkeydown="clearalert()"><p id="alerttxt" style="width: 90%"></p><button style="position: relative; top: 50vh; height: 4em;"><u>> Continue <</u></button></div>
+    <div id="overlay"></div>
+  </body>
+ </html>

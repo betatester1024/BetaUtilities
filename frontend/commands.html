@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>System commands</title>
+    <meta name="viewport" content="width=device-width">
+    <script src="/login.js">
+    </script>
+    <script>
+      function onLoad() {
+        let ele = document.getElementById("ctntp");
+        ele.innerHTML = document.URL.match("nick=(.*)")?
+          ele.innerHTML.replaceAll(/BetaUtilities/gmui, document.URL.match("nick=(.*)")[1]):
+          ele.innerHTML;
+        ele = document.getElementById("h");
+        ele.innerHTML = document.URL.match("nick=(.*)")?
+          ele.innerHTML.replaceAll(/BetaUtilities/gmui, document.URL.match("nick=(.*)")[1]):
+          ele.innerHTML;
+      }
+    </script>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+<!--     <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap">  -->
+    <style>
+      body {
+        overflow-y: auto;
+      }
+      #content {
+        text-align: left;
+      }
+      p {
+        width: 100%; 
+        font-size: large;
+      }
+      a {
+        font-size: large;
+      }
+      span {
+        font-size: 1.5em !important; 
+        position: relative; 
+        top:0.2em;
+      }
+      button {
+        position: relative;
+        left: auto;
+        margin: 0 auto;
+        width: unset;
+        display: block;
+      }
+      .HOME {
+        width: 80vw;
+      }
+    </style>
+  </head>
+  
+  
+  <body onload = "onLoad();">
+    
+    <div id = "mainDiv">
+      <h1 id="h">@BetaUtilities commands</h1>
+      <hr class="rounded"></hr>
+      <div id="content">
+
+        <p id="ctntp">
+          BetaUtilities is a bot that connects to the online discussion site 
+          <a href="https://euphoria.io">Euphoria</a>'s "rooms". It automatically responds
+          to commands such as <kbd>!help</kbd> and provides a variety of features:<br>
+          (The bot sometimes appears as a different username according to the room 
+          it is currently in.)<br>
+          <kbd>!ping</kbd>/<kbd>!ping @BetaUtilities</kbd> - Checks if BetaUtilities is online. <br>
+          <kbd>!help @BetaUtilities</kbd>/<kbd>!contact @BetaUtilities</kbd> - Displays a telephone-button style menu for accessing 
+          almost all features in the bot. Enter numbers, the english form of the letter or the emoji
+          :short-code: for the choice you would like to make to interact with the menu. Call ends 
+          after around 30 seconds.<br>
+          <kbd>!kill @BetaUtilities</kbd> - Disconnects BetaUtilities from the room. <br>
+          <kbd>!pause @BetaUtilities</kbd> - Deactivates BetaUtilities without disconnecting it from
+          the current room. BetaUtilities will no longer respond to your commands until you run:<br>
+          <kbd>!restore @BetaUtilities</kbd> - Re-activates BetaUtilities. <br>
+          <kbd>!uptime @BetaUtilities</kbd> - Displays how long the current instance has been up. <br>
+          <kbd>!wordle</kbd> - Plays wordle with you! BetaUtilities comes with a built-in word-list so
+          you can't just enter sequences of five letters. <br>
+          <kbd>!leetlen't</kbd> - Plays a BetaOS version of <a href="https://leet.nu/leetle">Leetle</a>
+          with you - it works the same as Wordle but you can enter any sequences of 5 alphanumeric
+          characters.<br>
+          <kbd>!unblock [link]</kbd> - Sends your link through a proxy to un-block it for school networks. <br>
+          <kbd>!src @BetaUtilities</kbd> - Sends you a link to the source-code. <br>
+          <kbd>!runStats @BetaUtilities</kbd> - Shows you statistics on how many times BetaUtilities has been run,
+          and how many times it has been @-mentionned. <br>
+          <kbd>!creatorInfo</kbd>,<kbd>!version</kbd> - Pretty self-explanatory. <br>
+          <kbd>!instant</kbd> - Get the <a href="instant.leet.nu">Instant</a> room of the same name.
+          <kbd>!leet</kbd> - See this room in <a href="euphoria.leet.nu">EuphLeet</a>!
+          <kbd>!status @BetaUtilities</kbd> - Sends this site to the room.<br>
+          <kbd>!issue/!bug/!feature/!syslog/!support</kbd> - Sends a link to the respective features on the site.<br>
+          <kbd>!activeRooms @BetaUtilities</kbd> - Shows all the rooms BetaUtilities is active in. <br>
+          <kbd>!enable/disableLogging @BetaUtilities</kbd> - Enables/disables message logging in the room.<br>
+          <kbd>@BetaUtilities !mitoseTo &[ROOM] as @[NAME]</kbd> - Sends BetaUtilities to a new room as another username.<br>
+          <kbd>!rating @BetaUtilities</kbd> - Accesses the current call satisfaction rating for BetaUtilities.
+          You can rate us by using the help-menu.<br>
+          <kbd>!work</kbd>/<kbd>!work @user</kbd>/<kbd>!sleep</kbd>/<kbd>!sleep @user</kbd> - 
+          Screams at you or any user to GO TO SLEEP or GET TO WORK.<br>
+          <kbd>!wake</kbd>/<kbd>!wake @user</kbd>/<kbd>!play</kbd>/<kbd>!play @user</kbd> - 
+          Stops screaming at you or any user. <br>
+          <kbd>!issue</kbd>/<kbd>!bug</kbd>/<kbd>!feature</kbd> - File an issue/bug/feature request 
+          (same <a href="https://github.com/betatester1024/BetaUtilities/issues/new/choose">link</a>)
+          <kbd>!antispam</kbd> - Configures AntiSpam activation. Requires a code entry.<br>
+          <kbd>!remindme of [MSG] in [1d2h3m4s] </kbd> - Reminds you of whatever you want after a specified time. 
+          Pretty lenient with spaces.<br>
+          <kbd>!about @[USER] </kbd> - Retrieves that user's about-message.<br>
+          <kbd>!about set [MSG]</kbd> - Sets your about-message. Introduce yourself!<br>
+          <b>Some features are hidden! <a href="/contact">ask BetaOS</a> about them, or find
+          us in <a href="https://euphoria.io/room/xkcd">&xkcd</a>/<a href="/support?room=main_support">#main_support</a>
+          to ask about the features!</b>
+        </p>
+                
+        <button class="HOME" onclick="window.close();">&#x00AB Close<br><hr class="btnHr"></hr></button>
+      </div>
+    </div>
+<!--     <h1 class="beforeoverload" id="h1">Sorry, this is taking longer than expected.  -->
+<!--       <br> -->
+<!--       <a href = '/'> Return to home</a> -->
+<!--     </h1> -->
+<!--     <div id="alert" onclick = "clearalert()" onkeydown="clearalert()"><p id="alerttxt" style="width: 90%; font-size: 1.8em; color:#0a84ff;"></p><button style="position: relative; top: 50vh; height: 4em;"><u>> Continue <</u></button></div> -->
+<!--     <div id="overlay"></div> -->
+  </body>
+ </html>

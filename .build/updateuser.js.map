@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../updateuser.ts"],
+  "sourcesContent": ["\nvar bcrypt = require(\"bcrypt\");\nimport { database } from \"./database\";\nconst DB = database.collection('SystemAUTH');\nexport function initUsers() {\n  updateUser('betatester1024', process.env['betatester1024'] as string, 3);\n  updateUser(\"user\", \"pass\", 1)\n  // DB.updateOne(\"betatester1024\", bcrypt.hashSync(process.env['betatester1024'] as string, 8));\n  // WS.db.set(\"betatester1024^PERM\", \"3\");\n  // WS.db.set(\"user\", bcrypt.hashSync(\"pass\", 8));\n  // WS.db.set(\"user^PERM\", \"1\");\n}\n\nexport function updateUser(username: string, pwd: string, access: number=1) {\n    DB.updateOne({fieldName:\"UserData\", user: username}, \n    {\n      $set: {\n        permLevel: access,\n        passHash: bcrypt.hashSync(pwd, 8),\n      },\n      $currentDate: { lastModified: true }\n    }, {upsert: true});\n  \n}"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAEA,sBAAyB;AADzB,IAAI,SAAS,QAAQ,QAAQ;AAE7B,MAAM,KAAK,yBAAS,WAAW,YAAY;AACpC,SAAS,YAAY;AAC1B,aAAW,kBAAkB,QAAQ,IAAI,mBAA6B,CAAC;AACvE,aAAW,QAAQ,QAAQ,CAAC;AAK9B;AAEO,SAAS,WAAW,UAAkB,KAAa,SAAe,GAAG;AACxE,KAAG;AAAA,IAAU,EAAC,WAAU,YAAY,MAAM,SAAQ;AAAA,IAClD;AAAA,MACE,MAAM;AAAA,QACJ,WAAW;AAAA,QACX,UAAU,OAAO,SAAS,KAAK,CAAC;AAAA,MAClC;AAAA,MACA,cAAc,EAAE,cAAc,KAAK;AAAA,IACrC;AAAA,IAAG,EAAC,QAAQ,KAAI;AAAA,EAAC;AAErB;",
+  "names": []
+}

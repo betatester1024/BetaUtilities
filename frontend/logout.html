@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Logout</title>
+    
+    <script src="/login.js"></script>
+    <script> 
+    function onLoad() {
+      console.log("Logging user out");
+      setTimeout(()=>{validateLogin("logout")}, 1000);
+    }
+    </script>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+
+    </style>
+  </head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
+  <body onload = "onLoad()">
+    <div id = "mainDiv">
+      <h1>Logging you out now.</h1>
+      <hr class="rounded"></hr>
+      <h1>Awaiting server response...</h1>
+    </div>
+    <h1 class="overload">Sorry, this is taking longer than expected. 
+      <br>
+      <a href = './'> Return to home</a>
+    </h1>
+     <div id="alert" onclick = "clearalert()" onkeydown="clearalert()"><p id="alerttxt" style="width: 90%"></p><button style="position: relative; top: 50vh; height: 4em;"><u>> Continue <</u></button></div>
+    <div id="overlay"></div>
+  </body>
+ </html>

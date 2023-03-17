@@ -1,9 +1,7 @@
-
-# e0e0e0
-compile = "./.config/build2.sh"
-run = "node --enable-source-maps .build/initialiser.js"
-entrypoint = "initialiser.ts"
-# hidden = [".build", ".config"]
+compile = "./.config/build.sh"
+run = "node --enable-source-maps .build/index.js"
+entrypoint = "index.ts"
+hidden = [".build", ".config"]
 
 [packager]
 language = "nodejs"
@@ -29,7 +27,3 @@ pattern = "**/{*.ts,*.js,*.tsx,*.jsx}"
 
 [languages.typescript.languageServer]
 start = "typescript-language-server --stdio"
-
-[auth]
-pageEnabled = false
-buttonEnabled = true

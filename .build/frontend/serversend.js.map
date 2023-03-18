@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../frontend/serversend.ts"],
+  "sourcesContent": ["\nfunction send(params:string, callback:()=>any) {\n  var xhr = new XMLHttpRequest();\n  xhr.open(\"POST\", \"server\", true);\n  xhr.setRequestHeader(\"Content-type\", \"application/x-www-form-urlencoded\");\n  xhr.onreadystatechange = ()=> {\n    if (xhr.readyState == 4 && xhr.status == 200) {\n      callback(JSON.parse(xhr.responseText));\n    }\n  }\n  xhr.send(params);\n}"],
+  "mappings": ";AACA,SAAS,KAAK,QAAe,UAAkB;AAC7C,MAAI,MAAM,IAAI,eAAe;AAC7B,MAAI,KAAK,QAAQ,UAAU,IAAI;AAC/B,MAAI,iBAAiB,gBAAgB,mCAAmC;AACxE,MAAI,qBAAqB,MAAK;AAC5B,QAAI,IAAI,cAAc,KAAK,IAAI,UAAU,KAAK;AAC5C,eAAS,KAAK,MAAM,IAAI,YAAY,CAAC;AAAA,IACvC;AAAA,EACF;AACA,MAAI,KAAK,MAAM;AACjB;",
+  "names": []
+}

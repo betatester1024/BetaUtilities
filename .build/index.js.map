@@ -1,7 +1,7 @@
 {
   "version": 3,
-  "sources": [],
-  "sourcesContent": [],
-  "mappings": "",
+  "sources": ["../index.ts"],
+  "sourcesContent": ["import {initServer} from './server';\ninitServer();"],
+  "mappings": ";AAAA,oBAAyB;AAAA,IACzB,0BAAW;",
   "names": []
 }

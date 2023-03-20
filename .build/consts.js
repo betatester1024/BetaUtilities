@@ -22,6 +22,7 @@ __export(consts_exports, {
 });
 module.exports = __toCommonJS(consts_exports);
 var import_database = require("./database");
+const argon2 = require("argon2");
 const K = {
   rootDir: "/home/runner/BetaUtilitiesV2/",
   frontendDir: "/home/runner/BetaUtilitiesV2/frontend/",
@@ -32,7 +33,15 @@ const K = {
   userMaxLength: 9e99,
   authDB: import_database.database.collection("SystemAUTH_V2"),
   msgDB: import_database.database.collection("SupportMessaging"),
-  uDB: import_database.database.collection("BetaUtilities")
+  uDB: import_database.database.collection("BetaUtilities"),
+  hashingOptions: {
+    type: argon2.argon2d,
+    memoryCost: 12288,
+    timeCost: 3,
+    parallelism: 1,
+    hashLength: 50
+  },
+  expiry: [9e99, 1e3 * 30, 1e3 * 60 * 60 * 24 * 30, 1e3 * 60 * 60]
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

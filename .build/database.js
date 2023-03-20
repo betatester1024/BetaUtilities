@@ -18,18 +18,29 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var database_exports = {};
 __export(database_exports, {
-  DB: () => DB,
+  DBMaintenance: () => DBMaintenance,
   database: () => database
 });
 module.exports = __toCommonJS(database_exports);
+var import_consts = require("./consts");
 const { MongoClient } = require("mongodb");
 const uri = "mongodb://SystemLogin:" + process.env["dbPwd"] + "@ac-rz8jdrl-shard-00-00.d8o7x8n.mongodb.net:27017,ac-rz8jdrl-shard-00-01.d8o7x8n.mongodb.net:27017,ac-rz8jdrl-shard-00-02.d8o7x8n.mongodb.net:27017/?ssl=true&replicaSet=atlas-3yyxq8-shard-0&authSource=admin&retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 const database = client.db("BetaOS-Database01");
-const DB = database.collection("BetaUtilities");
+async function DBMaintenance() {
+  let items = await import_consts.K.authDB.find({ fieldName: "Token" }).toArray();
+  for (let i = 0; i < items.length; i++) {
+    if (!items[i].expiry || items[i].expiry < Date.now()) {
+      console.log("Expired");
+      await import_consts.K.authDB.deleteOne(items[i]);
+    }
+  }
+  ;
+  setTimeout(DBMaintenance, 1e3);
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  DB,
+  DBMaintenance,
   database
 });
 //# sourceMappingURL=database.js.map

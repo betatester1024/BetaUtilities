@@ -67,9 +67,10 @@ async function initServer() {
     var body = await parse.json(req);
     if (!body)
       res.end(JSON.stringify({ status: "ERROR", data: null }));
-    let cookiematch = req.cookies.match("sessionID=[0-9a-zA-Z\\-]");
-    makeRequest(body.action, cookiematch ? cookiematch[1] : "", body.data, (s, d, token) => {
+    console.log(req.cookies.sessionID);
+    makeRequest(body.action, req.cookies.sessionID, body.data, (s, d, token) => {
       res.cookie("sessionID", token, { maxAge: 1e3 * 60 * 60 * 24 * 30, httpOnly: true, secure: true, sameSite: "Strict" });
+      console.log(d);
       res.end(JSON.stringify({ status: s, data: d }));
     });
   });
@@ -90,6 +91,9 @@ function makeRequest(action, token, data, callback) {
     case "signup":
       data = data;
       signup(data.user, data.pass, callback, token);
+      break;
+    case "userRequest":
+      userRequest(callback, token);
       break;
     default:
       callback("ERROR", { error: "Unknown command string!" }, token);
@@ -114,7 +118,9 @@ async function validateLogin(user, pwd, callback, token) {
   } else if (await argon2.verify(usrInfo.pwd, pwd)) {
     let uuid = crypto.randomUUID();
     console.log("Verified in " + (Date.now() - start) + "ms");
-    await import_consts.K.authDB.insertOne({ fieldName: "Token", associatedUser: user, token: uuid });
+    start = Date.now();
+    let userData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user });
+    await import_consts.K.authDB.insertOne({ fieldName: "Token", associatedUser: user, token: uuid, expiry: Date.now() + import_consts.K.expiry[userData.permLevel] });
     callback("SUCCESS", { perms: usrInfo.permLevel }, uuid);
     console.log("Completed in " + (Date.now() - start) + "ms");
     return;
@@ -137,13 +143,23 @@ async function signup(user, pwd, callback, token) {
     callback("ERROR", { error: "User is registered" }, token);
     return;
   } else {
-    let hash = await argon2.hash(pwd);
-    let uuid = crypto.randomUUID();
+    let hash = await argon2.hash(pwd, import_consts.K.hashingOptions);
     await import_consts.K.authDB.insertOne({ fieldName: "UserData", user, pwd: hash, permLevel: 1 });
-    await import_consts.K.authDB.insertOne({ fieldName: "Token", associatedUser: user, token: uuid });
-    callback("SUCCESS", { perms: 1 }, uuid);
+    validateLogin(user, pwd, callback, token);
     return;
   }
+}
+async function userRequest(callback, token) {
+  let userData = await import_consts.K.authDB.findOne({ fieldName: "Token", token });
+  if (!userData) {
+    callback("ERROR", { error: "Your session could not be found!" }, token);
+    return;
+  }
+  if (Date.now() > userData.expiry) {
+    callback("ERROR", { error: "Your session has expired!" }, token);
+    return;
+  }
+  callback("SUCCESS", { user: userData.associatedUser, perms: userData.permLevel }, token);
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

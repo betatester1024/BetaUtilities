@@ -12,8 +12,12 @@ function send(params:any, callback:(thing:any)=>any) {
     }
   }
   xhr.send(params);
+  failureTimeout = setTimeout(()=>alertDialog(`This is taking longer than expected. 
+  <button class='btn szThird fssml' onclick='location.reload()'>Refresh?
+  <div class="anim"></div></button`), 1000);
 }
 
+let failureTimeout;
 let dialogQ = false;
 let cbk: ()=>any = ()=>{};
 function alertDialog(str:string, callback:()=>any) {
@@ -22,14 +26,16 @@ function alertDialog(str:string, callback:()=>any) {
   ele.style.top = "0vh";
   dialogQ = true;
   cbk = callback;
-  p.innerText = str;
+  p.innerHTML = str;
+  if (failureTimeout) clearTimeout(failureTimeout);
+  failureTimeout = null;
 }
 
 function closeAlert() {
   let ele = document.getElementById("overlay") as HTMLDivElement;
   ele.style.top = "100vh";
   dialogQ = false;
-  cbk();
+  if (cbk) cbk();
 }
 
 function keydown() {

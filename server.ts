@@ -57,9 +57,11 @@ export async function initServer() {
     
     var body = await parse.json(req);
     if (!body) res.end(JSON.stringify({status:"ERROR", data:null}));
-    let cookiematch = req.cookies.match("sessionID=[0-9a-zA-Z\\-]");
-    makeRequest(body.action, cookiematch?cookiematch[1]:"", body.data, (s:string, d:any, token:string)=>{
+    console.log(req.cookies.sessionID);
+    // let cookiematch = req.cookies.match("sessionID=[0-9a-zA-Z\\-]");
+    makeRequest(body.action, req.cookies.sessionID, body.data, (s:string, d:any, token:string)=>{
       res.cookie('sessionID', token, { maxAge: 1000*60*60*24*30, httpOnly: true, secure:true, sameSite:"Strict"});
+      console.log(d);
       res.end(JSON.stringify({status:s, data:d}));
     })
   });
@@ -84,12 +86,16 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       data = data as {user:string, pass:string};
       signup(data.user, data.pass, callback, token);
       break;
+    case 'userRequest': 
+      userRequest(callback, token);
+      break;
     default:
       callback("ERROR", {error: "Unknown command string!"}, token);
   }
   return; 
 }
 const argon2 = require('argon2');
+// https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
 
 
 async function validateLogin(user:string, pwd:string, callback:(status:string, data:any, token:string)=>any, token:string) {
@@ -110,7 +116,9 @@ async function validateLogin(user:string, pwd:string, callback:(status:string, d
   else if (await argon2.verify(usrInfo.pwd, pwd)) {
     let uuid = crypto.randomUUID() // gen new token
     console.log("Verified in "+(Date.now() - start)+"ms");
-    await K.authDB.insertOne({fieldName:"Token", associatedUser:user, token:uuid})
+    start = Date.now();
+    let userData:{permLevel:number} = await K.authDB.findOne({fieldName:"UserData", user:user});
+    await K.authDB.insertOne({fieldName:"Token", associatedUser:user, token:uuid, expiry: Date.now()+K.expiry[userData.permLevel]})
     callback("SUCCESS", {perms: usrInfo.permLevel}, uuid);
     console.log("Completed in "+(Date.now() - start)+"ms");
     return;
@@ -135,12 +143,22 @@ async function signup(user:string, pwd:string, callback:(status:string, data:any
     return;
   }
   else {
-    let hash = await argon2.hash(pwd); 
-    let uuid = crypto.randomUUID() // gen new token
+    let hash = await argon2.hash(pwd, K.hashingOptions); 
     await K.authDB.insertOne({fieldName:"UserData", user:user, pwd:hash, permLevel: 1});
-    await K.authDB.insertOne({fieldName:"Token", associatedUser:user, token:uuid})
-   
-    callback("SUCCESS", {perms: 1}, uuid);
+    validateLogin(user, pwd, callback, token);
     return;
   }
+}
+
+async function userRequest(callback:(status:string, data:any, token:string)=>any, token:string) {
+  let userData:{associatedUser:string, expiry:number, permLevel:string} = await K.authDB.findOne({fieldName:"Token", token:token});
+  if (!userData) {
+    callback("ERROR", {error:"Your session could not be found!"}, token)
+    return;
+  }
+  if (Date.now() > userData.expiry) {
+    callback("ERROR", {error:"Your session has expired!"}, token)
+    return;
+  }
+  callback("SUCCESS", {user: userData.associatedUser, perms:userData.permLevel}, token);
 }

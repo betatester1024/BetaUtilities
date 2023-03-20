@@ -8,6 +8,8 @@ function send(params:any, callback:(thing:any)=>any) {
   xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
   xhr.onreadystatechange = ()=> {
     if (xhr.readyState == 4 && xhr.status == 200) {
+      clearTimeout(failureTimeout);
+      failureTimeout = null;
       callback(JSON.parse(xhr.responseText));
     }
   }
@@ -18,7 +20,7 @@ function send(params:any, callback:(thing:any)=>any) {
 let failureTimeout:NodeJS.Timeout|null;
 let dialogQ = false;
 let cbk: ()=>any = ()=>{};
-function alertDialog(str:string, callback:()=>any, refreshButtonQ:boolean) {
+function alertDialog(str:string, callback:()=>any, refreshButtonQ:boolean=false) {
   let ele = document.getElementById("overlay") as HTMLDivElement;
   let p = document.getElementById("alerttext") as HTMLParagraphElement;
   if (!ele || !p) {
@@ -35,11 +37,11 @@ function alertDialog(str:string, callback:()=>any, refreshButtonQ:boolean) {
   failureTimeout = null;
 }
 
-function closeAlert() {
+function closeAlert(overrideCallback:boolean=false) {
   let ele = document.getElementById("overlay") as HTMLDivElement;
   ele.style.top = "500vh";
   dialogQ = false;
-  if (cbk) cbk();
+  if (cbk && !overrideCallback) cbk();
 }
 
 function keydown() {
@@ -57,6 +59,7 @@ function toTime(ms:number) {
   let min = Math.floor(ms/1000/60);
   ms = ms%(1000*60);
   let sec = Math.floor(ms/1000);
+  if (ms<0) return "00:00:00";
   return (day>0?day+"d ":"") + padWithZero(hr)+":"+padWithZero(min)+":"+padWithZero(sec);
 }
 

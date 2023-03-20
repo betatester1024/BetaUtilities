@@ -35,6 +35,18 @@ export async function initServer() {
   app.get('/config', (req:any, res:any) => {
     res.sendFile(K.frontendDir+'/config.html');
   });
+
+  app.get('/account', (req:any, res:any) => {
+    res.sendFile(K.frontendDir+'/config.html');
+  });
+  
+  app.get('/logout', (req:any, res:any) => {
+    res.sendFile(K.frontendDir+'/logout.html');
+  });
+
+  app.get('/accountDel', (req:any, res:any) => {
+    res.sendFile(K.frontendDir+'/delAcc.html');
+  });
     
   app.get('*/favicon.ico', (req:Request, res:any)=> {
     res.sendFile(K.rootDir+'/favicon.ico')
@@ -61,11 +73,10 @@ export async function initServer() {
     
     var body = await parse.json(req);
     if (!body) res.end(JSON.stringify({status:"ERROR", data:null}));
-    console.log(req.cookies.sessionID);
     // let cookiematch = req.cookies.match("sessionID=[0-9a-zA-Z\\-]");
     makeRequest(body.action, req.cookies.sessionID, body.data, (s:string, d:any, token:string)=>{
-      res.cookie('sessionID', token, { maxAge: 1000*60*60*24*30, httpOnly: true, secure:true, sameSite:"Strict"});
-      console.log(d);
+      if(body.action=="login"||body.action == "logout" ||
+        body.action == "delAcc" || body.action == "signup") res.cookie('sessionID', token?token:"", { maxAge: 1000*60*60*24*30, httpOnly: true, secure:true, sameSite:"Strict"});
       res.end(JSON.stringify({status:s, data:d}));
     })
   });
@@ -83,7 +94,6 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
     case 'login': 
       // validate login-data before sending to server
       data = data as {user:string, pass:string};
-      console.log(data);
       validateLogin(data.user, data.pass, callback, token);
       break;
     case 'signup':
@@ -92,6 +102,17 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       break;
     case 'userRequest': 
       userRequest(callback, token);
+      break;
+    case 'updateuser': 
+      data = data as {user:string, oldPass: string, pass:string};
+      updateUser(data.user, data.oldPass, data.pass, callback, token);
+      break;
+    case 'delAcc':
+      data = data as {user:string, pass:string};
+      delAcc(data.user, data.pass, callback, token);
+      break;
+    case 'logout':
+      logout(callback, token);
       break;
     default:
       callback("ERROR", {error: "Unknown command string!"}, token);
@@ -103,7 +124,6 @@ const argon2 = require('argon2');
 
 
 async function validateLogin(user:string, pwd:string, callback:(status:string, data:any, token:string)=>any, token:string) {
-  let start = Date.now();
   if (!user.match(K.userRegex)) {
     callback("ERROR", {error:"Invalid user string!"}, token)
     return;
@@ -119,12 +139,9 @@ async function validateLogin(user:string, pwd:string, callback:(status:string, d
   }
   else if (await argon2.verify(usrInfo.pwd, pwd)) {
     let uuid = crypto.randomUUID() // gen new token
-    console.log("Verified in "+(Date.now() - start)+"ms");
-    start = Date.now();
     let userData:{permLevel:number} = await K.authDB.findOne({fieldName:"UserData", user:user});
     await K.authDB.insertOne({fieldName:"Token", associatedUser:user, token:uuid, expiry: Date.now()+K.expiry[userData.permLevel]})
     callback("SUCCESS", {perms: usrInfo.permLevel}, uuid);
-    console.log("Completed in "+(Date.now() - start)+"ms");
     return;
   } else {
     callback("ERROR", {error:"Password is invalid!"}, token);
@@ -157,13 +174,75 @@ async function signup(user:string, pwd:string, callback:(status:string, data:any
 async function userRequest(callback:(status:string, data:any, token:string)=>any, token:string) {
   let tokenData:{associatedUser:string, expiry:number} = await K.authDB.findOne({fieldName:"Token", token:token});
   if (!tokenData) {
-    callback("ERROR", {error:"Your session could not be found!"}, token)
+    callback("ERROR", {error:"Your session could not be found!"}, "")
     return;
   }
   let userData:{permLevel:number} = await K.authDB.findOne({fieldName:"UserData", user:tokenData.associatedUser});
   if (Date.now() > tokenData.expiry) {
-    callback("ERROR", {error:"Your session has expired!"}, token)
+    callback("ERROR", {error:"Your session has expired!"}, "")
     return;
   }
   callback("SUCCESS", {user: tokenData.associatedUser, perms:userData.permLevel, expiry: tokenData.expiry}, token);
+}
+
+async function logout(callback:(status:string, data:any, token:string)=>any, token:string) {
+  await K.authDB.deleteOne({fieldName:"Token", token:token});
+  callback("SUCCESS", null, "");
+}
+
+async function updateUser(user:string, oldPass:string, newPass:string, callback:(status:string, data:any, token:string)=>any, token:string) {
+  if (!user.match(K.userRegex)) {
+    callback("ERROR", {error:"Invalid user string!"}, token)
+    return;
+  }
+  if (oldPass.length == 0 || newPass.length == 0) {
+    callback("ERROR", {error:"No password provided!"}, token)
+    return;
+  }
+  let tokenData:{associatedUser:string, expiry:number} = await K.authDB.findOne({fieldName:"Token", token:token});
+  if (!tokenData) {
+    callback("ERROR", {error:"Cannot update user information: EYour session could not be found!"}, "")
+    return;
+  }
+  let userData:{permLevel:number} = await K.authDB.findOne({fieldName:"UserData", user:tokenData.associatedUser});
+  if (Date.now() > tokenData.expiry) {
+    callback("ERROR", {error:"Cannot update user information: Your session has expired!"}, "")
+    return;
+  }
+  else if (await argon2.verify(userData.pwd, oldPass)) {
+    let uuid = crypto.randomUUID() // gen new token
+    await K.authDB.updateOne({fieldName:"UserData", user:tokenData.associatedUser}, 
+        {$set:{pwd:await argon2.hash(newPass, K.hashingOptions)}});
+    callback("SUCCESS",{perms:userData.permLevel}, uuid);
+    return;
+  } else {
+    callback("ERROR", {error:"Cannot update user information: password is invalid!"}, token);
+    return;
+  }
+}
+
+async function delAcc(user:string, pass:string, callback:(status:string, data:any, token:string)=>any, token:string) {
+  if (!user.match(K.userRegex)) {
+    callback("ERROR", {error:"Invalid user string!"}, token)
+    return;
+  }
+  if (pass.length == 0) {
+    callback("ERROR", {error:"No password provided!"}, token)
+    return;
+  }
+  let usrInfo = await K.authDB.findOne({fieldName:"UserData", user:{$eq:user}}) as {pwd:string, permLevel:number};
+  if (!usrInfo) {
+    callback("ERROR", {error:"No such user!"}, token);
+    return;
+  }
+  else if (await argon2.verify(usrInfo.pwd, pass)) {
+    let userData:{permLevel:number} = await K.authDB.findOne({fieldName:"UserData", user:user});
+    await K.authDB.deleteOne({fieldName:"Token", token:token})
+    await K.authDB.deleteOne({fieldName:"UserData", user:user});
+    callback("SUCCESS", null, "");
+    return;
+  } else {
+    callback("ERROR", {error:"Cannot delete account. Password is invalid!"}, token);
+    return;
+  }
 }

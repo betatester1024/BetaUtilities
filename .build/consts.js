@@ -41,7 +41,7 @@ const K = {
     parallelism: 1,
     hashLength: 50
   },
-  expiry: [9e99, 1e3 * 30, 1e3 * 60 * 60 * 24 * 30, 1e3 * 60 * 60]
+  expiry: [9e99, 1e3 * 60 * 60, 1e3 * 60 * 60 * 24 * 30, 1e3 * 60 * 60]
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

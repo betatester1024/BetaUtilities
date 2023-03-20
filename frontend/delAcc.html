@@ -2,20 +2,32 @@
 <html>
   <head>
     <script src='./utils.js'></script>
-    <title>Login | BetaOS Systems</title>
+    <title>Account deletion | BetaOS Systems</title></title>
     <script>
-      const accessLevels = ["Error-level", "User", "Admin", "Super-admin"];
-      function login() {
+      let DELUSER = "ErrorUser";
+      function onLoad() {
+        send(JSON.stringify({action:"userRequest"}), (res)=> {
+          if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{window.open('/login', '_self')});
+          else {
+            DELUSER=res.data.user;
+            let usr = document.getElementById("userInp");
+            usr.placeholder = "Re-enter username ("+DELUSER+") to delete account";
+          }
+        })
+      }
+      function del() {
         let usr = document.getElementById("userInp");
         let pwd = document.getElementById("pwdInp");
+        if (usr.value !=DELUSER) {
+          alertDialog("Error: Username does not match!", ()=>{});
+          return;
+        }
         let redirect = document.URL.match("redirect=(.*)$")
-        send(JSON.stringify({action:"login", data:{user:usr.value, pass:pwd.value}}), (res)=>{
+        send(JSON.stringify({action:"delAcc", data:{user:usr.value, pass:pwd.value}}), (res)=>{
           if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{});
           else {
-            alertDialog("Welcome, "+usr.value +" ("+accessLevels[res.data.perms]+")", ()=>{
-              if (redirect) window.open(redirect[1], '_self');
-              else window.open("/", '_self');
-            });
+            alertDialog("Account "+usr.value +" has been successfully deleted.", 
+                        ()=>{window.open('/', '_self'); });
           }
         });
         pwd.value="";
@@ -31,34 +43,28 @@
     <style>
     </style>
   </head>
-  <body onload = "globalOnload();">
+  <body onload = "globalOnload(); onLoad()">
     <div class="main_content">
       <header>
-        <h2>System Login</h2>
+        <h2>Account deletion</h2>
         <hr class="rounded">
       </header>
       <div class="btnRow">
-        <form action="javascript:login()">
+        <form action="javascript:del()">
           <div class="inpContainer">
-            <input id="userInp" placeholder="Username" autofocus >
+            <input id="userInp" placeholder="Re-enter your username to delete account." autofocus>
             <div class="anim inp"></div>
           </div>
           <div class="inpContainer">
-            <input id="pwdInp" type="password" placeholder="Password">
+            <input id="pwdInp" type="password" placeholder="Re-enter password">
             <div class="anim inp"></div>
           </div>
-          <button type=submit class="btn szFull grn">
-            <span class="material-symbols-outlined">login</span>
-            Log into BetaOS Services<div class="anim"></div></button>
-<!--           <button type=button class="btn szFull" onclick="alertDialog('TEST')">
-            <span class="material-symbols-outlined">looks_one</span>
-            Test alert dialog<div class="anim"></div></button> -->
-          <a class="btn szFull" href="/signup">
-            <span class="material-symbols-outlined">arrow_forward_ios</span>
-            Sign up instead<div class="anim"></div></a>
-          <a class="btn szFull" href="/">
+          <button type=submit class="btn szFull red">
+            <span class="material-symbols-outlined">delete_forever</span>
+            Delete your account<div class="anim"></div></button>
+          <a class="btn szFull grn" href="/">
             <span class="material-symbols-outlined">arrow_back_ios</span>
-            Return to home<div class="anim"></div></a>
+            Return to safety<div class="anim"></div></a>
         </form>
       </div>
     </div>

@@ -51,6 +51,15 @@ async function initServer() {
   app.get("/config", (req, res) => {
     res.sendFile(import_consts.K.frontendDir + "/config.html");
   });
+  app.get("/account", (req, res) => {
+    res.sendFile(import_consts.K.frontendDir + "/config.html");
+  });
+  app.get("/logout", (req, res) => {
+    res.sendFile(import_consts.K.frontendDir + "/logout.html");
+  });
+  app.get("/accountDel", (req, res) => {
+    res.sendFile(import_consts.K.frontendDir + "/delAcc.html");
+  });
   app.get("*/favicon.ico", (req, res) => {
     res.sendFile(import_consts.K.rootDir + "/favicon.ico");
   });
@@ -70,10 +79,9 @@ async function initServer() {
     var body = await parse.json(req);
     if (!body)
       res.end(JSON.stringify({ status: "ERROR", data: null }));
-    console.log(req.cookies.sessionID);
     makeRequest(body.action, req.cookies.sessionID, body.data, (s, d, token) => {
-      res.cookie("sessionID", token, { maxAge: 1e3 * 60 * 60 * 24 * 30, httpOnly: true, secure: true, sameSite: "Strict" });
-      console.log(d);
+      if (body.action == "login" || body.action == "logout" || body.action == "delAcc" || body.action == "signup")
+        res.cookie("sessionID", token ? token : "", { maxAge: 1e3 * 60 * 60 * 24 * 30, httpOnly: true, secure: true, sameSite: "Strict" });
       res.end(JSON.stringify({ status: s, data: d }));
     });
   });
@@ -88,7 +96,6 @@ function makeRequest(action, token, data, callback) {
       break;
     case "login":
       data = data;
-      console.log(data);
       validateLogin(data.user, data.pass, callback, token);
       break;
     case "signup":
@@ -98,6 +105,17 @@ function makeRequest(action, token, data, callback) {
     case "userRequest":
       userRequest(callback, token);
       break;
+    case "updateuser":
+      data = data;
+      updateUser(data.user, data.oldPass, data.pass, callback, token);
+      break;
+    case "delAcc":
+      data = data;
+      delAcc(data.user, data.pass, callback, token);
+      break;
+    case "logout":
+      logout(callback, token);
+      break;
     default:
       callback("ERROR", { error: "Unknown command string!" }, token);
   }
@@ -105,7 +123,6 @@ function makeRequest(action, token, data, callback) {
 }
 const argon2 = require("argon2");
 async function validateLogin(user, pwd, callback, token) {
-  let start = Date.now();
   if (!user.match(import_consts.K.userRegex)) {
     callback("ERROR", { error: "Invalid user string!" }, token);
     return;
@@ -120,12 +137,9 @@ async function validateLogin(user, pwd, callback, token) {
     return;
   } else if (await argon2.verify(usrInfo.pwd, pwd)) {
     let uuid = crypto.randomUUID();
-    console.log("Verified in " + (Date.now() - start) + "ms");
-    start = Date.now();
     let userData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user });
     await import_consts.K.authDB.insertOne({ fieldName: "Token", associatedUser: user, token: uuid, expiry: Date.now() + import_consts.K.expiry[userData.permLevel] });
     callback("SUCCESS", { perms: usrInfo.permLevel }, uuid);
-    console.log("Completed in " + (Date.now() - start) + "ms");
     return;
   } else {
     callback("ERROR", { error: "Password is invalid!" }, token);
@@ -155,15 +169,74 @@ async function signup(user, pwd, callback, token) {
 async function userRequest(callback, token) {
   let tokenData = await import_consts.K.authDB.findOne({ fieldName: "Token", token });
   if (!tokenData) {
-    callback("ERROR", { error: "Your session could not be found!" }, token);
+    callback("ERROR", { error: "Your session could not be found!" }, "");
     return;
   }
   let userData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
   if (Date.now() > tokenData.expiry) {
-    callback("ERROR", { error: "Your session has expired!" }, token);
+    callback("ERROR", { error: "Your session has expired!" }, "");
     return;
   }
   callback("SUCCESS", { user: tokenData.associatedUser, perms: userData.permLevel, expiry: tokenData.expiry }, token);
+}
+async function logout(callback, token) {
+  await import_consts.K.authDB.deleteOne({ fieldName: "Token", token });
+  callback("SUCCESS", null, "");
+}
+async function updateUser(user, oldPass, newPass, callback, token) {
+  if (!user.match(import_consts.K.userRegex)) {
+    callback("ERROR", { error: "Invalid user string!" }, token);
+    return;
+  }
+  if (oldPass.length == 0 || newPass.length == 0) {
+    callback("ERROR", { error: "No password provided!" }, token);
+    return;
+  }
+  let tokenData = await import_consts.K.authDB.findOne({ fieldName: "Token", token });
+  if (!tokenData) {
+    callback("ERROR", { error: "Cannot update user information: EYour session could not be found!" }, "");
+    return;
+  }
+  let userData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
+  if (Date.now() > tokenData.expiry) {
+    callback("ERROR", { error: "Cannot update user information: Your session has expired!" }, "");
+    return;
+  } else if (await argon2.verify(userData.pwd, oldPass)) {
+    let uuid = crypto.randomUUID();
+    await import_consts.K.authDB.updateOne(
+      { fieldName: "UserData", user: tokenData.associatedUser },
+      { $set: { pwd: await argon2.hash(newPass, import_consts.K.hashingOptions) } }
+    );
+    callback("SUCCESS", { perms: userData.permLevel }, uuid);
+    return;
+  } else {
+    callback("ERROR", { error: "Cannot update user information: password is invalid!" }, token);
+    return;
+  }
+}
+async function delAcc(user, pass, callback, token) {
+  if (!user.match(import_consts.K.userRegex)) {
+    callback("ERROR", { error: "Invalid user string!" }, token);
+    return;
+  }
+  if (pass.length == 0) {
+    callback("ERROR", { error: "No password provided!" }, token);
+    return;
+  }
+  let usrInfo = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: { $eq: user } });
+  if (!usrInfo) {
+    callback("ERROR", { error: "No such user!" }, token);
+    return;
+  } else if (await argon2.verify(usrInfo.pwd, pass)) {
+    let userData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user });
+    await import_consts.K.authDB.deleteOne({ fieldName: "Token", token });
+    await import_consts.K.authDB.deleteOne({ fieldName: "UserData", user });
+    callback("SUCCESS", null, "");
+    return;
+  } else {
+    callback("ERROR", { error: "Cannot delete account. Password is invalid!" }, token);
+    return;
+  }
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

@@ -5,7 +5,7 @@ html {
   --system-blue2: rgba(10, 132, 255, 0.1);
   --system-green: #00cc00;
   --system-green2: rgba(0, 255, 0, 0.1);
-  --max-yellow: #00ef00;
+  --max-green: #00ef00;
   --system-yellow: #FFCC1F;
   --system-yellow2:rgba(255, 204, 31, 0.1);
   --system-bg: #eee;
@@ -24,7 +24,7 @@ body {
 }
 
 hr.rounded {
-  border: 3px solid #0e0;
+  border: 3px solid var(--max-green);
   width: 90vw;
   border-radius: 5px;
 }
@@ -52,7 +52,7 @@ h2 {
 .btn {
   display: inline-block;
   border-radius: 15px;
-  background-color: rgba(220, 220, 220, 0.2);
+  background-color: rgba(210, 210, 210, 0.2);
   border: none;
   color: var(--system-blue);
   transition: all 0.7s ease-in;
@@ -75,6 +75,8 @@ h2 {
 }
 input:focus + div.anim,
 input:hover + div.anim,
+select:focus + div.anim,
+select:hover + div.anim,
 div.inpContainer:hover > div.anim {
   width: 100%;
   opacity: 1;
@@ -84,7 +86,7 @@ div.anim {
   height: 0px;
   width: 0px;
   opacity: 0;
-  border: 2.3px solid black;
+  border: 2.3px solid var(--system-blue);
   margin: 10px auto;
   border-radius: 2px;
   transition: all 0.5s ease-in-out;
@@ -95,7 +97,7 @@ div.anim.inp {
 }
 
 .szThird {
-  width: max(26%, 4em);
+  width: max(26%, 5.2em);
 }
 .szHalf{
   width: max(42%, 7em);
@@ -112,7 +114,9 @@ div.anim.inp {
 }
 .grn:hover {
   background-color: var(--system-green2);
-/*   color: #000; */
+}
+.grn:hover > .anim {
+  border: 2.3px solid var(--system-green);
 }
 .ylw {
   color: var(--system-yellow);
@@ -121,12 +125,18 @@ div.anim.inp {
   background-color: var(--system-yellow2);
 /*   color: #000; */
 }
+.ylw:hover > .anim {
+  border: 2.3px solid var(--system-yellow);
+}
 .red {
   color: var(--system-red);
-  border: 4px solid var(--system-red);
+  border: 3px solid var(--system-red);
 }
 .red:hover {
   background-color: var(--system-red2);
+}
+.red:hover > .anim {
+  border: 2.3px solid var(--system-red);
 }
 
 
@@ -141,7 +151,7 @@ div.anim.inp {
   top: 10px;
 }
 
-input {
+input, select {
   border: 3px solid var(--system-bg);
   background-color: var(--system-bg);
   height: 1.6em;
@@ -156,7 +166,15 @@ input {
   cursor: text;
 }
 
-input:focus {
+select {
+  cursor: pointer;
+}
+
+option {
+  font-family: 'Noto Sans Display';
+}
+
+input:focus, select:focus {
   border: 3px solid var(--system-blue);
 /*   cursor: text; */
 }
@@ -184,6 +202,7 @@ div.inpContainer {
   width: 90%;
   margin-left: auto;
   margin-right: auto;
+  padding: 10px;
 }
 .overlay .internal {
   margin: auto;

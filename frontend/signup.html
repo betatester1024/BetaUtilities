@@ -2,9 +2,9 @@
 <html>
   <head>
     <script src='./utils.js'></script>
-    <title>Sign up</title></title>
+    <title>Sign up | BetaOS Systems</title></title>
     <script>
-      function login() {
+      function signup() {
         let usr = document.getElementById("userInp");
         let pwd = document.getElementById("pwdInp");
         let redirect = document.URL.match("redirect=(.*)$")
@@ -13,7 +13,10 @@
           else {
             alertDialog("Welcome, "+usr.value +"! You have successfully signed up for "+
                         "a BetaOS Services account.", 
-                        ()=>{ if (redirect) window.open(redirect[1], '_self'); });
+                        ()=>{ 
+                          if (redirect) window.open(redirect[1], '_self'); 
+                          else window.open('/', '_self');
+                        });
           }
         });
         pwd.value="";
@@ -32,11 +35,11 @@
   <body onload = "globalOnload();">
     <div class="main_content">
       <header>
-        <h2>System Signup</h2>
+        <h2>Sign up</h2>
         <hr class="rounded">
       </header>
       <div class="btnRow">
-        <form action="javascript:login()">
+        <form action="javascript:signup()">
           <div class="inpContainer">
             <input id="userInp" placeholder="Username" autofocus>
             <div class="anim inp"></div>

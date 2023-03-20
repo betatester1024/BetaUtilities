@@ -8,6 +8,8 @@ function send(params, callback) {
   xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
+      clearTimeout(failureTimeout);
+      failureTimeout = null;
       callback(JSON.parse(xhr.responseText));
     }
   };
@@ -19,7 +21,7 @@ let failureTimeout;
 let dialogQ = false;
 let cbk = () => {
 };
-function alertDialog(str, callback, refreshButtonQ) {
+function alertDialog(str, callback, refreshButtonQ = false) {
   let ele = document.getElementById("overlay");
   let p = document.getElementById("alerttext");
   if (!ele || !p) {
@@ -37,11 +39,11 @@ function alertDialog(str, callback, refreshButtonQ) {
     clearTimeout(failureTimeout);
   failureTimeout = null;
 }
-function closeAlert() {
+function closeAlert(overrideCallback = false) {
   let ele = document.getElementById("overlay");
   ele.style.top = "500vh";
   dialogQ = false;
-  if (cbk)
+  if (cbk && !overrideCallback)
     cbk();
 }
 function keydown() {
@@ -58,6 +60,8 @@ function toTime(ms) {
   let min = Math.floor(ms / 1e3 / 60);
   ms = ms % (1e3 * 60);
   let sec = Math.floor(ms / 1e3);
+  if (ms < 0)
+    return "00:00:00";
   return (day > 0 ? day + "d " : "") + padWithZero(hr) + ":" + padWithZero(min) + ":" + padWithZero(sec);
 }
 function padWithZero(n) {

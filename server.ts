@@ -40,7 +40,11 @@ export async function initServer() {
     res.sendFile(K.rootDir+'/favicon.ico')
   })
   
-  app.get('/*.js', (req:any, res:any) => {
+  app.get('/*.js*', (req:any, res:any) => {
+    res.sendFile(K.jsDir+req.url);
+  })
+  
+  app.get('/*.ts', (req:any, res:any) => {
     res.sendFile(K.jsDir+req.url);
   })
 
@@ -151,14 +155,15 @@ async function signup(user:string, pwd:string, callback:(status:string, data:any
 }
 
 async function userRequest(callback:(status:string, data:any, token:string)=>any, token:string) {
-  let userData:{associatedUser:string, expiry:number, permLevel:string} = await K.authDB.findOne({fieldName:"Token", token:token});
-  if (!userData) {
+  let tokenData:{associatedUser:string, expiry:number} = await K.authDB.findOne({fieldName:"Token", token:token});
+  if (!tokenData) {
     callback("ERROR", {error:"Your session could not be found!"}, token)
     return;
   }
-  if (Date.now() > userData.expiry) {
+  let userData:{permLevel:number} = await K.authDB.findOne({fieldName:"UserData", user:tokenData.associatedUser});
+  if (Date.now() > tokenData.expiry) {
     callback("ERROR", {error:"Your session has expired!"}, token)
     return;
   }
-  callback("SUCCESS", {user: userData.associatedUser, perms:userData.permLevel}, token);
+  callback("SUCCESS", {user: tokenData.associatedUser, perms:userData.permLevel, expiry: tokenData.expiry}, token);
 }

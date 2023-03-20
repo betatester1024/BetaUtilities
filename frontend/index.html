@@ -3,8 +3,19 @@
   <head>
     <script src='./utils.js'></script>
     <title>Welcome to BetaOS Services!</title>
-    <script>send(JSON.stringify({action:"userRequest"}), 
-                 (res)=>{console.log(res)});</script>
+    <script>
+      const accessLevels = ["error-level", "user", "admin", "super-admin"];
+      send(JSON.stringify({action:"userRequest"}), 
+       (res)=>{
+         if (res.status == "ERROR") return;
+         let ele = document.getElementById("welcomeHdr");
+         ele.innerText = "Welcome "+res.data.user+"!"; 
+         let userInfo = document.createElement("h2");
+         userInfo.innerText = "logged in as "+accessLevels[res.data.perms]+" (session expiring in "+toTime(res.data.expiry-Date.now())+")";
+         ele.append(userInfo);
+         userInfo.style.fontSize = "0.4em";
+       });
+    </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
@@ -28,7 +39,7 @@
   <body onload = "globalOnload();">
     <div class="main_content">
       <header>
-        <h1>Welcome to BetaOS Services!</h1>
+        <h1 id="welcomeHdr">Welcome to BetaOS Services!</h1>
         <hr class="rounded">
       </header>
       <div class="btnRow">

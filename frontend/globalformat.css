@@ -55,7 +55,7 @@ h2 {
   background-color: rgba(220, 220, 220, 0.2);
   border: none;
   color: var(--system-blue);
-  transition: all 0.5s ease-in-out;
+  transition: all 0.7s ease-in;
   font-size: 2.5em;
 /*   width: max(33%, 7em); */
   overflow-wrap: break-word;
@@ -173,7 +173,7 @@ div.inpContainer {
   text-align: center;
   transition: all 0.5s ease-in-out;
   background-color: rgba(200, 200, 200, 0.95);
-  top: 100vh;
+  top: 500vh;
   z-index: 1;
 }
 #alerttext {

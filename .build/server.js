@@ -54,7 +54,10 @@ async function initServer() {
   app.get("*/favicon.ico", (req, res) => {
     res.sendFile(import_consts.K.rootDir + "/favicon.ico");
   });
-  app.get("/*.js", (req, res) => {
+  app.get("/*.js*", (req, res) => {
+    res.sendFile(import_consts.K.jsDir + req.url);
+  });
+  app.get("/*.ts", (req, res) => {
     res.sendFile(import_consts.K.jsDir + req.url);
   });
   app.get("/*.css", (req, res) => {
@@ -150,16 +153,17 @@ async function signup(user, pwd, callback, token) {
   }
 }
 async function userRequest(callback, token) {
-  let userData = await import_consts.K.authDB.findOne({ fieldName: "Token", token });
-  if (!userData) {
+  let tokenData = await import_consts.K.authDB.findOne({ fieldName: "Token", token });
+  if (!tokenData) {
     callback("ERROR", { error: "Your session could not be found!" }, token);
     return;
   }
-  if (Date.now() > userData.expiry) {
+  let userData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
+  if (Date.now() > tokenData.expiry) {
     callback("ERROR", { error: "Your session has expired!" }, token);
     return;
   }
-  callback("SUCCESS", { user: userData.associatedUser, perms: userData.permLevel }, token);
+  callback("SUCCESS", { user: tokenData.associatedUser, perms: userData.permLevel, expiry: tokenData.expiry }, token);
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

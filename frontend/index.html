@@ -1,13 +1,51 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src='./serversend.js'></script>
-    <script>send("action=test&token=abc", (res)=>{console.log(res)});</script>
+    <script src='./utils.js'></script>
+    <title>Welcome to BetaOS Services!</title>
+    <script>send(JSON.stringify({action:"test"}), (res)=>{console.log(res)});</script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      h1 {
+        font-size: 4em;
+        font-weight: 700;
+        margin: 0px;
+        width: 80%;
+        margin: auto;
+      }
+      .btnRow {
+        width: 90%;
+        margin: auto;
+      }
+    </style>
   </head>
-  <body>
-    <h1>Welcome to BetaOS Services!</h1>
+  <body onload = "globalOnload();">
     <div class="main_content">
-      
+      <header>
+        <h1>Welcome to BetaOS Services!</h1>
+        <hr class="rounded">
+      </header>
+      <div class="btnRow">
+        <a class="btn szThird" href="/status">
+          <span class="material-symbols-outlined">published_with_changes </span>
+           Status<div class="anim"></div></a>
+        <a class="btn szThird grn" href="/signup">
+          <span class="material-symbols-outlined">person_add</span>
+          Sign-up<div class="anim"></div></a>
+        <a class="btn szThird grn" href="/login">
+          <span class="material-symbols-outlined">login</span>
+          Login<div class="anim"></div></a>
+        <a class="btn szHalf" href="/login">Login4<div class="anim"></div></a>
+        <a class="btn szHalf" href="/login">Login5<div class="anim"></div></a>
+        <a class="btn szTwoThirds" href="/login">Login6<div class="anim"></div></a>
+        <a class="btn szThird" href="/login">Login7<div class="anim"></div></a>
+        <a class="btn szFull" href="/login">Login<div class="anim"></div></a>
+      </div>
     </div>
   </body>
 </html>

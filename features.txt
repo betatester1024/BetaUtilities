@@ -1,6 +1,6 @@
 BetaOS Systems features
 - online site:
-login, sign-up
+login, sign-up [DONE]
 user access classes: basic user, anonymous account, admin, super-admin
 anonymous accounts: access support, enter messages
 user permissions: update username in support, update account, delete account, access todo list

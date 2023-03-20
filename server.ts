@@ -32,8 +32,8 @@ export async function initServer() {
     res.sendFile(K.frontendDir+'/signup.html');
   });
 
-  app.get('/signup', (req:any, res:any) => {
-    res.sendFile(K.frontendDir+'/signup.html');
+  app.get('/config', (req:any, res:any) => {
+    res.sendFile(K.frontendDir+'/config.html');
   });
     
   app.get('*/favicon.ico', (req:Request, res:any)=> {
@@ -57,8 +57,9 @@ export async function initServer() {
     
     var body = await parse.json(req);
     if (!body) res.end(JSON.stringify({status:"ERROR", data:null}));
-    makeRequest(body.action, body.token, body.data, (s:string, d:any, token:string)=>{
-      res.cookie('sessionID', token, { maxAge: 1000*60*60*24*30, httpOnly: true, secure:true});
+    let cookiematch = req.cookies.match("sessionID=[0-9a-zA-Z\\-]");
+    makeRequest(body.action, cookiematch?cookiematch[1]:"", body.data, (s:string, d:any, token:string)=>{
+      res.cookie('sessionID', token, { maxAge: 1000*60*60*24*30, httpOnly: true, secure:true, sameSite:"Strict"});
       res.end(JSON.stringify({status:s, data:d}));
     })
   });
@@ -68,10 +69,10 @@ export async function initServer() {
   })
 }
 
-function makeRequest(action:string|null, token:string|null, data:any|null, callback: (status:string, data:any, token:string)=>any) {
+function makeRequest(action:string|null, token:string, data:any|null, callback: (status:string, data:any, token:string)=>any) {
   switch (action) {
     case 'test':
-      callback("SUCCESS", {abc:"def", def:5}, token?token:"");
+      callback("SUCCESS", {abc:"def", def:5}, token);
       break;
     case 'login': 
       // validate login-data before sending to server
@@ -83,58 +84,54 @@ function makeRequest(action:string|null, token:string|null, data:any|null, callb
       data = data as {user:string, pass:string};
       signup(data.user, data.pass, callback, token);
       break;
-    case 'config':
-      break;
-    case 'tokenReq':
-      // eh, just needs to be large enough.
-      break;
     default:
-      callback("ERROR", {error: "Unknown command string!"}, token?token:"");
+      callback("ERROR", {error: "Unknown command string!"}, token);
   }
   return; 
 }
 const argon2 = require('argon2');
 
 
-async function validateLogin(user:string, pwd:string, callback:(status:string, data:any, token:string)=>any, token:string|null) {
+async function validateLogin(user:string, pwd:string, callback:(status:string, data:any, token:string)=>any, token:string) {
   let start = Date.now();
   if (!user.match(K.userRegex)) {
-    callback("ERROR", {error:"Invalid user string!"}, token?token:"")
+    callback("ERROR", {error:"Invalid user string!"}, token)
     return;
   }
   if (pwd.length == 0) {
-    callback("ERROR", {error:"No password provided!"}, token?token:"")
+    callback("ERROR", {error:"No password provided!"}, token)
     return;
   }
   let usrInfo = await K.authDB.findOne({fieldName:"UserData", user:{$eq:user}}) as {pwd:string, permLevel:number};
   if (!usrInfo) {
-    callback("ERROR", {error:"No such user!"}, token?token:""); // keep the original token.
+    callback("ERROR", {error:"No such user!"}, token); // keep the original token.
     return;
   }
   else if (await argon2.verify(usrInfo.pwd, pwd)) {
     let uuid = crypto.randomUUID() // gen new token
+    console.log("Verified in "+(Date.now() - start)+"ms");
     await K.authDB.insertOne({fieldName:"Token", associatedUser:user, token:uuid})
     callback("SUCCESS", {perms: usrInfo.permLevel}, uuid);
     console.log("Completed in "+(Date.now() - start)+"ms");
     return;
   } else {
-    callback("ERROR", {error:"Password is invalid!"}, token?token:"");
+    callback("ERROR", {error:"Password is invalid!"}, token);
     return;
   }
 }
 
-async function signup(user:string, pwd:string, callback:(status:string, data:any, token:string)=>any, token:string|null) {
+async function signup(user:string, pwd:string, callback:(status:string, data:any, token:string)=>any, token:string) {
   if (!user.match(K.userRegex)) {
-    callback("ERROR", {error:"Invalid user string!"}, token?token:"")
+    callback("ERROR", {error:"Invalid user string!"}, token)
     return;
   }
   if (pwd.length == 0) {
-    callback("ERROR", {error:"No password provided!"}, token?token:"")
+    callback("ERROR", {error:"No password provided!"}, token)
     return;
   }
   let usrInfo = await K.authDB.findOne({fieldName:"UserData", user:user}) as {pwd:string, permLevel:number};
   if (usrInfo) {
-    callback("ERROR", {error:"User is registered"}, token?token:"") // keep the original token.
+    callback("ERROR", {error:"User is registered"}, token) // keep the original token.
     return;
   }
   else {

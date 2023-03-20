@@ -48,6 +48,9 @@ async function initServer() {
   app.get("/signup", (req, res) => {
     res.sendFile(import_consts.K.frontendDir + "/signup.html");
   });
+  app.get("/config", (req, res) => {
+    res.sendFile(import_consts.K.frontendDir + "/config.html");
+  });
   app.get("*/favicon.ico", (req, res) => {
     res.sendFile(import_consts.K.rootDir + "/favicon.ico");
   });
@@ -64,8 +67,9 @@ async function initServer() {
     var body = await parse.json(req);
     if (!body)
       res.end(JSON.stringify({ status: "ERROR", data: null }));
-    makeRequest(body.action, body.token, body.data, (s, d, token) => {
-      res.cookie("sessionID", token, { maxAge: 1e3 * 60 * 60 * 24 * 30, httpOnly: true, secure: true });
+    let cookiematch = req.cookies.match("sessionID=[0-9a-zA-Z\\-]");
+    makeRequest(body.action, cookiematch ? cookiematch[1] : "", body.data, (s, d, token) => {
+      res.cookie("sessionID", token, { maxAge: 1e3 * 60 * 60 * 24 * 30, httpOnly: true, secure: true, sameSite: "Strict" });
       res.end(JSON.stringify({ status: s, data: d }));
     });
   });
@@ -76,7 +80,7 @@ async function initServer() {
 function makeRequest(action, token, data, callback) {
   switch (action) {
     case "test":
-      callback("SUCCESS", { abc: "def", def: 5 }, token ? token : "");
+      callback("SUCCESS", { abc: "def", def: 5 }, token);
       break;
     case "login":
       data = data;
@@ -87,10 +91,8 @@ function makeRequest(action, token, data, callback) {
       data = data;
       signup(data.user, data.pass, callback, token);
       break;
-    case "tokenReq":
-      break;
     default:
-      callback("ERROR", null, token ? token : "");
+      callback("ERROR", { error: "Unknown command string!" }, token);
   }
   return;
 }
@@ -98,40 +100,41 @@ const argon2 = require("argon2");
 async function validateLogin(user, pwd, callback, token) {
   let start = Date.now();
   if (!user.match(import_consts.K.userRegex)) {
-    callback("ERROR", { error: "Invalid user string!" }, token ? token : "");
+    callback("ERROR", { error: "Invalid user string!" }, token);
     return;
   }
   if (pwd.length == 0) {
-    callback("ERROR", { error: "No password provided!" }, token ? token : "");
+    callback("ERROR", { error: "No password provided!" }, token);
     return;
   }
   let usrInfo = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: { $eq: user } });
   if (!usrInfo) {
-    callback("ERROR", { error: "No such user!" }, token ? token : "");
+    callback("ERROR", { error: "No such user!" }, token);
     return;
   } else if (await argon2.verify(usrInfo.pwd, pwd)) {
     let uuid = crypto.randomUUID();
+    console.log("Verified in " + (Date.now() - start) + "ms");
     await import_consts.K.authDB.insertOne({ fieldName: "Token", associatedUser: user, token: uuid });
     callback("SUCCESS", { perms: usrInfo.permLevel }, uuid);
     console.log("Completed in " + (Date.now() - start) + "ms");
     return;
   } else {
-    callback("ERROR", { error: "Password is invalid!" }, token ? token : "");
+    callback("ERROR", { error: "Password is invalid!" }, token);
     return;
   }
 }
 async function signup(user, pwd, callback, token) {
   if (!user.match(import_consts.K.userRegex)) {
-    callback("ERROR", { error: "Invalid user string!" }, token ? token : "");
+    callback("ERROR", { error: "Invalid user string!" }, token);
     return;
   }
   if (pwd.length == 0) {
-    callback("ERROR", { error: "No password provided!" }, token ? token : "");
+    callback("ERROR", { error: "No password provided!" }, token);
     return;
   }
   let usrInfo = await import_consts.K.authDB.findOne({ fieldName: "UserData", user });
   if (usrInfo) {
-    callback("ERROR", { error: "User is registered" }, token ? token : "");
+    callback("ERROR", { error: "User is registered" }, token);
     return;
   } else {
     let hash = await argon2.hash(pwd);

@@ -2,15 +2,18 @@
 <html>
   <head>
     <script src='./utils.js'></script>
-    <title>Account Management | BetaOS Systems</title>
+    <title>Administrative panel | BetaOS Systems</title>
     <script>
       const accessLevels = ["Error-level", "User", "Admin", "Super-admin"];
       function onLoad() {
         send(JSON.stringify({action:"userRequest"}), (res)=> {
-          if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{window.open('/', '_self')});
+          if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{window.open('/login', '_self')});
           else {
-            document.getElementById("userInp").value=res.data.user;
-          }
+            if (res.data.perms < 2) {
+              alertDialog("Error: Insufficient permissions!", ()=>{window.open('/account', '_self')})
+              return;
+            }
+          } // access OK
         })
       }
       function updateInfo() {
@@ -22,7 +25,7 @@
           alertDialog("Passwords do not match!", ()=>{});
           return;
         }
-        send(JSON.stringify({action:"updateuser", data:{user:usr.value, pass:pwd.value, newPerms:perms.value}}), (res)=>{
+        send(JSON.stringify({action:"updateuser", data:{user:usr.value, pass:pwd.value, oldPass:"", newPermLevel:perms.value}}), (res)=>{
           if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{});
           else {
             alertDialog("Updated "+usr.value +" ("+accessLevels[res.data.perms]+")", ()=>{});
@@ -30,6 +33,19 @@
         });
         pwd.value="";
         pwd2.value="";
+      }
+
+      function del() {
+        let usr = document.getElementById("userInp");
+        let pwd = document.getElementById("pwdInp");
+        let redirect = document.URL.match("redirect=(.*)$")
+        send(JSON.stringify({action:"delAcc", data:{user:usr.value}}), (res)=>{
+          if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{});
+          else {
+            alertDialog("Account "+usr.value +" has been successfully deleted.", ()=>{});
+          }
+        });
+        pwd.value="";
       }
       
     </script>
@@ -45,13 +61,13 @@
   <body onload = "globalOnload(); onLoad()">
     <div class="main_content">
       <header>
-        <h2>Account management</h2>
+        <h2>Administrative panel</h2>
         <hr class="rounded">
       </header>
       <div class="btnRow">
         <form action="javascript:updateInfo()">
           <div class="inpContainer">
-            <input id="userInp" placeholder="Username" value="[ERROR] Account info could not be loaded" disabled>
+            <input id="userInp" placeholder="Username">
             <div class="anim inp"></div>
           </div>
           <div class="inpContainer">
@@ -71,16 +87,13 @@
           </div>
           <button type=submit class="btn szFull grn">
             <span class="material-symbols-outlined">update</span>
-            Update your information<div class="anim"></div></button>
-          <a class="btn szFull red" href="/accountDel">
+            Update this account<div class="anim"></div></button>
+          <a class="btn szFull" href="/account">
+            <span class="material-symbols-outlined">arrow_back_ios</span>
+            Return to your account<div class="anim"></div></a>
+          <button type="button" class="btn szFull red" onclick="del()">
             <span class="material-symbols-outlined">warning</span>
-            Delete your account<div class="anim"></div></a>
-<!--           <button type=button class="btn szFull" onclick="alertDialog('TEST')">
-            <span class="material-symbols-outlined">looks_one</span>
-            Test alert dialog<div class="anim"></div></button> -->
-          <a class="btn szFull" href="/admin">
-            <span class="material-symbols-outlined">arrow_forward_ios</span>
-            Access admin panel<div class="anim"></div></a>
+            Delete this account<div class="anim"></div></button>
           <a class="btn szFull" href="/">
             <span class="material-symbols-outlined">arrow_back_ios</span>
             Return to home<div class="anim"></div></a>

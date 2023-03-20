@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../supportRooms.ts"],
+  "sourcesContent": ["const RoomType = \"EUPH_ROOM\"|\"ONLINE_SUPPORT\"|\"HIDDEN_SUPPORT\"|\"PASSWORD_SUPPORT\"\nexport class Room {\n  type:RoomType;\n  constructor(type:RoomType);\n}\n\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,MAAM,WAAW,cAAY,mBAAiB,mBAAiB;AACxD,MAAM,KAAK;AAAA,EAChB;AAEF;",
+  "names": []
+}

@@ -7,7 +7,7 @@
       const accessLevels = ["Error-level", "User", "Admin", "Super-admin"];
       function onLoad() {
         send(JSON.stringify({action:"userRequest"}), (res)=> {
-          if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{window.open('/login', '_self')});
+          if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{window.open('/login?redirect=config', '_self')});
           else {
             document.getElementById("userInp").value=res.data.user;
           }

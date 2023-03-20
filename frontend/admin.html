@@ -7,7 +7,7 @@
       const accessLevels = ["Error-level", "User", "Admin", "Super-admin"];
       function onLoad() {
         send(JSON.stringify({action:"userRequest"}), (res)=> {
-          if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{window.open('/login', '_self')});
+          if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{window.open('/login?redirect=admin', '_self')});
           else {
             if (res.data.perms < 2) {
               alertDialog("Error: Insufficient permissions!", ()=>{window.open('/account', '_self')})
@@ -87,12 +87,12 @@
           </div>
           <button type=submit class="btn szFull grn">
             <span class="material-symbols-outlined">update</span>
-            Update this account<div class="anim"></div></button>
+            Create or update this account<div class="anim"></div></button>
           <a class="btn szFull" href="/account">
             <span class="material-symbols-outlined">arrow_back_ios</span>
             Return to your account<div class="anim"></div></a>
           <button type="button" class="btn szFull red" onclick="del()">
-            <span class="material-symbols-outlined">warning</span>
+            <span class="material-symbols-outlined">delete_forever</span>
             Delete this account<div class="anim"></div></button>
           <a class="btn szFull" href="/">
             <span class="material-symbols-outlined">arrow_back_ios</span>

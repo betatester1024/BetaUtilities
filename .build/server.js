@@ -22,6 +22,10 @@ __export(server_exports, {
 });
 module.exports = __toCommonJS(server_exports);
 var import_consts = require("./consts");
+var import_validateLogin = require("./validateLogin");
+var import_delacc = require("./delacc");
+var import_updateUser = require("./updateUser");
+var import_userRequest = require("./userRequest");
 const express = require("express");
 const app = express();
 const crypto = require("crypto");
@@ -117,165 +121,30 @@ function makeRequest(action, token, data, callback) {
       break;
     case "login":
       data = data;
-      validateLogin(data.user, data.pass, callback, token);
+      (0, import_validateLogin.validateLogin)(data.user, data.pass, callback, token);
       break;
     case "signup":
       data = data;
-      signup(data.user, data.pass, callback, token);
+      (0, import_validateLogin.signup)(data.user, data.pass, callback, token);
       break;
     case "userRequest":
-      userRequest(callback, token);
+      (0, import_userRequest.userRequest)(callback, token);
       break;
     case "updateuser":
       data = data;
-      updateUser(data.user, data.oldPass, data.pass, data.newPermLevel, callback, token);
+      (0, import_updateUser.updateUser)(data.user, data.oldPass, data.pass, data.newPermLevel, callback, token);
       break;
     case "delAcc":
       data = data;
-      delAcc(data.user, data.pass, callback, token);
+      (0, import_delacc.delAcc)(data.user, data.pass, callback, token);
       break;
     case "logout":
-      logout(callback, token);
+      (0, import_validateLogin.logout)(callback, token);
       break;
     default:
       callback("ERROR", { error: "Unknown command string!" }, token);
   }
   return;
-}
-const argon2 = require("argon2");
-async function validateLogin(user, pwd, callback, token) {
-  if (!user.match(import_consts.K.userRegex)) {
-    callback("ERROR", { error: "Invalid user string!" }, token);
-    return;
-  }
-  if (pwd.length == 0) {
-    callback("ERROR", { error: "No password provided!" }, token);
-    return;
-  }
-  let usrInfo = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: { $eq: user } });
-  if (!usrInfo) {
-    callback("ERROR", { error: "No such user!" }, token);
-    return;
-  } else if (await argon2.verify(usrInfo.pwd, pwd)) {
-    let uuid = crypto.randomUUID();
-    let userData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user });
-    await import_consts.K.authDB.insertOne({ fieldName: "Token", associatedUser: user, token: uuid, expiry: Date.now() + import_consts.K.expiry[userData.permLevel] });
-    callback("SUCCESS", { perms: usrInfo.permLevel }, uuid);
-    return;
-  } else {
-    callback("ERROR", { error: "Password is invalid!" }, token);
-    return;
-  }
-}
-async function signup(user, pwd, callback, token) {
-  if (!user.match(import_consts.K.userRegex)) {
-    callback("ERROR", { error: "Invalid user string!" }, token);
-    return;
-  }
-  if (pwd.length == 0) {
-    callback("ERROR", { error: "No password provided!" }, token);
-    return;
-  }
-  let usrInfo = await import_consts.K.authDB.findOne({ fieldName: "UserData", user });
-  if (usrInfo) {
-    callback("ERROR", { error: "User is registered" }, token);
-    return;
-  } else {
-    let hash = await argon2.hash(pwd, import_consts.K.hashingOptions);
-    await import_consts.K.authDB.insertOne({ fieldName: "UserData", user, pwd: hash, permLevel: 1 });
-    validateLogin(user, pwd, callback, token);
-    return;
-  }
-}
-async function userRequest(callback, token) {
-  let tokenData = await import_consts.K.authDB.findOne({ fieldName: "Token", token });
-  if (!tokenData) {
-    callback("ERROR", { error: "Your session could not be found!" }, "");
-    return;
-  }
-  let userData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
-  if (Date.now() > tokenData.expiry) {
-    callback("ERROR", { error: "Your session has expired!" }, "");
-    return;
-  }
-  callback("SUCCESS", { user: tokenData.associatedUser, perms: userData.permLevel, expiry: tokenData.expiry }, token);
-}
-async function logout(callback, token) {
-  await import_consts.K.authDB.deleteOne({ fieldName: "Token", token });
-  callback("SUCCESS", null, "");
-}
-async function updateUser(user, oldPass, newPass, newPermLevel, callback, token) {
-  if (!user.match(import_consts.K.userRegex)) {
-    callback("ERROR", { error: "Invalid user string!" }, token);
-    return;
-  }
-  if (newPass.length == 0) {
-    callback("ERROR", { error: "No password provided!" }, token);
-    return;
-  }
-  let tokenData = await import_consts.K.authDB.findOne({ fieldName: "Token", token });
-  if (!tokenData) {
-    callback("ERROR", { error: "Cannot update user information: Your session could not be found!" }, "");
-    return;
-  }
-  let userData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
-  if (Date.now() > tokenData.expiry) {
-    callback("ERROR", { error: "Cannot update user information: Your session has expired!" }, "");
-    return;
-  }
-  if (userData.permLevel >= 2) {
-    await import_consts.K.authDB.updateOne(
-      { fieldName: "UserData", user },
-      { $set: { pwd: await argon2.hash(newPass, import_consts.K.hashingOptions), permLevel: newPermLevel } }
-    );
-    callback("SUCCESS", { perms: newPermLevel }, token);
-    return;
-  } else if (await argon2.verify(userData.pwd, oldPass)) {
-    await import_consts.K.authDB.updateOne(
-      { fieldName: "UserData", user: tokenData.associatedUser },
-      { $set: { pwd: await argon2.hash(newPass, import_consts.K.hashingOptions) } }
-    );
-    callback("SUCCESS", { perms: userData.permLevel }, token);
-    return;
-  } else {
-    callback("ERROR", { error: "Cannot update user information: Access denied!" }, token);
-    return;
-  }
-}
-async function delAcc(user, pass, callback, token) {
-  let tokenData = await import_consts.K.authDB.findOne({ fieldName: "Token", token });
-  if (!tokenData) {
-    callback("ERROR", { error: "Cannot update user information: Your session could not be found!" }, "");
-    return;
-  }
-  if (!user.match(import_consts.K.userRegex)) {
-    callback("ERROR", { error: "Invalid user string!" }, token);
-    return;
-  }
-  let usrInfo = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: { $eq: user } });
-  if (!usrInfo) {
-    callback("ERROR", { error: "No such user!" }, token);
-    return;
-  }
-  let loginInfo = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
-  if (loginInfo.permLevel >= 2) {
-    await import_consts.K.authDB.deleteOne({ fieldName: "Token", token });
-    await import_consts.K.authDB.deleteOne({ fieldName: "UserData", user });
-    callback("SUCCESS", null, token);
-    return;
-  }
-  if (pass.length == 0) {
-    callback("ERROR", { error: "No password provided!" }, token);
-    return;
-  } else if (await argon2.verify(usrInfo.pwd, pass)) {
-    await import_consts.K.authDB.deleteOne({ fieldName: "Token", token });
-    await import_consts.K.authDB.deleteOne({ fieldName: "UserData", user });
-    callback("SUCCESS", null, "");
-    return;
-  } else {
-    callback("ERROR", { error: "Cannot delete account. Password is invalid!" }, token);
-    return;
-  }
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

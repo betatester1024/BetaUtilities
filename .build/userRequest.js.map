@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../userRequest.ts"],
+  "sourcesContent": ["const argon2 = require('argon2');\n// https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html\nimport {K} from './consts';\n\nexport async function userRequest(callback:(status:string, data:any, token:string)=>any, token:string) {\n  let tokenData:{associatedUser:string, expiry:number} = await K.authDB.findOne({fieldName:\"Token\", token:token});\n  if (!tokenData) {\n    callback(\"ERROR\", {error:\"Your session could not be found!\"}, \"\")\n    return;\n  }\n  let userData:{permLevel:number} = await K.authDB.findOne({fieldName:\"UserData\", user:tokenData.associatedUser});\n  if (Date.now() > tokenData.expiry) {\n    callback(\"ERROR\", {error:\"Your session has expired!\"}, \"\")\n    return;\n  }\n  callback(\"SUCCESS\", {user: tokenData.associatedUser, perms:userData.permLevel, expiry: tokenData.expiry}, token);\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAEA,oBAAgB;AAFhB,MAAM,SAAS,QAAQ,QAAQ;AAI/B,eAAsB,YAAY,UAAuD,OAAc;AACrG,MAAI,YAAmD,MAAM,gBAAE,OAAO,QAAQ,EAAC,WAAU,SAAS,MAAW,CAAC;AAC9G,MAAI,CAAC,WAAW;AACd,aAAS,SAAS,EAAC,OAAM,mCAAkC,GAAG,EAAE;AAChE;AAAA,EACF;AACA,MAAI,WAA8B,MAAM,gBAAE,OAAO,QAAQ,EAAC,WAAU,YAAY,MAAK,UAAU,eAAc,CAAC;AAC9G,MAAI,KAAK,IAAI,IAAI,UAAU,QAAQ;AACjC,aAAS,SAAS,EAAC,OAAM,4BAA2B,GAAG,EAAE;AACzD;AAAA,EACF;AACA,WAAS,WAAW,EAAC,MAAM,UAAU,gBAAgB,OAAM,SAAS,WAAW,QAAQ,UAAU,OAAM,GAAG,KAAK;AACjH;",
+  "names": []
+}

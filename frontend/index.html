@@ -11,7 +11,7 @@
          let ele = document.getElementById("welcomeHdr");
          ele.innerText = "Welcome "+res.data.user+"!"; 
          let userInfo = document.createElement("h2");
-         userInfo.innerText = "logged in as "+accessLevels[res.data.perms]+" (session expiring in "+toTime(res.data.expiry-Date.now())+")";
+         setInterval(()=>{userInfo.innerText = "logged in as "+accessLevels[res.data.perms]+" (session expiring in "+toTime(res.data.expiry-Date.now())+")";}, 100);
          ele.append(userInfo);
          userInfo.style.fontSize = "0.4em";
          let loginBtn = document.getElementById("loginBtn")
@@ -64,7 +64,7 @@
         <a id="loginBtn" class="btn szHalf grn" href="/login">
           <span class="material-symbols-outlined" id="loginIco">login</span>
           Login<div class="anim"></div></a>
-        <a id="logoutBtn" class="btn szThird red" href="/logout" style="display:none">
+        <a id="logoutBtn" class="btn szThird ylw" href="/logout" style="display:none">
           <span class="material-symbols-outlined" id="signupIco">logout</span>
           Logout<div class="anim"></div></a>
         <a id="configBtn" class="btn szThird" href="/account" style="display:none">

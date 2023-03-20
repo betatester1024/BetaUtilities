@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": ["../index.ts"],
-  "sourcesContent": ["import {initServer} from './server';\nimport {DBMaintenance} from './database';\ninitServer();\nDBMaintenance();"],
-  "mappings": ";AAAA,oBAAyB;AACzB,sBAA4B;AAAA,IAC5B,0BAAW;AAAA,IACX,+BAAc;",
+  "sourcesContent": ["import {initServer} from './server';\nimport {DBMaintenance} from './database';\nimport {Room} from './supportRooms'\ninitServer();\nDBMaintenance();\nnew Room(\"EUPH_ROOM\");"],
+  "mappings": ";AAAA,oBAAyB;AACzB,sBAA4B;AAC5B,0BAAmB;AAAA,IACnB,0BAAW;AAAA,IACX,+BAAc;AACd,IAAI,yBAAK,WAAW;",
   "names": []
 }

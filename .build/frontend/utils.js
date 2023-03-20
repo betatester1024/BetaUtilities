@@ -8,7 +8,8 @@ function send(params, callback) {
   xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
-      clearTimeout(failureTimeout);
+      if (failureTimeout)
+        clearTimeout(failureTimeout);
       failureTimeout = null;
       callback(JSON.parse(xhr.responseText));
     }

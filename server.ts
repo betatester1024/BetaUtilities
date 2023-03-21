@@ -10,6 +10,7 @@ import {updateUser} from './updateUser'
 import {userRequest} from './userRequest';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
+import {supportHandler, Room} from './supportRooms'
 const urlencodedParser = bodyParser.urlencoded({ extended: false }) 
 var RateLimit = require('express-rate-limit');
 
@@ -58,6 +59,11 @@ export async function initServer() {
     incrRequests();
   });
 
+  app.get('/support', (req:any, res:any) => {
+    res.sendFile(K.frontendDir+'/support.html');
+    incrRequests();
+  });
+
   app.get('/accountDel', (req:any, res:any) => {
     res.sendFile(K.frontendDir+'/delAcc.html');
     incrRequests();
@@ -82,6 +88,24 @@ export async function initServer() {
     res.sendFile(K.frontendDir+req.url);
     incrRequests();
   })
+
+  app.get("/stream", (req:any, res:any) =>{
+    res.set({
+      'Cache-Control': 'no-cache',
+      'Content-Type': 'text/event-stream',
+      'Connection': 'keep-alive'
+    });
+    res.flushHeaders();
+    res.write("retry:500\n\n");
+    // add the connection
+    supportHandler.addConnection(res, req.query.room, req.query.token);
+    res.on("close", () => {
+      // clear the connection
+      supportHandler.removeConnection(res, req.query.room, req.query.token);
+      res.end();
+      // console.log("Removed stream");
+    });
+  });
 
   app.get('/*', (req:any, res:any) => {
     res.sendFile(K.frontendDir+"404.html");
@@ -138,6 +162,9 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       break;
     case 'logout':
       logout(callback, token);
+      break;
+    case 'logout_all':
+      logout(callback, token, true);
       break;
     default:
       callback("ERROR", {error: "Unknown command string!"}, token);

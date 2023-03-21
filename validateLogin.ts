@@ -50,7 +50,16 @@ export async function signup(user:string, pwd:string, callback:(status:string, d
   }
 }
 
-export async function logout(callback:(status:string, data:any, token:string)=>any, token:string) {
+export async function logout(callback:(status:string, data:any, token:string)=>any, token:string, allaccsQ:boolean=false) {
+  if (allaccsQ) {
+    let userData:{associatedUser:string} = await K.authDB.findOne({fieldName:"Token", token:token});
+    if (!userData) {
+      await K.authDB.deleteOne({fieldName:"Token", token:token});
+      callback("ERROR", {error:"Cannot find your session. Logged you out."})
+      return;
+    }
+    await K.authDB.deleteMany({fieldName:"Token", associatedUser:userData.associatedUser});
+  }
   await K.authDB.deleteOne({fieldName:"Token", token:token});
   callback("SUCCESS", null, "");
 }

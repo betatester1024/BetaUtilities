@@ -5,9 +5,10 @@
     <title>Logout | BetaOS Systems</title></title>
     <script>
       function logout() {
-        let redirect = document.URL.match("redirect=(.*)$")
-        send(JSON.stringify({action:"logout"}), (res)=>{
-          if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{});
+        let redirect = document.URL.match("redirect=(.*)$");
+        let option = document.URL.match("options=all$");
+        send(JSON.stringify({action:option?"logout_all":"logout"}), (res)=>{
+          if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{window.open('/', '_self')});
           else {
             alertDialog("Successfully logged out!", ()=>{window.open('/', '_self');});
           }

@@ -26,6 +26,7 @@ var import_validateLogin = require("./validateLogin");
 var import_delacc = require("./delacc");
 var import_updateUser = require("./updateUser");
 var import_userRequest = require("./userRequest");
+var import_supportRooms = require("./supportRooms");
 const express = require("express");
 const app = express();
 const crypto = require("crypto");
@@ -71,6 +72,10 @@ async function initServer() {
     res.sendFile(import_consts.K.frontendDir + "/logout.html");
     incrRequests();
   });
+  app.get("/support", (req, res) => {
+    res.sendFile(import_consts.K.frontendDir + "/support.html");
+    incrRequests();
+  });
   app.get("/accountDel", (req, res) => {
     res.sendFile(import_consts.K.frontendDir + "/delAcc.html");
     incrRequests();
@@ -90,6 +95,20 @@ async function initServer() {
   app.get("/*.css", (req, res) => {
     res.sendFile(import_consts.K.frontendDir + req.url);
     incrRequests();
+  });
+  app.get("/stream", (req, res) => {
+    res.set({
+      "Cache-Control": "no-cache",
+      "Content-Type": "text/event-stream",
+      "Connection": "keep-alive"
+    });
+    res.flushHeaders();
+    res.write("retry:500\n\n");
+    import_supportRooms.supportHandler.addConnection(res, req.query.room, req.query.token);
+    res.on("close", () => {
+      import_supportRooms.supportHandler.removeConnection(res, req.query.room, req.query.token);
+      res.end();
+    });
   });
   app.get("/*", (req, res) => {
     res.sendFile(import_consts.K.frontendDir + "404.html");
@@ -140,6 +159,9 @@ function makeRequest(action, token, data, callback) {
       break;
     case "logout":
       (0, import_validateLogin.logout)(callback, token);
+      break;
+    case "logout_all":
+      (0, import_validateLogin.logout)(callback, token, true);
       break;
     default:
       callback("ERROR", { error: "Unknown command string!" }, token);

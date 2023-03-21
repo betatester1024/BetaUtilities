@@ -10,11 +10,14 @@ function send(params:any, callback:(thing:any)=>any) {
     if (xhr.readyState == 4 && xhr.status == 200) {
       if (failureTimeout) clearTimeout(failureTimeout);
       failureTimeout = null;
+      console.log("Success");
       callback(JSON.parse(xhr.responseText));
     }
   }
   xhr.send(params);
+  if (failureTimeout) clearTimeout(failureTimeout);
   failureTimeout = setTimeout(()=>alertDialog(`This is taking longer than expected.`, ()=>{}, true), 1000);
+  console.log(failureTimeout);
 }
 
 let failureTimeout:NodeJS.Timeout|null;

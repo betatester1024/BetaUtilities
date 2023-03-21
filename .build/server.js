@@ -73,7 +73,10 @@ async function initServer() {
     incrRequests();
   });
   app.get("/support", (req, res) => {
-    res.sendFile(import_consts.K.frontendDir + "/support.html");
+    if (req.url.match("\\?room="))
+      res.sendFile(import_consts.K.frontendDir + "/support.html");
+    else
+      res.sendFile(import_consts.K.frontendDir + "/supportIndex.html");
     incrRequests();
   });
   app.get("/accountDel", (req, res) => {
@@ -104,9 +107,9 @@ async function initServer() {
     });
     res.flushHeaders();
     res.write("retry:500\n\n");
-    import_supportRooms.supportHandler.addConnection(res, req.query.room, req.query.token);
+    import_supportRooms.supportHandler.addConnection(res, req.query.room, req.cookies.sessionID);
     res.on("close", () => {
-      import_supportRooms.supportHandler.removeConnection(res, req.query.room, req.query.token);
+      import_supportRooms.supportHandler.removeConnection(res, req.query.room, req.cookies.sessionID);
       res.end();
     });
   });

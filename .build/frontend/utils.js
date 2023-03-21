@@ -11,12 +11,16 @@ function send(params, callback) {
       if (failureTimeout)
         clearTimeout(failureTimeout);
       failureTimeout = null;
+      console.log("Success");
       callback(JSON.parse(xhr.responseText));
     }
   };
   xhr.send(params);
+  if (failureTimeout)
+    clearTimeout(failureTimeout);
   failureTimeout = setTimeout(() => alertDialog(`This is taking longer than expected.`, () => {
   }, true), 1e3);
+  console.log(failureTimeout);
 }
 let failureTimeout;
 let dialogQ = false;

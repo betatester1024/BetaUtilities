@@ -2,25 +2,66 @@
 <html>
   <head>
     <script src='./utils.js'></script>
-    <title>Login | BetaOS Systems</title>
+    <title>Support | BetaOS Systems</title>
     <script>
-      const accessLevels = ["Error-level", "User", "Admin", "Super-admin"];
-      function login() {
-        let usr = document.getElementById("userInp");
-        let pwd = document.getElementById("pwdInp");
-        let redirect = document.URL.match("redirect=(.*)$")
-        send(JSON.stringify({action:"login", data:{user:usr.value, pass:pwd.value}}), (res)=>{
-          if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{});
-          else {
-            alertDialog("Welcome, "+usr.value +" ("+accessLevels[res.data.perms]+")", ()=>{
-              if (redirect) window.open(redirect[1], '_self');
-              else window.open("/", '_self');
-            });
-          }
+      function onLoad() {
+        send(JSON.stringify({action:"refresh"}), (res)=>{
+          console.log(res)
         });
-        pwd.value="";
+        send(JSON.stringify({action:"refresh_users"}), (res)=>{
+          console.log(res);
+        });
+        document.getElementById("header").innerHTML = "Support: #"+
+          document.URL.match("\\?room=(.*)")[1];
       }
+      // system refresh auto!
+      let LOADEDQ2 = false;
+      async function initClient()
+      {
+        
+        try {
+        console.log("Starting client.")
+        const source = new EventSource('/stream?room='+
+                                       document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1]);
+        source.addEventListener('message', message => {
+          console.log('Got', message);
+          ele = document.getElementById("users");
+          let modif = message.data;
+          let removed = modif.match("^\\-(.+)\\\\n");
+          let added = modif.match("^\\+(.+)\\\\n");
+          while (removed || added) {
+            if (removed) {
+              ele.innerHTML= ele.innerHTML.replace(removed[1]+"<br>", "");
+              console.log("removed"+removed[1])
+            }
+            if (added) {
+              ele.innerHTML+= added[1]+"<br>";
+              console.log("added"+added[1]);
+            }
+            modif = modif.replaceAll(/^\-(.+)\\n/gm, "");
+            modif = modif.replaceAll(/^\+(.+)\\n/gm, "");
+            removed = modif.match("^\\-(.+)\\\\n");
+            added = modif.match("^\\+(.+)\\\\n");
+          }
+          ele = document.getElementById("msgArea");
+          let scrDistOKQ =  (ele.scrollTop) >= (ele.scrollHeight-ele.offsetHeight - 100)
+          document.getElementById("msgArea").innerHTML+=modif;
+          
+          if (!LOADEDQ2 || scrDistOKQ)
+          {
+            ele.scrollTop = ele.scrollHeight;
+            // console.log("Scrolling to bottom.")
+            LOADEDQ2 = true;
+          }
       
+          
+        });
+        } catch (e) {
+          console.log("Restartng client ("+e+")")
+          setTimeout(initClient, 0);
+        }
+      } // initClient();
+            
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -29,38 +70,79 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
     <style>
+      #msgArea {
+        width: calc(85% - 20px);
+        height: 77vh;
+        float: left;
+        border: 2px solid var(--system-blue);
+        text-align: left;
+        padding: 0px 10px;
+      }
+      #userList {
+        width: 12%;
+        height: 77vh;
+        float: right;
+        border: 2px solid var(--system-blue);
+      }
+      #containingDiv {
+        white-space: nowrap;
+        width: 95%;
+        margin: 0 auto;
+        height: 77vh;
+      }
+      h2 {
+        font-size: 2em;
+      }
+      hr.rounded {
+        border: 2px solid var(--system-green);
+        margin-top: 0px;
+      }
+      form {
+        width: 95%;
+        margin: 0 auto;
+      }
+      .anim.inp, #inpContainment, input {
+        display: inline-block;
+      }
+      input {
+        border: none !important;
+      }
+      #inpContainment {
+         width: calc(100% - 6.5em);
+      }
+      button {
+        position: relative;
+        top: -40px;
+        height: 2em;
+        padding-top: 0px !important;
+      }
     </style>
   </head>
-  <body onload = "globalOnload();">
+  <body onload = "globalOnload(); onLoad(); initClient()">
     <div class="main_content">
       <header>
-        <h2>Support</h2>
+        <h2 id="header">Support</h2>
         <hr class="rounded">
       </header>
-      <div class="btnRow">
-        <form action="javascript:login()">
-          <div class="inpContainer">
-            <input id="userInp" placeholder="Username" autofocus >
+        <div id="containingDiv">
+          <div id="msgArea">
+            stuff goes here
+          </div>
+          <div id="userList"></div>
+        </div><br>
+        <form action="javascript:sendMsg()">
+          <div class="szFull" id="inpContainment">
+            <input placeholder="Enter a message...">
             <div class="anim inp"></div>
           </div>
-          <div class="inpContainer">
-            <input id="pwdInp" type="password" placeholder="Password">
-            <div class="anim inp"></div>
-          </div>
-          <button type=submit class="btn szFull grn">
-            <span class="material-symbols-outlined">login</span>
-            Log into BetaOS Services<div class="anim"></div></button>
-<!--           <button type=button class="btn szFull" onclick="alertDialog('TEST')">
-            <span class="material-symbols-outlined">looks_one</span>
-            Test alert dialog<div class="anim"></div></button> -->
-          <button class="btn szFull"
-            onclick="window.open(document.URL.replace('login', 'signup'), '_self')">
-            <span class="material-symbols-outlined">arrow_forward_ios</span>
-            Sign up instead<div class="anim"></div></button>
-          <a class="btn szFull" href="/">
+          <button class="btn szIco">
+            <span class="material-symbols-outlined">send</span>
+            <div class="anim"></div>
+          </button>
+        </form>
+          <a class="btn" href="/">
             <span class="material-symbols-outlined">arrow_back_ios</span>
             Return to home<div class="anim"></div></a>
-        </form>
       </div>
     </div>
     <div class="overlay" id="overlay">

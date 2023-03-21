@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": ["../index.ts"],
-  "sourcesContent": ["import {initServer} from './server';\nimport {DBMaintenance} from './database';\nimport {Room} from './supportRooms'\ninitServer();\nDBMaintenance();"],
-  "mappings": ";AAAA,oBAAyB;AACzB,sBAA4B;AAAA,IAE5B,0BAAW;AAAA,IACX,+BAAc;",
+  "sourcesContent": ["import {initServer} from './server';\nimport {DBMaintenance} from './database';\nimport {supportHandler, Room} from './supportRooms'\ninitServer();\nDBMaintenance();\nsupportHandler.addRoom(new Room(\"main_support\"));"],
+  "mappings": ";AAAA,oBAAyB;AACzB,sBAA4B;AAC5B,0BAAmC;AAAA,IACnC,0BAAW;AAAA,IACX,+BAAc;AACd,mCAAe,QAAQ,IAAI,yBAAK,cAAc,CAAC;",
   "names": []
 }

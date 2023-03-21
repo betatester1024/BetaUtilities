@@ -60,7 +60,8 @@ export async function initServer() {
   });
 
   app.get('/support', (req:any, res:any) => {
-    res.sendFile(K.frontendDir+'/support.html');
+    if (req.url.match('\\?room=')) res.sendFile(K.frontendDir+'/support.html');
+    else res.sendFile(K.frontendDir+'/supportIndex.html');
     incrRequests();
   });
 
@@ -98,10 +99,10 @@ export async function initServer() {
     res.flushHeaders();
     res.write("retry:500\n\n");
     // add the connection
-    supportHandler.addConnection(res, req.query.room, req.query.token);
+    supportHandler.addConnection(res, req.query.room, req.cookies.sessionID);
     res.on("close", () => {
       // clear the connection
-      supportHandler.removeConnection(res, req.query.room, req.query.token);
+      supportHandler.removeConnection(res, req.query.room, req.cookies.sessionID);
       res.end();
       // console.log("Removed stream");
     });

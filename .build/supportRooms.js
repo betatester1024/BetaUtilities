@@ -37,13 +37,18 @@ class Room {
   }
 }
 class supportHandler {
-  static allRooms;
-  static connections;
+  static allRooms = [];
+  static connections = [];
   static addRoom(r) {
     this.allRooms.push(r);
   }
-  static addConnection(ev, rn) {
+  static addConnection(ev, rn, token) {
     this.connections.push({ event: ev, roomName: rn });
+    (0, import_userRequest.userRequest)((status, data, token2) => {
+      if (status == "SUCCESS")
+        this.sendMsgTo(rn, "+" + data.user + "(" + data.perms + ")");
+    }, token);
+    console.log("added connection in " + rn);
   }
   static async removeConnection(ev, rn, token) {
     let idx = this.connections.indexOf({ event: ev, roomName: rn });
@@ -67,15 +72,15 @@ class supportHandler {
   }
   static checkFoundQ(roomName) {
     for (let i = 0; i < this.allRooms.length; i++) {
-      if (this.allRooms[i].roomName == roomName)
+      if (this.allRooms[i].name == roomName)
         return true;
     }
     return false;
   }
   static sendMsgTo(roomName, data) {
     for (let i = 0; i < this.allRooms.length; i++) {
-      if (this.allRooms[i].roomName == roomName)
-        this.allRooms[i].event.write("data:" + data + "\n\n");
+      if (this.connections[i].roomName == roomName)
+        this.connections[i].event.write("data:" + data + "\n\n");
     }
   }
 }

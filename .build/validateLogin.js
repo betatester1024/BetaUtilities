@@ -75,7 +75,7 @@ async function logout(callback, token, allaccsQ = false) {
     let userData = await import_consts.K.authDB.findOne({ fieldName: "Token", token });
     if (!userData) {
       await import_consts.K.authDB.deleteOne({ fieldName: "Token", token });
-      callback("ERROR", { error: "Cannot find your session. Logged you out." });
+      callback("ERROR", { error: "Cannot find your session. Logged you out." }, token);
       return;
     }
     await import_consts.K.authDB.deleteMany({ fieldName: "Token", associatedUser: userData.associatedUser });

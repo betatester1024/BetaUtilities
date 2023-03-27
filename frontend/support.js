@@ -1,52 +1,66 @@
 function onLoad() {
-  validateLogin("refresh", "");
-  validateLogin("refresh_users", "");
-  // setInterval(()=>{validateLogin("refresh", "")}, 2500);
-  document.getElementById("alert").hidden=true;
-  document.getElementById("h1").hidden=true;
-  // console.log(document.cookie);
-  let match = document.cookie.match("__Secure-user=(.+)");
-  // console.log(match[1]);
-  if (match) CURRUSER = match[1];
-  match = document.cookie.match("__Secure-perms=([0-9]+)");
-  // console.log(match[1]);
-  if (match) CURRPERMS = match[1];
+  // send(JSON.stringify({action:"refresh"}), (res)=>{
+  // });
+  // send(JSON.stringify({action:"refresh_users"}), (res)=>{
+  // });
   document.getElementById("header").innerHTML = "Support: #"+
     document.URL.match("\\?room=(.*)")[1];
+  ROOMNAME = document.URL.match("\\?room=(.*)")[1];
 }
 // system refresh auto!
+function sendMsg() {
+  let inp = document.getElementById("msgInp");
+  send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME}}), ()=>{});
+  inp.value="";
+}
 let LOADEDQ2 = false;
+const rmvReg = /(>|^)\-(.+)\([0-9]\)>/gm;
+const addReg = /(>|^)\+(.+)\([0-9]\)>/gm;
+const classStr = ["error", "user", "admin", "superadmin"]
 async function initClient()
 {
   
   try {
   console.log("Starting client.")
   const source = new EventSource('/stream?room='+
-                                 document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1]+
-                                 "&token="+sessionID);
+                                 document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1]);
   source.addEventListener('message', message => {
     console.log('Got', message);
-    ele = document.getElementById("users");
+    ele = document.getElementById("userList");
     let modif = message.data;
-    let removed = modif.match("^\\-(.+)\\\\n");
-    let added = modif.match("^\\+(.+)\\\\n");
+    document.getElementById("placeholder").style.display="none";
+
+    let removed = rmvReg.exec(modif);
+    let added = addReg.exec(modif)
     while (removed || added) {
       if (removed) {
-        ele.innerHTML= ele.innerHTML.replace(removed[1]+"<br>", "");
-        console.log("removed"+removed[1])
+        ele.innerText= ele.innerText.replace(removed[2]+"\n", "");
       }
       if (added) {
-        ele.innerHTML+= added[1]+"<br>";
-        console.log("added"+added[1]);
+        ele.innerText+= added[2]+"\n";
       }
-      modif = modif.replaceAll(/^\-(.+)\\n/gm, "");
-      modif = modif.replaceAll(/^\+(.+)\\n/gm, "");
-      removed = modif.match("^\\-(.+)\\\\n");
-      added = modif.match("^\\+(.+)\\\\n");
+      modif = modif.replaceAll(rmvReg, "");
+      modif = modif.replaceAll(addReg, "");
+      removed = modif.match(rmvReg);
+      added = modif.match(addReg);
     }
     ele = document.getElementById("msgArea");
     let scrDistOKQ =  (ele.scrollTop) >= (ele.scrollHeight-ele.offsetHeight - 100)
-    document.getElementById("msgArea").innerHTML+=modif;
+    let msgs = modif.split(">");
+    for (let i=0; i<msgs.length; i++) {
+      let matches = msgs[i].match(/\[(.+)\]\(([0-9])\)(.*)/)
+      if (!matches) continue;
+      let newMsgBody = document.createElement("p");
+      let newMsgSender = document.createElement("b");
+      // parse things
+      newMsgSender.innerText = matches[1];
+      newMsgSender.className = classStr[matches[2]];
+      newMsgBody.className = classStr[matches[2]];
+      newMsgBody.innerText = matches[3].replaceAll("&gt;", ">");
+      ele.appendChild(newMsgSender);
+      ele.appendChild(newMsgBody);
+      ele.appendChild(document.createElement("br"));
+    }
     
     if (!LOADEDQ2 || scrDistOKQ)
     {
@@ -62,3 +76,4 @@ async function initClient()
     setTimeout(initClient, 0);
   }
 } // initClient();
+      

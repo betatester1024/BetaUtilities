@@ -73,9 +73,15 @@ async function initServer() {
     incrRequests();
   });
   app.get("/support", (req, res) => {
-    if (req.url.match("\\?room="))
-      res.sendFile(import_consts.K.frontendDir + "/support.html");
-    else
+    let match = req.url.match("\\?room=(" + import_consts.K.roomRegex + ")");
+    if (match) {
+      if (!import_supportRooms.supportHandler.checkFoundQ(match[1])) {
+        console.log("Room not found");
+        res.sendFile(import_consts.K.frontendDir + "/room404.html");
+        return;
+      } else
+        res.sendFile(import_consts.K.frontendDir + "/support.html");
+    } else
       res.sendFile(import_consts.K.frontendDir + "/supportIndex.html");
     incrRequests();
   });
@@ -85,6 +91,10 @@ async function initServer() {
   });
   app.get("*/favicon.ico", (req, res) => {
     res.sendFile(import_consts.K.rootDir + "/favicon.ico");
+    incrRequests();
+  });
+  app.get("/support.js", (req, res) => {
+    res.sendFile(import_consts.K.frontendDir + "support.js");
     incrRequests();
   });
   app.get("/*.js*", (req, res) => {
@@ -166,6 +176,9 @@ function makeRequest(action, token, data, callback) {
     case "logout_all":
       (0, import_validateLogin.logout)(callback, token, true);
       break;
+    case "sendMsg":
+      data = data;
+      (0, import_supportRooms.sendMsg)(data.msg, data.room, callback, token);
     default:
       callback("ERROR", { error: "Unknown command string!" }, token);
   }

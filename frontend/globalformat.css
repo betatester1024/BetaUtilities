@@ -115,7 +115,7 @@ div.anim.inp {
 .grn:hover {
   background-color: var(--system-green2);
 }
-.grn:hover > .anim {
+.grn > .anim {
   border: 2.3px solid var(--system-green);
 }
 .ylw {
@@ -125,7 +125,7 @@ div.anim.inp {
   background-color: var(--system-yellow2);
 /*   color: #000; */
 }
-.ylw:hover > .anim {
+.ylw > .anim{
   border: 2.3px solid var(--system-yellow);
 }
 .red {
@@ -135,7 +135,7 @@ div.anim.inp {
 .red:hover {
   background-color: var(--system-red2);
 }
-.red:hover > .anim {
+.red > .anim {
   border: 2.3px solid var(--system-red);
 }
 

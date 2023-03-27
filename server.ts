@@ -10,7 +10,7 @@ import {updateUser} from './updateUser'
 import {userRequest} from './userRequest';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
-import {supportHandler, Room} from './supportRooms'
+import {supportHandler, Room, sendMsg} from './supportRooms'
 const urlencodedParser = bodyParser.urlencoded({ extended: false }) 
 var RateLimit = require('express-rate-limit');
 
@@ -60,7 +60,15 @@ export async function initServer() {
   });
 
   app.get('/support', (req:any, res:any) => {
-    if (req.url.match('\\?room=')) res.sendFile(K.frontendDir+'/support.html');
+    let match = req.url.match('\\?room=('+K.roomRegex+")");
+    if (match) {
+      if (!supportHandler.checkFoundQ(match[1])) {
+        console.log("Room not found")
+        res.sendFile(K.frontendDir+"/room404.html");
+        return;
+      }
+      else res.sendFile(K.frontendDir+'/support.html');
+    }
     else res.sendFile(K.frontendDir+'/supportIndex.html');
     incrRequests();
   });
@@ -74,11 +82,18 @@ export async function initServer() {
     res.sendFile(K.rootDir+'/favicon.ico')
     incrRequests();
   })
+
+  
+  app.get('/support.js', (req:any, res:any) => {
+    res.sendFile(K.frontendDir+"support.js");
+    incrRequests();
+  })
   
   app.get('/*.js*', (req:any, res:any) => {
     res.sendFile(K.jsDir+req.url);
     incrRequests();
   })
+
   
   app.get('/*.ts', (req:any, res:any) => {
     res.sendFile(K.jsDir+req.url);
@@ -167,6 +182,9 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
     case 'logout_all':
       logout(callback, token, true);
       break;
+    case 'sendMsg':
+      data = data as {msg:string, room:string};
+      sendMsg(data.msg, data.room, callback, token);
     default:
       callback("ERROR", {error: "Unknown command string!"}, token);
   }

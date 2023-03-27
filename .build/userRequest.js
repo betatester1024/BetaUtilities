@@ -34,7 +34,7 @@ async function userRequest(callback, token) {
     callback("ERROR", { error: "Your session has expired!" }, "");
     return;
   }
-  callback("SUCCESS", { user: tokenData.associatedUser, perms: userData.permLevel, expiry: tokenData.expiry }, token);
+  callback("SUCCESS", { user: tokenData.associatedUser, alias: userData.alias ? userData.alias : userData.user, perms: userData.permLevel, expiry: tokenData.expiry }, token);
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

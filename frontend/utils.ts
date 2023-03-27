@@ -9,21 +9,20 @@ function send(params:any, callback:(thing:any)=>any) {
   xhr.onreadystatechange = ()=> {
     if (xhr.readyState == 4 && xhr.status == 200) {
       if (failureTimeout) clearTimeout(failureTimeout);
+      else closeAlert(true);
       failureTimeout = null;
-      console.log("Success");
       callback(JSON.parse(xhr.responseText));
     }
   }
   xhr.send(params);
   if (failureTimeout) clearTimeout(failureTimeout);
-  failureTimeout = setTimeout(()=>alertDialog(`This is taking longer than expected.`, ()=>{}, true), 1000);
-  console.log(failureTimeout);
+  failureTimeout = setTimeout(()=>alertDialog(`This is taking longer than expected.`, ()=>{}, true, params), 1000);
 }
 
 let failureTimeout:NodeJS.Timeout|null;
 let dialogQ = false;
 let cbk: ()=>any = ()=>{};
-function alertDialog(str:string, callback:()=>any, refreshButtonQ:boolean=false) {
+function alertDialog(str:string, callback:()=>any, refreshButtonQ:boolean=false, failedReq:string="") {
   let ele = document.getElementById("overlay") as HTMLDivElement;
   let p = document.getElementById("alerttext") as HTMLParagraphElement;
   if (!ele || !p) {
@@ -34,8 +33,11 @@ function alertDialog(str:string, callback:()=>any, refreshButtonQ:boolean=false)
   dialogQ = true;
   cbk = callback;
   p.innerText = str;
-  if (refreshButtonQ) p.innerHTML += `<button class='btn szThird fssml' onclick='location.reload()'>Refresh?
-  <div class="anim"></div></button>`
+  if (refreshButtonQ) {
+    p.innerHTML += `<button class='btn szThird fssml' onclick='location.reload()'>Refresh?
+    <div class="anim"></div></button>`
+    console.log("Failed request: "+failedReq);
+  }
   if (failureTimeout) clearTimeout(failureTimeout);
   failureTimeout = null;
 }

@@ -8,10 +8,10 @@ export async function userRequest(callback:(status:string, data:any, token:strin
     callback("ERROR", {error:"Your session could not be found!"}, "")
     return;
   }
-  let userData:{permLevel:number} = await K.authDB.findOne({fieldName:"UserData", user:tokenData.associatedUser});
+  let userData:{permLevel:number, alias:string} = await K.authDB.findOne({fieldName:"UserData", user:tokenData.associatedUser});
   if (Date.now() > tokenData.expiry) {
     callback("ERROR", {error:"Your session has expired!"}, "")
     return;
   }
-  callback("SUCCESS", {user: tokenData.associatedUser, perms:userData.permLevel, expiry: tokenData.expiry}, token);
+  callback("SUCCESS", {user: tokenData.associatedUser, alias:userData.alias?userData.alias:userData.user, perms:userData.permLevel, expiry: tokenData.expiry}, token);
 }

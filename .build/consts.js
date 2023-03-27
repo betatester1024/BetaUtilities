@@ -29,6 +29,7 @@ const K = {
   jsDir: "/home/runner/BetaUtilitiesV2/.build/frontend/",
   port: 3e3,
   userRegex: /^[0-9a-zA-Z_\\-]+$/,
+  roomRegex: "[0-9a-zA-Z_\\-]{1,20}",
   pwdMaxLength: 9e99,
   userMaxLength: 9e99,
   authDB: import_database.database.collection("SystemAUTH_V2"),

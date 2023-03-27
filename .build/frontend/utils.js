@@ -10,8 +10,9 @@ function send(params, callback) {
     if (xhr.readyState == 4 && xhr.status == 200) {
       if (failureTimeout)
         clearTimeout(failureTimeout);
+      else
+        closeAlert(true);
       failureTimeout = null;
-      console.log("Success");
       callback(JSON.parse(xhr.responseText));
     }
   };
@@ -19,14 +20,13 @@ function send(params, callback) {
   if (failureTimeout)
     clearTimeout(failureTimeout);
   failureTimeout = setTimeout(() => alertDialog(`This is taking longer than expected.`, () => {
-  }, true), 1e3);
-  console.log(failureTimeout);
+  }, true, params), 1e3);
 }
 let failureTimeout;
 let dialogQ = false;
 let cbk = () => {
 };
-function alertDialog(str, callback, refreshButtonQ = false) {
+function alertDialog(str, callback, refreshButtonQ = false, failedReq = "") {
   let ele = document.getElementById("overlay");
   let p = document.getElementById("alerttext");
   if (!ele || !p) {
@@ -37,9 +37,11 @@ function alertDialog(str, callback, refreshButtonQ = false) {
   dialogQ = true;
   cbk = callback;
   p.innerText = str;
-  if (refreshButtonQ)
+  if (refreshButtonQ) {
     p.innerHTML += `<button class='btn szThird fssml' onclick='location.reload()'>Refresh?
-  <div class="anim"></div></button>`;
+    <div class="anim"></div></button>`;
+    console.log("Failed request: " + failedReq);
+  }
   if (failureTimeout)
     clearTimeout(failureTimeout);
   failureTimeout = null;

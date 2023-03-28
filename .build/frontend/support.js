@@ -25,14 +25,11 @@ async function initClient() {
       let removed = rmvReg.exec(modif);
       let added = addReg.exec(modif);
       while (removed || added) {
-        console.log(added);
         if (removed) {
           ele.innerText = ele.innerText.replace(removed[2] + "\n", "");
-          console.log("removed" + removed[2]);
         }
         if (added) {
           ele.innerText += added[2] + "\n";
-          console.log("added" + added[2]);
         }
         modif = modif.replaceAll(rmvReg, "");
         modif = modif.replaceAll(addReg, "");
@@ -48,12 +45,41 @@ async function initClient() {
           continue;
         let newMsgBody = document.createElement("p");
         let newMsgSender = document.createElement("b");
-        console.log(matches);
         newMsgSender.innerText = matches[1];
         newMsgSender.className = classStr[matches[2]];
-        newMsgBody.className = classStr[matches[2]];
-        newMsgBody.innerText = matches[3].replaceAll("&gt;", ">");
         ele.appendChild(newMsgSender);
+        newMsgBody.className = classStr[matches[2]];
+        let msg = matches[3].replaceAll("&gt;", ">");
+        for (let j = 0; j < replacements.length; j++) {
+          let regex = new RegExp(replacements[j].from, "gmiu");
+          while ((arr = regex.exec(msg)) !== null) {
+            console.log(`Found ${arr[0]}. `, arr.index);
+            let fragment = document.createElement("span");
+            fragment.className = classStr[matches[2]];
+            fragment.innerText = msg.slice(0, arr.index);
+            ele.appendChild(fragment);
+            let replaced = document.createElement("span");
+            replaced.className = "material-symbols-outlined supportMsg " + classStr[matches[2]];
+            replaced.innerText = replacements[j].to;
+            console.log(replaced);
+            ele.appendChild(replaced);
+            msg = msg.slice(arr.index + replacements[j].from.length);
+          }
+          regex = new RegExp("(#[0-9a-zA-Z_\\-]){1,20}", "gmiu");
+          while ((arr = regex.exec(msg)) !== null) {
+            console.log(`Found ${arr[0]}. `, arr.index);
+            let fragment = document.createElement("span");
+            fragment.className = classStr[matches[2]];
+            fragment.innerText = msg.slice(0, arr.index);
+            ele.appendChild(fragment);
+            let replaced = document.createElement("a");
+            replaced.className = classStr[matches[2]];
+            replaced.innerText = arr[1];
+            ele.appendChild(replaced);
+            msg = msg.slice(arr.index + replacements[j].from.length);
+          }
+        }
+        newMsgBody.innerText = msg;
         ele.appendChild(newMsgBody);
         ele.appendChild(document.createElement("br"));
       }
@@ -67,4 +93,8 @@ async function initClient() {
     setTimeout(initClient, 0);
   }
 }
+const replacements = [
+  { from: ":one:", to: "looks_one" },
+  { from: ":two:", to: "looks_two" }
+];
 //# sourceMappingURL=support.js.map

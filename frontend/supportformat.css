@@ -8,10 +8,12 @@
   word-wrap: break-word;
   overflow-y: auto;
   white-space: normal;
+  border-radius: 10px;
 }
 #userList {
+  border-radius: 10px;
   width: calc(12% - 20px);
-  height: 77vh;
+  height: calc(77vh - 12px - 2em);
   float: right;
   border: 2px solid var(--system-blue);
   text-align: left;
@@ -24,7 +26,7 @@
   white-space: nowrap;
   width: 95%;
   margin: 0 auto;
-  height: 77vh;
+  height: 79vh;
 }
 h2 {
   font-size: 2em;
@@ -52,20 +54,48 @@ button#sendBtn {
   height: 2em;
   padding-top: 0px !important;
 }
+
+#msgArea > a, 
+#msgArea > b, 
+#msgArea > p, 
+#msgArea > span {
+  white-space: pre;
+}
 b {
-/*   display: inline-block; */
+/*   font-family: "SupportText", "Noto Sans Display"; */
+  margin-right: 5px;
 }
-h2 > span {
+
+p {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+h2 > span, .supportMsg {
   top: 5px;
+  color: var(--system-blue);
 }
-p.admin, p.user, p.error, p.superadmin {
+p.admin, p.user, p.error, 
+span.admin, span.user, span.error,
+a.admin, a.user, a.error {
   display: inline-block;
-  margin: 0 5px;
+  color: var(--system-blue);
 } 
-b.admin, p.superadmin {
+
+b.admin{
+  color: var(--system-blue);
+}
+p.superadmin, b.superadmin, span.superadmin, a.superadmin {
+  color: #00e500;
+  font-variant-caps: small-caps;
+  font-size: large;
+}
+
+#userlist {
   color: var(--system-blue);
 }
 
-p.superadmin, b.superadmin {
-  color: var(--system-green);
+@font-face {
+  font-family: "SupportText";
+  font-weight: 500;
+  src: url(https://fonts.gstatic.com/s/materialsymbolsoutlined/v100/kJEhBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oFsI.woff2) format('woff2');
 }

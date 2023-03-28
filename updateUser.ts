@@ -20,13 +20,14 @@ export async function updateUser(user:string, oldPass:string, newPass:string, ne
     callback("ERROR", {error:"Cannot update user information: Your session has expired!"}, "")
     return;
   }
-  if (userData.permLevel >=2) {// administrators can update other accounts
+  if (userData.permLevel >=2 && (await K.authDB.findOne({fieldName:"UserData", user:user})).permLevel < userData.permLevel) {
+    // administrators can update other accounts but not other admins
     await K.authDB.updateOne({fieldName:"UserData", user:user}, 
         {$set:{pwd:await argon2.hash(newPass, K.hashingOptions), permLevel:newPermLevel}}, {upsert:true});
     callback("SUCCESS", {perms: newPermLevel}, token);
     return;
   }
-  else if (await argon2.verify(userData.pwd, oldPass)) {
+  else if (await argon2.verify(userData.pwd, oldPass)) { // unless you have their password, I suppose.
     await K.authDB.updateOne({fieldName:"UserData", user:tokenData.associatedUser}, 
         {$set:{pwd:await argon2.hash(newPass, K.hashingOptions)}});
     callback("SUCCESS",{perms:userData.permLevel}, token);

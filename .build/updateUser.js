@@ -42,7 +42,7 @@ async function updateUser(user, oldPass, newPass, newPermLevel, callback, token)
     callback("ERROR", { error: "Cannot update user information: Your session has expired!" }, "");
     return;
   }
-  if (userData.permLevel >= 2) {
+  if (userData.permLevel >= 2 && (await import_consts.K.authDB.findOne({ fieldName: "UserData", user })).permLevel < userData.permLevel) {
     await import_consts.K.authDB.updateOne(
       { fieldName: "UserData", user },
       { $set: { pwd: await argon2.hash(newPass, import_consts.K.hashingOptions), permLevel: newPermLevel } },

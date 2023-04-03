@@ -3,6 +3,22 @@
   <head>
     <script src='./utils.js'></script>
     <title>Room listing | BetaOS Systems</title>
+    <script>
+      function onLoad() {
+        send(JSON.stringify({action:"roomRequest"}), (res)=>{
+          if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});
+          else {
+            let btns = "";
+            for (let i=0; i<res.data.length; i++) {
+              btns += `<a class="btn fsmed" style="width:12em" href="/support?room=${res.data[i]}">${res.data[i]}<div class="anim"></div></a>`;
+            }
+            document.getElementById("rooms").innerHTML = btns;
+          }
+        });
+      }
+      function visit() {
+        window.open("/support?room="+document.getElementById("inp").value, '_self');
+      }
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -10,14 +26,33 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      #rooms {
+        width: 95%;
+        margin: 0px auto;
+      }
+    </style>
   </head>
-  <body onload = "globalOnload();">
+  <body onload = "globalOnload(); onLoad()">
     <div class="main_content">
       <header>
         <h2 id="header">Support rooms</h2>
         <hr class="rounded">
       </header>
+      <form action="javascript:visit()">
+        <div class="inpContainer szHalf" style="margin: 0px auto">
+          <input class="inp" id="inp" placeholder="Search..." autofocus>
+          <div class="anim inp"></div>
+        </div>
+        <button class="btn szHalf">
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          Visit<div class="anim"></div></button>
+      </form>
+      <div id="rooms">
         
+        <h2><span class="material-symbols-outlined">schedule</span>
+          Loading rooms, please wait.</h2>
+      </div>
     </div>
     <div class="overlay" id="overlay">
       <div class="internal">

@@ -26,6 +26,7 @@ var import_validateLogin = require("./validateLogin");
 var import_delacc = require("./delacc");
 var import_updateUser = require("./updateUser");
 var import_userRequest = require("./userRequest");
+var import_EEHandler = require("./EEHandler");
 var import_supportRooms = require("./supportRooms");
 const express = require("express");
 const app = express();
@@ -66,6 +67,25 @@ async function initServer() {
   });
   app.get("/admin", (req, res) => {
     res.sendFile(import_consts.K.frontendDir + "/admin.html");
+    incrRequests();
+  });
+  app.get("/todo", (req, res) => {
+    res.sendFile(import_consts.K.frontendDir + "/todo.html");
+    incrRequests();
+  });
+  app.get("/EE", (req, res) => {
+    (0, import_EEHandler.EE)(true, (status, data, token) => {
+      res.set("Content-Type", "text/html");
+      res.send(Buffer.from(data.data));
+    }, "");
+    incrRequests();
+  });
+  app.get("/docs", (req, res) => {
+    res.sendFile(import_consts.K.frontendDir + "/docs.html");
+    incrRequests();
+  });
+  app.get("/EEdit", (req, res) => {
+    res.sendFile(import_consts.K.frontendDir + "/EEdit.html");
     incrRequests();
   });
   app.get("/logout", (req, res) => {
@@ -161,6 +181,16 @@ function makeRequest(action, token, data, callback) {
       break;
     case "userRequest":
       (0, import_userRequest.userRequest)(callback, token);
+      break;
+    case "roomRequest":
+      (0, import_supportRooms.roomRequest)(callback, token);
+      break;
+    case "getEE":
+      (0, import_EEHandler.EE)(true, callback, token, "");
+      break;
+    case "setEE":
+      data = data;
+      (0, import_EEHandler.EE)(false, callback, token, data.data);
       break;
     case "updateuser":
       data = data;

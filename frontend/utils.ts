@@ -16,13 +16,14 @@ function send(params:any, callback:(thing:any)=>any) {
   }
   xhr.send(params);
   if (failureTimeout) clearTimeout(failureTimeout);
-  failureTimeout = setTimeout(()=>alertDialog(`This is taking longer than expected.`, ()=>{}, true, params), 1000);
+  failureTimeout = setTimeout(()=>alertDialog(`This is taking longer than expected.`, ()=>{}, 1, params), 1000);
 }
 
 let failureTimeout:NodeJS.Timeout|null;
 let dialogQ = false;
 let cbk: ()=>any = ()=>{};
-function alertDialog(str:string, callback:()=>any, refreshButtonQ:boolean=false, failedReq:string="") {
+let BLOCKCALLBACK = false;
+function alertDialog(str:string, callback:()=>any, button:number=-1, failedReq:string="") {
   let ele = document.getElementById("overlay") as HTMLDivElement;
   let p = document.getElementById("alerttext") as HTMLParagraphElement;
   if (!ele || !p) {
@@ -33,10 +34,19 @@ function alertDialog(str:string, callback:()=>any, refreshButtonQ:boolean=false,
   dialogQ = true;
   cbk = callback;
   p.innerText = str;
-  if (refreshButtonQ) {
+  if (button == 1) {
     p.innerHTML += `<button class='btn szThird fssml' onclick='location.reload()'>Refresh?
     <div class="anim"></div></button>`
     console.log("Failed request: "+failedReq);
+    BLOCKCALLBACK=true;
+  }
+  else if (button == 2) {
+    p.innerHTML += `<br>
+    <p class="fssml gry nohover"> [Press any key or click 'Continue' below to confirm] </p>
+    <button class='btn szFull red fssml cancel' onclick='closeAlert(true)'>
+    <span class="material-symbols-outlined">cancel</span>Cancel
+    <div class="anim"></div></button>`
+    console.log("Confirm speedbump");
   }
   if (failureTimeout) clearTimeout(failureTimeout);
   failureTimeout = null;
@@ -46,13 +56,17 @@ function closeAlert(overrideCallback:boolean=false) {
   let ele = document.getElementById("overlay") as HTMLDivElement;
   ele.style.top = "500vh";
   dialogQ = false;
-  if (cbk && !overrideCallback) cbk();
+  if (cbk && !overrideCallback && !BLOCKCALLBACK) cbk();
+  
 }
 
 function keydown() {
   if (dialogQ) {
     console.log("CLOSED DIALOG")
-    closeAlert();
+    if (BLOCKCALLBACK) console.log("CALLBACK HAS BEEN BLOCKED")
+    else closeAlert();
+    BLOCKCALLBACK = false;
+    
   }
 }
 

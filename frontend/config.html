@@ -74,9 +74,9 @@
           <a class="btn szThird ylw" href="/logout">
             <span class="material-symbols-outlined">logout</span>
             Logout: <br>This session<div class="anim"></div></a>
-          <a class="btn szThird ylw" href="/logout?options=all">
+          <button type="button" class="btn szThird ylw" onclick="alertDialog('Confirm logout from all accounts?', ()=>{window.open('/logout?options=all', '_self')}, 2)">
             <span class="material-symbols-outlined">logout</span>
-            Logout: <br>All accounts<div class="anim"></div></a>
+            Logout: <br>All accounts<div class="anim"></div></button>
           <a class="btn szThird red" href="/accountDel">
             <span class="material-symbols-outlined">warning</span>
             Delete your account<div class="anim"></div></a>

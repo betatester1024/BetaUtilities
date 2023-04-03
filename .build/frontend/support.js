@@ -49,37 +49,10 @@ async function initClient() {
         newMsgSender.className = classStr[matches[2]];
         ele.appendChild(newMsgSender);
         newMsgBody.className = classStr[matches[2]];
-        let msg = matches[3].replaceAll("&gt;", ">");
-        for (let j = 0; j < replacements.length; j++) {
-          let regex = new RegExp(replacements[j].from, "gmiu");
-          while ((arr = regex.exec(msg)) !== null) {
-            console.log(`Found ${arr[0]}. `, arr.index);
-            let fragment = document.createElement("span");
-            fragment.className = classStr[matches[2]];
-            fragment.innerText = msg.slice(0, arr.index);
-            ele.appendChild(fragment);
-            let replaced = document.createElement("span");
-            replaced.className = "material-symbols-outlined supportMsg " + classStr[matches[2]];
-            replaced.innerText = replacements[j].to;
-            console.log(replaced);
-            ele.appendChild(replaced);
-            msg = msg.slice(arr.index + replacements[j].from.length);
-          }
-          regex = new RegExp("(#[0-9a-zA-Z_\\-]){1,20}", "gmiu");
-          while ((arr = regex.exec(msg)) !== null) {
-            console.log(`Found ${arr[0]}. `, arr.index);
-            let fragment = document.createElement("span");
-            fragment.className = classStr[matches[2]];
-            fragment.innerText = msg.slice(0, arr.index);
-            ele.appendChild(fragment);
-            let replaced = document.createElement("a");
-            replaced.className = classStr[matches[2]];
-            replaced.innerText = arr[1];
-            ele.appendChild(replaced);
-            msg = msg.slice(arr.index + replacements[j].from.length);
-          }
-        }
+        let msg = matches[3];
+        msg = msg.replaceAll("&gt;", ">");
         newMsgBody.innerText = msg;
+        ele.appendChild(newMsgSender);
         ele.appendChild(newMsgBody);
         ele.appendChild(document.createElement("br"));
       }
@@ -94,7 +67,28 @@ async function initClient() {
   }
 }
 const replacements = [
-  { from: ":one:", to: "looks_one" },
-  { from: ":two:", to: "looks_two" }
+  { from: "one", to: "looks_one" },
+  { from: "two", to: "looks_two" }
 ];
+function replaceAll(msg, ele2, matches) {
+  console.log(msg, ele2, matches);
+  for (let j = 0; j < replacements.length; j++) {
+    let regex = new RegExp(replacements[j].from, "gmiu");
+    while ((arr = regex.exec(msg)) !== null) {
+      console.log(`Found ${arr[0]}. `, arr.index);
+      let fragment = document.createElement("span");
+      fragment.className = classStr[matches[2]];
+      console.log(msg.slice(0, arr.index));
+      if (msg.slice(0, arr.index))
+        replaceAll(msg.slice(0, arr.index), ele2, matches);
+      let replaced = document.createElement("span");
+      replaced.className = "material-symbols-outlined supportMsg " + classStr[matches[2]];
+      replaced.innerText = replacements[j].to;
+      console.log(replaced);
+      ele2.appendChild(replaced);
+      msg = msg.slice(arr.index + replacements[j].from.length);
+      console.log(msg);
+    }
+  }
+}
 //# sourceMappingURL=support.js.map

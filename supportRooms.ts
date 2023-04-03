@@ -49,10 +49,11 @@ export class supportHandler {
     }, token);
     console.log("removed connection in "+rn);
   }
-  static listRooms(euphOnlyQ:boolean) {
+  static listRooms(euphOnlyQ:boolean, onlineOnlyQ:boolean) {
     let out = [];
     for (let i=0; i<this.allRooms.length; i++) {
       if (euphOnlyQ && this.allRooms[i].type != "EUPH_ROOM") continue;
+      if (onlineOnlyQ && this.allRooms[i].type != "ONLINE_SUPPORT") continue;
       if (this.allRooms[i].type == "HIDDEN_SUPPORT") continue;
       out.push(this.allRooms[i].name);
     }
@@ -86,5 +87,9 @@ export async function sendMsg(msg:string, room:string, callback: (status:string,
 }
 
 function processAnon(token:string) {
-  return token?token.slice(0, 4):"Err";
+  return token?token.slice(0, 4):"";
+}
+
+export function roomRequest(callback:(status:string, data:any, token:string)=>any, token:string) {
+  callback("SUCCESS", supportHandler.listRooms(false, true), token);
 }

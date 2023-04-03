@@ -24,6 +24,7 @@
          logoutBtn.style.display="inline-block";
          configBtn.style.display=res.data.perms>=1?"inline-block":"none";
          adminBtn.style.display = res.data.perms==1?"none":"inline-block";
+         configBtn.className = res.data.perms>1?"btn szThird":"btn szTwoThirds";
          console.log(signupIco.innerHTML);
        });
     </script>
@@ -55,16 +56,16 @@
         <hr class="rounded">
       </header>
       <div class="btnRow">
-        <a class="btn szHalf" href="/status">
+        <a class="btn szHalf grn" href="/status">
           <span class="material-symbols-outlined">published_with_changes </span>
            Status<div class="anim"></div></a>
         <a class="btn szHalf" href="/support">
           <span class="material-symbols-outlined" id="loginIco">help</span>
           Support<div class="anim"></div></a>
-        <a id="signupBtn" class="btn szTwoThirds grn" href="/signup">
+        <a id="signupBtn" class="btn szTwoThirds" href="/signup">
           <span class="material-symbols-outlined" id="signupIco">person_add</span>
           Sign-up<div class="anim"></div></a>
-        <a id="loginBtn" class="btn szThird grn" href="/login">
+        <a id="loginBtn" class="btn szThird" href="/login">
           <span class="material-symbols-outlined" id="loginIco">login</span>
           Login<div class="anim"></div></a>
         <a id="logoutBtn" class="btn szThird ylw" href="/logout" style="display:none">
@@ -76,6 +77,18 @@
         <a id="adminBtn" class="btn szThird" href="/admin" style="display:none">
           <span class="material-symbols-outlined" id="loginIco">security</span>
           Admin<div class="anim"></div></a>
+        <a class="btn szTwoThirds grn" href="/todo">
+          <span class="material-symbols-outlined">checklist</span>
+          To do<div class="anim"></div></a>
+        <a class="btn szThird ylw" href="/syslog">
+          <span class="material-symbols-outlined">security</span>
+          SysLog<div class="anim"></div></a>
+        <a class="btn szHalf" href="/EE">
+          <span class="material-symbols-outlined">sync</span>
+          Page of Edits<div class="anim"></div></a>
+        <a class="btn szHalf" href="/EEdit">
+          <span class="material-symbols-outlined">edit</span>
+          Edit the page!<div class="anim"></div></a>
         
 <!--         <a class="btn szHalf" href="/login">login4<div class="anim"></div></a>
         <a class="btn szHalf" href="/login">Login5<div class="anim"></div></a>

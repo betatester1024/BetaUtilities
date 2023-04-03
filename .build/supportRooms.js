@@ -19,6 +19,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var supportRooms_exports = {};
 __export(supportRooms_exports, {
   Room: () => Room,
+  roomRequest: () => roomRequest,
   sendMsg: () => sendMsg,
   supportHandler: () => supportHandler
 });
@@ -77,10 +78,12 @@ class supportHandler {
     }, token);
     console.log("removed connection in " + rn);
   }
-  static listRooms(euphOnlyQ) {
+  static listRooms(euphOnlyQ, onlineOnlyQ) {
     let out = [];
     for (let i = 0; i < this.allRooms.length; i++) {
       if (euphOnlyQ && this.allRooms[i].type != "EUPH_ROOM")
+        continue;
+      if (onlineOnlyQ && this.allRooms[i].type != "ONLINE_SUPPORT")
         continue;
       if (this.allRooms[i].type == "HIDDEN_SUPPORT")
         continue;
@@ -115,11 +118,15 @@ async function sendMsg(msg, room, callback, token) {
   }, token);
 }
 function processAnon(token) {
-  return token ? token.slice(0, 4) : "Err";
+  return token ? token.slice(0, 4) : "";
+}
+function roomRequest(callback, token) {
+  callback("SUCCESS", supportHandler.listRooms(false, true), token);
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Room,
+  roomRequest,
   sendMsg,
   supportHandler
 });

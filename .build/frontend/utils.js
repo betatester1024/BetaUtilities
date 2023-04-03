@@ -20,13 +20,14 @@ function send(params, callback) {
   if (failureTimeout)
     clearTimeout(failureTimeout);
   failureTimeout = setTimeout(() => alertDialog(`This is taking longer than expected.`, () => {
-  }, true, params), 1e3);
+  }, 1, params), 1e3);
 }
 let failureTimeout;
 let dialogQ = false;
 let cbk = () => {
 };
-function alertDialog(str, callback, refreshButtonQ = false, failedReq = "") {
+let BLOCKCALLBACK = false;
+function alertDialog(str, callback, button = -1, failedReq = "") {
   let ele = document.getElementById("overlay");
   let p = document.getElementById("alerttext");
   if (!ele || !p) {
@@ -37,10 +38,18 @@ function alertDialog(str, callback, refreshButtonQ = false, failedReq = "") {
   dialogQ = true;
   cbk = callback;
   p.innerText = str;
-  if (refreshButtonQ) {
+  if (button == 1) {
     p.innerHTML += `<button class='btn szThird fssml' onclick='location.reload()'>Refresh?
     <div class="anim"></div></button>`;
     console.log("Failed request: " + failedReq);
+    BLOCKCALLBACK = true;
+  } else if (button == 2) {
+    p.innerHTML += `<br>
+    <p class="fssml gry nohover"> [Press any key or click 'Continue' below to confirm] </p>
+    <button class='btn szFull red fssml cancel' onclick='closeAlert(true)'>
+    <span class="material-symbols-outlined">cancel</span>Cancel
+    <div class="anim"></div></button>`;
+    console.log("Confirm speedbump");
   }
   if (failureTimeout)
     clearTimeout(failureTimeout);
@@ -50,13 +59,17 @@ function closeAlert(overrideCallback = false) {
   let ele = document.getElementById("overlay");
   ele.style.top = "500vh";
   dialogQ = false;
-  if (cbk && !overrideCallback)
+  if (cbk && !overrideCallback && !BLOCKCALLBACK)
     cbk();
 }
 function keydown() {
   if (dialogQ) {
     console.log("CLOSED DIALOG");
-    closeAlert();
+    if (BLOCKCALLBACK)
+      console.log("CALLBACK HAS BEEN BLOCKED");
+    else
+      closeAlert();
+    BLOCKCALLBACK = false;
   }
 }
 function toTime(ms) {

@@ -56,10 +56,10 @@ button#sendBtn {
 }
 
 #msgArea > a, 
-#msgArea > b, 
 #msgArea > p, 
 #msgArea > span {
-  white-space: pre;
+  white-space: pre-wrap;
+  display: inline-block;
 }
 b {
 /*   font-family: "SupportText", "Noto Sans Display"; */
@@ -88,6 +88,10 @@ p.superadmin, b.superadmin, span.superadmin, a.superadmin {
   color: #00e500;
   font-variant-caps: small-caps;
   font-size: large;
+}
+
+.superadmin.material-symbols-outlined {
+  font-variant-caps: normal;
 }
 
 #userlist {

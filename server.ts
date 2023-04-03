@@ -8,9 +8,10 @@ import {signup, validateLogin, logout} from './validateLogin';
 import { delAcc } from './delacc';
 import {updateUser} from './updateUser'
 import {userRequest} from './userRequest';
+import {EE} from './EEHandler';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
-import {supportHandler, Room, sendMsg} from './supportRooms'
+import {supportHandler, roomRequest, sendMsg} from './supportRooms'
 const urlencodedParser = bodyParser.urlencoded({ extended: false }) 
 var RateLimit = require('express-rate-limit');
 
@@ -51,6 +52,30 @@ export async function initServer() {
 
   app.get('/admin', (req:any, res:any) => {
     res.sendFile(K.frontendDir+'/admin.html');
+    incrRequests();
+  });
+
+  app.get('/todo', (req:any, res:any) => {
+    res.sendFile(K.frontendDir+'/todo.html');
+    incrRequests();
+  });
+  
+  app.get('/EE', (req:any, res:any) => {
+    EE(true, (status:string, data:any, token:string)=>{
+      res.set('Content-Type', 'text/html')
+      res.send(Buffer.from(data.data));
+    }, "")
+    
+    incrRequests();
+  });
+
+  app.get('/docs', (req:any, res:any) => {
+    res.sendFile(K.frontendDir+'/docs.html');
+    incrRequests();
+  });
+  
+  app.get('/EEdit', (req:any, res:any) => {
+    res.sendFile(K.frontendDir+'/EEdit.html');
     incrRequests();
   });
   
@@ -167,6 +192,16 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       break;
     case 'userRequest': 
       userRequest(callback, token);
+      break;
+    case 'roomRequest':
+      roomRequest(callback, token);
+      break;
+    case 'getEE':
+      EE(true, callback, token, "");
+      break;
+    case 'setEE':
+      data = data as {data:string}
+      EE(false, callback, token, data.data);
       break;
     case 'updateuser': 
       data = data as {user:string, oldPass: string, pass:string, newPermLevel:string};

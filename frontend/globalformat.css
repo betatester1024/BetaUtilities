@@ -8,6 +8,8 @@ html {
   --max-green: #00ef00;
   --system-yellow: #FFCC1F;
   --system-yellow2:rgba(255, 204, 31, 0.1);
+  --system-grey: #8c8c8c;
+  --system-grey2:rgba(140, 140, 140, 0.1);
   --system-bg: #eee;
   font-family: 'Noto Sans Display', monospace;
 }
@@ -139,6 +141,18 @@ div.anim.inp {
   border: 2.3px solid var(--system-red);
 }
 
+.gry {
+  color: var(--system-grey);
+}
+.gry:hover {
+  background-color: var(--system-grey2);
+}
+.gry > .anim {
+  border: 2.3px solid var(--system-grey);
+}
+.nohover:hover {
+  background-color: unset !important;
+}
 
 .material-symbols-outlined {
   font-variation-settings:
@@ -184,6 +198,10 @@ div.inpContainer {
   margin: 0px 5%;
 }
 
+span.material-symbols-outlined {
+  max-width:1.4em;
+}
+
 .overlay {
   position: absolute;
   height: 100vh;
@@ -217,4 +235,15 @@ div.inpContainer {
 }
 .fslg {
   font-size: 4em;
+}
+
+textarea {
+  width: 90%;
+  height: 50vh;
+  
+}
+
+.cancel {
+  top: calc(100% - 9em);
+  position: relative;
 }

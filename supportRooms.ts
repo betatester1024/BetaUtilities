@@ -52,13 +52,13 @@ export class supportHandler {
   
   static listRooms(euphOnlyQ:boolean, onlineOnlyQ:boolean) {
     if(euphOnlyQ) {
-      return listEuphRooms
+      return listEuphRooms()
     }
     else if (onlineOnlyQ) {
-      return listOnlineRooms
+      return listOnlineRooms()
     }
     else {
-      return listAllRooms
+      return listAllRooms()
     }
   }
   

@@ -201,8 +201,9 @@ export async function initServer() {
     if (!body) res.end(JSON.stringify({status:"ERROR", data:null}));
     // let cookiematch = req.cookies.match("sessionID=[0-9a-zA-Z\\-]");
     makeRequest(body.action, req.cookies.sessionID, body.data, (s:string, d:any, token:string)=>{
-      if(body.action=="login"||body.action == "logout" ||
-        body.action == "delAcc" || body.action == "signup") res.cookie('sessionID', token?token:"", { maxAge: 1000*60*60*24*30, httpOnly: true, secure:true, sameSite:"Strict"});
+      /*if(body.action=="login"||body.action == "logout" ||
+        body.action == "delAcc" || body.action == "signup")*/
+      if (body.action != "sendMsg") res.cookie('sessionID', token?token:"", { maxAge: 1000*60*60*24*30, httpOnly: true, secure:true, sameSite:"Strict"});
       res.end(JSON.stringify({status:s, data:d}));
     })
   });

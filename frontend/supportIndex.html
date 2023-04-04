@@ -10,7 +10,7 @@
           else {
             let btns = "";
             for (let i=0; i<res.data.length; i++) {
-              btns += `<a class="btn fsmed" style="width:12em" href="/support?room=${res.data[i]}">${res.data[i]}<div class="anim"></div></a>`;
+              btns += `<a class="btn fsmed" style="width:12em" href="/support?room=${res.data[i].slice(1)}">${res.data[i]}<div class="anim"></div></a>`;
             }
             document.getElementById("rooms").innerHTML = btns;
           }

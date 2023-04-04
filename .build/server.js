@@ -193,7 +193,7 @@ async function initServer() {
     if (!body)
       res.end(JSON.stringify({ status: "ERROR", data: null }));
     makeRequest(body.action, req.cookies.sessionID, body.data, (s, d, token) => {
-      if (body.action == "login" || body.action == "logout" || body.action == "delAcc" || body.action == "signup")
+      if (body.action != "sendMsg")
         res.cookie("sessionID", token ? token : "", { maxAge: 1e3 * 60 * 60 * 24 * 30, httpOnly: true, secure: true, sameSite: "Strict" });
       res.end(JSON.stringify({ status: s, data: d }));
     });

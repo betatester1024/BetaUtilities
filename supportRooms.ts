@@ -55,9 +55,17 @@ export class supportHandler {
       if (euphOnlyQ && this.allRooms[i].type != "EUPH_ROOM") continue;
       if (onlineOnlyQ && this.allRooms[i].type != "ONLINE_SUPPORT") continue;
       if (this.allRooms[i].type == "HIDDEN_SUPPORT") continue;
-      out.push(this.allRooms[i].name);
+      out.push(this.getPrefix(this.allRooms[i].type)+this.allRooms[i].name);
     }
     return out;
+  }
+
+  static getPrefix(type:string) {
+    switch(type) {
+      case 'EUPH_ROOM': return "&";
+      case 'ONLINE_SUPPORT': return "#";
+      default: return "??";
+    }
   }
   
   static checkFoundQ(roomName:string) {
@@ -90,6 +98,7 @@ function processAnon(token:string) {
   return token?token.slice(0, 4):"";
 }
 
-export function roomRequest(callback:(status:string, data:any, token:string)=>any, token:string) {
-  callback("SUCCESS", supportHandler.listRooms(false, true), token);
+export function roomRequest(callback:(status:string, data:any, token:string)=>any, token:string, all:boolean=false) {
+  if (all) callback("SUCCESS", supportHandler.listRooms(false, false), token);
+  else callback("SUCCESS", supportHandler.listRooms(false, true), token);
 }

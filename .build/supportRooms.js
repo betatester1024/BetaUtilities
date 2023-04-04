@@ -87,9 +87,19 @@ class supportHandler {
         continue;
       if (this.allRooms[i].type == "HIDDEN_SUPPORT")
         continue;
-      out.push(this.allRooms[i].name);
+      out.push(this.getPrefix(this.allRooms[i].type) + this.allRooms[i].name);
     }
     return out;
+  }
+  static getPrefix(type) {
+    switch (type) {
+      case "EUPH_ROOM":
+        return "&";
+      case "ONLINE_SUPPORT":
+        return "#";
+      default:
+        return "??";
+    }
   }
   static checkFoundQ(roomName) {
     for (let i = 0; i < this.allRooms.length; i++) {
@@ -120,8 +130,11 @@ async function sendMsg(msg, room, callback, token) {
 function processAnon(token) {
   return token ? token.slice(0, 4) : "";
 }
-function roomRequest(callback, token) {
-  callback("SUCCESS", supportHandler.listRooms(false, true), token);
+function roomRequest(callback, token, all = false) {
+  if (all)
+    callback("SUCCESS", supportHandler.listRooms(false, false), token);
+  else
+    callback("SUCCESS", supportHandler.listRooms(false, true), token);
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

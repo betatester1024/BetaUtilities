@@ -59,12 +59,17 @@ export async function initServer() {
     res.sendFile(K.frontendDir+'/todo.html');
     incrRequests();
   });
+
+  app.get('/status', (req:any, res:any) => {
+    res.sendFile(K.frontendDir+'/status.html');
+    incrRequests();
+  });
   
   app.get('/EE', (req:any, res:any) => {
-    EE(true, (status:string, data:any, token:string)=>{
+    EE(true, (_status:string, data:any, _token:string)=>{
       res.set('Content-Type', 'text/html')
       res.send(Buffer.from(data.data));
-    }, "")
+    }, "", "")
     
     incrRequests();
   });
@@ -196,6 +201,8 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
     case 'roomRequest':
       roomRequest(callback, token);
       break;
+    case 'statusRequest':
+      roomRequest(callback, token, true);
     case 'getEE':
       EE(true, callback, token, "");
       break;

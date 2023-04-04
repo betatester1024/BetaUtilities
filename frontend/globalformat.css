@@ -31,6 +31,12 @@ hr.rounded {
   border-radius: 5px;
 }
 
+hr.redrounded {
+  border: 3px solid var(--system-red);
+  width: 90vw;
+  border-radius: 5px;
+}
+
 .main_content {
   height: 100vh;
   width: 100vw;
@@ -150,6 +156,16 @@ div.anim.inp {
 .gry > .anim {
   border: 2.3px solid var(--system-grey);
 }
+
+.blu {
+  color: var(--system-blue);
+}
+.blu:hover {
+  background-color: var(--system-blue2);
+}
+.blu > .anim {
+  border: 2.3px solid var(--system-blue);
+}
 .nohover:hover {
   background-color: unset !important;
 }
@@ -240,7 +256,11 @@ span.material-symbols-outlined {
 textarea {
   width: 90%;
   height: 50vh;
-  
+  color: var(--system-blue);
+  font-family:"Noto Sans Mono";
+  border: 2px var(--system-blue);
+  border-radius: 10px;
+  resize: vertical;
 }
 
 .cancel {

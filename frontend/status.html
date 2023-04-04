@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='./utils.js'></script>
+    <title>Status | BetaOS Systems</title>
+    <script>
+      function onLoad() {
+        send(JSON.stringify({action:"statusRequest"}), (res)=>{
+          if (res.status != "SUCCESS") {
+            alertDialog("Error: "+res.data.error);
+            return;
+          }
+          let euphOnlineQ = false;
+          let out = "<span>BetaUtilities is in: </span>";
+          for (let i=0; i<res.data.length; i++) {
+            if (res.data[i].charAt(0) == "&") {
+              euphOnlineQ = true;
+              out += `<a class='blu' href="https://euphoria.io/room/${res.data[i].slice(1)}">${res.data[i]}</a>`;
+            }
+            else out += `<a class='blu' href="/support?room=${res.data[i].slice(1)}">${res.data[i]}</a>`;
+            if (i<res.data.length-1) out += ", ";
+          }
+          let hdr = document.getElementById("hdr");
+          let hr = document.getElementById("hr");
+          if (euphOnlineQ) {
+            hdr.innerText = "Status: ONLINE";
+            hdr.className = "grn nohover";
+          } // services online on euph
+          else {
+            hdr.innerText = "Status: Euphoria connection FAILED";
+            hdr.className = "red nohover";
+            hr.className = "redrounded";
+          }
+          if (res.data.length == 0 ) {
+            hdr.innerText = "Status: Euphoria connection and Support Rooms FAILED"
+          }
+          document.getElementById("inner_content").innerHTML = out;
+        })
+      }
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      #inner_content {
+        width: 90%;
+        margin: 0px auto;
+      }
+      a {
+        border-radius: 5px;
+        transition: all 0.2s ease-in-out;
+      }
+      #hdr {
+        border: none;
+        width: 95%;
+        margin: 0px auto;
+      }
+    </style>
+  </head>
+  <body onload = "globalOnload(); onLoad()">
+    <div class="main_content">
+      <header>
+        <h2 id="hdr" class="gry nohover">Status: Loading</h2>
+        <hr class="rounded" id="hr">
+      </header>
+      <p id="inner_content" class="fsmed">Loading... </p><br><br>
+      <a class="btn" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+    </div>
+    
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

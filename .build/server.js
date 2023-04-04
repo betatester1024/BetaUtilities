@@ -73,11 +73,15 @@ async function initServer() {
     res.sendFile(import_consts.K.frontendDir + "/todo.html");
     incrRequests();
   });
+  app.get("/status", (req, res) => {
+    res.sendFile(import_consts.K.frontendDir + "/status.html");
+    incrRequests();
+  });
   app.get("/EE", (req, res) => {
-    (0, import_EEHandler.EE)(true, (status, data, token) => {
+    (0, import_EEHandler.EE)(true, (_status, data, _token) => {
       res.set("Content-Type", "text/html");
       res.send(Buffer.from(data.data));
-    }, "");
+    }, "", "");
     incrRequests();
   });
   app.get("/docs", (req, res) => {
@@ -185,6 +189,8 @@ function makeRequest(action, token, data, callback) {
     case "roomRequest":
       (0, import_supportRooms.roomRequest)(callback, token);
       break;
+    case "statusRequest":
+      (0, import_supportRooms.roomRequest)(callback, token, true);
     case "getEE":
       (0, import_EEHandler.EE)(true, callback, token, "");
       break;

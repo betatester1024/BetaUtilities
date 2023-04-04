@@ -49,12 +49,41 @@ export class supportHandler {
     }, token);
     console.log("removed connection in "+rn);
   }
+  
   static listRooms(euphOnlyQ:boolean, onlineOnlyQ:boolean) {
+    if(euphOnlyQ) {
+      return listEuphRooms()
+    }
+    else if (onlineOnlyQ) {
+      return listOnlineRooms()
+    }
+    else {
+      return listAllRooms()
+    }
+  }
+  
+  static listAllRooms(euphOnlyQ:boolean, onlineOnlyQ:boolean) {
     let out = [];
     for (let i=0; i<this.allRooms.length; i++) {
-      if (euphOnlyQ && this.allRooms[i].type != "EUPH_ROOM") continue;
-      if (onlineOnlyQ && this.allRooms[i].type != "ONLINE_SUPPORT") continue;
       if (this.allRooms[i].type == "HIDDEN_SUPPORT") continue;
+      out.push(this.getPrefix(this.allRooms[i].type)+this.allRooms[i].name);
+    }
+    return out;
+  }
+  
+  static listEuphRooms(euphOnlyQ:boolean, onlineOnlyQ:boolean) {
+    let out = [];
+    for (let i=0; i<this.allRooms.length; i++) {
+      if (this.allRooms[i].type != "EUPH_ROOM") continue;
+      out.push(this.getPrefix(this.allRooms[i].type)+this.allRooms[i].name);
+    }
+    return out;
+  }
+  
+  static listOnlineRooms(euphOnlyQ:boolean, onlineOnlyQ:boolean) {
+    let out = [];
+    for (let i=0; i<this.allRooms.length; i++) {
+      if (this.allRooms[i].type != "ONLINE_SUPPORT") continue;
       out.push(this.getPrefix(this.allRooms[i].type)+this.allRooms[i].name);
     }
     return out;
@@ -99,6 +128,6 @@ function processAnon(token:string) {
 }
 
 export function roomRequest(callback:(status:string, data:any, token:string)=>any, token:string, all:boolean=false) {
-  if (all) callback("SUCCESS", supportHandler.listRooms(false, false), token);
-  else callback("SUCCESS", supportHandler.listRooms(false, true), token);
+  if (all) callback("SUCCESS", supportHandler.listAllRooms(), token);
+  else callback("SUCCESS", supportHandler.listOnlineRooms(), token);
 }

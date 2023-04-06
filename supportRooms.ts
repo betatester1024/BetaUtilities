@@ -1,5 +1,5 @@
-import { userRequest } from './userRequest';
-import { K } from './consts';
+import {userRequest} from './userRequest';
+import {msgDB} from './consts';
 export class Room {
   type:string;
   pausedQ: boolean;
@@ -123,12 +123,20 @@ export class supportHandler {
   }  
 }
 
+<<<<<<< HEAD
 export function sendMsg(msg:string, room:string, token:string, callback: (status:string, data:any, token:string)=>any) {
   userRequest(token).then(async (obj:{status:string, data:any, token:string})=>{
     await K.msgDB.insertOne({fieldName:"MSG", data:msg, 
                              sender:obj.data.user??""+processAnon(token), expiry:Date.now()+3600*1000, room:room});
     if (obj.status == "SUCCESS") supportHandler.sendMsgTo(room, "["+obj.data.alias+"]("+obj.data.perms+")"+msg);
     else supportHandler.sendMsgTo(room, "["+processAnon(token)+"](1)"+msg);
+=======
+export async function sendMsg(msg:string, room:string, callback: (status:string, data:any, token:string)=>any, token:string) {
+  userRequest(async (status:string, data:any, _token:string)=>{
+    await msgDB.insertOne({fieldName:"MSG", user:data.alias});
+    if (status == "SUCCESS") supportHandler.sendMsgTo(room, "["+data.alias+"]("+data.perms+")"+msg);
+    else supportHandler.sendMsgTo(room, "[ANON|"+processAnon(token)+"](1)"+msg);
+>>>>>>> origin/v2
     callback("SUCCESS", null, token);
   });
 }

@@ -1,21 +1,29 @@
-import {K} from './consts';
+import {authDB, userRegex, hashingOptions} from './consts';
 const argon2 = require('argon2');
 
+<<<<<<< HEAD
 export async function updateUser(user:string, oldPass:string, newPass:string, newPermLevel:number, token:string) {
   if (!user.match(K.userRegex)) {
     return {status:"ERROR", data:{error:"Invalid user string!"}, token:token}
+=======
+export async function updateUser(user:string, oldPass:string, newPass:string, newPermLevel:number, callback:(status:string, data:any, token:string)=>any, token:string) {
+  if (!user.match(userRegex)) {
+    callback("ERROR", {error:"Invalid user string!"}, token)
+    return;
+>>>>>>> origin/v2
   }
   if (newPass.length == 0) {
     return {status:"ERROR", data:{error:"No password provided!"}, token:token}
   }
-  let tokenData:{associatedUser:string, expiry:number} = await K.authDB.findOne({fieldName:"Token", token:token});
+  let tokenData:{associatedUser:string, expiry:number} = await authDB.findOne({fieldName:"Token", token:token});
   if (!tokenData) {
     return {status:"ERROR", data:{error:"Cannot update user information: Your session could not be found!"}, token:""}
   }
-  let userData:{permLevel:number, pwd:string} = await K.authDB.findOne({fieldName:"UserData", user:tokenData.associatedUser});
+  let userData:{permLevel:number, pwd:string} = await authDB.findOne({fieldName:"UserData", user:tokenData.associatedUser});
   if (Date.now() > tokenData.expiry) {
     return {status:"ERROR", data:{error:"Cannot update user information: Your session has expired!"}, token:""};
   }
+<<<<<<< HEAD
   let newUserData = await K.authDB.findOne({fieldName:"UserData", user:user});
   if (userData.permLevel >=2 && 
       (!newUserData || newUserData.permLevel< userData.permLevel)
@@ -30,6 +38,21 @@ export async function updateUser(user:string, oldPass:string, newPass:string, ne
     await K.authDB.updateOne({fieldName:"UserData", user:tokenData.associatedUser}, 
         {$set:{pwd:await argon2.hash(newPass, K.hashingOptions)}});
     return {status:"SUCCESS", data:{perms:userData.permLevel}, token: token};
+=======
+  let newUserData = await authDB.findOne({fieldName:"UserData", user:user});
+  if (userData.permLevel >=2 && (!newUserData || newUserData.permLevel< userData.permLevel)) {
+    // administrators can update other accounts but not other admins
+    await authDB.updateOne({fieldName:"UserData", user:user}, 
+        {$set:{pwd:await argon2.hash(newPass, hashingOptions), permLevel:newPermLevel}}, {upsert:true});
+    callback("SUCCESS", {perms: newPermLevel}, token);
+    return;
+  }
+  else if (await argon2.verify(userData.pwd, oldPass)) { // unless you have their password, I suppose.
+    await authDB.updateOne({fieldName:"UserData", user:tokenData.associatedUser}, 
+        {$set:{pwd:await argon2.hash(newPass, hashingOptions)}});
+    callback("SUCCESS",{perms:userData.permLevel}, token);
+    return;
+>>>>>>> origin/v2
   } else {
     return {status: "ERROR", data:{error:"Cannot update user information: Access denied!"}, token:token};
   }

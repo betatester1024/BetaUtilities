@@ -8,8 +8,9 @@
       function login() {
         let usr = document.getElementById("userInp");
         let pwd = document.getElementById("pwdInp");
+        let ck = document.getElementById("ckInp");
         let redirect = document.URL.match("redirect=(.*)$")
-        send(JSON.stringify({action:"login", data:{user:usr.value, pass:pwd.value}}), (res)=>{
+        send(JSON.stringify({action:"login", data:{user:usr.value, pass:pwd.value, persistQ:ck.checked}}), (res)=>{
           if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{});
           else {
             alertDialog("Welcome, "+usr.value +" ("+accessLevels[res.data.perms]+")", ()=>{
@@ -46,6 +47,13 @@
           <div class="inpContainer">
             <input id="pwdInp" type="password" placeholder="Password">
             <div class="anim inp"></div>
+          </div>
+          <div class="inpContainer">
+            <label class="inpContainer">
+              <input id="ckInp" type="checkbox" placeholder="Password">
+              <span class="blu nohover fsmed">Stay logged in</span>
+              <div class="anim inp"></div>
+            </label>
           </div>
           <button type=submit class="btn szFull grn">
             <span class="material-symbols-outlined">login</span>

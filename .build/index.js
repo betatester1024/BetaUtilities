@@ -2,6 +2,8 @@
 var import_server = require("./server");
 var import_database = require("./database");
 var import_supportRooms = require("./supportRooms");
+var import_logging = require("./logging");
+(0, import_logging.log)("Systems restarted", true);
 (0, import_server.initServer)();
 (0, import_database.DBMaintenance)();
 import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("ONLINE_SUPPORT", "main_support"));

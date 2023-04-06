@@ -24,11 +24,11 @@ module.exports = __toCommonJS(consts_exports);
 var import_database = require("./database");
 const argon2 = require("argon2");
 const K = {
-  rootDir: "/home/runner/BetaUtilitiesV2/",
-  frontendDir: "/home/runner/BetaUtilitiesV2/frontend/",
-  jsDir: "/home/runner/BetaUtilitiesV2/.build/frontend/",
+  rootDir: "/home/runner/v2/",
+  frontendDir: "/home/runner/v2/frontend/",
+  jsDir: "/home/runner/v2/.build/frontend/",
   port: 3e3,
-  userRegex: /^[0-9a-zA-Z_\\-]+$/,
+  userRegex: /^[0-9a-zA-Z_\\-]{1,20}$/,
   roomRegex: "[0-9a-zA-Z_\\-]{1,20}",
   pwdMaxLength: 9e99,
   userMaxLength: 9e99,

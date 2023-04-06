@@ -11,7 +11,12 @@
          let ele = document.getElementById("welcomeHdr");
          ele.innerText = "Welcome "+res.data.user+"!"; 
          let userInfo = document.createElement("h2");
-         setInterval(()=>{userInfo.innerText = "logged in as "+accessLevels[res.data.perms]+" (session expiring in "+toTime(res.data.expiry-Date.now())+")";}, 100);
+         setInterval(()=>{userInfo.innerHTML = "logged in as "+accessLevels[res.data.perms]+
+           (res.data.expiry<Date.now()?" (session expired)":
+            (res.data.expiry>100*365*24*69*60*1000?` (session expiring in 
+            <span class="material-symbols-outlined">all_inclusive</span> days)`:
+             " (session expiring in "+toTime(res.data.expiry-Date.now())+")"));
+          }, 100);
          ele.append(userInfo);
          userInfo.style.fontSize = "0.4em";
          let loginBtn = document.getElementById("loginBtn")
@@ -89,6 +94,15 @@
         <a class="btn szHalf" href="/EEdit">
           <span class="material-symbols-outlined">edit</span>
           Edit the page!<div class="anim"></div></a>
+        <a class="btn szThird" href="/about">
+          <span class="material-symbols-outlined">info</span>
+          About<div class="anim"></div></a>
+        <a class="btn szThird fsmed" href="/commands">
+          <span class="material-symbols-outlined">build</span>
+          Commands<div class="anim"></div></a>
+        <a class="btn szThird" href="/contact">
+          <span class="material-symbols-outlined">phone</span>
+          Contact<div class="anim"></div></a>
         
 <!--         <a class="btn szHalf" href="/login">login4<div class="anim"></div></a>
         <a class="btn szHalf" href="/login">Login5<div class="anim"></div></a>
@@ -97,5 +111,6 @@
         <a class="btn szFull" href="/login">Login<div class="anim"></div></a> -->
       </div>
     </div>
+    
   </body>
 </html>

@@ -28,7 +28,7 @@ async function initClient()
     console.log('Got', message);
     ele = document.getElementById("userList");
     let modif = message.data;
-    document.getElementById("placeholder").style.display="none";
+    
 
     let removed = rmvReg.exec(modif);
     let added = addReg.exec(modif)
@@ -44,6 +44,7 @@ async function initClient()
       removed = modif.match(rmvReg);
       added = modif.match(addReg);
     }
+    
     ele = document.getElementById("msgArea");
     let scrDistOKQ =  (ele.scrollTop) >= (ele.scrollHeight-ele.offsetHeight - 100)
     let msgs = modif.split(">");
@@ -105,6 +106,7 @@ async function initClient()
       ele.appendChild(newMsgSender);
       ele.appendChild(newMsgBody);
       ele.appendChild(document.createElement("br"));
+      document.getElementById("placeholder").style.display="none";
     } // 
     
     if (!LOADEDQ2 || scrDistOKQ)

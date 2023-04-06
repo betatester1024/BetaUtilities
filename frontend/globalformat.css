@@ -3,6 +3,7 @@ html {
   --system-red2: rgba(238, 0, 0, 0.1);
   --system-blue:#0a84ff;
   --system-blue2: rgba(10, 132, 255, 0.1);
+  --system-blue3: rgba(10, 132, 255, 0.4);
   --system-green: #00cc00;
   --system-green2: rgba(0, 255, 0, 0.1);
   --max-green: #00ef00;
@@ -11,6 +12,7 @@ html {
   --system-grey: #8c8c8c;
   --system-grey2:rgba(140, 140, 140, 0.1);
   --system-bg: #eee;
+  --system-transp: rgba(0, 0, 0, 0);
   font-family: 'Noto Sans Display', monospace;
 }
 
@@ -196,6 +198,18 @@ input, select {
   cursor: text;
 }
 
+input[type=checkbox] {
+  cursor: pointer;
+  width: 0.6em;
+  height: 0.6em;
+  margin-right: 0.3em;
+  background-color: var(--system-blue);
+}
+
+label {
+  cursor: pointer;
+}
+
 select {
   cursor: pointer;
 }
@@ -216,6 +230,7 @@ div.inpContainer {
 
 span.material-symbols-outlined {
   max-width:1.4em;
+  font-variant-caps: normal !important;
 }
 
 .overlay {
@@ -258,7 +273,7 @@ textarea {
   height: 50vh;
   color: var(--system-blue);
   font-family:"Noto Sans Mono";
-  border: 2px var(--system-blue);
+  border: 2px solid var(--system-blue);
   border-radius: 10px;
   resize: vertical;
 }

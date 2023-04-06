@@ -45,47 +45,79 @@ class supportHandler {
   static addRoom(r) {
     this.allRooms.push(r);
   }
-  static addConnection(ev, rn, token) {
+  static async addConnection(ev, rn, token) {
     for (let i = 0; i < this.connections.length; i++) {
       if (this.connections[i].roomName == rn)
-        (0, import_userRequest.userRequest)((status, data, _token) => {
-          if (status == "SUCCESS")
-            ev.write("data:+" + data.alias + "(" + data.perms + ")>\n\n");
+        (0, import_userRequest.userRequest)(this.connections[i].tk).then((obj) => {
+          if (obj.status == "SUCCESS")
+            ev.write("data:+" + obj.data.alias + "(" + obj.data.perms + ")>\n\n");
           else
-            ev.write("data:+ANON|" + processAnon(this.connections[i].tk) + "(1)>\n\n");
-        }, this.connections[i].tk);
+            ev.write("data:+" + processAnon(this.connections[i].tk) + "(1)>\n\n");
+        });
     }
     this.connections.push({ event: ev, roomName: rn, tk: token });
-    (0, import_userRequest.userRequest)((status, data, _token) => {
-      if (status == "SUCCESS")
-        this.sendMsgTo(rn, "+" + data.alias + "(" + data.perms + ")");
+    (0, import_userRequest.userRequest)(token).then((obj) => {
+      if (obj.status == "SUCCESS")
+        this.sendMsgTo(rn, "+" + obj.data.alias + "(" + obj.data.perms + ")");
       else
-        this.sendMsgTo(rn, "+ANON|" + processAnon(token) + "(1)");
-    }, token);
+        this.sendMsgTo(rn, "+" + processAnon(obj.token) + "(1)");
+    });
     console.log("added connection in " + rn);
+    let msgs = await import_consts.K.msgDB.find({ fieldName: "MSG", room: rn }).toArray();
+    let text = "";
+    for (let i = 0; i < msgs.length; i++) {
+      let userData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: msgs[i].sender });
+      if (!userData)
+        text += "[" + msgs[i].sender + "](1)" + msgs[i].data + ">";
+      else
+        text += "[" + (userData.alias ?? msgs[i].sender) + "](" + userData.permLevel + ")" + msgs[i].data + ">";
+    }
+    text += "[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. \nThank you for using BetaOS Systems!>";
+    ev.write("data:" + text + "\n\n");
   }
   static async removeConnection(ev, rn, token) {
-    for (let i = 0; i < this.connections.length; i++) {
-      if (this.connections[i].event == ev)
-        this.connections.splice(i, 1);
-    }
-    ;
-    (0, import_userRequest.userRequest)((status, data, _token) => {
-      if (status == "SUCCESS")
-        this.sendMsgTo(rn, "-" + data.alias + "(" + data.perms + ")");
+    let idx = this.connections.findIndex((cn) => cn.event == ev);
+    if (idx >= 0)
+      this.connections.splice(idx, 1);
+    (0, import_userRequest.userRequest)(token).then((obj) => {
+      if (obj.status == "SUCCESS")
+        this.sendMsgTo(rn, "-" + obj.data.alias + "(" + obj.data.perms + ")");
       else
-        this.sendMsgTo(rn, "-ANON|" + processAnon(token) + "(1)");
-    }, token);
-    console.log("removed connection in " + rn);
+        this.sendMsgTo(rn, "-" + processAnon(obj.token) + "(1)");
+      console.log("removed connection in " + rn);
+    });
   }
   static listRooms(euphOnlyQ, onlineOnlyQ) {
+    if (euphOnlyQ) {
+      return this.listEuphRooms();
+    } else if (onlineOnlyQ) {
+      return this.listOnlineRooms();
+    } else {
+      return this.listAllRooms();
+    }
+  }
+  static listAllRooms() {
     let out = [];
     for (let i = 0; i < this.allRooms.length; i++) {
-      if (euphOnlyQ && this.allRooms[i].type != "EUPH_ROOM")
-        continue;
-      if (onlineOnlyQ && this.allRooms[i].type != "ONLINE_SUPPORT")
-        continue;
       if (this.allRooms[i].type == "HIDDEN_SUPPORT")
+        continue;
+      out.push(this.getPrefix(this.allRooms[i].type) + this.allRooms[i].name);
+    }
+    return out;
+  }
+  static listEuphRooms() {
+    let out = [];
+    for (let i = 0; i < this.allRooms.length; i++) {
+      if (this.allRooms[i].type != "EUPH_ROOM")
+        continue;
+      out.push(this.getPrefix(this.allRooms[i].type) + this.allRooms[i].name);
+    }
+    return out;
+  }
+  static listOnlineRooms() {
+    let out = [];
+    for (let i = 0; i < this.allRooms.length; i++) {
+      if (this.allRooms[i].type != "ONLINE_SUPPORT")
         continue;
       out.push(this.getPrefix(this.allRooms[i].type) + this.allRooms[i].name);
     }
@@ -111,30 +143,36 @@ class supportHandler {
   static sendMsgTo(roomName, data) {
     for (let i = 0; i < this.connections.length; i++) {
       if (this.connections[i].roomName == roomName) {
-        data = data.replace(">", "&gt;");
+        data = data.replaceAll(">", "&gt;");
         this.connections[i].event.write("data:" + data + ">\n\n");
       }
     }
   }
 }
-async function sendMsg(msg, room, callback, token) {
-  (0, import_userRequest.userRequest)(async (status, data, _token) => {
-    await import_consts.K.msgDB.insertOne({ fieldName: "MSG", user: data.alias });
-    if (status == "SUCCESS")
-      supportHandler.sendMsgTo(room, "[" + data.alias + "](" + data.perms + ")" + msg);
+function sendMsg(msg, room, token, callback) {
+  (0, import_userRequest.userRequest)(token).then(async (obj) => {
+    await import_consts.K.msgDB.insertOne({
+      fieldName: "MSG",
+      data: msg,
+      sender: obj.data.user ?? "" + processAnon(token),
+      expiry: Date.now() + 3600 * 1e3,
+      room
+    });
+    if (obj.status == "SUCCESS")
+      supportHandler.sendMsgTo(room, "[" + obj.data.alias + "](" + obj.data.perms + ")" + msg);
     else
-      supportHandler.sendMsgTo(room, "[ANON|" + processAnon(token) + "](1)" + msg);
+      supportHandler.sendMsgTo(room, "[" + processAnon(token) + "](1)" + msg);
     callback("SUCCESS", null, token);
-  }, token);
+  });
 }
 function processAnon(token) {
-  return token ? token.slice(0, 4) : "";
+  return "Anonymous user";
 }
-function roomRequest(callback, token, all = false) {
+function roomRequest(token, all = false) {
   if (all)
-    callback("SUCCESS", supportHandler.listRooms(false, false), token);
+    return { status: "SUCCESS", data: supportHandler.listAllRooms(), token };
   else
-    callback("SUCCESS", supportHandler.listRooms(false, true), token);
+    return { status: "SUCCESS", data: supportHandler.listOnlineRooms(), token };
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

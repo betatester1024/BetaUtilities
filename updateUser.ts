@@ -1,40 +1,36 @@
 import {K} from './consts';
 const argon2 = require('argon2');
 
-export async function updateUser(user:string, oldPass:string, newPass:string, newPermLevel:number, callback:(status:string, data:any, token:string)=>any, token:string) {
+export async function updateUser(user:string, oldPass:string, newPass:string, newPermLevel:number, token:string) {
   if (!user.match(K.userRegex)) {
-    callback("ERROR", {error:"Invalid user string!"}, token)
-    return;
+    return {status:"ERROR", data:{error:"Invalid user string!"}, token:token}
   }
   if (newPass.length == 0) {
-    callback("ERROR", {error:"No password provided!"}, token)
-    return;
+    return {status:"ERROR", data:{error:"No password provided!"}, token:token}
   }
   let tokenData:{associatedUser:string, expiry:number} = await K.authDB.findOne({fieldName:"Token", token:token});
   if (!tokenData) {
-    callback("ERROR", {error:"Cannot update user information: Your session could not be found!"}, "")
-    return;
+    return {status:"ERROR", data:{error:"Cannot update user information: Your session could not be found!"}, token:""}
   }
   let userData:{permLevel:number, pwd:string} = await K.authDB.findOne({fieldName:"UserData", user:tokenData.associatedUser});
   if (Date.now() > tokenData.expiry) {
-    callback("ERROR", {error:"Cannot update user information: Your session has expired!"}, "")
-    return;
+    return {status:"ERROR", data:{error:"Cannot update user information: Your session has expired!"}, token:""};
   }
   let newUserData = await K.authDB.findOne({fieldName:"UserData", user:user});
-  if (userData.permLevel >=2 && (!newUserData || newUserData.permLevel< userData.permLevel)) {
+  if (userData.permLevel >=2 && 
+      (!newUserData || newUserData.permLevel< userData.permLevel)
+     && newPermLevel < userData.permLevel) {
     // administrators can update other accounts but not other admins
     await K.authDB.updateOne({fieldName:"UserData", user:user}, 
         {$set:{pwd:await argon2.hash(newPass, K.hashingOptions), permLevel:newPermLevel}}, {upsert:true});
-    callback("SUCCESS", {perms: newPermLevel}, token);
-    return;
+    return {status:"SUCCESS", data:{perms: newPermLevel}, token:token};
   }
-  else if (await argon2.verify(userData.pwd, oldPass)) { // unless you have their password, I suppose.
+  else if (await argon2.verify(userData.pwd, oldPass)) { 
+    // unless you have their password, I suppose. but you can't provide that without editing the headers.
     await K.authDB.updateOne({fieldName:"UserData", user:tokenData.associatedUser}, 
         {$set:{pwd:await argon2.hash(newPass, K.hashingOptions)}});
-    callback("SUCCESS",{perms:userData.permLevel}, token);
-    return;
+    return {status:"SUCCESS", data:{perms:userData.permLevel}, token: token};
   } else {
-    callback("ERROR", {error:"Cannot update user information: Access denied!"}, token);
-    return;
+    return {status: "ERROR", data:{error:"Cannot update user information: Access denied!"}, token:token};
   }
 }

@@ -23,44 +23,37 @@ __export(updateUser_exports, {
 module.exports = __toCommonJS(updateUser_exports);
 var import_consts = require("./consts");
 const argon2 = require("argon2");
-async function updateUser(user, oldPass, newPass, newPermLevel, callback, token) {
+async function updateUser(user, oldPass, newPass, newPermLevel, token) {
   if (!user.match(import_consts.K.userRegex)) {
-    callback("ERROR", { error: "Invalid user string!" }, token);
-    return;
+    return { status: "ERROR", data: { error: "Invalid user string!" }, token };
   }
   if (newPass.length == 0) {
-    callback("ERROR", { error: "No password provided!" }, token);
-    return;
+    return { status: "ERROR", data: { error: "No password provided!" }, token };
   }
   let tokenData = await import_consts.K.authDB.findOne({ fieldName: "Token", token });
   if (!tokenData) {
-    callback("ERROR", { error: "Cannot update user information: Your session could not be found!" }, "");
-    return;
+    return { status: "ERROR", data: { error: "Cannot update user information: Your session could not be found!" }, token: "" };
   }
   let userData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
   if (Date.now() > tokenData.expiry) {
-    callback("ERROR", { error: "Cannot update user information: Your session has expired!" }, "");
-    return;
+    return { status: "ERROR", data: { error: "Cannot update user information: Your session has expired!" }, token: "" };
   }
   let newUserData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user });
-  if (userData.permLevel >= 2 && (!newUserData || newUserData.permLevel < userData.permLevel)) {
+  if (userData.permLevel >= 2 && (!newUserData || newUserData.permLevel < userData.permLevel) && newPermLevel < userData.permLevel) {
     await import_consts.K.authDB.updateOne(
       { fieldName: "UserData", user },
       { $set: { pwd: await argon2.hash(newPass, import_consts.K.hashingOptions), permLevel: newPermLevel } },
       { upsert: true }
     );
-    callback("SUCCESS", { perms: newPermLevel }, token);
-    return;
+    return { status: "SUCCESS", data: { perms: newPermLevel }, token };
   } else if (await argon2.verify(userData.pwd, oldPass)) {
     await import_consts.K.authDB.updateOne(
       { fieldName: "UserData", user: tokenData.associatedUser },
       { $set: { pwd: await argon2.hash(newPass, import_consts.K.hashingOptions) } }
     );
-    callback("SUCCESS", { perms: userData.permLevel }, token);
-    return;
+    return { status: "SUCCESS", data: { perms: userData.permLevel }, token };
   } else {
-    callback("ERROR", { error: "Cannot update user information: Access denied!" }, token);
-    return;
+    return { status: "ERROR", data: { error: "Cannot update user information: Access denied!" }, token };
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

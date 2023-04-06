@@ -1,11 +1,11 @@
 import { database } from "./database";
 const argon2 = require('argon2');
 export const K = {
-  rootDir: '/home/runner/BetaUtilitiesV2/',
-  frontendDir: '/home/runner/BetaUtilitiesV2/frontend/',
-  jsDir:'/home/runner/BetaUtilitiesV2/.build/frontend/',
+  rootDir: '/home/runner/v2/',
+  frontendDir: '/home/runner/v2/frontend/',
+  jsDir:'/home/runner/v2/.build/frontend/',
   port: 3000,
-  userRegex: /^[0-9a-zA-Z_\\-]+$/,
+  userRegex: /^[0-9a-zA-Z_\\-]{1,20}$/,
   roomRegex: "[0-9a-zA-Z_\\-]{1,20}",
   pwdMaxLength: 9e99,
   userMaxLength: 9e99,
@@ -19,5 +19,7 @@ export const K = {
     parallelism: 1,
     hashLength: 50
   },
+  // time in ms until accounts expire (indexed according to access-level. 
+  // access-level 0 shouldn't exist.)
   expiry: [9e99, 1000*60, 1000*60*60*24*30, 1000*60*60],
 }

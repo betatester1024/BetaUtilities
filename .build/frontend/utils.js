@@ -1,6 +1,12 @@
 "use strict";
 function globalOnload() {
   document.onkeydown = keydown;
+  let maincontent = document.getElementsByClassName("main_content").item(0);
+  let ftr = document.createElement("footer");
+  maincontent.appendChild(ftr);
+  let ele = document.createElement("p");
+  ele.innerHTML = "BetaOS Systems | 2023";
+  ftr.appendChild(ele);
 }
 function send(params, callback) {
   var xhr = new XMLHttpRequest();
@@ -16,6 +22,7 @@ function send(params, callback) {
       callback(JSON.parse(xhr.responseText));
     }
   };
+  console.log(params);
   xhr.send(params);
   if (failureTimeout)
     clearTimeout(failureTimeout);
@@ -59,11 +66,14 @@ function closeAlert(overrideCallback = false) {
   let ele = document.getElementById("overlay");
   ele.style.top = "500vh";
   dialogQ = false;
-  if (cbk && !overrideCallback && !BLOCKCALLBACK)
+  if (cbk && !overrideCallback && !BLOCKCALLBACK) {
+    console.log("calling back");
     cbk();
+  }
 }
-function keydown() {
+function keydown(e) {
   if (dialogQ) {
+    e.preventDefault();
     console.log("CLOSED DIALOG");
     if (BLOCKCALLBACK)
       console.log("CALLBACK HAS BEEN BLOCKED");

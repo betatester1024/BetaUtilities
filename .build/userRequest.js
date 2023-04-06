@@ -23,18 +23,16 @@ __export(userRequest_exports, {
 module.exports = __toCommonJS(userRequest_exports);
 var import_consts = require("./consts");
 const argon2 = require("argon2");
-async function userRequest(callback, token) {
+async function userRequest(token) {
   let tokenData = await import_consts.K.authDB.findOne({ fieldName: "Token", token });
   if (!tokenData) {
-    callback("ERROR", { error: "Your session could not be found!" }, "");
-    return;
+    return { status: "ERROR", data: { error: "Your session could not be found!" }, token: "" };
   }
   let userData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
   if (Date.now() > tokenData.expiry) {
-    callback("ERROR", { error: "Your session has expired!" }, "");
-    return;
+    return { status: "ERROR", data: { error: "Your session has expired!" }, token: "" };
   }
-  callback("SUCCESS", { user: tokenData.associatedUser, alias: userData.alias ? userData.alias : userData.user, perms: userData.permLevel, expiry: tokenData.expiry }, token);
+  return { status: "SUCCESS", data: { user: tokenData.associatedUser, alias: userData.alias ?? userData.user, perms: userData.permLevel, expiry: tokenData.expiry }, token };
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

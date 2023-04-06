@@ -5,10 +5,11 @@ const parse = require("co-body");
  // for generating secure random #'s
 import {K} from './consts';
 import {signup, validateLogin, logout} from './validateLogin';
-import { delAcc } from './delacc';
+import { deleteAccount } from './delacc';
 import {updateUser} from './updateUser'
 import {userRequest} from './userRequest';
 import {EE} from './EEHandler';
+import {getLogs, log, purgeLogs} from './logging';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
 import {supportHandler, roomRequest, sendMsg} from './supportRooms'
@@ -29,101 +30,29 @@ export async function initServer() {
     res.sendFile(K.frontendDir+'/index.html');
     incrRequests();
   })
-
-  app.get('/login', (req:any, res:any) => {
-    res.sendFile(K.frontendDir+'/login.html');
-    incrRequests();
-  });
-
-  app.get('/signup', (req:any, res:any) => {
+  
+  app.get('/register', (req:any, res:any) => {
     res.sendFile(K.frontendDir+'/signup.html');
     incrRequests();
   });
 
-  app.get('/config', (req:any, res:any) => {
-    res.sendFile(K.frontendDir+'/config.html');
-    incrRequests();
-  });
 
   app.get('/account', (req:any, res:any) => {
     res.sendFile(K.frontendDir+'/config.html');
     incrRequests();
   });
 
-  app.get('/admin', (req:any, res:any) => {
-    res.sendFile(K.frontendDir+'/admin.html');
-    incrRequests();
-  });
-
-  app.get('/todo', (req:any, res:any) => {
-    res.sendFile(K.frontendDir+'/todo.html');
-    incrRequests();
-  });
-
-  app.get('/status', (req:any, res:any) => {
-    res.sendFile(K.frontendDir+'/status.html');
-    incrRequests();
-  });
   
   app.get('/EE', (req:any, res:any) => {
     EE(true, (_status:string, data:any, _token:string)=>{
       res.set('Content-Type', 'text/html')
-      res.send(Buffer.from(`<!DOCTYPE html>
-<html>
-  <head>
-    <script src='./utils.js'></script>
-    <title>Everyone Edits | BetaOS Systems</title>
-    <script>
-    </script>
-    <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="/globalformat.css">
-    <style>
-    </style>
-  </head>
-  <body onload = "globalOnload();">
-    <div class="main_content">
-    <header>
-      <h2>Everybody edits!</h2>
-      <hr class="rounded">
-    </header>
-      ${data.data}
-    </div>
-    
-    <div class="overlay" id="overlay">
-      <div class="internal">
-        <p class="fsmed" id="alerttext">Hey, some text here</p>
-        <button class="btn szTwoThirds" onclick="closeAlert()">
-          Continue
-          <span class="material-symbols-outlined">arrow_forward_ios</span>
-          <div class="anim"></div>
-        </button>
-      </div>
-    </div>
-  </body>
-</html>`));
+      res.send(Buffer.from(eeFormat(data.data)));
     }, "", "")
     
     incrRequests();
   });
 
-  app.get('/docs', (req:any, res:any) => {
-    res.sendFile(K.frontendDir+'/docs.html');
-    incrRequests();
-  });
   
-  app.get('/EEdit', (req:any, res:any) => {
-    res.sendFile(K.frontendDir+'/EEdit.html');
-    incrRequests();
-  });
-  
-  app.get('/logout', (req:any, res:any) => {
-    res.sendFile(K.frontendDir+'/logout.html');
-    incrRequests();
-  });
 
   app.get('/support', (req:any, res:any) => {
     let match = req.url.match('\\?room=('+K.roomRegex+")");
@@ -190,20 +119,33 @@ export async function initServer() {
   });
 
   app.get('/*', (req:any, res:any) => {
-    res.sendFile(K.frontendDir+"404.html");
+    let requrl = req.url.match("([^?]*)\\??.*")[1]
+    let idx = validPages.findIndex((obj)=>obj.toLowerCase()==requrl.toLowerCase());
+    if (idx>=0) res.sendFile(K.frontendDir+validPages[idx]+".html");
+    else res.sendFile(K.frontendDir+"404.html");
     incrRequests();
   })
   
   
   app.post('/server', urlencodedParser, async (req:any, res:any) => {
     incrRequests();
+    if (req.headers['content-length'] > 60000) {
+      res.set("Connection", "close");
+      res.status(413).end();
+      return;
+    }
     var body = await parse.json(req);
     if (!body) res.end(JSON.stringify({status:"ERROR", data:null}));
     // let cookiematch = req.cookies.match("sessionID=[0-9a-zA-Z\\-]");
     makeRequest(body.action, req.cookies.sessionID, body.data, (s:string, d:any, token:string)=>{
       /*if(body.action=="login"||body.action == "logout" ||
         body.action == "delAcc" || body.action == "signup")*/
-      if (body.action != "sendMsg") res.cookie('sessionID', token?token:"", { maxAge: 1000*60*60*24*30, httpOnly: true, secure:true, sameSite:"Strict"});
+      if (body.action == "getLogs"){}
+      else if (s=="SUCCESS") {
+        log("Action performed:"+body.action+", response:"+JSON.stringify(d));
+      }
+      else log("Action performed, error on "+body.action+", error:"+d.error);
+      res.cookie('sessionID', token?token:"", { maxAge: 1000*60*60*24*30, httpOnly: true, secure:true, sameSite:"Strict"});
       res.end(JSON.stringify({status:s, data:d}));
     })
   });
@@ -214,32 +156,40 @@ export async function initServer() {
 }
 
 async function incrRequests() {
-  let ct:{visitCt:number} = await K.uDB.findOne({fieldName:"VISITS"});
-  K.uDB.updateOne({fieldName:"VISITS"}, {$set:{visitCt:ct.visitCt+1}}, {upsert:true});
+  K.uDB.updateOne({fieldName:"VISITS"}, {$inc:{visitCt:1}}, {upsert:true});
 }
 
-function makeRequest(action:string|null, token:string, data:any|null, callback: (status:string, data:any, token:string)=>any) {
+function makeRequest(action:string|null, token:string, data:any|null, callback: (status:string, dat:any, token:string)=>any) {
   switch (action) {
     case 'test':
       callback("SUCCESS", {abc:"def", def:5}, token);
       break;
     case 'login': 
       // validate login-data before sending to server
-      data = data as {user:string, pass:string};
-      validateLogin(data.user, data.pass, callback, token);
+      data = data as {user:string, pass:string, persistQ:boolean};
+      validateLogin(data.user, data.pass, data.persistQ, token).
+        then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
       break;
     case 'signup':
       data = data as {user:string, pass:string};
-      signup(data.user, data.pass, callback, token);
+      signup(data.user, data.pass, token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});;
       break;
     case 'userRequest': 
-      userRequest(callback, token);
+      userRequest(token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
       break;
     case 'roomRequest':
-      roomRequest(callback, token);
+      let obj2 = roomRequest(token); // this one is synchronous
+      callback(obj2.status, obj2.data, obj2.token);
       break;
     case 'statusRequest':
-      roomRequest(callback, token, true);
+      let obj3 = roomRequest(token, true);
+      callback(obj3.status, obj3.data, obj3.token);
+      break;
     case 'getEE':
       EE(true, callback, token, "");
       break;
@@ -249,23 +199,86 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       break;
     case 'updateuser': 
       data = data as {user:string, oldPass: string, pass:string, newPermLevel:string};
-      updateUser(data.user, data.oldPass, data.pass, data.newPermLevel, callback, token);
+      updateUser(data.user, data.oldPass, data.pass, data.newPermLevel, token)
+      .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
       break;
     case 'delAcc':
       data = data as {user:string, pass:string};
-      delAcc(data.user, data.pass, callback, token);
+      deleteAccount(data.user, data.pass, token)
+      .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
       break;
     case 'logout':
-      logout(callback, token);
+      logout(token)
+      .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
       break;
     case 'logout_all':
-      logout(callback, token, true);
+      logout(token, true)
+      .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
       break;
     case 'sendMsg':
       data = data as {msg:string, room:string};
-      sendMsg(data.msg, data.room, callback, token);
+      sendMsg(data.msg, data.room, token, callback);
+      break;
+    case "getLogs":
+      getLogs(token)
+      .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "purgeLogs":
+      purgeLogs(token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
     default:
       callback("ERROR", {error: "Unknown command string!"}, token);
   }
   return; 
 }
+
+
+function eeFormat(data:string) {
+  return `<!DOCTYPE html>
+<html>
+  <head>
+    <script src='./utils.js'></script>
+    <title>Everyone Edits | BetaOS Systems</title>
+    <script>
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+    </style>
+  </head>
+  <body onload = "globalOnload();">
+    <div class="main_content">
+    <header>
+      <h2>Everybody edits!</h2>
+      <hr class="rounded">
+    </header>
+      ${data}
+    </div>
+    
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>`;
+}
+
+const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
+                    '/config', '/admin', '/docs', '/login', '/syslog'];

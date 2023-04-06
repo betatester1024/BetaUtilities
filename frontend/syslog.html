@@ -2,26 +2,27 @@
 <html>
   <head>
     <script src='./utils.js'></script>
-    <title>Edit the page | BetaOS Systems</title>
+    <title>System Log | BetaOS Systems</title>
     <script>
-      function onload() {
-        send(JSON.stringify({action:"getEE", data:null}), (res)=>{
-          if (res.status != "SUCCESS") alertDialog(res.data.error, ()=>{});
-          else {
-            document.getElementById("txtArea").value = res.data.data;
-          }
-        })
-      }
-      function sendUpdate() {
-        alertDialog("Confirm edits?", ()=>{
-          send(JSON.stringify({action:"setEE", data:{data:document.getElementById("txtArea").value}}), (res)=>{
-            if (res.status != "SUCCESS") alertDialog(res.data.error, ()=>{});
+      let LOADEDQ2 = false;
+      
+      function onLoad() {
+        setInterval(()=>{
+          ele = document.getElementById("txtarea");
+          let scrDistOKQ =  (ele.scrollTop) >= (ele.scrollHeight-ele.offsetHeight - 100)
+          send(JSON.stringify({action:"getLogs"}), (res)=>{
+            if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{location.href="/"});
             else {
-              alertDialog("Updated page!", ()=>{window.open('/EE', '_self')});
-            }
-            console.log("???");
-          })
-        }, 2);
+              document.getElementById("txtarea").value = res.data;
+            }    
+          });
+          if (!LOADEDQ2 || scrDistOKQ)
+          {
+            ele.scrollTop = ele.scrollHeight;
+            // console.log("Scrolling to bottom.")
+            LOADEDQ2 = true;
+          }
+        },1000);
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -32,24 +33,26 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
     <style>
+      textarea {
+        height: 65%;
+      }
     </style>
   </head>
-  <body onload = "globalOnload(); onload()">
+  <body onload = "globalOnload(); onLoad()">
     <div class="main_content">
       <header>
-        <h2>Edit the page.</h2>
+        <h2>System Log</h2>
         <hr class="rounded">
       </header>
-      <form action="javascript:sendUpdate()">
-        <textarea id="txtArea"></textarea><div class="anim"></div>
-        <button class="btn grn fsmed szTwoThirds">
-          <span class="material-symbols-outlined">update</span>
-          Update page<div class="anim"></div></button>
-        <a class="btn fsmed szThird" href="/docs">
-          <span class="material-symbols-outlined">help</span>
-          Docs<div class="anim"></div></a>
-        
-      </form>
+      <textarea id="txtarea" readonly></textarea>
+      <button class="btn red" onclick="alertDialog('Confirm purge logs?', ()=>{
+        send(JSON.stringify({action:'purgeLogs'}), (res)=>{
+          if (res.status!='SUCCESS') alertDialog('ERROR: '+res.data.error, ()=>{})
+          else alertDialog('Purge success!', ()=>{});
+        })
+      }, 2)">
+        <span class="material-symbols-outlined">delete_forever</span>
+        Purge logs<div class="anim"></div></button>
       <a class="btn" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>
         Return to home<div class="anim"></div></a>
@@ -63,6 +66,7 @@
           <span class="material-symbols-outlined">arrow_forward_ios</span>
           <div class="anim"></div>
         </button>
+        
       </div>
     </div>
   </body>

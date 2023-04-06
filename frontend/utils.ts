@@ -1,5 +1,11 @@
 function globalOnload() {
   document.onkeydown=keydown;
+  let maincontent = document.getElementsByClassName("main_content").item(0) as HTMLDivElement;
+  let ftr= document.createElement("footer");
+  maincontent.appendChild(ftr);
+  let ele = document.createElement("p");
+  ele.innerHTML = "BetaOS Systems | 2023";
+  ftr.appendChild(ele);
 }
 
 function send(params:any, callback:(thing:any)=>any) {
@@ -14,6 +20,7 @@ function send(params:any, callback:(thing:any)=>any) {
       callback(JSON.parse(xhr.responseText));
     }
   }
+  console.log(params);
   xhr.send(params);
   if (failureTimeout) clearTimeout(failureTimeout);
   failureTimeout = setTimeout(()=>alertDialog(`This is taking longer than expected.`, ()=>{}, 1, params), 1000);
@@ -56,17 +63,20 @@ function closeAlert(overrideCallback:boolean=false) {
   let ele = document.getElementById("overlay") as HTMLDivElement;
   ele.style.top = "500vh";
   dialogQ = false;
-  if (cbk && !overrideCallback && !BLOCKCALLBACK) cbk();
+  if (cbk && !overrideCallback && !BLOCKCALLBACK) {
+    console.log("calling back")
+    cbk();
+  }
   
 }
 
-function keydown() {
+function keydown(e:Event) {
   if (dialogQ) {
+    e.preventDefault();
     console.log("CLOSED DIALOG")
     if (BLOCKCALLBACK) console.log("CALLBACK HAS BEEN BLOCKED")
     else closeAlert();
     BLOCKCALLBACK = false;
-    
   }
 }
 

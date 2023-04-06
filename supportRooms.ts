@@ -1,5 +1,5 @@
-import {userRequest} from './userRequest';
-import {msgDB} from './consts';
+import { userRequest } from './userRequest';
+import { K } from './consts';
 export class Room {
   type:string;
   pausedQ: boolean;
@@ -116,7 +116,7 @@ export class supportHandler {
 
 export async function sendMsg(msg:string, room:string, callback: (status:string, data:any, token:string)=>any, token:string) {
   userRequest(async (status:string, data:any, _token:string)=>{
-    await msgDB.insertOne({fieldName:"MSG", user:data.alias});
+    await K.msgDB.insertOne({fieldName:"MSG", user:data.alias});
     if (status == "SUCCESS") supportHandler.sendMsgTo(room, "["+data.alias+"]("+data.perms+")"+msg);
     else supportHandler.sendMsgTo(room, "[ANON|"+processAnon(token)+"](1)"+msg);
     callback("SUCCESS", null, token);

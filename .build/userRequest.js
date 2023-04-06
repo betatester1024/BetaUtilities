@@ -24,11 +24,11 @@ module.exports = __toCommonJS(userRequest_exports);
 var import_consts = require("./consts");
 const argon2 = require("argon2");
 async function userRequest(token) {
-  let tokenData = await import_consts.K.authDB.findOne({ fieldName: "Token", token });
+  let tokenData = await import_consts.authDB.findOne({ fieldName: "Token", token });
   if (!tokenData) {
     return { status: "ERROR", data: { error: "Your session could not be found!" }, token: "" };
   }
-  let userData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
+  let userData = await import_consts.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
   if (Date.now() > tokenData.expiry) {
     return { status: "ERROR", data: { error: "Your session has expired!" }, token: "" };
   }

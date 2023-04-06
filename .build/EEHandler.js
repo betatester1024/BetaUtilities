@@ -23,11 +23,11 @@ __export(EEHandler_exports, {
 module.exports = __toCommonJS(EEHandler_exports);
 var import_consts = require("./consts");
 async function EE(getQ, callback, token, newStr) {
-  let obj = await import_consts.K.uDB.findOne({ fieldName: "EE" });
+  let obj = await import_consts.uDB.findOne({ fieldName: "EE" });
   if (getQ)
     callback("SUCCESS", { data: obj ? obj.data : "" }, token);
   else {
-    await import_consts.K.uDB.updateOne({ fieldName: "EE" }, {
+    await import_consts.uDB.updateOne({ fieldName: "EE" }, {
       $set: { data: newStr }
     }, { upsert: true });
     callback("SUCCESS", null, token);

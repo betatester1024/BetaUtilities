@@ -18,34 +18,56 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var consts_exports = {};
 __export(consts_exports, {
-  K: () => K
+  authDB: () => authDB,
+  expiry: () => expiry,
+  frontendDir: () => frontendDir,
+  hashingOptions: () => hashingOptions,
+  jsDir: () => jsDir,
+  msgDB: () => msgDB,
+  port: () => port,
+  pwdMaxLength: () => pwdMaxLength,
+  roomRegex: () => roomRegex,
+  rootDir: () => rootDir,
+  uDB: () => uDB,
+  userMaxLength: () => userMaxLength,
+  userRegex: () => userRegex
 });
 module.exports = __toCommonJS(consts_exports);
 var import_database = require("./database");
 const argon2 = require("argon2");
-const K = {
-  rootDir: "/home/runner/v2/",
-  frontendDir: "/home/runner/v2/frontend/",
-  jsDir: "/home/runner/v2/.build/frontend/",
-  port: 3e3,
-  userRegex: /^[0-9a-zA-Z_\\-]{1,20}$/,
-  roomRegex: "[0-9a-zA-Z_\\-]{1,20}",
-  pwdMaxLength: 9e99,
-  userMaxLength: 9e99,
-  authDB: import_database.database.collection("SystemAUTH_V2"),
-  msgDB: import_database.database.collection("SupportMessaging"),
-  uDB: import_database.database.collection("BetaUtilities"),
-  hashingOptions: {
-    type: argon2.argon2d,
-    memoryCost: 12288,
-    timeCost: 3,
-    parallelism: 1,
-    hashLength: 50
-  },
-  expiry: [9e99, 1e3 * 60, 1e3 * 60 * 60 * 24 * 30, 1e3 * 60 * 60]
+const rootDir = "/home/runner/v2/";
+const frontendDir = "/home/runner/v2/frontend/";
+const jsDir = "/home/runner/v2/.build/frontend/";
+const port = 3e3;
+const userRegex = /^[0-9a-zA-Z_\\-]+$/;
+const roomRegex = "[0-9a-zA-Z_\\-]{1,20}";
+const pwdMaxLength = 9e99;
+const userMaxLength = 9e99;
+const authDB = import_database.database.collection("SystemAUTH_V2");
+const msgDB = import_database.database.collection("SupportMessaging");
+const uDB = import_database.database.collection("BetaUtilities");
+const hashingOptions = {
+  type: argon2.argon2d,
+  memoryCost: 12288,
+  timeCost: 3,
+  parallelism: 1,
+  hashLength: 50
 };
+const expiry = [9e99, 1e3 * 60, 1e3 * 60 * 60 * 24 * 30, 1e3 * 60 * 60];
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  K
+  authDB,
+  expiry,
+  frontendDir,
+  hashingOptions,
+  jsDir,
+  msgDB,
+  port,
+  pwdMaxLength,
+  roomRegex,
+  rootDir,
+  uDB,
+  userMaxLength,
+  userRegex
 });
 //# sourceMappingURL=consts.js.map

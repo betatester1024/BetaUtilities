@@ -26,7 +26,7 @@ module.exports = __toCommonJS(logging_exports);
 var import_consts = require("./consts");
 var import_userRequest = require("./userRequest");
 function log(thing) {
-  import_consts.K.uDB.insertOne({ fieldName: "SysLogV2", data: thing + "\n" });
+  import_consts.uDB.insertOne({ fieldName: "SysLogV2", data: thing + "\n" });
 }
 async function getLogs(token) {
   let userData = await (0, import_userRequest.userRequest)(token);
@@ -34,7 +34,7 @@ async function getLogs(token) {
     return { status: "ERROR", data: { error: userData.data.error ?? "Insufficient permissions" }, token: userData.token };
   }
   let out = "";
-  let logs = await import_consts.K.uDB.find({ fieldName: "SysLogV2" }).toArray();
+  let logs = await import_consts.uDB.find({ fieldName: "SysLogV2" }).toArray();
   for (let i = 0; i < logs.length; i++) {
     out += logs[i].data;
   }
@@ -45,7 +45,7 @@ async function purgeLogs(token) {
   if (userData.status != "SUCCESS" || userData.data.perms < 2) {
     return { status: "ERROR", data: { error: userData.data.error ?? "Insufficient permissions" }, token: userData.token };
   }
-  await import_consts.K.uDB.deleteMany({ fieldName: "SysLogV2" });
+  await import_consts.uDB.deleteMany({ fieldName: "SysLogV2" });
   return { status: "SUCCESS", data: null, token };
 }
 // Annotate the CommonJS export names for ESM import in node:

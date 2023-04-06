@@ -63,10 +63,10 @@ class supportHandler {
         this.sendMsgTo(rn, "+" + processAnon(obj.token) + "(1)");
     });
     console.log("added connection in " + rn);
-    let msgs = await import_consts.K.msgDB.find({ fieldName: "MSG", room: rn }).toArray();
+    let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: rn }).toArray();
     let text = "";
     for (let i = 0; i < msgs.length; i++) {
-      let userData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: msgs[i].sender });
+      let userData = await import_consts.authDB.findOne({ fieldName: "UserData", user: msgs[i].sender });
       if (!userData)
         text += "[" + msgs[i].sender + "](1)" + msgs[i].data + ">";
       else
@@ -151,7 +151,7 @@ class supportHandler {
 }
 function sendMsg(msg, room, token, callback) {
   (0, import_userRequest.userRequest)(token).then(async (obj) => {
-    await import_consts.K.msgDB.insertOne({
+    await import_consts.msgDB.insertOne({
       fieldName: "MSG",
       data: msg,
       sender: obj.data.user ?? "" + processAnon(token),

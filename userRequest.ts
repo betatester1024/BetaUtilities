@@ -1,6 +1,6 @@
 const argon2 = require('argon2');
 // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
-import {K} from './consts';
+import {authDB} from './consts';
 
 export async function userRequest(token:string) {
   let tokenData:{associatedUser:string, expiry:number} = await authDB.findOne({fieldName:"Token", token:token});

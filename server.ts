@@ -3,7 +3,7 @@ const app = express()
 const crypto = require("crypto");
 const parse = require("co-body");
  // for generating secure random #'s
-import {K} from './consts';
+import {port, msgDB, authDB, frontendDir, roomRegex, rootDir, jsDir, uDB} from './consts';
 import {signup, validateLogin, logout} from './validateLogin';
 import { deleteAccount } from './delacc';
 import {updateUser} from './updateUser'

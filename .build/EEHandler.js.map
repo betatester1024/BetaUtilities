@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": ["../EEHandler.ts"],
-  "sourcesContent": ["import {K} from './consts';\n\nexport async function EE(getQ:boolean, callback:(status:string, data:any, token:string)=>any, token:string, newStr:string) {\n  let obj = await K.uDB.findOne({fieldName:\"EE\"});\n  if (getQ) callback(\"SUCCESS\", {data:obj?obj.data:\"\"}, token);\n  else {\n    await K.uDB.updateOne({fieldName:\"EE\"}, {\n      $set:{data:newStr}\n    }, {upsert:true})\n    callback(\"SUCCESS\", null, token);\n  }\n}"],
-  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,oBAAgB;AAEhB,eAAsB,GAAG,MAAc,UAAuD,OAAc,QAAe;AACzH,MAAI,MAAM,MAAM,gBAAE,IAAI,QAAQ,EAAC,WAAU,KAAI,CAAC;AAC9C,MAAI;AAAM,aAAS,WAAW,EAAC,MAAK,MAAI,IAAI,OAAK,GAAE,GAAG,KAAK;AAAA,OACtD;AACH,UAAM,gBAAE,IAAI,UAAU,EAAC,WAAU,KAAI,GAAG;AAAA,MACtC,MAAK,EAAC,MAAK,OAAM;AAAA,IACnB,GAAG,EAAC,QAAO,KAAI,CAAC;AAChB,aAAS,WAAW,MAAM,KAAK;AAAA,EACjC;AACF;",
+  "sourcesContent": ["import {uDB} from './consts';\n\nexport async function EE(getQ:boolean, callback:(status:string, data:any, token:string)=>any, token:string, newStr:string) {\n  let obj = await uDB.findOne({fieldName:\"EE\"});\n  if (getQ) callback(\"SUCCESS\", {data:obj?obj.data:\"\"}, token);\n  else {\n    await uDB.updateOne({fieldName:\"EE\"}, {\n      $set:{data:newStr}\n    }, {upsert:true})\n    callback(\"SUCCESS\", null, token);\n  }\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,oBAAkB;AAElB,eAAsB,GAAG,MAAc,UAAuD,OAAc,QAAe;AACzH,MAAI,MAAM,MAAM,kBAAI,QAAQ,EAAC,WAAU,KAAI,CAAC;AAC5C,MAAI;AAAM,aAAS,WAAW,EAAC,MAAK,MAAI,IAAI,OAAK,GAAE,GAAG,KAAK;AAAA,OACtD;AACH,UAAM,kBAAI,UAAU,EAAC,WAAU,KAAI,GAAG;AAAA,MACpC,MAAK,EAAC,MAAK,OAAM;AAAA,IACnB,GAAG,EAAC,QAAO,KAAI,CAAC;AAChB,aAAS,WAAW,MAAM,KAAK;AAAA,EACjC;AACF;",
   "names": []
 }

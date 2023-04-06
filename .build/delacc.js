@@ -24,29 +24,29 @@ module.exports = __toCommonJS(delacc_exports);
 var import_consts = require("./consts");
 const argon2 = require("argon2");
 async function deleteAccount(user, pass, token) {
-  let tokenData = await import_consts.K.authDB.findOne({ fieldName: "Token", token });
+  let tokenData = await import_consts.authDB.findOne({ fieldName: "Token", token });
   if (!tokenData) {
     return { status: "ERROR", data: { error: "Cannot update user information: Your session could not be found!" }, token: "" };
   }
-  if (!user.match(import_consts.K.userRegex)) {
+  if (!user.match(import_consts.userRegex)) {
     return { status: "ERROR", data: { error: "Invalid user string!" }, token };
   }
-  let usrInfo = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: { $eq: user } });
+  let usrInfo = await import_consts.authDB.findOne({ fieldName: "UserData", user: { $eq: user } });
   if (!usrInfo) {
     return { status: "ERROR", data: { error: "No such user!" }, token };
   }
-  let loginInfo = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
+  let loginInfo = await import_consts.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
   if (loginInfo.permLevel > usrInfo.permLevel) {
-    await import_consts.K.authDB.deleteMany({ fieldName: "Token", associatedUser: user });
-    await import_consts.K.authDB.deleteOne({ fieldName: "UserData", user });
+    await import_consts.authDB.deleteMany({ fieldName: "Token", associatedUser: user });
+    await import_consts.authDB.deleteOne({ fieldName: "UserData", user });
     return { status: "SUCCESS", data: null, token };
   } else
     return { status: "ERROR", data: { error: "Cannot delete account -- insufficient permissions!" }, token };
   if (pass.length == 0) {
     return { status: "ERROR", data: { error: "No password provided!" }, token };
   } else if (await argon2.verify(usrInfo.pwd, pass)) {
-    await import_consts.K.authDB.deleteOne({ fieldName: "Token", token });
-    await import_consts.K.authDB.deleteOne({ fieldName: "UserData", user });
+    await import_consts.authDB.deleteOne({ fieldName: "Token", token });
+    await import_consts.authDB.deleteOne({ fieldName: "UserData", user });
     return { status: "SUCCESS", data: null, token: "" };
   } else {
     return { status: "ERROR", data: { error: "Cannot delete account. Password is invalid!" }, token };

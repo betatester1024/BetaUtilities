@@ -47,15 +47,15 @@ async function initServer() {
   app.use(limiter);
   app.use(new cookieParser());
   app.get("/", (req, res) => {
-    res.sendFile(import_consts.K.frontendDir + "/index.html");
+    res.sendFile(import_consts.frontendDir + "/index.html");
     incrRequests();
   });
   app.get("/register", (req, res) => {
-    res.sendFile(import_consts.K.frontendDir + "/signup.html");
+    res.sendFile(import_consts.frontendDir + "/signup.html");
     incrRequests();
   });
   app.get("/account", (req, res) => {
-    res.sendFile(import_consts.K.frontendDir + "/config.html");
+    res.sendFile(import_consts.frontendDir + "/config.html");
     incrRequests();
   });
   app.get("/EE", (req, res) => {
@@ -66,40 +66,40 @@ async function initServer() {
     incrRequests();
   });
   app.get("/support", (req, res) => {
-    let match = req.url.match("\\?room=(" + import_consts.K.roomRegex + ")");
+    let match = req.url.match("\\?room=(" + import_consts.roomRegex + ")");
     if (match) {
       if (!import_supportRooms.supportHandler.checkFoundQ(match[1])) {
         console.log("Room not found");
-        res.sendFile(import_consts.K.frontendDir + "/room404.html");
+        res.sendFile(import_consts.frontendDir + "/room404.html");
         return;
       } else
-        res.sendFile(import_consts.K.frontendDir + "/support.html");
+        res.sendFile(import_consts.frontendDir + "/support.html");
     } else
-      res.sendFile(import_consts.K.frontendDir + "/supportIndex.html");
+      res.sendFile(import_consts.frontendDir + "/supportIndex.html");
     incrRequests();
   });
   app.get("/accountDel", (req, res) => {
-    res.sendFile(import_consts.K.frontendDir + "/delAcc.html");
+    res.sendFile(import_consts.frontendDir + "/delAcc.html");
     incrRequests();
   });
   app.get("*/favicon.ico", (req, res) => {
-    res.sendFile(import_consts.K.rootDir + "/favicon.ico");
+    res.sendFile(import_consts.rootDir + "/favicon.ico");
     incrRequests();
   });
   app.get("/support.js", (req, res) => {
-    res.sendFile(import_consts.K.frontendDir + "support.js");
+    res.sendFile(import_consts.frontendDir + "support.js");
     incrRequests();
   });
   app.get("/*.js*", (req, res) => {
-    res.sendFile(import_consts.K.jsDir + req.url);
+    res.sendFile(import_consts.jsDir + req.url);
     incrRequests();
   });
   app.get("/*.ts", (req, res) => {
-    res.sendFile(import_consts.K.jsDir + req.url);
+    res.sendFile(import_consts.jsDir + req.url);
     incrRequests();
   });
   app.get("/*.css", (req, res) => {
-    res.sendFile(import_consts.K.frontendDir + req.url);
+    res.sendFile(import_consts.frontendDir + req.url);
     incrRequests();
   });
   app.get("/stream", (req, res) => {
@@ -120,9 +120,9 @@ async function initServer() {
     let requrl = req.url.match("([^?]*)\\??.*")[1];
     let idx = validPages.findIndex((obj) => obj.toLowerCase() == requrl.toLowerCase());
     if (idx >= 0)
-      res.sendFile(import_consts.K.frontendDir + validPages[idx] + ".html");
+      res.sendFile(import_consts.frontendDir + validPages[idx] + ".html");
     else
-      res.sendFile(import_consts.K.frontendDir + "404.html");
+      res.sendFile(import_consts.frontendDir + "404.html");
     incrRequests();
   });
   app.post("/server", urlencodedParser, async (req, res) => {
@@ -145,12 +145,12 @@ async function initServer() {
       res.end(JSON.stringify({ status: s, data: d }));
     });
   });
-  app.listen(import_consts.K.port, () => {
-    console.log(`BetaUtilities V2 listening on port ${import_consts.K.port}`);
+  app.listen(import_consts.port, () => {
+    console.log(`BetaUtilities V2 listening on port ${import_consts.port}`);
   });
 }
 async function incrRequests() {
-  import_consts.K.uDB.updateOne({ fieldName: "VISITS" }, { $inc: { visitCt: 1 } }, { upsert: true });
+  import_consts.uDB.updateOne({ fieldName: "VISITS" }, { $inc: { visitCt: 1 } }, { upsert: true });
 }
 function makeRequest(action, token, data, callback) {
   switch (action) {

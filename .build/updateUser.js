@@ -24,32 +24,32 @@ module.exports = __toCommonJS(updateUser_exports);
 var import_consts = require("./consts");
 const argon2 = require("argon2");
 async function updateUser(user, oldPass, newPass, newPermLevel, token) {
-  if (!user.match(import_consts.K.userRegex)) {
+  if (!user.match(userRegex)) {
     return { status: "ERROR", data: { error: "Invalid user string!" }, token };
   }
   if (newPass.length == 0) {
     return { status: "ERROR", data: { error: "No password provided!" }, token };
   }
-  let tokenData = await import_consts.K.authDB.findOne({ fieldName: "Token", token });
+  let tokenData = await import_consts.authDB.findOne({ fieldName: "Token", token });
   if (!tokenData) {
     return { status: "ERROR", data: { error: "Cannot update user information: Your session could not be found!" }, token: "" };
   }
-  let userData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
+  let userData = await import_consts.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
   if (Date.now() > tokenData.expiry) {
     return { status: "ERROR", data: { error: "Cannot update user information: Your session has expired!" }, token: "" };
   }
-  let newUserData = await import_consts.K.authDB.findOne({ fieldName: "UserData", user });
+  let newUserData = await import_consts.authDB.findOne({ fieldName: "UserData", user });
   if (userData.permLevel >= 2 && (!newUserData || newUserData.permLevel < userData.permLevel) && newPermLevel < userData.permLevel) {
-    await import_consts.K.authDB.updateOne(
+    await import_consts.authDB.updateOne(
       { fieldName: "UserData", user },
-      { $set: { pwd: await argon2.hash(newPass, import_consts.K.hashingOptions), permLevel: newPermLevel } },
+      { $set: { pwd: await argon2.hash(newPass, hashingOptions), permLevel: newPermLevel } },
       { upsert: true }
     );
     return { status: "SUCCESS", data: { perms: newPermLevel }, token };
   } else if (await argon2.verify(userData.pwd, oldPass)) {
-    await import_consts.K.authDB.updateOne(
+    await import_consts.authDB.updateOne(
       { fieldName: "UserData", user: tokenData.associatedUser },
-      { $set: { pwd: await argon2.hash(newPass, import_consts.K.hashingOptions) } }
+      { $set: { pwd: await argon2.hash(newPass, hashingOptions) } }
     );
     return { status: "SUCCESS", data: { perms: userData.permLevel }, token };
   } else {

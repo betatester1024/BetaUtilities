@@ -1,5 +1,5 @@
 const argon2 = require('argon2');
-import {K} from './consts';
+import {userRegex, authDB, hashingOptions} from './consts';
 const crypto = require("crypto");
 
 export async function validateLogin(user:string, pwd:string, persistQ:boolean, token:string) {
@@ -37,7 +37,7 @@ export async function signup(user:string, pwd:string, token:string) {
   else {
     let hash = await argon2.hash(pwd, hashingOptions); 
     await authDB.insertOne({fieldName:"UserData", user:user, pwd:hash, permLevel: 1});
-    return await validateLogin(user, pwd, token);
+    return await validateLogin(user, pwd, false, token);
   }
 }
 

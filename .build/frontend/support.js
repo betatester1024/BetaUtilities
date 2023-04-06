@@ -21,7 +21,6 @@ async function initClient() {
       console.log("Got", message);
       ele = document.getElementById("userList");
       let modif = message.data;
-      document.getElementById("placeholder").style.display = "none";
       let removed = rmvReg.exec(modif);
       let added = addReg.exec(modif);
       while (removed || added) {
@@ -55,6 +54,7 @@ async function initClient() {
         ele.appendChild(newMsgSender);
         ele.appendChild(newMsgBody);
         ele.appendChild(document.createElement("br"));
+        document.getElementById("placeholder").style.display = "none";
       }
       if (!LOADEDQ2 || scrDistOKQ) {
         ele.scrollTop = ele.scrollHeight;

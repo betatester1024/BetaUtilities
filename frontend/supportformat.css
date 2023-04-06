@@ -64,11 +64,14 @@ button#sendBtn {
 b {
 /*   font-family: "SupportText", "Noto Sans Display"; */
   margin-right: 5px;
+  border-radius: 2px;
+  background-color: var(--system-grey2);
 }
 
 p {
   margin-top: 0px;
   margin-bottom: 0px;
+  max-width: 100%;
 }
 h2 > span, .supportMsg {
   top: 5px;
@@ -83,11 +86,15 @@ a.admin, a.user, a.error {
 
 b.admin{
   color: var(--system-blue);
+  background-color: var(--system-blue2);
 }
 p.superadmin, b.superadmin, span.superadmin, a.superadmin {
   color: #00e500;
   font-variant-caps: small-caps;
   font-size: large;
+}
+b.superadmin {
+  background-color: var(--system-green2);
 }
 
 .superadmin.material-symbols-outlined {

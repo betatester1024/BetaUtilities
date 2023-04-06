@@ -31,8 +31,16 @@ async function DBMaintenance() {
   let items = await import_consts.K.authDB.find({ fieldName: "Token" }).toArray();
   for (let i = 0; i < items.length; i++) {
     if (!items[i].expiry || items[i].expiry < Date.now()) {
-      console.log("Expired");
+      console.log("Token from " + items[i].associatedUser + " has expired");
       await import_consts.K.authDB.deleteOne(items[i]);
+    }
+  }
+  ;
+  let items2 = await import_consts.K.msgDB.find({ fieldName: "MSG" }).toArray();
+  for (let i = 0; i < items2.length; i++) {
+    if (!items2[i].expiry || items2[i].expiry < Date.now()) {
+      console.log("Message from " + items2[i].sender + " has expired");
+      await import_consts.K.msgDB.deleteOne(items2[i]);
     }
   }
   ;

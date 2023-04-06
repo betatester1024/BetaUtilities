@@ -27,6 +27,7 @@ var import_delacc = require("./delacc");
 var import_updateUser = require("./updateUser");
 var import_userRequest = require("./userRequest");
 var import_EEHandler = require("./EEHandler");
+var import_logging = require("./logging");
 var import_supportRooms = require("./supportRooms");
 const express = require("express");
 const app = express();
@@ -49,87 +50,19 @@ async function initServer() {
     res.sendFile(import_consts.K.frontendDir + "/index.html");
     incrRequests();
   });
-  app.get("/login", (req, res) => {
-    res.sendFile(import_consts.K.frontendDir + "/login.html");
-    incrRequests();
-  });
-  app.get("/signup", (req, res) => {
+  app.get("/register", (req, res) => {
     res.sendFile(import_consts.K.frontendDir + "/signup.html");
-    incrRequests();
-  });
-  app.get("/config", (req, res) => {
-    res.sendFile(import_consts.K.frontendDir + "/config.html");
     incrRequests();
   });
   app.get("/account", (req, res) => {
     res.sendFile(import_consts.K.frontendDir + "/config.html");
     incrRequests();
   });
-  app.get("/admin", (req, res) => {
-    res.sendFile(import_consts.K.frontendDir + "/admin.html");
-    incrRequests();
-  });
-  app.get("/todo", (req, res) => {
-    res.sendFile(import_consts.K.frontendDir + "/todo.html");
-    incrRequests();
-  });
-  app.get("/status", (req, res) => {
-    res.sendFile(import_consts.K.frontendDir + "/status.html");
-    incrRequests();
-  });
   app.get("/EE", (req, res) => {
     (0, import_EEHandler.EE)(true, (_status, data, _token) => {
       res.set("Content-Type", "text/html");
-      res.send(Buffer.from(`<!DOCTYPE html>
-<html>
-  <head>
-    <script src='./utils.js'><\/script>
-    <title>Everyone Edits | BetaOS Systems</title>
-    <script>
-    <\/script>
-    <meta name="viewport" content="width=device-width">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="/globalformat.css">
-    <style>
-    </style>
-  </head>
-  <body onload = "globalOnload();">
-    <div class="main_content">
-    <header>
-      <h2>Everybody edits!</h2>
-      <hr class="rounded">
-    </header>
-      ${data.data}
-    </div>
-    
-    <div class="overlay" id="overlay">
-      <div class="internal">
-        <p class="fsmed" id="alerttext">Hey, some text here</p>
-        <button class="btn szTwoThirds" onclick="closeAlert()">
-          Continue
-          <span class="material-symbols-outlined">arrow_forward_ios</span>
-          <div class="anim"></div>
-        </button>
-      </div>
-    </div>
-  </body>
-</html>`));
+      res.send(Buffer.from(eeFormat(data.data)));
     }, "", "");
-    incrRequests();
-  });
-  app.get("/docs", (req, res) => {
-    res.sendFile(import_consts.K.frontendDir + "/docs.html");
-    incrRequests();
-  });
-  app.get("/EEdit", (req, res) => {
-    res.sendFile(import_consts.K.frontendDir + "/EEdit.html");
-    incrRequests();
-  });
-  app.get("/logout", (req, res) => {
-    res.sendFile(import_consts.K.frontendDir + "/logout.html");
     incrRequests();
   });
   app.get("/support", (req, res) => {
@@ -184,17 +117,31 @@ async function initServer() {
     });
   });
   app.get("/*", (req, res) => {
-    res.sendFile(import_consts.K.frontendDir + "404.html");
+    let requrl = req.url.match("([^?]*)\\??.*")[1];
+    let idx = validPages.findIndex((obj) => obj.toLowerCase() == requrl.toLowerCase());
+    if (idx >= 0)
+      res.sendFile(import_consts.K.frontendDir + validPages[idx] + ".html");
+    else
+      res.sendFile(import_consts.K.frontendDir + "404.html");
     incrRequests();
   });
   app.post("/server", urlencodedParser, async (req, res) => {
     incrRequests();
+    if (req.headers["content-length"] > 6e4) {
+      res.set("Connection", "close");
+      res.status(413).end();
+      return;
+    }
     var body = await parse.json(req);
     if (!body)
       res.end(JSON.stringify({ status: "ERROR", data: null }));
     makeRequest(body.action, req.cookies.sessionID, body.data, (s, d, token) => {
-      if (body.action != "sendMsg")
-        res.cookie("sessionID", token ? token : "", { maxAge: 1e3 * 60 * 60 * 24 * 30, httpOnly: true, secure: true, sameSite: "Strict" });
+      if (body.action == "getLogs") {
+      } else if (s == "SUCCESS") {
+        (0, import_logging.log)("Action performed:" + body.action + ", response:" + JSON.stringify(d));
+      } else
+        (0, import_logging.log)("Action performed, error on " + body.action + ", error:" + d.error);
+      res.cookie("sessionID", token ? token : "", { maxAge: 1e3 * 60 * 60 * 24 * 30, httpOnly: true, secure: true, sameSite: "Strict" });
       res.end(JSON.stringify({ status: s, data: d }));
     });
   });
@@ -203,8 +150,7 @@ async function initServer() {
   });
 }
 async function incrRequests() {
-  let ct = await import_consts.K.uDB.findOne({ fieldName: "VISITS" });
-  import_consts.K.uDB.updateOne({ fieldName: "VISITS" }, { $set: { visitCt: ct.visitCt + 1 } }, { upsert: true });
+  import_consts.K.uDB.updateOne({ fieldName: "VISITS" }, { $inc: { visitCt: 1 } }, { upsert: true });
 }
 function makeRequest(action, token, data, callback) {
   switch (action) {
@@ -213,20 +159,30 @@ function makeRequest(action, token, data, callback) {
       break;
     case "login":
       data = data;
-      (0, import_validateLogin.validateLogin)(data.user, data.pass, callback, token);
+      (0, import_validateLogin.validateLogin)(data.user, data.pass, data.persistQ, token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
       break;
     case "signup":
       data = data;
-      (0, import_validateLogin.signup)(data.user, data.pass, callback, token);
+      (0, import_validateLogin.signup)(data.user, data.pass, token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      ;
       break;
     case "userRequest":
-      (0, import_userRequest.userRequest)(callback, token);
+      (0, import_userRequest.userRequest)(token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
       break;
     case "roomRequest":
-      (0, import_supportRooms.roomRequest)(callback, token);
+      let obj2 = (0, import_supportRooms.roomRequest)(token);
+      callback(obj2.status, obj2.data, obj2.token);
       break;
     case "statusRequest":
-      (0, import_supportRooms.roomRequest)(callback, token, true);
+      let obj3 = (0, import_supportRooms.roomRequest)(token, true);
+      callback(obj3.status, obj3.data, obj3.token);
+      break;
     case "getEE":
       (0, import_EEHandler.EE)(true, callback, token, "");
       break;
@@ -236,26 +192,98 @@ function makeRequest(action, token, data, callback) {
       break;
     case "updateuser":
       data = data;
-      (0, import_updateUser.updateUser)(data.user, data.oldPass, data.pass, data.newPermLevel, callback, token);
+      (0, import_updateUser.updateUser)(data.user, data.oldPass, data.pass, data.newPermLevel, token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
       break;
     case "delAcc":
       data = data;
-      (0, import_delacc.delAcc)(data.user, data.pass, callback, token);
+      (0, import_delacc.deleteAccount)(data.user, data.pass, token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
       break;
     case "logout":
-      (0, import_validateLogin.logout)(callback, token);
+      (0, import_validateLogin.logout)(token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
       break;
     case "logout_all":
-      (0, import_validateLogin.logout)(callback, token, true);
+      (0, import_validateLogin.logout)(token, true).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
       break;
     case "sendMsg":
       data = data;
-      (0, import_supportRooms.sendMsg)(data.msg, data.room, callback, token);
+      (0, import_supportRooms.sendMsg)(data.msg, data.room, token, callback);
+      break;
+    case "getLogs":
+      (0, import_logging.getLogs)(token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
+    case "purgeLogs":
+      (0, import_logging.purgeLogs)(token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
     default:
       callback("ERROR", { error: "Unknown command string!" }, token);
   }
   return;
 }
+function eeFormat(data) {
+  return `<!DOCTYPE html>
+<html>
+  <head>
+    <script src='./utils.js'><\/script>
+    <title>Everyone Edits | BetaOS Systems</title>
+    <script>
+    <\/script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+    </style>
+  </head>
+  <body onload = "globalOnload();">
+    <div class="main_content">
+    <header>
+      <h2>Everybody edits!</h2>
+      <hr class="rounded">
+    </header>
+      ${data}
+    </div>
+    
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>`;
+}
+const validPages = [
+  "/commands",
+  "/contact",
+  "/EEdit",
+  "/todo",
+  "/status",
+  "/logout",
+  "/signup",
+  "/config",
+  "/admin",
+  "/docs",
+  "/login",
+  "/syslog"
+];
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   initServer

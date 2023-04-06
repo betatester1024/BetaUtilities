@@ -1,5 +1,6 @@
 import {database} from "./database";
 const argon2 = require('argon2');
+
 export const rootDir:string = '/home/runner/BetaUtilitiesV2/'
 export const frontendDir:string = '/home/runner/BetaUtilitiesV2/frontend/'
 export const jsDir:string = '/home/runner/BetaUtilitiesV2/.build/frontend/'

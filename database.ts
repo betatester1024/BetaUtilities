@@ -1,5 +1,5 @@
 const { MongoClient } = require("mongodb");
-import {authDB} from './consts';
+import {authDB, msgDB} from './consts';
 
 // Replace the uri string with your connection string.
 const uri =
@@ -12,26 +12,18 @@ export const database = client.db('BetaOS-Database01');
 // export const DB = database.collection('BetaUtilities');
 
 export async function DBMaintenance() {
-<<<<<<< HEAD
-  let items:{associatedUser:string, expiry:number}[] = await K.authDB.find({fieldName:"Token"}).toArray();
+  let items:{associatedUser:string, expiry:number}[] = await authDB.find({fieldName:"Token"}).toArray();
   for (let i=0; i<items.length; i++) {
     if (!items[i].expiry || items[i].expiry < Date.now()) {
       console.log("Token from "+items[i].associatedUser + " has expired");
-      await K.authDB.deleteOne(items[i]);
-=======
-  let items:{expiry:number}[] = await authDB.find({fieldName:"Token"}).toArray();
-  for (let i=0; i<items.length; i++) {
-    if (!items[i].expiry || items[i].expiry < Date.now()) {
-      console.log("Expired");
       await authDB.deleteOne(items[i]);
->>>>>>> origin/v2
     }
-  };
-  let items2:{sender:string, expiry:number}[] = await K.msgDB.find({fieldName:"MSG"}).toArray();
+  }
+  let items2:{sender:string, expiry:number}[] = await msgDB.find({fieldName:"MSG"}).toArray();
   for (let i=0; i<items2.length; i++) {
     if (!items2[i].expiry || items2[i].expiry < Date.now()) {
       console.log("Message from "+items2[i].sender + " has expired");
-      await K.msgDB.deleteOne(items2[i]);
+      await msgDB.deleteOne(items2[i]);
     }
   };
   setTimeout(DBMaintenance, 1000);

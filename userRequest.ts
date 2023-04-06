@@ -1,14 +1,9 @@
 const argon2 = require('argon2');
 // https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
-import {authDB} from './consts';
+import {K} from './consts';
 
-<<<<<<< HEAD
 export async function userRequest(token:string) {
-  let tokenData:{associatedUser:string, expiry:number} = await K.authDB.findOne({fieldName:"Token", token:token});
-=======
-export async function userRequest(callback:(status:string, data:any, token:string)=>any, token:string) {
   let tokenData:{associatedUser:string, expiry:number} = await authDB.findOne({fieldName:"Token", token:token});
->>>>>>> origin/v2
   if (!tokenData) {
     return {status:"ERROR", data:{error:"Your session could not be found!"}, token:""}
   }

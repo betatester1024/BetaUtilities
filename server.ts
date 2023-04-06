@@ -3,13 +3,9 @@ const app = express()
 const crypto = require("crypto");
 const parse = require("co-body");
  // for generating secure random #'s
-import {frontendDir, jsDir, rootDir, roomRegex, port, uDB} from './consts';
+import {K} from './consts';
 import {signup, validateLogin, logout} from './validateLogin';
-<<<<<<< HEAD
 import { deleteAccount } from './delacc';
-=======
-import {delAcc} from './delacc';
->>>>>>> origin/v2
 import {updateUser} from './updateUser'
 import {userRequest} from './userRequest';
 import {EE} from './EEHandler';
@@ -34,53 +30,18 @@ export async function initServer() {
     res.sendFile(frontendDir+'/index.html');
     incrRequests();
   })
-<<<<<<< HEAD
   
   app.get('/register', (req:any, res:any) => {
-    res.sendFile(K.frontendDir+'/signup.html');
-    incrRequests();
-  });
-
-=======
-
-  app.get('/login', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/login.html');
-    incrRequests();
-  });
-
-  app.get('/signup', (req:any, res:any) => {
     res.sendFile(frontendDir+'/signup.html');
     incrRequests();
   });
 
-  app.get('/config', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/config.html');
-    incrRequests();
-  });
->>>>>>> origin/v2
 
   app.get('/account', (req:any, res:any) => {
     res.sendFile(frontendDir+'/config.html');
     incrRequests();
   });
 
-<<<<<<< HEAD
-=======
-  app.get('/admin', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/admin.html');
-    incrRequests();
-  });
-
-  app.get('/todo', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/todo.html');
-    incrRequests();
-  });
-
-  app.get('/status', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/status.html');
-    incrRequests();
-  });
->>>>>>> origin/v2
   
   app.get('/EE', (req:any, res:any) => {
     EE(true, (_status:string, data:any, _token:string)=>{
@@ -91,24 +52,7 @@ export async function initServer() {
     incrRequests();
   });
 
-<<<<<<< HEAD
   
-=======
-  app.get('/docs', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/docs.html');
-    incrRequests();
-  });
-  
-  app.get('/EEdit', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/EEdit.html');
-    incrRequests();
-  });
-  
-  app.get('/logout', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/logout.html');
-    incrRequests();
-  });
->>>>>>> origin/v2
 
   app.get('/support', (req:any, res:any) => {
     let match = req.url.match('\\?room=('+roomRegex+")");
@@ -175,14 +119,10 @@ export async function initServer() {
   });
 
   app.get('/*', (req:any, res:any) => {
-<<<<<<< HEAD
     let requrl = req.url.match("([^?]*)\\??.*")[1]
     let idx = validPages.findIndex((obj)=>obj.toLowerCase()==requrl.toLowerCase());
-    if (idx>=0) res.sendFile(K.frontendDir+validPages[idx]+".html");
-    else res.sendFile(K.frontendDir+"404.html");
-=======
-    res.sendFile(frontendDir+"404.html");
->>>>>>> origin/v2
+    if (idx>=0) res.sendFile(frontendDir+validPages[idx]+".html");
+    else res.sendFile(frontendDir+"404.html");
     incrRequests();
   })
   
@@ -216,12 +156,7 @@ export async function initServer() {
 }
 
 async function incrRequests() {
-<<<<<<< HEAD
-  K.uDB.updateOne({fieldName:"VISITS"}, {$inc:{visitCt:1}}, {upsert:true});
-=======
-  let ct:{visitCt:number} = await uDB.findOne({fieldName:"VISITS"});
-  uDB.updateOne({fieldName:"VISITS"}, {$set:{visitCt:ct.visitCt+1}}, {upsert:true});
->>>>>>> origin/v2
+  uDB.updateOne({fieldName:"VISITS"}, {$inc:{visitCt:1}}, {upsert:true});
 }
 
 function makeRequest(action:string|null, token:string, data:any|null, callback: (status:string, dat:any, token:string)=>any) {

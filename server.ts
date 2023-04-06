@@ -3,9 +3,9 @@ const app = express()
 const crypto = require("crypto");
 const parse = require("co-body");
  // for generating secure random #'s
-import {frontendDir, jsDir, rootDir, roomRegex, port, uDB} from './consts';
+import {K} from './consts';
 import {signup, validateLogin, logout} from './validateLogin';
-import {delAcc} from './delacc';
+import { delAcc } from './delacc';
 import {updateUser} from './updateUser'
 import {userRequest} from './userRequest';
 import {EE} from './EEHandler';
@@ -26,42 +26,42 @@ export async function initServer() {
   app.use(new cookieParser());
   
   app.get('/', (req:Request, res:any) => {
-    res.sendFile(frontendDir+'/index.html');
+    res.sendFile(K.frontendDir+'/index.html');
     incrRequests();
   })
 
   app.get('/login', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/login.html');
+    res.sendFile(K.frontendDir+'/login.html');
     incrRequests();
   });
 
   app.get('/signup', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/signup.html');
+    res.sendFile(K.frontendDir+'/signup.html');
     incrRequests();
   });
 
   app.get('/config', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/config.html');
+    res.sendFile(K.frontendDir+'/config.html');
     incrRequests();
   });
 
   app.get('/account', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/config.html');
+    res.sendFile(K.frontendDir+'/config.html');
     incrRequests();
   });
 
   app.get('/admin', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/admin.html');
+    res.sendFile(K.frontendDir+'/admin.html');
     incrRequests();
   });
 
   app.get('/todo', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/todo.html');
+    res.sendFile(K.frontendDir+'/todo.html');
     incrRequests();
   });
 
   app.get('/status', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/status.html');
+    res.sendFile(K.frontendDir+'/status.html');
     incrRequests();
   });
   
@@ -111,63 +111,63 @@ export async function initServer() {
   });
 
   app.get('/docs', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/docs.html');
+    res.sendFile(K.frontendDir+'/docs.html');
     incrRequests();
   });
   
   app.get('/EEdit', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/EEdit.html');
+    res.sendFile(K.frontendDir+'/EEdit.html');
     incrRequests();
   });
   
   app.get('/logout', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/logout.html');
+    res.sendFile(K.frontendDir+'/logout.html');
     incrRequests();
   });
 
   app.get('/support', (req:any, res:any) => {
-    let match = req.url.match('\\?room=('+roomRegex+")");
+    let match = req.url.match('\\?room=('+K.roomRegex+")");
     if (match) {
       if (!supportHandler.checkFoundQ(match[1])) {
         console.log("Room not found")
-        res.sendFile(frontendDir+"/room404.html");
+        res.sendFile(K.frontendDir+"/room404.html");
         return;
       }
-      else res.sendFile(frontendDir+'/support.html');
+      else res.sendFile(K.frontendDir+'/support.html');
     }
-    else res.sendFile(frontendDir+'/supportIndex.html');
+    else res.sendFile(K.frontendDir+'/supportIndex.html');
     incrRequests();
   });
 
   app.get('/accountDel', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/delAcc.html');
+    res.sendFile(K.frontendDir+'/delAcc.html');
     incrRequests();
   });
     
   app.get('*/favicon.ico', (req:Request, res:any)=> {
-    res.sendFile(rootDir+'/favicon.ico')
+    res.sendFile(K.rootDir+'/favicon.ico')
     incrRequests();
   })
 
   
   app.get('/support.js', (req:any, res:any) => {
-    res.sendFile(frontendDir+"support.js");
+    res.sendFile(K.frontendDir+"support.js");
     incrRequests();
   })
   
   app.get('/*.js*', (req:any, res:any) => {
-    res.sendFile(jsDir+req.url);
+    res.sendFile(K.jsDir+req.url);
     incrRequests();
   })
 
   
   app.get('/*.ts', (req:any, res:any) => {
-    res.sendFile(jsDir+req.url);
+    res.sendFile(K.jsDir+req.url);
     incrRequests();
   })
 
   app.get('/*.css', (req:any, res:any) => {
-    res.sendFile(frontendDir+req.url);
+    res.sendFile(K.frontendDir+req.url);
     incrRequests();
   })
 
@@ -190,7 +190,7 @@ export async function initServer() {
   });
 
   app.get('/*', (req:any, res:any) => {
-    res.sendFile(frontendDir+"404.html");
+    res.sendFile(K.frontendDir+"404.html");
     incrRequests();
   })
   
@@ -208,14 +208,14 @@ export async function initServer() {
     })
   });
   
-  app.listen(port, () => {
-    console.log(`BetaUtilities V2 listening on port ${port}`)
+  app.listen(K.port, () => {
+    console.log(`BetaUtilities V2 listening on port ${K.port}`)
   })
 }
 
 async function incrRequests() {
-  let ct:{visitCt:number} = await uDB.findOne({fieldName:"VISITS"});
-  uDB.updateOne({fieldName:"VISITS"}, {$set:{visitCt:ct.visitCt+1}}, {upsert:true});
+  let ct:{visitCt:number} = await K.uDB.findOne({fieldName:"VISITS"});
+  K.uDB.updateOne({fieldName:"VISITS"}, {$set:{visitCt:ct.visitCt+1}}, {upsert:true});
 }
 
 function makeRequest(action:string|null, token:string, data:any|null, callback: (status:string, data:any, token:string)=>any) {

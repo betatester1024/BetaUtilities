@@ -1,5 +1,5 @@
 const { MongoClient } = require("mongodb");
-import {authDB} from './consts';
+import {K} from './consts';
 
 // Replace the uri string with your connection string.
 const uri =
@@ -12,11 +12,11 @@ export const database = client.db('BetaOS-Database01');
 // export const DB = database.collection('BetaUtilities');
 
 export async function DBMaintenance() {
-  let items:{expiry:number}[] = await authDB.find({fieldName:"Token"}).toArray();
+  let items:{expiry:number}[] = await K.authDB.find({fieldName:"Token"}).toArray();
   for (let i=0; i<items.length; i++) {
     if (!items[i].expiry || items[i].expiry < Date.now()) {
       console.log("Expired");
-      await authDB.deleteOne(items[i]);
+      await K.authDB.deleteOne(items[i]);
     }
   };
   setTimeout(DBMaintenance, 1000);

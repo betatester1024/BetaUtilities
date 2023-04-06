@@ -21,7 +21,6 @@ export async function deleteAccount(user:string, pass:string, token:string) {
     await authDB.deleteOne({fieldName:"UserData", user:user});
     return {status:"SUCCESS", data:null, token:token};
   }
-  else return {status:"ERROR", data:{error:"Cannot delete account -- insufficient permissions!"}, token:token}
   if (pass.length == 0) {
     return {status:"ERROR", data:{error:"No password provided!"}, token:token}
   }
@@ -30,6 +29,6 @@ export async function deleteAccount(user:string, pass:string, token:string) {
     await authDB.deleteOne({fieldName:"UserData", user:user});
     return {status:"SUCCESS", data:null, token:""};
   } else {
-    return {status:"ERROR", data:{error:"Cannot delete account. Password is invalid!"}, token:token};
+    return {status:"ERROR", data:{error:"Cannot delete account-- Access denied"}, token:token};
   }
 }

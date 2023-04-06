@@ -39,7 +39,7 @@ async function validateLogin(user, pwd, persistQ, token) {
   } else if (await argon2.verify(usrInfo.pwd, pwd)) {
     let uuid = crypto.randomUUID();
     let userData = await import_consts.authDB.findOne({ fieldName: "UserData", user });
-    await import_consts.authDB.insertOne({ fieldName: "Token", associatedUser: user, token: uuid, expiry: persistQ ? 9e99 : Date.now() + expiry[userData.permLevel] });
+    await import_consts.authDB.insertOne({ fieldName: "Token", associatedUser: user, token: uuid, expiry: persistQ ? 9e99 : Date.now() + import_consts.expiry[userData.permLevel] });
     return { status: "SUCCESS", data: { perms: usrInfo.permLevel }, token: uuid };
   } else {
     return { status: "ERROR", data: { error: "Password is invalid!" }, token };

@@ -24,7 +24,7 @@ module.exports = __toCommonJS(updateUser_exports);
 var import_consts = require("./consts");
 const argon2 = require("argon2");
 async function updateUser(user, oldPass, newPass, newPermLevel, token) {
-  if (!user.match(userRegex)) {
+  if (!user.match(import_consts.userRegex)) {
     return { status: "ERROR", data: { error: "Invalid user string!" }, token };
   }
   if (newPass.length == 0) {
@@ -42,14 +42,14 @@ async function updateUser(user, oldPass, newPass, newPermLevel, token) {
   if (userData.permLevel >= 2 && (!newUserData || newUserData.permLevel < userData.permLevel) && newPermLevel < userData.permLevel) {
     await import_consts.authDB.updateOne(
       { fieldName: "UserData", user },
-      { $set: { pwd: await argon2.hash(newPass, hashingOptions), permLevel: newPermLevel } },
+      { $set: { pwd: await argon2.hash(newPass, import_consts.hashingOptions), permLevel: newPermLevel } },
       { upsert: true }
     );
     return { status: "SUCCESS", data: { perms: newPermLevel }, token };
   } else if (await argon2.verify(userData.pwd, oldPass)) {
     await import_consts.authDB.updateOne(
       { fieldName: "UserData", user: tokenData.associatedUser },
-      { $set: { pwd: await argon2.hash(newPass, hashingOptions) } }
+      { $set: { pwd: await argon2.hash(newPass, import_consts.hashingOptions) } }
     );
     return { status: "SUCCESS", data: { perms: userData.permLevel }, token };
   } else {

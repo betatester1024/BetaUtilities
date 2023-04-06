@@ -1,5 +1,5 @@
 const argon2 = require('argon2');
-import {userRegex, authDB, hashingOptions} from './consts';
+import {userRegex, authDB, hashingOptions, expiry} from './consts';
 const crypto = require("crypto");
 
 export async function validateLogin(user:string, pwd:string, persistQ:boolean, token:string) {

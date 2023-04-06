@@ -40,8 +40,7 @@ async function deleteAccount(user, pass, token) {
     await import_consts.authDB.deleteMany({ fieldName: "Token", associatedUser: user });
     await import_consts.authDB.deleteOne({ fieldName: "UserData", user });
     return { status: "SUCCESS", data: null, token };
-  } else
-    return { status: "ERROR", data: { error: "Cannot delete account -- insufficient permissions!" }, token };
+  }
   if (pass.length == 0) {
     return { status: "ERROR", data: { error: "No password provided!" }, token };
   } else if (await argon2.verify(usrInfo.pwd, pass)) {
@@ -49,7 +48,7 @@ async function deleteAccount(user, pass, token) {
     await import_consts.authDB.deleteOne({ fieldName: "UserData", user });
     return { status: "SUCCESS", data: null, token: "" };
   } else {
-    return { status: "ERROR", data: { error: "Cannot delete account. Password is invalid!" }, token };
+    return { status: "ERROR", data: { error: "Cannot delete account-- Access denied" }, token };
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

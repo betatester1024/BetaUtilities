@@ -1,4 +1,4 @@
-import {authDB} from './consts';
+import {authDB, userRegex, hashingOptions} from './consts';
 const argon2 = require('argon2');
 
 export async function updateUser(user:string, oldPass:string, newPass:string, newPermLevel:number, token:string) {

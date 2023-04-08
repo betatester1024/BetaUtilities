@@ -5,6 +5,8 @@ function globalOnload() {
   maincontent.appendChild(ftr);
   let ele = document.createElement("p");
   ele.innerHTML = "BetaOS Systems | 2023";
+  ele = document.createElement("overlay");
+  ele.innerHTML = ``;
   ftr.appendChild(ele);
 }
 

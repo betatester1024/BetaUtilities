@@ -186,6 +186,10 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       let obj2 = roomRequest(token); // this one is synchronous
       callback(obj2.status, obj2.data, obj2.token);
       break;
+    case 'createRoom':
+      createRoom(token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
     case 'statusRequest':
       let obj3 = roomRequest(token, true);
       callback(obj3.status, obj3.data, obj3.token);

@@ -2,7 +2,7 @@ import {initServer} from './server';
 import {DBMaintenance} from './database';
 import {supportHandler, Room} from './supportRooms'
 import {log} from './logging';
-log("Systems restarted", true);
+log("Systems restarted");
 initServer();
 DBMaintenance();
 supportHandler.addRoom(new Room("ONLINE_SUPPORT", "main_support"));

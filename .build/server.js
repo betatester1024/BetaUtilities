@@ -136,7 +136,8 @@ async function initServer() {
     if (!body)
       res.end(JSON.stringify({ status: "ERROR", data: null }));
     makeRequest(body.action, req.cookies.sessionID, body.data, (s, d, token) => {
-      if (body.action == "getLogs") {
+      if (ignoreLog.indexOf(body.action) >= 0) {
+        console.log("action ignored");
       } else if (s == "SUCCESS") {
         (0, import_logging.log)("Action performed:" + body.action + ", response:" + JSON.stringify(d));
       } else
@@ -178,6 +179,18 @@ function makeRequest(action, token, data, callback) {
     case "roomRequest":
       let obj2 = (0, import_supportRooms.roomRequest)(token);
       callback(obj2.status, obj2.data, obj2.token);
+      break;
+    case "createRoom":
+      data = data;
+      (0, import_supportRooms.createRoom)(data.name, token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
+    case "deleteRoom":
+      data = data;
+      (0, import_supportRooms.deleteRoom)(data.name, token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
       break;
     case "statusRequest":
       let obj3 = (0, import_supportRooms.roomRequest)(token, true);
@@ -284,6 +297,7 @@ const validPages = [
   "/login",
   "/syslog"
 ];
+const ignoreLog = ["getEE", "userRequest", "getLogs"];
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   initServer

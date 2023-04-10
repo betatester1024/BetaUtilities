@@ -282,3 +282,12 @@ textarea {
   top: calc(100% - 9em);
   position: relative;
 }
+
+@media screen and (max-width: 600px) {
+  .alertlbl {
+    display: none;
+  }
+  .internal .btn {
+    width: 3em;
+  }
+}

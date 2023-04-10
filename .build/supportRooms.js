@@ -19,6 +19,8 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var supportRooms_exports = {};
 __export(supportRooms_exports, {
   Room: () => Room,
+  createRoom: () => createRoom,
+  deleteRoom: () => deleteRoom,
   roomRequest: () => roomRequest,
   sendMsg: () => sendMsg,
   supportHandler: () => supportHandler
@@ -28,15 +30,10 @@ var import_userRequest = require("./userRequest");
 var import_consts = require("./consts");
 class Room {
   type;
-  pausedQ;
   name;
   constructor(type, name) {
     this.type = type;
-    this.pausedQ = false;
     this.name = name;
-  }
-  pause() {
-    this.pausedQ = true;
   }
 }
 class supportHandler {
@@ -44,6 +41,14 @@ class supportHandler {
   static connections = [];
   static addRoom(r) {
     this.allRooms.push(r);
+  }
+  static deleteRoom(type, roomName) {
+    let idx = this.allRooms.findIndex((r) => {
+      return r.type == type && r.name == roomName;
+    });
+    if (idx >= 0)
+      this.allRooms.splice(idx, 1);
+    console.log(this.allRooms);
   }
   static async addConnection(ev, rn, token) {
     for (let i = 0; i < this.connections.length; i++) {
@@ -174,9 +179,37 @@ function roomRequest(token, all = false) {
   else
     return { status: "SUCCESS", data: supportHandler.listOnlineRooms(), token };
 }
+async function createRoom(name, token) {
+  if (supportHandler.checkFoundQ(name))
+    return { status: "ERROR", data: { error: "Room already exists" }, token };
+  let usrData = await (0, import_userRequest.userRequest)(token);
+  if (usrData.status == "SUCCESS") {
+    if (usrData.data.perms >= 2) {
+      supportHandler.addRoom(new Room("ONLINE_SUPPORT", name));
+      return { status: "SUCCESS", data: null, token };
+    } else
+      return { status: "ERROR", data: { error: "Access denied!" }, token };
+  } else
+    return usrData;
+}
+async function deleteRoom(name, token) {
+  if (!supportHandler.checkFoundQ(name))
+    return { status: "ERROR", data: { error: "Room does not exist" }, token };
+  let usrData = await (0, import_userRequest.userRequest)(token);
+  if (usrData.status == "SUCCESS") {
+    if (usrData.data.perms >= 2) {
+      supportHandler.deleteRoom("ONLINE_SUPPORT", name);
+      return { status: "SUCCESS", data: null, token };
+    } else
+      return { status: "ERROR", data: { error: "Access denied!" }, token };
+  } else
+    return usrData;
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Room,
+  createRoom,
+  deleteRoom,
   roomRequest,
   sendMsg,
   supportHandler

@@ -11,7 +11,7 @@
           ele = document.getElementById("txtarea");
           let scrDistOKQ =  (ele.scrollTop) >= (ele.scrollHeight-ele.offsetHeight - 100)
           send(JSON.stringify({action:"getLogs"}), (res)=>{
-            if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{location.href="/"});
+            if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{location.href="/login?redirect=syslog"});
             else {
               document.getElementById("txtarea").value = res.data;
             }    

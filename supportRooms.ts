@@ -1,18 +1,13 @@
 import {userRequest} from './userRequest';
-import {msgDB, authDB, uDB} from './consts';
+import {msgDB, authDB} from './consts';
 export class Room {
   type:string;
-  pausedQ: boolean;
   name:string;
   constructor(type:string, name:string) {
     this.type=type;
-    this.pausedQ = false;
     this.name=name;
   };
 
-  pause() {
-    this.pausedQ = true;
-  }
 }
 
 export class supportHandler {
@@ -21,11 +16,15 @@ export class supportHandler {
   static addRoom(r:Room) {
     this.allRooms.push(r);
   }
+  static deleteRoom(type:string, roomName:string) {
+    let idx = this.allRooms.findIndex((r:any)=>{return r.type==type && r.name==roomName});
+    if (idx >= 0) this.allRooms.splice(idx, 1);
+  }
   static async addConnection(ev:any, rn:string, token:string) {
     // send existing connections to THIS EVENT ONLY
     for (let i=0; i<this.connections.length; i++) {
       if (this.connections[i].roomName == rn)
-        userRequest(this.connections[i].tk).then((obj:{status:string, data:any, _token:string})=>{
+        userRequest(this.connections[i].tk).then((obj:{status:string, data:any, token:string})=>{
           if (obj.status == "SUCCESS") ev.write("data:+"+obj.data.alias+"("+obj.data.perms+")>\n\n");
           else ev.write("data:+"+processAnon(this.connections[i].tk)+"(1)>\n\n");
         });
@@ -140,4 +139,33 @@ function processAnon(token:string) {
 export function roomRequest(token:string, all:boolean=false) {
   if (all) return {status: "SUCCESS", data:supportHandler.listAllRooms(), token:token};
   else return {status: "SUCCESS", data:supportHandler.listOnlineRooms(), token:token};
+}
+
+export async function createRoom(name:string, token:string) {
+  if (supportHandler.checkFoundQ(name)) return {status:"ERROR", data:{error:"Room already exists"}, token:token};
+  let usrData = await userRequest(token) as {status:string, data:{perms:number}};
+  
+  if (usrData.status == "SUCCESS") {
+    if (usrData.data.perms >= 2) {
+      supportHandler.addRoom(new Room("ONLINE_SUPPORT", name));
+      return {status:"SUCCESS", data:null, token:token}
+    }
+    else return {status:"ERROR", data:{error:"Access denied!"}, token:token};
+  }
+  else return usrData;
+}
+
+export async function deleteRoom(name:string, token:string) {
+  if (!supportHandler.checkFoundQ(name)) return {status:"ERROR", data:{error:"Room does not exist"}, token:token};
+  let usrData = await userRequest(token) as {status:string, data:{perms:number}};
+  
+  if (usrData.status == "SUCCESS") {
+    if (usrData.data.perms >= 2) {
+      supportHandler.deleteRoom("ONLINE_SUPPORT", name);
+      
+      return {status:"SUCCESS", data:null, token:token}
+    }
+    else return {status:"ERROR", data:{error:"Access denied!"}, token:token};
+  }
+  else return usrData;
 }

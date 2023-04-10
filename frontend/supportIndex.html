@@ -15,6 +15,32 @@
             document.getElementById("rooms").innerHTML = btns;
           }
         });
+        send(JSON.stringify({action:"userRequest"}), (res)=>{
+          if (res.status == "SUCCESS") {
+            if (res.data.perms >= 2) {
+              document.getElementById("admin").style.display="block";
+            }
+          }
+        })
+      }
+
+      function deleterm() {
+        let inp = document.getElementById("inp2");
+        
+        send(JSON.stringify({action:"deleteRoom", data:{name:inp.value}}), (res)=>{
+          if (res.status != "SUCCESS") {alertDialog("Error: "+res.data.error, ()=>{});}
+          else {alertDialog("Action successful!", ()=>{onLoad();});}
+        })
+        inp.value="";
+        
+      }
+      function createRm() {
+        let inp = document.getElementById("inp2");
+        send(JSON.stringify({action:"createRoom", data:{name:inp.value}}), (res)=>{
+          if (res.status != "SUCCESS") {alertDialog("Error: "+res.data.error, ()=>{});}
+          else {alertDialog("Action successful!", ()=>{onLoad();});}
+        })
+        inp.value="";
       }
       function visit() {
         window.open("/support?room="+document.getElementById("inp").value, '_self');
@@ -52,6 +78,23 @@
         
         <h2><span class="material-symbols-outlined">schedule</span>
           Loading rooms, please wait.</h2>
+      </div>
+      <div id="admin" style="display: none">
+        <h2 class="fsmed">Administrative tools</h2>
+        <hr class="rounded">
+        <form action="javascript:createRm()">
+        <div class="inpContainer szTwoThirds" style="margin: 0px auto">
+          <input class="inp" id="inp2" placeholder="Room name..">
+          <div class="anim inp"></div>
+        </div>
+        <button class="btn szHalf grn">
+          <span class="material-symbols-outlined">add_circle</span>
+          Create room<div class="anim"></div></button>
+        <button type="button" class="btn szHalf red" onclick="alertDialog('Confirm room deletion?', deleterm, 2);">
+          <span class="material-symbols-outlined">delete</span>
+          Delete room<div class="anim"></div></button>
+        </form>
+        
       </div>
      <a class="btn" href="/">
       <span class="material-symbols-outlined">arrow_back_ios</span>

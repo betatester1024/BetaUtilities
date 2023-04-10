@@ -12,7 +12,7 @@ import {EE} from './EEHandler';
 import {getLogs, log, purgeLogs} from './logging';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
-import {supportHandler, roomRequest, sendMsg} from './supportRooms'
+import {supportHandler, roomRequest, sendMsg, createRoom, deleteRoom} from './supportRooms'
 const urlencodedParser = bodyParser.urlencoded({ extended: false }) 
 var RateLimit = require('express-rate-limit');
 
@@ -140,7 +140,7 @@ export async function initServer() {
     makeRequest(body.action, req.cookies.sessionID, body.data, (s:string, d:any, token:string)=>{
       /*if(body.action=="login"||body.action == "logout" ||
         body.action == "delAcc" || body.action == "signup")*/
-      if (body.action == "getLogs"){}
+      if (ignoreLog.indexOf(body.action)>=0){console.log("action ignored")}
       else if (s=="SUCCESS") {
         log("Action performed:"+body.action+", response:"+JSON.stringify(d));
       }
@@ -187,9 +187,17 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       callback(obj2.status, obj2.data, obj2.token);
       break;
     case 'createRoom':
-      createRoom(token)
+      data = data as {name:string}
+      createRoom(data.name, token)
         .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
+      break;
+    case 'deleteRoom':
+      data = data as {name:string}
+      deleteRoom(data.name, token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+      break;
     case 'statusRequest':
       let obj3 = roomRequest(token, true);
       callback(obj3.status, obj3.data, obj3.token);
@@ -286,3 +294,4 @@ function eeFormat(data:string) {
 
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
                     '/config', '/admin', '/docs', '/login', '/syslog'];
+const ignoreLog = ["getEE", "userRequest", 'getLogs'];

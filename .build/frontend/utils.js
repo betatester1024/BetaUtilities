@@ -5,8 +5,26 @@ function globalOnload() {
   let ftr = document.createElement("footer");
   maincontent.appendChild(ftr);
   let ele = document.createElement("p");
-  ele.innerHTML = "BetaOS Systems | 2023";
+  ele.innerHTML = `<a href='/login'>Login</a> | <a href='/signup'>Sign-up</a> | <a href='/status'>Status</a> | BetaOS Systems | 2023`;
   ftr.appendChild(ele);
+  let ele2 = document.getElementById("overlay");
+  if (ele2)
+    ele2.innerHTML = `
+  <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szHalf" onclick="closeAlert()" style="display: inline-block">
+          <span class="alertlbl">Continue</span>
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+        <button class="btn szHalf red" id="cancelBtn" style="display: none" onclick="closeAlert(true)">
+          <span class="alertlbl">Cancel</span>
+          <span class="material-symbols-outlined">cancel</span>
+          <div class="anim"></div>
+        </button>
+      </div>`;
+  else
+    console.log("Alert dialogs disabled on this page");
 }
 function send(params, callback) {
   var xhr = new XMLHttpRequest();
@@ -45,18 +63,16 @@ function alertDialog(str, callback, button = -1, failedReq = "") {
   dialogQ = true;
   cbk = callback;
   p.innerText = str;
+  document.getElementById("cancelBtn").style.display = "none";
   if (button == 1) {
     p.innerHTML += `<button class='btn szThird fssml' onclick='location.reload()'>Refresh?
     <div class="anim"></div></button>`;
     console.log("Failed request: " + failedReq);
     BLOCKCALLBACK = true;
   } else if (button == 2) {
-    p.innerHTML += `<br>
-    <p class="fssml gry nohover"> [Press any key or click 'Continue' below to confirm] </p>
-    <button class='btn szFull red fssml cancel' onclick='closeAlert(true)'>
-    <span class="material-symbols-outlined">cancel</span>Cancel
-    <div class="anim"></div></button>`;
+    document.getElementById("cancelBtn").style.display = "inline-block";
     console.log("Confirm speedbump");
+    BLOCKCALLBACK = true;
   }
   if (failureTimeout)
     clearTimeout(failureTimeout);
@@ -66,20 +82,21 @@ function closeAlert(overrideCallback = false) {
   let ele = document.getElementById("overlay");
   ele.style.top = "500vh";
   dialogQ = false;
-  if (cbk && !overrideCallback && !BLOCKCALLBACK) {
+  if (cbk && !overrideCallback) {
     console.log("calling back");
     cbk();
   }
+  BLOCKCALLBACK = false;
 }
 function keydown(e) {
   if (dialogQ) {
     e.preventDefault();
-    console.log("CLOSED DIALOG");
     if (BLOCKCALLBACK)
-      console.log("CALLBACK HAS BEEN BLOCKED");
-    else
+      closeAlert(true);
+    else {
+      console.log("KEYDOWNCLOSEDIALOG");
       closeAlert();
-    BLOCKCALLBACK = false;
+    }
   }
 }
 function toTime(ms) {

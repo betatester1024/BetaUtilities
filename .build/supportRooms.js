@@ -48,7 +48,6 @@ class supportHandler {
     });
     if (idx >= 0)
       this.allRooms.splice(idx, 1);
-    console.log(this.allRooms);
   }
   static async addConnection(ev, rn, token) {
     for (let i = 0; i < this.connections.length; i++) {
@@ -60,7 +59,8 @@ class supportHandler {
             ev.write("data:+" + processAnon(this.connections[i].tk) + "(1)>\n\n");
         });
     }
-    this.connections.push({ event: ev, roomName: rn, tk: token });
+    let thiscn = { event: ev, roomName: rn, tk: token, readyQ: false };
+    this.connections.push(thiscn);
     (0, import_userRequest.userRequest)(token).then((obj) => {
       if (obj.status == "SUCCESS")
         this.sendMsgTo(rn, "+" + obj.data.alias + "(" + obj.data.perms + ")");
@@ -71,14 +71,11 @@ class supportHandler {
     let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: rn }).toArray();
     let text = "";
     for (let i = 0; i < msgs.length; i++) {
-      let userData = await import_consts.authDB.findOne({ fieldName: "UserData", user: msgs[i].sender });
-      if (!userData)
-        text += "[" + msgs[i].sender + "](1)" + msgs[i].data + ">";
-      else
-        text += "[" + (userData.alias ?? msgs[i].sender) + "](" + userData.permLevel + ")" + msgs[i].data + ">";
+      ev.write("data:[" + msgs[i].sender + "](" + msgs[i].permLevel + ")" + msgs[i].data + ">\n\n");
     }
     text += "[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. \nThank you for using BetaOS Systems!>";
     ev.write("data:" + text + "\n\n");
+    thiscn.readyQ = true;
   }
   static async removeConnection(ev, rn, token) {
     let idx = this.connections.findIndex((cn) => cn.event == ev);
@@ -158,8 +155,9 @@ function sendMsg(msg, room, token, callback) {
   (0, import_userRequest.userRequest)(token).then(async (obj) => {
     await import_consts.msgDB.insertOne({
       fieldName: "MSG",
-      data: msg,
-      sender: obj.data.user ?? "" + processAnon(token),
+      data: msg.replaceAll(">", "&gt;"),
+      permLevel: obj.data.perms ?? 1,
+      sender: obj.data.alias ?? "" + processAnon(token),
       expiry: Date.now() + 3600 * 1e3,
       room
     });

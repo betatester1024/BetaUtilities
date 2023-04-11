@@ -227,7 +227,11 @@ function makeRequest(action, token, data, callback) {
       break;
     case "sendMsg":
       data = data;
-      (0, import_supportRooms.sendMsg)(data.msg, data.room, token, callback);
+      if (data.msg.length == 0) {
+        callback("SUCCESS", null, token);
+        break;
+      }
+      (0, import_supportRooms.sendMsg)(data.msg.slice(0, 1024), data.room, token, callback);
       break;
     case "getLogs":
       (0, import_logging.getLogs)(token).then((obj) => {
@@ -236,6 +240,11 @@ function makeRequest(action, token, data, callback) {
       break;
     case "purgeLogs":
       (0, import_logging.purgeLogs)(token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
+    case "realias":
+      (0, import_updateUser.realias)(data.alias, token).then((obj) => {
         callback(obj.status, obj.data, obj.token);
       });
       break;

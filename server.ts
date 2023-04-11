@@ -6,7 +6,7 @@ const parse = require("co-body");
 import {port, msgDB, authDB, frontendDir, roomRegex, rootDir, jsDir, uDB} from './consts';
 import {signup, validateLogin, logout} from './validateLogin';
 import { deleteAccount } from './delacc';
-import {updateUser} from './updateUser'
+import {updateUser, realias} from './updateUser'
 import {userRequest} from './userRequest';
 import {EE} from './EEHandler';
 import {getLogs, log, purgeLogs} from './logging';
@@ -233,7 +233,10 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       break;
     case 'sendMsg':
       data = data as {msg:string, room:string};
-      sendMsg(data.msg, data.room, token, callback);
+      if (data.msg.length == 0) {
+        callback("SUCCESS", null, token); break;
+      }
+      sendMsg(data.msg.slice(0, 1024), data.room, token, callback);
       break;
     case "getLogs":
       getLogs(token)
@@ -242,6 +245,11 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       break;
     case "purgeLogs":
       purgeLogs(token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "realias":
+      realias(data.alias, token)
       .then((obj:{status:string, data:any, token:string})=>
         {callback(obj.status, obj.data, obj.token)});
       break;

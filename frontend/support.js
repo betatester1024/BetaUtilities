@@ -10,7 +10,12 @@ function onLoad() {
 // system refresh auto!
 function sendMsg() {
   let inp = document.getElementById("msgInp");
-  send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME}}), ()=>{});
+  let match = inp.value.match("!alias @(.+)");
+  if (match) send(JSON.stringify({action:"realias", data:{alias:match[1]}}), (res)=>{
+    if (res.status != "SUCCESS") alertDialog("ERROR: "+res.data.error, ()=>{});
+    else alertDialog("Updated alias!", ()=>{});
+  });
+  else send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME}}), ()=>{});
   inp.value="";
 }
 let LOADEDQ2 = false;
@@ -59,6 +64,41 @@ async function initClient()
       ele.appendChild(newMsgSender);
       newMsgBody.className = classStr[matches[2]];
       let msg = matches[3];
+      for (let i=0; i<replacements.length; i++) {
+        msg = msg.replaceAll(`:${replacements[i].from}:`, ">EMOJI"+replacements[i].to+">");
+      }
+      msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu,">LINK$<test>>")
+
+      
+      let split = msg.split(">");
+      // console.log("message fragments:", split.length, split);
+      let out= "";
+      for (let i=0; i<split.length; i++) {
+        if (i%2 == 0) {
+          let fragment = document.createElement("p");
+          fragment.className = classStr[matches[2]];
+          fragment.innerText = split[i].replaceAll("&gt;", ">");
+          ele.appendChild(fragment);
+        }
+        else {
+          let pref = split[i].match("^(EMOJI|LINK)")[1];
+          let post = split[i].match("^(EMOJI|LINK)(.+)")[2];
+          if (pref == "EMOJI") {
+            let replaced = document.createElement("span");
+            replaced.title = ":"+findReplacement(post)+":";
+            replaced.className="material-symbols-outlined supportMsg "+classStr[matches[2]];
+            replaced.innerText = post;
+            ele.appendChild(replaced);
+          }
+          else if (pref == "LINK") {
+            let replaced = document.createElement("a");
+            replaced.className="supportMsg "+classStr[matches[2]];
+            replaced.href = "https://"+post;
+            replaced.innerText = post;
+            ele.appendChild(replaced);
+          }
+        }
+      }
       // let arr2 = msg.split(":");
       // let arr3 = [];
       // let prevColon = false;
@@ -99,12 +139,12 @@ async function initClient()
       // }
       
       // do this sometime soon. 
-      msg = msg.replaceAll("&gt;", ">");
+      // msg = msg.replaceAll("&gt;", ">");
       // start replacing emojis
       // replaceAll(msg, ele, matches);
-      newMsgBody.innerText = msg; // but of course.
-      ele.appendChild(newMsgSender);
-      ele.appendChild(newMsgBody);
+      // newMsgBody.innerText = msg; // but of course.
+      
+      // if (split.length <= 2) ele.appendChild(newMsgBody);
       ele.appendChild(document.createElement("br"));
       document.getElementById("placeholder").style.display="none";
     } // 
@@ -126,27 +166,48 @@ async function initClient()
 
 
 const replacements = [
-  {from:"one", to:"looks_one"},
-  {from:"two", to:"looks_two"},
+  {from: "one", to: "counter_1"},
+  {from: "two", to: "counter_2"},
+  {from: "three", to: "counter_3"},
+  {from: "four", to: "counter_4"},
+  {from: "five", to: "counter_5"},
+  {from: "six", to: "counter_6"},
+  {from: "seven", to: "counter_7"},
+  {from: "eight", to: "counter_8"},
+  {from: "nine", to: "counter_9"},
+  {from: "zero", to: "counter_0"},
+  {from: "white_check_mark", to: "check_circle"},
+  {from: "active", to: "check_circle"},
+  {from: "info", to: "info"},
+  {from: "confirm", to:"check"},
+  {from: "warn", to: "warning"},
+  {from: "error", to:"error"},
+  {from: "egg", to:"egg_alt"}
 ]
 
-function replaceAll(msg, ele, matches) {
-  console.log(msg, ele, matches);
-  for (let j=0; j<replacements.length; j++) {
-    let regex = new RegExp(replacements[j].from, "gmiu");
-    while ((arr = regex.exec(msg)) !== null) {
-      console.log(`Found ${arr[0]}. `, arr.index);
-      let fragment = document.createElement("span");
-      fragment.className = classStr[matches[2]];
-      console.log(msg.slice(0, arr.index));
-      if (msg.slice(0, arr.index)) replaceAll(msg.slice(0, arr.index), ele, matches);
-      let replaced = document.createElement("span");
-      replaced.className="material-symbols-outlined supportMsg "+classStr[matches[2]];
-      replaced.innerText = replacements[j].to;
-      console.log(replaced);
-      ele.appendChild(replaced);
-      msg = msg.slice(arr.index+replacements[j].from.length);
-      console.log(msg);
-    }
-  } // for replacements
+// function replaceAll(msg, ele, matches) {
+//   console.log(msg, ele, matches);
+//   for (let j=0; j<replacements.length; j++) {
+//     let regex = new RegExp(replacements[j].from, "gmiu");
+//     while ((arr = regex.exec(msg)) !== null) {
+//       console.log(`Found ${arr[0]}. `, arr.index);
+//       let fragment = document.createElement("span");
+//       fragment.className = classStr[matches[2]];
+//       console.log(msg.slice(0, arr.index));
+//       if (msg.slice(0, arr.index)) replaceAll(msg.slice(0, arr.index), ele, matches);
+//       let replaced = document.createElement("span");
+//       replaced.className="material-symbols-outlined supportMsg "+classStr[matches[2]];
+//       replaced.innerText = replacements[j].to;
+//       console.log(replaced);
+//       ele.appendChild(replaced);
+//       msg = msg.slice(arr.index+replacements[j].from.length);
+//       console.log(msg);
+//     }
+//   } // for replacements
+// }
+
+function findReplacement(thing) {
+  for (let i=0; i<replacements.length; i++) {
+    if (replacements[i].to == thing) return replacements[i].from;
+  }
 }

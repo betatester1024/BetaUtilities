@@ -1,5 +1,7 @@
 { pkgs }: {
     deps = [
+        # pkgs.telnet
+        pkgs.iputils
         pkgs.yarn
         pkgs.esbuild
         pkgs.nodejs-16_x

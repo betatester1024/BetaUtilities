@@ -18,6 +18,7 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var updateUser_exports = {};
 __export(updateUser_exports, {
+  realias: () => realias,
   updateUser: () => updateUser
 });
 module.exports = __toCommonJS(updateUser_exports);
@@ -56,8 +57,24 @@ async function updateUser(user, oldPass, newPass, newPermLevel, token) {
     return { status: "ERROR", data: { error: "Cannot update user information: Access denied!" }, token };
   }
 }
+async function realias(newalias, token) {
+  let tokenData = await import_consts.authDB.findOne({ fieldName: "Token", token });
+  if (!tokenData) {
+    return { status: "ERROR", data: { error: "Cannot update user information: Your session could not be found!" }, token: "" };
+  }
+  if (Date.now() > tokenData.expiry) {
+    return { status: "ERROR", data: { error: "Cannot update user information: Your session has expired!" }, token: "" };
+  }
+  if (!newalias.match(import_consts.userRegex))
+    return { status: "ERROR", data: { error: "Invalid alias" }, token };
+  await import_consts.authDB.updateOne({ fieldName: "UserData", user: tokenData.associatedUser }, {
+    $set: { alias: newalias }
+  });
+  return { status: "SUCCESS", data: null, token };
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  realias,
   updateUser
 });
 //# sourceMappingURL=updateUser.js.map

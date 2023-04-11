@@ -12,7 +12,7 @@ export class Room {
 
 export class supportHandler {
   static allRooms: Room[] = [];
-  static connections: {event:any, roomName:string, tk:string}[] = [];
+  static connections: {event:any, roomName:string, tk:string, readyQ:boolean}[] = [];
   static addRoom(r:Room) {
     this.allRooms.push(r);
   }
@@ -30,7 +30,8 @@ export class supportHandler {
         });
     }
     // add NEW CONNECTION
-    this.connections.push({event:ev, roomName:rn, tk:token});
+    let thiscn = {event:ev, roomName:rn, tk:token, readyQ:false};
+    this.connections.push(thiscn);
     // TELL EVERYONE ELSE ABOUT THE NEW CONNECTION
     userRequest(token).then((obj:{status:string, data:any, token:string})=>{
       if (obj.status == "SUCCESS") this.sendMsgTo(rn, "+"+obj.data.alias+"("+obj.data.perms+")");
@@ -40,12 +41,15 @@ export class supportHandler {
     let msgs = await msgDB.find({fieldName:"MSG", room:rn}).toArray();
     let text = "";
     for (let i=0; i<msgs.length; i++) {
-      let userData = await authDB.findOne({fieldName:"UserData", user:msgs[i].sender})
-      if (!userData) text+= "["+msgs[i].sender+"](1)"+msgs[i].data+">";
-      else text += "["+(userData.alias??msgs[i].sender)+"]("+userData.permLevel+")"+msgs[i].data+">";
+      // let userData = await authDB.findOne({fieldName:"UserData", user:msgs[i].sender})
+      // if (!userData) text+= "["+msgs[i].sender+"](1)"+msgs[i].data+">";
+      // if (!userData) ev.write("data:["+msgs[i].sender+"](1)"+msgs[i].data+">\n\n");
+      // else text += "["+(userData.alias??msgs[i].sender)+"]("+userData.permLevel+")"+msgs[i].data+">";
+      ev.write("data:["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data+">\n\n");
     }
     text += "[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. \nThank you for using BetaOS Systems!>"
     ev.write("data:"+text+"\n\n")
+    thiscn.readyQ = true;
   }
   static async removeConnection(ev:any, rn:string, token:string) {
     let idx = this.connections.findIndex((cn:any)=>cn.event == ev);
@@ -124,8 +128,8 @@ export class supportHandler {
 
 export function sendMsg(msg:string, room:string, token:string, callback: (status:string, data:any, token:string)=>any) {
   userRequest(token).then(async (obj:{status:string, data:any, token:string})=>{
-    await msgDB.insertOne({fieldName:"MSG", data:msg, 
-                             sender:obj.data.user??""+processAnon(token), expiry:Date.now()+3600*1000, room:room});
+    await msgDB.insertOne({fieldName:"MSG", data:msg.replaceAll(">", "&gt;"), permLevel:obj.data.perms??1, 
+                             sender:obj.data.alias??""+processAnon(token), expiry:Date.now()+3600*1000, room:room});
     if (obj.status == "SUCCESS") supportHandler.sendMsgTo(room, "["+obj.data.alias+"]("+obj.data.perms+")"+msg);
     else supportHandler.sendMsgTo(room, "["+processAnon(token)+"](1)"+msg);
     callback("SUCCESS", null, token);

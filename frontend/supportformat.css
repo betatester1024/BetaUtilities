@@ -66,6 +66,10 @@ b {
   margin-right: 5px;
   border-radius: 2px;
   background-color: var(--system-grey2);
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-bottom: 2px;
+  margin-bottom: 10px;
 }
 
 p {
@@ -109,4 +113,10 @@ b.superadmin {
   font-family: "SupportText";
   font-weight: 500;
   src: url(https://fonts.gstatic.com/s/materialsymbolsoutlined/v100/kJEhBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oFsI.woff2) format('woff2');
+}
+
+br {
+  display: block; /* makes it have a width */
+  content: ""; /* clears default height */
+  margin-top: 5px; /* change this to whatever height you want it */
 }

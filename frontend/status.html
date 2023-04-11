@@ -36,6 +36,13 @@
           }
           document.getElementById("inner_content").innerHTML = out;
         })
+        let match = document.URL.match("\\?refresh=([0-9]+)");
+        if (match) {
+          document.getElementById("ardis").style.display="inline-block";
+          document.getElementById("arenb").style.display="none";
+          document.getElementById("sel").style.display="none";
+          setTimeout(()=>{location.reload()}, match[1]);
+        }
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -66,7 +73,24 @@
         <h2 id="hdr" class="gry nohover">Status: Loading</h2>
         <hr class="rounded" id="hr">
       </header>
-      <p id="inner_content" class="fsmed">Loading... </p><br><br>
+      <p id="inner_content" class="fsmed">Loading... </p><br>
+      <button id="arenb" class="btn fssml2" onclick="window.open('/status?refresh='+document.getElementById('sel').value, '_self');">
+        <span class="material-symbols-outlined">sync</span>Enable AutoRefresh - every:
+      <div class="anim"></div></button>
+      
+      <button id="ardis" style="display: none" class="btn fssml2" onclick="window.open('/status', '_self');">
+        <span class="material-symbols-outlined">sync_disabled</span>Disable AutoRefresh
+      <div class="anim"></div></button>
+      <select class="szThird" id="sel">
+        <option value="1000">1s</option>
+        <option value="1001">1001ms</option>
+        <option value="5000">5s</option>
+        <option value="15000">15s</option>
+        <option value="30000">30s</option>
+        <option value="60000">1min</option>
+        <option value="300000">5min</option>
+      </select><br>
+        
       <a class="btn fsmed" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>
         Return to home<div class="anim"></div></a>

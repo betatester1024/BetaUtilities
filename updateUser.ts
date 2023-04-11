@@ -34,3 +34,18 @@ export async function updateUser(user:string, oldPass:string, newPass:string, ne
     return {status: "ERROR", data:{error:"Cannot update user information: Access denied!"}, token:token};
   }
 }
+
+export async function realias(newalias:string, token:string) {
+  let tokenData:{associatedUser:string, expiry:number} = await authDB.findOne({fieldName:"Token", token:token});
+  if (!tokenData) {
+    return {status:"ERROR", data:{error:"Cannot update user information: Your session could not be found!"}, token:""}
+  }
+  if (Date.now() > tokenData.expiry) {
+    return {status:"ERROR", data:{error:"Cannot update user information: Your session has expired!"}, token:""};
+  }
+  if (!newalias.match(userRegex)) return {status:"ERROR",data:{error:"Invalid alias"}, token:token};
+  await authDB.updateOne({fieldName:"UserData", user:tokenData.associatedUser}, {
+    $set:{alias:newalias}
+  });
+  return {status:"SUCCESS", data:null, token:token};
+}

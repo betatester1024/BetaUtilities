@@ -1,12 +1,28 @@
 "use strict";
 function globalOnload() {
   document.onkeydown = keydown;
-  let maincontent = document.getElementsByClassName("main_content").item(0);
-  let ftr = document.createElement("footer");
-  maincontent.appendChild(ftr);
-  let ele = document.createElement("p");
-  ele.innerHTML = `<a href='/login'>Login</a> | <a href='/signup'>Sign-up</a> | <a href='/status'>Status</a> | BetaOS Systems | 2023`;
-  ftr.appendChild(ele);
+  send(
+    JSON.stringify({ action: "userRequest" }),
+    (res) => {
+      let maincontent = document.getElementsByClassName("main_content").item(0);
+      let ftr = document.createElement("footer");
+      maincontent.appendChild(ftr);
+      let ele = document.createElement("p");
+      if (res.status != "SUCCESS")
+        ele.innerHTML = `<a href='/login'>Login</a> | 
+                      <a href='/signup'>Sign-up</a> | 
+                      <a href='/status'>Status</a> | 
+                      BetaOS Systems | 2023`;
+      else {
+        ele.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
+                      <a href='/logout'>Logout</a> | 
+                      <a href='/config'>Account</a> | 
+                      <a href='/status'>Status</a> | 
+                      BetaOS Systems | 2023`;
+      }
+      ftr.appendChild(ele);
+    }
+  );
   let ele2 = document.getElementById("overlay");
   if (ele2)
     ele2.innerHTML = `

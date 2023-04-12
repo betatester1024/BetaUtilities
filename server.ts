@@ -16,6 +16,28 @@ import {supportHandler, roomRequest, sendMsg} from './supportRooms'
 const urlencodedParser = bodyParser.urlencoded({ extended: false }) 
 var RateLimit = require('express-rate-limit');
 
+static function sendExpress(dir, URLAddon) {
+  res.sendFile(frontendDir+URLAddon);
+  
+static function useExpressWithRequest(name, URLAddon) {
+  app.get(name, (req:Request, res:any) => {
+    sendExpress(frontEndDir, URLAddon);
+    incrRequests();
+  });
+  
+static function useExpressWithAny(name, URLAddon) {
+  app.get(name, (req:any, res:any) => {
+    sendExpress(frontEndDir, URLAddon);
+    incrRequests();
+  });
+  
+static function useExpressWithCode(name, dir) {
+  app.get(name, (req:any, res:any) => {
+    sendExpress(dir, req.url);
+    incrRequests();
+  })
+    
+
 export async function initServer() {
   var limiter = RateLimit({
     windowMs: 10*1000, // 10 seconds
@@ -26,23 +48,12 @@ export async function initServer() {
   app.use(limiter);
   app.use(new cookieParser());
   
-  app.get('/', (req:Request, res:any) => {
-    res.sendFile(frontendDir+'/index.html');
-    incrRequests();
-  })
+  useExpressWithRequest('/', '/index.html');
   
-  app.get('/register', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/signup.html');
-    incrRequests();
-  });
-
-
-  app.get('/account', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/config.html');
-    incrRequests();
-  });
-
+  useExpressWithAny('/register', '/signup.html');
   
+  useExpressWithAny('/account', '/config.html');
+
   app.get('/EE', (req:any, res:any) => {
     EE(true, (_status:string, data:any, _token:string)=>{
       res.set('Content-Type', 'text/html')
@@ -67,38 +78,18 @@ export async function initServer() {
     else res.sendFile(frontendDir+'/supportIndex.html');
     incrRequests();
   });
-
-  app.get('/accountDel', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/delAcc.html');
-    incrRequests();
-  });
-    
-  app.get('*/favicon.ico', (req:Request, res:any)=> {
-    res.sendFile(rootDir+'/favicon.ico')
-    incrRequests();
-  })
-
   
-  app.get('/support.js', (req:any, res:any) => {
-    res.sendFile(frontendDir+"support.js");
-    incrRequests();
-  })
-  
-  app.get('/*.js*', (req:any, res:any) => {
-    res.sendFile(jsDir+req.url);
-    incrRequests();
-  })
+  useExpressWithAny('/accountDel', '/delAcc.html');
 
+  useExpressWithRequest('*/favicon.ico', '/favicon.ico');
   
-  app.get('/*.ts', (req:any, res:any) => {
-    res.sendFile(jsDir+req.url);
-    incrRequests();
-  })
+  useExpressWithAny('/support.js', "support.js")
 
-  app.get('/*.css', (req:any, res:any) => {
-    res.sendFile(frontendDir+req.url);
-    incrRequests();
-  })
+  useExpressWithCode('/*.js*', jsDir);
+  
+  useExpressWithCode('/*.ts', jsDir);
+  
+  useExpressWithCode('/*.css', frontendDir);
 
   app.get("/stream", (req:any, res:any) =>{
     res.set({

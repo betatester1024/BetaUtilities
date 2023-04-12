@@ -68,12 +68,12 @@ class supportHandler {
         this.sendMsgTo(rn, "+" + processAnon(obj.token) + "(1)");
     });
     console.log("added connection in " + rn);
-    let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: rn }).toArray();
+    let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn } }).toArray();
     let text = "";
     for (let i = 0; i < msgs.length; i++) {
       ev.write("data:[" + msgs[i].sender + "](" + msgs[i].permLevel + ")" + msgs[i].data + ">\n\n");
     }
-    text += "[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. \nThank you for using BetaOS Systems!>";
+    text += "[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. \nEnter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!>";
     ev.write("data:" + text + "\n\n");
     thiscn.readyQ = true;
   }
@@ -184,6 +184,13 @@ async function createRoom(name, token) {
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
       supportHandler.addRoom(new Room("ONLINE_SUPPORT", name));
+      let obj = await import_consts.uDB.findOne({ fieldName: "ROOMS" });
+      obj.rooms.push(name);
+      await import_consts.uDB.updateOne({ fieldName: "ROOMS" }, {
+        $set: {
+          rooms: obj.rooms
+        }
+      }, { upsert: true });
       return { status: "SUCCESS", data: null, token };
     } else
       return { status: "ERROR", data: { error: "Access denied!" }, token };
@@ -196,8 +203,31 @@ async function deleteRoom(name, token) {
   let usrData = await (0, import_userRequest.userRequest)(token);
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
-      supportHandler.deleteRoom("ONLINE_SUPPORT", name);
-      return { status: "SUCCESS", data: null, token };
+      let obj = await import_consts.uDB.findOne({ fieldName: "ROOMS" });
+      let idx = obj.rooms.indexOf(name);
+      if (idx >= 0) {
+        supportHandler.deleteRoom("ONLINE_SUPPORT", name);
+        obj.rooms.splice(idx, 1);
+        await import_consts.uDB.updateOne({ fieldName: "ROOMS" }, {
+          $set: {
+            rooms: obj.rooms
+          }
+        }, { upsert: true });
+        return { status: "SUCCESS", data: null, token };
+      } else {
+        let idx2 = obj.hidRooms.indexOf(name);
+        if (idx2 >= 0) {
+          supportHandler.deleteRoom("HIDDEN_SUPPORT", name);
+          obj.hidRooms.splice(idx2, 1);
+        } else
+          return { status: "ERROR", data: { error: "Database inconsistency detected" }, token };
+        await import_consts.uDB.updateOne({ fieldName: "ROOMS" }, {
+          $set: {
+            hidRooms: obj.hidRooms
+          }
+        }, { upsert: true });
+        return { status: "SUCCESS", data: null, token };
+      }
     } else
       return { status: "ERROR", data: { error: "Access denied!" }, token };
   } else

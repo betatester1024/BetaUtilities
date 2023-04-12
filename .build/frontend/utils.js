@@ -8,19 +8,26 @@ function globalOnload() {
       let ftr = document.createElement("footer");
       maincontent.appendChild(ftr);
       let ele = document.createElement("p");
+      ele.id = "footer";
       if (res.status != "SUCCESS")
         ele.innerHTML = `<a href='/login'>Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
-                      BetaOS Systems | 2023`;
+                      BetaOS Systems, 2023`;
       else {
         ele.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
                       <a href='/logout'>Logout</a> | 
                       <a href='/config'>Account</a> | 
                       <a href='/status'>Status</a> | 
-                      BetaOS Systems | 2023`;
+                      BetaOS Systems, 2023`;
       }
       ftr.appendChild(ele);
+      send(
+        JSON.stringify({ action: "visits" }),
+        (res2) => {
+          document.getElementById("footer").innerHTML += " | <kbd>" + res2.data.data + "</kbd>";
+        }
+      );
     }
   );
   let ele2 = document.getElementById("overlay");

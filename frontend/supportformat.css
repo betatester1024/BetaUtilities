@@ -63,7 +63,6 @@ button#sendBtn {
 }
 b {
 /*   font-family: "SupportText", "Noto Sans Display"; */
-  margin-right: 5px;
   border-radius: 2px;
   background-color: var(--system-grey2);
   padding-left: 5px;
@@ -76,11 +75,23 @@ p {
   margin-top: 0px;
   margin-bottom: 0px;
   max-width: 100%;
+/*   margin-left: 5px; */
 }
 h2 > span, .supportMsg {
   top: 5px;
   color: var(--system-blue);
 }
+
+p.slashMe {
+  padding-right: 5px; 
+  border-radius: 0px 3px 3px 0px;
+  background-color: var(--system-grey2);
+  margin-left: 0px;
+  font-style: italic;
+  position: relative;
+  top: 1px;
+}
+
 p.admin, p.user, p.error, 
 span.admin, span.user, span.error,
 a.admin, a.user, a.error {
@@ -89,7 +100,10 @@ a.admin, a.user, a.error {
 } 
 
 b.admin{
-  color: var(--system-blue);
+  color: var(--system-blue);  
+}
+
+p.admin.slashMe, b.admin {
   background-color: var(--system-blue2);
 }
 p.superadmin, b.superadmin, span.superadmin, a.superadmin {
@@ -97,7 +111,7 @@ p.superadmin, b.superadmin, span.superadmin, a.superadmin {
   font-variant-caps: small-caps;
   font-size: large;
 }
-b.superadmin {
+b.superadmin, p.superadmin.slashMe {
   background-color: var(--system-green2);
 }
 

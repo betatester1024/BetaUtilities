@@ -19,4 +19,4 @@ export const hashingOptions = {
    parallelism: 1,
    hashLength: 50
  }
-export const expiry = [9e99, 1000*60, 1000*60*60*24*30, 1000*60*60];
+export const expiry = [9e99, 1000*60*60*24, 1000*60*60*24*30, 1000*60*60];

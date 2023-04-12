@@ -10,11 +10,21 @@ function onLoad() {
 // system refresh auto!
 function sendMsg() {
   let inp = document.getElementById("msgInp");
-  let match = inp.value.match("!alias @(.+)");
-  if (match) send(JSON.stringify({action:"realias", data:{alias:match[1]}}), (res)=>{
-    if (res.status != "SUCCESS") alertDialog("ERROR: "+res.data.error, ()=>{});
-    else alertDialog("Updated alias!", ()=>{});
-  });
+  let match = inp.value.match("^!alias @(.+)");
+  if (match) {
+    source.close();
+    
+    document.getElementById("userList").innerHTML = ``;
+    send(JSON.stringify({action:"realias", data:{alias:match[1]}}), (res)=>{
+      if (res.status != "SUCCESS") alertDialog("ERROR: "+res.data.error, ()=>{});
+      else alertDialog("Updated alias!", ()=>{
+        document.getElementById("msgArea").innerHTML = `<h2 id="placeholder">
+        <span class="material-symbols-outlined">update</span> 
+        Reloading your messages, a moment please...</h2>`;
+        initClient();
+      });
+    });
+  }
   else send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME}}), ()=>{});
   inp.value="";
 }
@@ -22,12 +32,13 @@ let LOADEDQ2 = false;
 const rmvReg = /(>|^)\-(.+)\([0-9]\)>/gm;
 const addReg = /(>|^)\+(.+)\([0-9]\)>/gm;
 const classStr = ["error", "user", "admin", "superadmin"]
+let source = null;
 async function initClient()
 {
   
   try {
   console.log("Starting client.")
-  const source = new EventSource('/stream?room='+
+  source = new EventSource('/stream?room='+
                                  document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1]);
   source.addEventListener('message', message => {
     console.log('Got', message);
@@ -39,10 +50,10 @@ async function initClient()
     let added = addReg.exec(modif)
     while (removed || added) {
       if (removed) {
-        ele.innerText= ele.innerText.replace(removed[2]+"\n", "");
+        ele.innerHTML= ele.innerHTML.replace(removed[2]+"<br>", "");
       }
       if (added) {
-        ele.innerText+= added[2]+"\n";
+        ele.innerHTML+= added[2]+"<br>";
       }
       modif = modif.replaceAll(rmvReg, "");
       modif = modif.replaceAll(addReg, "");
@@ -63,12 +74,19 @@ async function initClient()
       newMsgSender.className = classStr[matches[2]];
       ele.appendChild(newMsgSender);
       newMsgBody.className = classStr[matches[2]];
-      let msg = matches[3];
+      let msg = " "+matches[3].replaceAll("&gt;", ";gt;");
       for (let i=0; i<replacements.length; i++) {
         msg = msg.replaceAll(`:${replacements[i].from}:`, ">EMOJI"+replacements[i].to+">");
       }
+      let slashMe = false;
+      msg = msg.replaceAll(/(&[a-zA-Z0-9]{1,20}[^;])/gm,">ROOM$1>")
+      msg = msg.replaceAll(/(#[a-zA-Z0-9_\-]{1,20}[^;])/gm,">SUPPORT$1>")
       msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu,">LINK$<test>>")
-
+      msg = msg.replaceAll(/(`.*`)/gm,">CODE$1>")
+      if (msg.match("/me.*")) {
+        msg = msg.slice(4);
+        slashMe = true;
+      }
       
       let split = msg.split(">");
       // console.log("message fragments:", split.length, split);
@@ -76,24 +94,45 @@ async function initClient()
       for (let i=0; i<split.length; i++) {
         if (i%2 == 0) {
           let fragment = document.createElement("p");
-          fragment.className = classStr[matches[2]];
-          fragment.innerText = split[i].replaceAll("&gt;", ">");
+          fragment.className = classStr[matches[2]] + (slashMe?" slashMe ":"");
+          fragment.innerText = split[i].replaceAll(";gt;", ">");
           ele.appendChild(fragment);
         }
         else {
-          let pref = split[i].match("^(EMOJI|LINK)")[1];
-          let post = split[i].match("^(EMOJI|LINK)(.+)")[2];
+          let pref = split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|CODE)")[1];
+          let post = split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|CODE)(.+)")[2];
           if (pref == "EMOJI") {
             let replaced = document.createElement("span");
             replaced.title = ":"+findReplacement(post)+":";
-            replaced.className="material-symbols-outlined supportMsg "+classStr[matches[2]];
+            replaced.className="material-symbols-outlined supportMsg "+classStr[matches[2]] + (slashMe?" slashMe ":"");
             replaced.innerText = post;
             ele.appendChild(replaced);
           }
           else if (pref == "LINK") {
             let replaced = document.createElement("a");
-            replaced.className="supportMsg "+classStr[matches[2]];
+            replaced.className="supportMsg "+classStr[matches[2]] + (slashMe?" slashMe ":"");
             replaced.href = "https://"+post;
+            replaced.innerText = post;
+            ele.appendChild(replaced);
+          }
+          else if (pref == "ROOM") {
+            let replaced = document.createElement("a");
+            replaced.className="supportMsg "+classStr[matches[2]] + (slashMe?" slashMe ":"");
+            replaced.href = "https://euphoria.io/room/"+post.slice(1);
+            replaced.innerText = post;
+            ele.appendChild(replaced);
+          }
+          else if (pref == "SUPPORT") {
+            let replaced = document.createElement("a");
+            replaced.className="supportMsg "+classStr[matches[2]] + (slashMe?" slashMe ":"");
+            replaced.href = "/support?room="+post.slice(1);
+            replaced.innerText = post;
+            ele.appendChild(replaced);
+          }
+          else if (pref == "CODE") {
+            let replaced = document.createElement("kbd");
+            replaced.className="supportMsg "+classStr[matches[2]] + (slashMe?" slashMe ":"");
+            // replaced.href = "https://euphoria.io/room/"+post.slice(1);
             replaced.innerText = post;
             ele.appendChild(replaced);
           }

@@ -9,7 +9,7 @@ import { deleteAccount } from './delacc';
 import {updateUser, realias} from './updateUser'
 import {userRequest} from './userRequest';
 import {EE} from './EEHandler';
-import {getLogs, log, purgeLogs} from './logging';
+import {getLogs, log, purgeLogs, visitCt, incrRequests} from './logging';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
 import {supportHandler, roomRequest, sendMsg, createRoom, deleteRoom} from './supportRooms'
@@ -140,12 +140,12 @@ export async function initServer() {
     makeRequest(body.action, req.cookies.sessionID, body.data, (s:string, d:any, token:string)=>{
       /*if(body.action=="login"||body.action == "logout" ||
         body.action == "delAcc" || body.action == "signup")*/
-      if (ignoreLog.indexOf(body.action)>=0){console.log("action ignored")}
+      if (ignoreLog.indexOf(body.action)>=0){}
       else if (s=="SUCCESS") {
         log("Action performed:"+body.action+", response:"+JSON.stringify(d));
       }
       else log("Action performed, error on "+body.action+", error:"+d.error);
-      res.cookie('sessionID', token?token:"", { maxAge: 1000*60*60*24*30, httpOnly: true, secure:true, sameSite:"Strict"});
+      res.cookie('sessionID', token?token:"", {httpOnly: true, secure:true, sameSite:"Strict"});
       res.end(JSON.stringify({status:s, data:d}));
     })
   });
@@ -153,10 +153,6 @@ export async function initServer() {
   app.listen(port, () => {
     console.log(`BetaUtilities V2 listening on port ${port}`)
   })
-}
-
-async function incrRequests() {
-  uDB.updateOne({fieldName:"VISITS"}, {$inc:{visitCt:1}}, {upsert:true});
 }
 
 function makeRequest(action:string|null, token:string, data:any|null, callback: (status:string, dat:any, token:string)=>any) {
@@ -253,6 +249,11 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       .then((obj:{status:string, data:any, token:string})=>
         {callback(obj.status, obj.data, obj.token)});
       break;
+    case "visits":
+      visitCt(token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
     default:
       callback("ERROR", {error: "Unknown command string!"}, token);
   }
@@ -302,4 +303,4 @@ function eeFormat(data:string) {
 
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
                     '/config', '/admin', '/docs', '/login', '/syslog'];
-const ignoreLog = ["getEE", "userRequest", 'getLogs'];
+const ignoreLog = ["getEE", "userRequest", 'getLogs', 'visits', 'roomRequest', 'sendMsg'];

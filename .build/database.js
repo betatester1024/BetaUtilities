@@ -19,13 +19,17 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var database_exports = {};
 __export(database_exports, {
   DBMaintenance: () => DBMaintenance,
+  connectDB: () => connectDB,
   database: () => database
 });
 module.exports = __toCommonJS(database_exports);
 var import_consts = require("./consts");
 const { MongoClient } = require("mongodb");
-const uri = `mongodb+srv://SystemLogin:${process.env["dbPwd"]}@betaos-datacluster00.d8o7x8n.mongodb.net/?retryWrites=true&w=majority`;
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const uri = "mongodb://SystemLogin:" + process.env["dbPwd"] + "@ac-rz8jdrl-shard-00-00.d8o7x8n.mongodb.net:27017,ac-rz8jdrl-shard-00-01.d8o7x8n.mongodb.net:27017,ac-rz8jdrl-shard-00-02.d8o7x8n.mongodb.net:27017/?ssl=true&replicaSet=atlas-3yyxq8-shard-0&authSource=admin&retryWrites=true&w=majority";
+const client = new MongoClient(uri);
+async function connectDB() {
+  return await client.connect();
+}
 const database = client.db("BetaOS-Database01");
 async function DBMaintenance() {
   let items = await import_consts.authDB.find({ fieldName: "Token" }).toArray();
@@ -48,6 +52,7 @@ async function DBMaintenance() {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   DBMaintenance,
+  connectDB,
   database
 });
 //# sourceMappingURL=database.js.map

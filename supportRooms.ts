@@ -1,5 +1,5 @@
 import {userRequest} from './userRequest';
-import {msgDB, authDB} from './consts';
+import {msgDB, authDB, uDB} from './consts';
 export class Room {
   type:string;
   name:string;
@@ -38,7 +38,7 @@ export class supportHandler {
       else this.sendMsgTo(rn, "+"+processAnon(obj.token)+"(1)");
     });
     console.log("added connection in "+rn);
-    let msgs = await msgDB.find({fieldName:"MSG", room:rn}).toArray();
+    let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}}).toArray();
     let text = "";
     for (let i=0; i<msgs.length; i++) {
       // let userData = await authDB.findOne({fieldName:"UserData", user:msgs[i].sender})
@@ -47,7 +47,9 @@ export class supportHandler {
       // else text += "["+(userData.alias??msgs[i].sender)+"]("+userData.permLevel+")"+msgs[i].data+">";
       ev.write("data:["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data+">\n\n");
     }
-    text += "[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. \nThank you for using BetaOS Systems!>"
+    text += "[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. "+
+      "Automated response services and utilities are provided by BetaOS System. \n"+
+      "Enter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!>"
     ev.write("data:"+text+"\n\n")
     thiscn.readyQ = true;
   }
@@ -152,6 +154,13 @@ export async function createRoom(name:string, token:string) {
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
       supportHandler.addRoom(new Room("ONLINE_SUPPORT", name));
+      let obj = await uDB.findOne({fieldName:"ROOMS"});
+      obj.rooms.push(name);
+      await uDB.updateOne({fieldName:"ROOMS"}, {
+        $set: {
+          rooms: obj.rooms
+        },
+      }, {upsert:true});
       return {status:"SUCCESS", data:null, token:token}
     }
     else return {status:"ERROR", data:{error:"Access denied!"}, token:token};
@@ -165,9 +174,33 @@ export async function deleteRoom(name:string, token:string) {
   
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
-      supportHandler.deleteRoom("ONLINE_SUPPORT", name);
-      
-      return {status:"SUCCESS", data:null, token:token}
+
+      let obj = await uDB.findOne({fieldName:"ROOMS"})
+      let idx = obj.rooms.indexOf(name); 
+      if (idx>=0) {
+        supportHandler.deleteRoom("ONLINE_SUPPORT", name);
+        obj.rooms.splice(idx, 1);
+        await uDB.updateOne({fieldName:"ROOMS"}, {
+          $set: {
+            rooms: obj.rooms
+          },
+        }, {upsert:true});
+        return {status:"SUCCESS", data:null, token:token}
+      }
+      else {
+        let idx = obj.hidRooms.indexOf(name); 
+        if (idx>=0) {
+          supportHandler.deleteRoom("HIDDEN_SUPPORT", name);
+          obj.hidRooms.splice(idx, 1);
+        }
+        else return {status:"ERROR", data:{error: "Database inconsistency detected"}, token:token};
+        await uDB.updateOne({fieldName:"ROOMS"}, {
+          $set: {
+            hidRooms: obj.hidRooms
+          },
+        }, {upsert:true});
+        return {status:"SUCCESS", data:null, token:token}
+      }
     }
     else return {status:"ERROR", data:{error:"Access denied!"}, token:token};
   }

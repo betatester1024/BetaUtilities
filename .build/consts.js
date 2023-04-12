@@ -53,7 +53,7 @@ const hashingOptions = {
   parallelism: 1,
   hashLength: 50
 };
-const expiry = [9e99, 1e3 * 60, 1e3 * 60 * 60 * 24 * 30, 1e3 * 60 * 60];
+const expiry = [9e99, 1e3 * 60 * 60 * 24, 1e3 * 60 * 60 * 24 * 30, 1e3 * 60 * 60];
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   authDB,

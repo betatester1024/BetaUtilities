@@ -19,14 +19,28 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var logging_exports = {};
 __export(logging_exports, {
   getLogs: () => getLogs,
+  incrRequests: () => incrRequests,
   log: () => log,
-  purgeLogs: () => purgeLogs
+  purgeLogs: () => purgeLogs,
+  systemLog: () => systemLog,
+  visitCt: () => visitCt
 });
 module.exports = __toCommonJS(logging_exports);
 var import_consts = require("./consts");
 var import_userRequest = require("./userRequest");
+function systemLog(thing) {
+  log(thing);
+}
+;
 function log(thing) {
   import_consts.uDB.insertOne({ fieldName: "SysLogV2", data: thing + "\n" });
+}
+async function incrRequests() {
+  import_consts.uDB.updateOne({ fieldName: "VISITS" }, { $inc: { visitCt: 1 } }, { upsert: true });
+}
+async function visitCt(token) {
+  let obj = await import_consts.uDB.findOne({ fieldName: "VISITS" });
+  return { status: "SUCCESS", data: { data: obj.visitCt }, token };
 }
 async function getLogs(token) {
   let userData = await (0, import_userRequest.userRequest)(token);
@@ -51,7 +65,10 @@ async function purgeLogs(token) {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   getLogs,
+  incrRequests,
   log,
-  purgeLogs
+  purgeLogs,
+  systemLog,
+  visitCt
 });
 //# sourceMappingURL=logging.js.map

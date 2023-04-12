@@ -48,22 +48,22 @@ async function initServer() {
   app.use(new cookieParser());
   app.get("/", (req, res) => {
     res.sendFile(import_consts.frontendDir + "/index.html");
-    incrRequests();
+    (0, import_logging.incrRequests)();
   });
   app.get("/register", (req, res) => {
     res.sendFile(import_consts.frontendDir + "/signup.html");
-    incrRequests();
+    (0, import_logging.incrRequests)();
   });
   app.get("/account", (req, res) => {
     res.sendFile(import_consts.frontendDir + "/config.html");
-    incrRequests();
+    (0, import_logging.incrRequests)();
   });
   app.get("/EE", (req, res) => {
     (0, import_EEHandler.EE)(true, (_status, data, _token) => {
       res.set("Content-Type", "text/html");
       res.send(Buffer.from(eeFormat(data.data)));
     }, "", "");
-    incrRequests();
+    (0, import_logging.incrRequests)();
   });
   app.get("/support", (req, res) => {
     let match = req.url.match("\\?room=(" + import_consts.roomRegex + ")");
@@ -76,31 +76,31 @@ async function initServer() {
         res.sendFile(import_consts.frontendDir + "/support.html");
     } else
       res.sendFile(import_consts.frontendDir + "/supportIndex.html");
-    incrRequests();
+    (0, import_logging.incrRequests)();
   });
   app.get("/accountDel", (req, res) => {
     res.sendFile(import_consts.frontendDir + "/delAcc.html");
-    incrRequests();
+    (0, import_logging.incrRequests)();
   });
   app.get("*/favicon.ico", (req, res) => {
     res.sendFile(import_consts.rootDir + "/favicon.ico");
-    incrRequests();
+    (0, import_logging.incrRequests)();
   });
   app.get("/support.js", (req, res) => {
     res.sendFile(import_consts.frontendDir + "support.js");
-    incrRequests();
+    (0, import_logging.incrRequests)();
   });
   app.get("/*.js*", (req, res) => {
     res.sendFile(import_consts.jsDir + req.url);
-    incrRequests();
+    (0, import_logging.incrRequests)();
   });
   app.get("/*.ts", (req, res) => {
     res.sendFile(import_consts.jsDir + req.url);
-    incrRequests();
+    (0, import_logging.incrRequests)();
   });
   app.get("/*.css", (req, res) => {
     res.sendFile(import_consts.frontendDir + req.url);
-    incrRequests();
+    (0, import_logging.incrRequests)();
   });
   app.get("/stream", (req, res) => {
     res.set({
@@ -123,10 +123,10 @@ async function initServer() {
       res.sendFile(import_consts.frontendDir + validPages[idx] + ".html");
     else
       res.sendFile(import_consts.frontendDir + "404.html");
-    incrRequests();
+    (0, import_logging.incrRequests)();
   });
   app.post("/server", urlencodedParser, async (req, res) => {
-    incrRequests();
+    (0, import_logging.incrRequests)();
     if (req.headers["content-length"] > 6e4) {
       res.set("Connection", "close");
       res.status(413).end();
@@ -137,21 +137,17 @@ async function initServer() {
       res.end(JSON.stringify({ status: "ERROR", data: null }));
     makeRequest(body.action, req.cookies.sessionID, body.data, (s, d, token) => {
       if (ignoreLog.indexOf(body.action) >= 0) {
-        console.log("action ignored");
       } else if (s == "SUCCESS") {
         (0, import_logging.log)("Action performed:" + body.action + ", response:" + JSON.stringify(d));
       } else
         (0, import_logging.log)("Action performed, error on " + body.action + ", error:" + d.error);
-      res.cookie("sessionID", token ? token : "", { maxAge: 1e3 * 60 * 60 * 24 * 30, httpOnly: true, secure: true, sameSite: "Strict" });
+      res.cookie("sessionID", token ? token : "", { httpOnly: true, secure: true, sameSite: "Strict" });
       res.end(JSON.stringify({ status: s, data: d }));
     });
   });
   app.listen(import_consts.port, () => {
     console.log(`BetaUtilities V2 listening on port ${import_consts.port}`);
   });
-}
-async function incrRequests() {
-  import_consts.uDB.updateOne({ fieldName: "VISITS" }, { $inc: { visitCt: 1 } }, { upsert: true });
 }
 function makeRequest(action, token, data, callback) {
   switch (action) {
@@ -248,6 +244,11 @@ function makeRequest(action, token, data, callback) {
         callback(obj.status, obj.data, obj.token);
       });
       break;
+    case "visits":
+      (0, import_logging.visitCt)(token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
     default:
       callback("ERROR", { error: "Unknown command string!" }, token);
   }
@@ -306,7 +307,7 @@ const validPages = [
   "/login",
   "/syslog"
 ];
-const ignoreLog = ["getEE", "userRequest", "getLogs"];
+const ignoreLog = ["getEE", "userRequest", "getLogs", "visits", "roomRequest", "sendMsg"];
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   initServer

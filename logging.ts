@@ -1,12 +1,23 @@
 import {uDB} from './consts';
 import {userRequest} from './userRequest';
 
+export function systemLog(thing:string) {log(thing)};
 export function log(thing:string) {
   // let out:any;
   // if (thing && typeof thing != "number" && typeof thing != "string") out = JSON.stringify(thing);
   // else out = thing;
   
   uDB.insertOne({fieldName:"SysLogV2", data:thing+"\n"});
+}
+
+
+export async function incrRequests() {
+  uDB.updateOne({fieldName:"VISITS"}, {$inc:{visitCt:1}}, {upsert:true});
+}
+
+export async function visitCt(token:string) {
+  let obj = await uDB.findOne({fieldName:"VISITS"});
+  return {status:"SUCCESS", data:{data:obj.visitCt}, token:token};
 }
 
 export async function getLogs(token:string) {

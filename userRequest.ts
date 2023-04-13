@@ -11,5 +11,5 @@ export async function userRequest(token:string) {
   if (Date.now() > tokenData.expiry) {
     return {status:"ERROR", data:{error:"Your session has expired!"}, token:""};
   }
-  return {status:"SUCCESS", data: {user: tokenData.associatedUser, alias:userData.alias??userData.user, perms:userData.permLevel, expiry: tokenData.expiry}, token:token};
+  return {status:"SUCCESS", data: {user: tokenData.associatedUser, alias:userData.alias??userData.user, perms:userData.permLevel, expiry: tokenData.expiry, tasks:userData.tasks}, token:token};
 }

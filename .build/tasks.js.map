@@ -1,7 +1,7 @@
 {
   "version": 3,
-  "sources": [],
-  "sourcesContent": [],
-  "mappings": "",
+  "sources": ["../tasks.ts"],
+  "sourcesContent": ["import {authDB} from './consts';\nimport {userRequest} from './userRequest';\nexport async function addTask(token:string) {\n  let uInfo = await userRequest(token);\n  if (uInfo.status != \"SUCCESS\") {\n    return uInfo;\n  }\n  else {\n    if (uInfo.data.tasks) uInfo.data.tasks.push(\"\");\n    await authDB.updateOne({user:uInfo.data.user, fieldName:\"UserData\"}, {\n      $set: {tasks: uInfo.data.tasks??[]}\n    }, {upsert: true})\n    return {status:\"SUCCESS\", data:null, token:token};\n  }\n}"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,oBAAqB;AACrB,yBAA0B;AAC1B,eAAsB,QAAQ,OAAc;AAC1C,MAAI,QAAQ,UAAM,gCAAY,KAAK;AACnC,MAAI,MAAM,UAAU,WAAW;AAC7B,WAAO;AAAA,EACT,OACK;AACH,QAAI,MAAM,KAAK;AAAO,YAAM,KAAK,MAAM,KAAK,EAAE;AAC9C,UAAM,qBAAO,UAAU,EAAC,MAAK,MAAM,KAAK,MAAM,WAAU,WAAU,GAAG;AAAA,MACnE,MAAM,EAAC,OAAO,MAAM,KAAK,SAAO,CAAC,EAAC;AAAA,IACpC,GAAG,EAAC,QAAQ,KAAI,CAAC;AACjB,WAAO,EAAC,QAAO,WAAW,MAAK,MAAM,MAAW;AAAA,EAClD;AACF;",
   "names": []
 }

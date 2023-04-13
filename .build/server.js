@@ -27,6 +27,7 @@ var import_delacc = require("./delacc");
 var import_updateUser = require("./updateUser");
 var import_userRequest = require("./userRequest");
 var import_EEHandler = require("./EEHandler");
+var import_tasks = require("./tasks");
 var import_logging = require("./logging");
 var import_supportRooms = require("./supportRooms");
 const express = require("express");
@@ -246,6 +247,11 @@ function makeRequest(action, token, data, callback) {
       break;
     case "visits":
       (0, import_logging.visitCt)(token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
+    case "addTODO":
+      (0, import_tasks.addTask)(token).then((obj) => {
         callback(obj.status, obj.data, obj.token);
       });
       break;

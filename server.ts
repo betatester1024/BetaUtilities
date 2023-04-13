@@ -9,6 +9,7 @@ import { deleteAccount } from './delacc';
 import {updateUser, realias} from './updateUser'
 import {userRequest} from './userRequest';
 import {EE} from './EEHandler';
+import {addTask} from './tasks';
 import {getLogs, log, purgeLogs, visitCt, incrRequests} from './logging';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
@@ -251,6 +252,11 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       break;
     case "visits":
       visitCt(token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "addTODO":
+      addTask(token)
       .then((obj:{status:string, data:any, token:string})=>
         {callback(obj.status, obj.data, obj.token)});
       break;

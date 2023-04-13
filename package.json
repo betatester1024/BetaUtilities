@@ -14,7 +14,7 @@
     "argon2": "^0.30.3",
     "bcrypt": "^5.1.0",
     "bcrypt-ts": "^3.0.0",
-    "body-parser": "^1.20.1",
+    "body-parser": "^1.20.2",
     "co-body": "^6.1.0",
     "cookie-parser": "^1.4.6",
     "csurf": "^1.11.0",

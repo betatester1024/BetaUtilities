@@ -81,8 +81,9 @@ async function initClient()
       let slashMe = false;
       msg = msg.replaceAll(/(&[a-zA-Z0-9]{1,20}[^;])/gm,">ROOM$1>")
       msg = msg.replaceAll(/(#[a-zA-Z0-9_\-]{1,20}[^;])/gm,">SUPPORT$1>")
+      msg = msg.replaceAll(/(;gt;;gt;.{0,20})/gm,">INTERNALLINK$1>");
       msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu,">LINK$<test>>")
-      msg = msg.replaceAll(/(`.*`)/gm,">CODE$1>")
+      console.log(msg);
       if (msg.match("/me.*")) {
         msg = msg.slice(4);
         slashMe = true;
@@ -99,8 +100,8 @@ async function initClient()
           ele.appendChild(fragment);
         }
         else {
-          let pref = split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|CODE)")[1];
-          let post = split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|CODE)(.+)")[2];
+          let pref = split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK)")[1];
+          let post = split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK)(.+)")[2];
           if (pref == "EMOJI") {
             let replaced = document.createElement("span");
             replaced.title = ":"+findReplacement(post)+":";
@@ -129,11 +130,11 @@ async function initClient()
             replaced.innerText = post;
             ele.appendChild(replaced);
           }
-          else if (pref == "CODE") {
-            let replaced = document.createElement("kbd");
+          else if (pref == "INTERNALLINK") {
+            let replaced = document.createElement("a");
             replaced.className="supportMsg "+classStr[matches[2]] + (slashMe?" slashMe ":"");
-            // replaced.href = "https://euphoria.io/room/"+post.slice(1);
-            replaced.innerText = post;
+            replaced.href = post.slice(8);
+            replaced.innerText = ">>"+post.slice(8);
             ele.appendChild(replaced);
           }
         }

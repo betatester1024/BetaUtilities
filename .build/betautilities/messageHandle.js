@@ -18,12 +18,11 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var messageHandle_exports = {};
 __export(messageHandle_exports, {
-  replyMessage: () => replyMessage,
-  updateActive: () => updateActive
+  replyMessage: () => replyMessage
 });
 module.exports = __toCommonJS(messageHandle_exports);
 var import_wsHandler = require("./wsHandler");
-var import_consts = require("./consts");
+var import_consts = require("../consts");
 const fs = require("fs");
 const serviceKey = process.env["serviceKey"];
 const DB_USERS = import_consts.authDB;
@@ -36,16 +35,6 @@ let workingUsers = [];
 let leetlentCt = 1;
 let wordleCt = 1;
 let STARTTIME = Date.now();
-function updateActive(roomID, activeQ) {
-  let idx = sysRooms.indexOf(roomID);
-  if (idx < 0 && activeQ) {
-    sysRooms.push(roomID);
-    pushEvents.push([]);
-    pushUserEvents.push([]);
-    users.push([]);
-  } else if (idx >= 0 && !activeQ)
-    sysRooms.splice(idx, 1);
-}
 function replyMessage(msg, sender, data) {
   msg = msg.toLowerCase();
   if (msg.match("@" + this.nick.toLowerCase())) {
@@ -81,6 +70,9 @@ function replyMessage(msg, sender, data) {
   }
   if (msg == "!issue" || msg == "!bug" || msg == "!feature") {
     return "https://github.com/betatester1024/BetaUtilities/issues/new/choose";
+  }
+  if (msg.match(/(\s|^)abc(\s|$)/)) {
+    this.delaySendMsg("arse*", data, 0);
   }
   import_consts.uDB.findOne({ fieldName: "WORKINGUSERS" }).then((obj) => {
     let match3 = msg.match("^!work @(.*)$");
@@ -573,7 +565,6 @@ function norm(str) {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  replyMessage,
-  updateActive
+  replyMessage
 });
 //# sourceMappingURL=messageHandle.js.map

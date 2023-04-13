@@ -1,10 +1,10 @@
 // Copyright (c) 2023 BetaOS
 import {WebSocket} from 'ws';
-import {uDB} from './consts';
+import {uDB} from '../consts';
 import {replyMessage} from './messageHandle';
-import { updateActive } from './messageHandle';
+import { updateActive } from '../supportRooms';
 // import {systemLog} from './misc';
-import {systemLog} from './logging'
+import {systemLog} from '../logging'
 const fs = require('fs')
 
 
@@ -189,13 +189,12 @@ export class WS
         this.sendMsg("Enter !help @"+this.nick+" for help!", data);
       } 
 
-      if (data["data"]["sender"]["id"].match("bot:")) {
-        // don't respond to the bots.
-        return;
-      }
-
       // send to messageHandle to process messages.
       else if (!this.pausedQ) {
+        if (data["data"]["sender"]["id"].match("bot:")) {
+          // don't respond to the bots.
+          return;
+        }
         let outStr = this.replyMessage(msg.trim(), snd, data);
         if (this.failedQ && outStr != "") outStr = "/me is rebooting."
         if (outStr == "") return;

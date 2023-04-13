@@ -23,7 +23,8 @@ __export(supportRooms_exports, {
   deleteRoom: () => deleteRoom,
   roomRequest: () => roomRequest,
   sendMsg: () => sendMsg,
-  supportHandler: () => supportHandler
+  supportHandler: () => supportHandler,
+  updateActive: () => updateActive
 });
 module.exports = __toCommonJS(supportRooms_exports);
 var import_userRequest = require("./userRequest");
@@ -39,8 +40,14 @@ class Room {
 class supportHandler {
   static allRooms = [];
   static connections = [];
-  static addRoom(r) {
-    this.allRooms.push(r);
+  static addRoom(rm) {
+    let idx = this.allRooms.findIndex((r) => {
+      return r.type == rm.type && r.name == rm.name;
+    });
+    if (idx >= 0)
+      return;
+    else
+      this.allRooms.push(rm);
   }
   static deleteRoom(type, roomName) {
     let idx = this.allRooms.findIndex((r) => {
@@ -73,7 +80,7 @@ class supportHandler {
     for (let i = 0; i < msgs.length; i++) {
       ev.write("data:[" + msgs[i].sender + "](" + msgs[i].permLevel + ")" + msgs[i].data + ">\n\n");
     }
-    text += "[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. \nEnter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!>";
+    text += "[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. Commands are available here: &gt;&gt;commands \nEnter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!>";
     ev.write("data:" + text + "\n\n");
     thiscn.readyQ = true;
   }
@@ -233,6 +240,12 @@ async function deleteRoom(name, token) {
   } else
     return usrData;
 }
+function updateActive(name, activeQ) {
+  if (activeQ)
+    supportHandler.addRoom(new Room("EUPH_ROOM", name));
+  else
+    supportHandler.deleteRoom("EUPH_ROOM", name);
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Room,
@@ -240,6 +253,7 @@ async function deleteRoom(name, token) {
   deleteRoom,
   roomRequest,
   sendMsg,
-  supportHandler
+  supportHandler,
+  updateActive
 });
 //# sourceMappingURL=supportRooms.js.map

@@ -1,5 +1,6 @@
 import {uDB} from './consts';
 import {userRequest} from './userRequest';
+import {connectionSuccess} from './index'
 
 export function systemLog(thing:string) {log(thing)};
 export function log(thing:string) {
@@ -7,17 +8,20 @@ export function log(thing:string) {
   // if (thing && typeof thing != "number" && typeof thing != "string") out = JSON.stringify(thing);
   // else out = thing;
   
-  uDB.insertOne({fieldName:"SysLogV2", data:thing+"\n"});
+  if (connectionSuccess) uDB.insertOne({fieldName:"SysLogV2", data:thing+"\n"});
 }
 
 
 export async function incrRequests() {
-  uDB.updateOne({fieldName:"VISITS"}, {$inc:{visitCt:1}}, {upsert:true});
+  if (connectionSuccess) uDB.updateOne({fieldName:"VISITS"}, {$inc:{visitCt:1}}, {upsert:true});
 }
 
 export async function visitCt(token:string) {
-  let obj = await uDB.findOne({fieldName:"VISITS"});
-  return {status:"SUCCESS", data:{data:obj.visitCt}, token:token};
+  if (connectionSuccess) {
+    let obj = await uDB.findOne({fieldName:"VISITS"});
+    return {status:"SUCCESS", data:{data:obj.visitCt}, token:token};
+  }
+  else return {status:"ERROR", data:{error:"Service database connection failed"}, token:token}
 }
 
 export async function getLogs(token:string) {

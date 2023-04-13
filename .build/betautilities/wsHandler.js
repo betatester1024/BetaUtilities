@@ -22,10 +22,10 @@ __export(wsHandler_exports, {
 });
 module.exports = __toCommonJS(wsHandler_exports);
 var import_ws = require("ws");
-var import_consts = require("./consts");
+var import_consts = require("../consts");
 var import_messageHandle = require("./messageHandle");
-var import_messageHandle2 = require("./messageHandle");
-var import_logging = require("./logging");
+var import_supportRooms = require("../supportRooms");
+var import_logging = require("../logging");
 const fs = require("fs");
 class WS {
   static notifRoom;
@@ -158,13 +158,13 @@ class WS {
         }, 100);
       } else if (this.pausedQ && msg == "!restore @" + this.nick.toLowerCase()) {
         this.sendMsg("/me has been unpaused", data);
-        (0, import_messageHandle2.updateActive)(this.roomName, true);
+        (0, import_supportRooms.updateActive)(this.roomName, true);
         this.pauser = null;
         this.callTimes = [];
         this.pausedQ = false;
       } else if (msg == "!pause @" + this.nick.toLowerCase()) {
         this.sendMsg("/me has been paused", data);
-        (0, import_messageHandle2.updateActive)(this.roomName, false);
+        (0, import_supportRooms.updateActive)(this.roomName, false);
         let reply = "Enter !kill @" + this.nick + " to kill this bot, or enter !restore @" + this.nick + " to restore it.";
         this.sendMsg(reply, data);
         this.pauser = snd;
@@ -180,10 +180,10 @@ class WS {
         this.incrPingCt();
       } else if (msg == "!help") {
         this.sendMsg("Enter !help @" + this.nick + " for help!", data);
-      }
-      if (data["data"]["sender"]["id"].match("bot:")) {
-        return;
       } else if (!this.pausedQ) {
+        if (data["data"]["sender"]["id"].match("bot:")) {
+          return;
+        }
         let outStr = this.replyMessage(msg.trim(), snd, data);
         if (this.failedQ && outStr != "")
           outStr = "/me is rebooting.";
@@ -218,10 +218,10 @@ class WS {
     setTimeout(() => {
       this.changeNick(this.nick);
       this.incrRunCt();
-      (0, import_messageHandle2.updateActive)(this.roomName, true);
+      (0, import_supportRooms.updateActive)(this.roomName, true);
       this.failedQ = false;
     }, 5e3);
-    (0, import_messageHandle2.updateActive)(this.roomName, false);
+    (0, import_supportRooms.updateActive)(this.roomName, false);
   }
   static resetTime = 1e3;
   onClose(event) {
@@ -231,14 +231,14 @@ class WS {
       WS.FAILSAFETIMEOUT = null;
     }
     if (event != 1e3 && event != 1006) {
-      (0, import_messageHandle2.updateActive)(this.roomName, false);
+      (0, import_supportRooms.updateActive)(this.roomName, false);
       (0, import_logging.systemLog)("!killed in &" + this.roomName);
       setTimeout(() => {
         new WS(this.url, this.nick, this.roomName, this.transferOutQ);
-        (0, import_messageHandle2.updateActive)(this.roomName, true);
+        (0, import_supportRooms.updateActive)(this.roomName, true);
       }, 1e3);
     } else {
-      (0, import_messageHandle2.updateActive)(this.roomName, false);
+      (0, import_supportRooms.updateActive)(this.roomName, false);
       if (event == 1e3)
         return;
       WS.resetTime *= 1.5;
@@ -248,7 +248,7 @@ class WS {
       }
       setTimeout(() => {
         new WS(this.url, this.nick, this.roomName, this.transferOutQ);
-        (0, import_messageHandle2.updateActive)(this.roomName, true);
+        (0, import_supportRooms.updateActive)(this.roomName, true);
       }, WS.resetTime);
       (0, import_logging.systemLog)("Retrying in: " + Math.round(WS.resetTime / 1e3) + " seconds");
       let dateStr = new Date().toLocaleDateString("en-US", { timeZone: "EST" }) + "/" + new Date().toLocaleTimeString("en-US", { timeZone: "EST" });
@@ -258,7 +258,7 @@ class WS {
   static killall() {
     for (let i = 0; i < WS.sockets.length; i++) {
       WS.sockets[i].socket.close(1e3, "!killall-ed");
-      (0, import_messageHandle2.updateActive)(WS.sockets[i].roomName, false);
+      (0, import_supportRooms.updateActive)(WS.sockets[i].roomName, false);
     }
   }
   constructor(url, nick, roomName, transferQ) {
@@ -275,7 +275,7 @@ class WS {
     this.socket.on("close", this.onClose.bind(this));
     this.socket.on("error", (e) => {
       this.socket.close(1e3, "");
-      (0, import_messageHandle2.updateActive)(this.roomName, false);
+      (0, import_supportRooms.updateActive)(this.roomName, false);
     });
     this.replyMessage = import_messageHandle.replyMessage;
   }

@@ -2,19 +2,8 @@
 <html>
   <head>
     <script src='./utils.js'></script>
-    <title>Logout | BetaOS Systems</title></title>
-    <script>
-      function logout() {
-        let redirect = document.URL.match("redirect=(.*)$");
-        let option = document.URL.match("options=all$");
-        send(JSON.stringify({action:option?"logout_all":"logout"}), (res)=>{
-          if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{window.open('/', '_self')});
-          else {
-            alertDialog("Successfully logged out!", ()=>{window.open('/', '_self');});
-          }
-        });
-      }
-      
+    <title>User Profiles | BetaOS Systems</title></title>
+    <script>      
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -25,12 +14,11 @@
     <style>
     </style>
   </head>
-  <body onload = "globalOnload(()=>{logout()})">
+  <body onload = "globalOnload();">
     <div class="main_content">
       <header>
-        <h2>Logging you out...</h2>
+        <h2>UserProfile</h2>
         <hr class="rounded">
-        <h1>A moment, please. Logging you out.</h1>
       </header>
     </div>
     <div class="overlay" id="overlay">

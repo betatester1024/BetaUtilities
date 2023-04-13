@@ -7,7 +7,11 @@
       const accessLevels = ["error-level", "user", "admin", "super-admin"];
       send(JSON.stringify({action:"userRequest"}), 
        (res)=>{
-         if (res.status == "ERROR") return;
+         if (res.status == "ERROR") {
+           document.getElementById('status').className = "btn szHalf red";
+           document.getElementById('statspan').innerHTML = "error";
+           return; 
+         }
          let ele = document.getElementById("welcomeHdr");
          ele.innerText = "Welcome "+res.data.user+"!"; 
          let userInfo = document.createElement("h2");
@@ -61,8 +65,8 @@
         <hr class="rounded">
       </header>
       <div class="btnRow">
-        <a class="btn szHalf grn" href="/status">
-          <span class="material-symbols-outlined">published_with_changes </span>
+        <a id="status" class="btn szHalf grn" href="/status">
+          <span id="statspan"class="material-symbols-outlined">published_with_changes </span>
            Status<div class="anim"></div></a>
         <a class="btn szHalf" href="/support">
           <span class="material-symbols-outlined" id="loginIco">help</span>

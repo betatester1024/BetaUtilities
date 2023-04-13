@@ -5,7 +5,7 @@ const fs = require('fs');
 // import {getUptimeStr, systemLog} from './misc';
 // import {allWords, validWords, todayLeetCODE, todayWordID} from './wordListHandle';
 const serviceKey = process.env['serviceKey'];
-import {uDB, authDB} from './consts';
+import {uDB, authDB} from '../consts';
 const DB_USERS = authDB
 const serviceResponse = process.env['serviceResponse'];
 const DB3 = uDB
@@ -21,16 +21,7 @@ let STARTTIME = Date.now();
 // import {sysRooms} from './initialiser';
 // import {pushEvents, pushUserEvents, users} from './server';
 // export let rooms:string[] = [];
-export function updateActive(roomID:string, activeQ:boolean) {
-  let idx = sysRooms.indexOf(roomID)
-  if (idx<0 && activeQ) {
-    sysRooms.push(roomID);
-    pushEvents.push([]);
-    pushUserEvents.push([]);
-    users.push([]);
-  }
-  else if (idx>=0 && !activeQ) sysRooms.splice(idx, 1); // remove at idx. (supposedly.)
-}
+
 
 export function replyMessage(this:WS, msg:string, sender:string, data:any):string {
   msg = msg.toLowerCase();
@@ -59,6 +50,10 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
 
   if (msg == "!issue" || msg == "!bug" || msg == "!feature") {
     return "https://github.com/betatester1024/BetaUtilities/issues/new/choose"
+  }
+
+  if (msg.match(/(\s|^)abc(\s|$)/)) {
+    this.delaySendMsg("arse*", data, 0);
   }
 
   uDB.findOne({fieldName:"WORKINGUSERS"}).then((obj:{working:string[]})=>{

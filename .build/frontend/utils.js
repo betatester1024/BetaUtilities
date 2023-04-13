@@ -1,5 +1,5 @@
 "use strict";
-function globalOnload() {
+function globalOnload(cbk2) {
   document.onkeydown = keydown;
   send(
     JSON.stringify({ action: "userRequest" }),
@@ -25,7 +25,14 @@ function globalOnload() {
       send(
         JSON.stringify({ action: "visits" }),
         (res2) => {
+          if (res2.status != "SUCCESS") {
+            alertDialog("Database connection failure. Please contact BetaOS.", () => {
+            });
+            ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`;
+          }
           document.getElementById("footer").innerHTML += " | <kbd>" + res2.data.data + "</kbd>";
+          if (cbk2)
+            cbk2();
         }
       );
     }
@@ -103,6 +110,10 @@ function alertDialog(str, callback, button = -1, failedReq = "") {
 }
 function closeAlert(overrideCallback = false) {
   let ele = document.getElementById("overlay");
+  if (!ele) {
+    console.log("Alert dialogs not enabled in this page");
+    return;
+  }
   ele.style.top = "500vh";
   dialogQ = false;
   if (cbk && !overrideCallback) {

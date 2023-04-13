@@ -28,19 +28,25 @@ __export(logging_exports, {
 module.exports = __toCommonJS(logging_exports);
 var import_consts = require("./consts");
 var import_userRequest = require("./userRequest");
+var import_index = require("./index");
 function systemLog(thing) {
   log(thing);
 }
 ;
 function log(thing) {
-  import_consts.uDB.insertOne({ fieldName: "SysLogV2", data: thing + "\n" });
+  if (import_index.connectionSuccess)
+    import_consts.uDB.insertOne({ fieldName: "SysLogV2", data: thing + "\n" });
 }
 async function incrRequests() {
-  import_consts.uDB.updateOne({ fieldName: "VISITS" }, { $inc: { visitCt: 1 } }, { upsert: true });
+  if (import_index.connectionSuccess)
+    import_consts.uDB.updateOne({ fieldName: "VISITS" }, { $inc: { visitCt: 1 } }, { upsert: true });
 }
 async function visitCt(token) {
-  let obj = await import_consts.uDB.findOne({ fieldName: "VISITS" });
-  return { status: "SUCCESS", data: { data: obj.visitCt }, token };
+  if (import_index.connectionSuccess) {
+    let obj = await import_consts.uDB.findOne({ fieldName: "VISITS" });
+    return { status: "SUCCESS", data: { data: obj.visitCt }, token };
+  } else
+    return { status: "ERROR", data: { error: "Service database connection failed" }, token };
 }
 async function getLogs(token) {
   let userData = await (0, import_userRequest.userRequest)(token);

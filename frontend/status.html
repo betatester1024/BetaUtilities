@@ -6,10 +6,10 @@
     <script>
       function onLoad() {
         send(JSON.stringify({action:"statusRequest"}), (res)=>{
-          if (res.status != "SUCCESS") {
-            alertDialog("Error: "+res.data.error);
-            return;
-          }
+          // if (res.status != "SUCCESS") {
+          //   alertDialog("Error: "+res.data.error);
+          //   return;
+          // }
           let euphOnlineQ = false;
           let out = "<span>BetaUtilities is in: </span>";
           for (let i=0; i<res.data.length; i++) {
@@ -31,7 +31,7 @@
             hdr.className = "red nohover";
             hr.className = "redrounded";
           }
-          if (res.data.length == 0 ) {
+          if (res.data.length == 0 || !res.data) {
             hdr.innerText = "Status: Euphoria connection and Support Rooms FAILED"
           }
           document.getElementById("inner_content").innerHTML = out;

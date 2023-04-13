@@ -21,6 +21,7 @@ __export(server_exports, {
   initServer: () => initServer
 });
 module.exports = __toCommonJS(server_exports);
+var import_index = require("./index");
 var import_consts = require("./consts");
 var import_validateLogin = require("./validateLogin");
 var import_delacc = require("./delacc");
@@ -151,6 +152,10 @@ async function initServer() {
   });
 }
 function makeRequest(action, token, data, callback) {
+  if (!import_index.connectionSuccess) {
+    callback("ERROR", { error: "Database connection failure" }, token);
+    return;
+  }
   switch (action) {
     case "test":
       callback("SUCCESS", { abc: "def", def: 5 }, token);
@@ -252,6 +257,26 @@ function makeRequest(action, token, data, callback) {
       break;
     case "addTODO":
       (0, import_tasks.addTask)(token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
+    case "getTodo":
+      (0, import_tasks.getTasks)(token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
+    case "updateTODO":
+      (0, import_tasks.updateTask)(token, data.id, data.updated).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
+    case "deleteTODO":
+      (0, import_tasks.deleteTask)(token, data.id).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
+    case "completeTODO":
+      (0, import_tasks.deleteTask)(token, data.id, true).then((obj) => {
         callback(obj.status, obj.data, obj.token);
       });
       break;

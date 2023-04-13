@@ -172,6 +172,18 @@ div.anim.inp {
   background-color: unset !important;
 }
 
+.roundhover {
+  transition: all 0.2s ease-in-out;
+}
+.roundhover:hover {
+  border-radius: 20%;
+  
+}
+
+.nooutline {
+  border: none;
+}
+
 .material-symbols-outlined {
   font-variation-settings:
   'FILL' 0,

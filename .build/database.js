@@ -19,16 +19,25 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var database_exports = {};
 __export(database_exports, {
   DBMaintenance: () => DBMaintenance,
+  client: () => client,
   connectDB: () => connectDB,
   database: () => database
 });
 module.exports = __toCommonJS(database_exports);
 var import_consts = require("./consts");
+var import_index = require("./index");
 const { MongoClient } = require("mongodb");
 const uri = "mongodb://SystemLogin:" + process.env["dbPwd"] + "@ac-rz8jdrl-shard-00-00.d8o7x8n.mongodb.net:27017,ac-rz8jdrl-shard-00-01.d8o7x8n.mongodb.net:27017,ac-rz8jdrl-shard-00-02.d8o7x8n.mongodb.net:27017/?ssl=true&replicaSet=atlas-3yyxq8-shard-0&authSource=admin&retryWrites=true&w=majority";
 const client = new MongoClient(uri);
 async function connectDB() {
-  return await client.connect();
+  try {
+    await client.connect();
+    clearTimeout(import_index.DBConnectFailure);
+    return null;
+  } catch (e) {
+    console.log(e);
+    return e;
+  }
 }
 const database = client.db("BetaOS-Database01");
 async function DBMaintenance() {
@@ -52,6 +61,7 @@ async function DBMaintenance() {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   DBMaintenance,
+  client,
   connectDB,
   database
 });

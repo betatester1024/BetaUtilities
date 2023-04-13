@@ -13,8 +13,10 @@ export class Room {
 export class supportHandler {
   static allRooms: Room[] = [];
   static connections: {event:any, roomName:string, tk:string, readyQ:boolean}[] = [];
-  static addRoom(r:Room) {
-    this.allRooms.push(r);
+  static addRoom(rm:Room) {
+    let idx = this.allRooms.findIndex((r:any)=>{return r.type==rm.type && r.name==rm.name});
+    if (idx >= 0) return;
+    else this.allRooms.push(rm);
   }
   static deleteRoom(type:string, roomName:string) {
     let idx = this.allRooms.findIndex((r:any)=>{return r.type==type && r.name==roomName});
@@ -48,7 +50,8 @@ export class supportHandler {
       ev.write("data:["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data+">\n\n");
     }
     text += "[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. "+
-      "Automated response services and utilities are provided by BetaOS System. \n"+
+      "Automated response services and utilities are provided by BetaOS System. "+
+      "Commands are available here: &gt;&gt;commands \n"+
       "Enter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!>"
     ev.write("data:"+text+"\n\n")
     thiscn.readyQ = true;
@@ -205,4 +208,9 @@ export async function deleteRoom(name:string, token:string) {
     else return {status:"ERROR", data:{error:"Access denied!"}, token:token};
   }
   else return usrData;
+}
+
+export function updateActive(name:string, activeQ: boolean) {
+  if (activeQ) supportHandler.addRoom(new Room("EUPH_ROOM", name));
+  else supportHandler.deleteRoom("EUPH_ROOM", name);
 }

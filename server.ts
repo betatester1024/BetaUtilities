@@ -3,13 +3,14 @@ const app = express()
 const crypto = require("crypto");
 const parse = require("co-body");
  // for generating secure random #'s
+import {connectionSuccess} from './index';
 import {port, msgDB, authDB, frontendDir, roomRegex, rootDir, jsDir, uDB} from './consts';
 import {signup, validateLogin, logout} from './validateLogin';
 import { deleteAccount } from './delacc';
 import {updateUser, realias} from './updateUser'
 import {userRequest} from './userRequest';
 import {EE} from './EEHandler';
-import {addTask} from './tasks';
+import {addTask, getTasks, updateTask, deleteTask} from './tasks';
 import {getLogs, log, purgeLogs, visitCt, incrRequests} from './logging';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
@@ -157,6 +158,10 @@ export async function initServer() {
 }
 
 function makeRequest(action:string|null, token:string, data:any|null, callback: (status:string, dat:any, token:string)=>any) {
+  if (!connectionSuccess) {
+    callback("ERROR", {error:"Database connection failure"}, token);
+    return;
+  }
   switch (action) {
     case 'test':
       callback("SUCCESS", {abc:"def", def:5}, token);
@@ -257,6 +262,26 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       break;
     case "addTODO":
       addTask(token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "getTodo":
+      getTasks(token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "updateTODO":
+      updateTask(token, data.id, data.updated)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "deleteTODO":
+      deleteTask(token, data.id)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "completeTODO":
+      deleteTask(token, data.id, true)
       .then((obj:{status:string, data:any, token:string})=>
         {callback(obj.status, obj.data, obj.token)});
       break;

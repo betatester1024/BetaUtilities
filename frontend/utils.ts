@@ -1,4 +1,4 @@
-function globalOnload() {
+function globalOnload(cbk:()=>any) {
   document.onkeydown = keydown;
   send(JSON.stringify({ action: "userRequest" }),
     (res) => {
@@ -22,7 +22,12 @@ function globalOnload() {
       ftr.appendChild(ele);
       send(JSON.stringify({ action: "visits" }),
         (res) => {
+          if (res.status != "SUCCESS") {
+            alertDialog("Database connection failure. Please contact BetaOS.", ()=>{});
+            ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`
+          }// this means the database died 
           document.getElementById("footer").innerHTML += " | <kbd>"+res.data.data+"</kbd>";
+          if (cbk) cbk();
         }
       ) 
     }
@@ -102,6 +107,10 @@ function alertDialog(str: string, callback: () => any, button: number = -1, fail
 
 function closeAlert(overrideCallback: boolean = false) {
   let ele = document.getElementById("overlay") as HTMLDivElement;
+  if (!ele) {
+    console.log("Alert dialogs not enabled in this page");
+    return;
+  }
   ele.style.top = "500vh";
   dialogQ = false;
   if (cbk && !overrideCallback) {

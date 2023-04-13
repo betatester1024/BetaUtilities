@@ -6,14 +6,11 @@
     <script>
       function onLoad() {
         let ele = document.getElementById("ctntp");
-        let match = decodeURIComponent(document.URL.match("nick=(.*)")[1]);
-        ele.innerHTML = match?
-          ele.innerHTML.replaceAll(/BetaxUtilities/gmui, match):
-          ele.innerHTML;
+        // nasty hack
+        let match = decodeURIComponent((document.URL.match("nick=(.*)")??["","BetaOS_System"])[1]);
+        ele.innerHTML =ele.innerHTML.replaceAll(/BetaUtilities/gmu, match);
         ele = document.getElementById("h");
-        ele.innerHTML = match?
-          ele.innerHTML.replaceAll(/BetaUtilities/gmui, match):
-          ele.innerHTML;
+        ele.innerHTML =ele.innerHTML.replaceAll(/BetaUtilities/gmu, match);
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -41,7 +38,11 @@
         top:0.2em;
       }
       kbd {
-        font-family: "Noto Sans Mono", monospace
+        font-family: "Noto Sans Mono", monospace;
+        border-radius: 5px;
+        padding-left: 2px;
+        padding-right: 2px;
+        background-color: var(--system-blue2)
       }
       h2 {
         font-variant-caps: unset;
@@ -58,7 +59,7 @@
 
         <p id="ctntp">
           BetaUtilities is a bot that connects to the online discussion site 
-          <a href="https://euphoria.io">Euphoria</a>'s "rooms". It automatically responds
+          <a href="https://euphoria.io">Euphoria</a> and the <a href="/support">Support system</a>'s' <kbd>room</kbd>s. It automatically responds
           to commands such as <kbd>!help</kbd> and provides a variety of features:<br>
           (The bot sometimes appears as a different username according to the room 
           it is currently in.)<br>
@@ -82,8 +83,8 @@
           <kbd>!runStats @BetaUtilities</kbd> - Shows you statistics on how many times BetaUtilities has been run,
           and how many times it has been @-mentionned. <br>
           <kbd>!creatorInfo</kbd>,<kbd>!version</kbd> - Pretty self-explanatory. <br>
-          <kbd>!instant</kbd> - Get the <a href="instant.leet.nu">Instant</a> room of the same name.
-          <kbd>!leet</kbd> - See this room in <a href="euphoria.leet.nu">EuphLeet</a>!
+          <kbd>!instant</kbd> - Get the <a href="instant.leet.nu">Instant</a> room of the same name.<br>
+          <kbd>!leet</kbd> - See this room in <a href="euphoria.leet.nu">EuphLeet</a>!<br>
           <kbd>!status @BetaUtilities</kbd> - Sends this site to the room.<br>
           <kbd>!issue/!bug/!feature/!syslog/!support</kbd> - Sends a link to the respective features on the site.<br>
           <kbd>!activeRooms @BetaUtilities</kbd> - Shows all the rooms BetaUtilities is active in. <br>
@@ -96,15 +97,15 @@
           <kbd>!wake</kbd>/<kbd>!wake @user</kbd>/<kbd>!play</kbd>/<kbd>!play @user</kbd> - 
           Stops screaming at you or any user. <br>
           <kbd>!issue</kbd>/<kbd>!bug</kbd>/<kbd>!feature</kbd> - File an issue/bug/feature request 
-          (same <a href="https://github.com/betatester1024/BetaUtilities/issues/new/choose">link</a>)
+          (same <a href="https://github.com/betatester1024/Betautilities/issues/new/choose">link</a>)<br>
           <kbd>!antispam</kbd> - Configures AntiSpam activation. Requires a code entry.<br>
           <kbd>!remindme of [MSG] in [1d2h3m4s] </kbd> - Reminds you of whatever you want after a specified time. 
           Pretty lenient with spaces.<br>
           <kbd>!about @[USER] </kbd> - Retrieves that user's about-message.<br>
           <kbd>!about set [MSG]</kbd> - Sets your about-message. Introduce yourself!<br>
-          <b>Some features are hidden! <a href="/contact">ask BetaOS</a> about them, or find
+          <b>Some features are hidden! !tell <kbd>@betatester1024</kbd> or find
           us in <a href="https://euphoria.io/room/xkcd">&xkcd</a>/<a href="/support?room=main_support">#main_support</a>
-          to ask about the features!</b>
+          to (maybe) find out more about them.</b>
         </p>
       </div>
       <a class="btn" href="/">

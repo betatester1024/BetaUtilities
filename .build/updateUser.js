@@ -19,10 +19,12 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var updateUser_exports = {};
 __export(updateUser_exports, {
   realias: () => realias,
+  toggleTheme: () => toggleTheme,
   updateUser: () => updateUser
 });
 module.exports = __toCommonJS(updateUser_exports);
 var import_consts = require("./consts");
+var import_userRequest = require("./userRequest");
 const argon2 = require("argon2");
 async function updateUser(user, oldPass, newPass, newPermLevel, token) {
   if (!user.match(import_consts.userRegex)) {
@@ -72,9 +74,21 @@ async function realias(newalias, token) {
   });
   return { status: "SUCCESS", data: null, token };
 }
+async function toggleTheme(token) {
+  let uInfo = await (0, import_userRequest.userRequest)(token);
+  if (uInfo.status != "SUCCESS") {
+    return uInfo;
+  } else {
+    await import_consts.authDB.updateOne({ user: uInfo.data.user, fieldName: "UserData" }, {
+      $set: { darkTheme: !uInfo.data.darkQ }
+    }, { upsert: true });
+    return { status: "SUCCESS", data: null, token };
+  }
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   realias,
+  toggleTheme,
   updateUser
 });
 //# sourceMappingURL=updateUser.js.map

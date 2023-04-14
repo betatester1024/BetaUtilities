@@ -30,6 +30,7 @@ var import_consts = require("./consts");
 var import_wsHandler = require("./betautilities/wsHandler");
 let connectionSuccess = true;
 let DBConnectFailure = null;
+const { exec } = require("child_process");
 try {
   if (connectionSuccess)
     (0, import_database.connectDB)().then((thing) => {
@@ -60,6 +61,7 @@ try {
     connectionSuccess = false;
     console.log("Connection failed");
     (0, import_server.initServer)();
+    exec("kill 1");
   }, 1e3);
 } catch (e) {
   console.log(e);

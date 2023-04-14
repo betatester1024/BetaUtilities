@@ -280,6 +280,11 @@ function makeRequest(action, token, data, callback) {
         callback(obj.status, obj.data, obj.token);
       });
       break;
+    case "toggleTheme":
+      (0, import_updateUser.toggleTheme)(token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
     default:
       callback("ERROR", { error: "Unknown command string!" }, token);
   }
@@ -336,7 +341,8 @@ const validPages = [
   "/admin",
   "/docs",
   "/login",
-  "/syslog"
+  "/syslog",
+  "/aboutme"
 ];
 const ignoreLog = ["getEE", "userRequest", "getLogs", "visits", "roomRequest", "sendMsg"];
 // Annotate the CommonJS export names for ESM import in node:

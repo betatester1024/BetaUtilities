@@ -1,9 +1,18 @@
 "use strict";
 function globalOnload(cbk2) {
   document.onkeydown = keydown;
+  let overlay = document.createElement("div");
+  overlay.className = "overlayLoader";
+  overlay.id = "overlayL";
+  overlay.style.left = "200vh";
+  overlay.style.opacity = "1";
+  overlay.innerHTML = `<span class="material-symbols-outlined loader">sync</span>
+  <p class="loadp fslg grn nohover">Loading.</p>`;
+  document.body.appendChild(overlay);
   send(
     JSON.stringify({ action: "userRequest" }),
     (res) => {
+      document.documentElement.className = res.data.darkQ ? "dark" : "";
       let maincontent = document.getElementsByClassName("main_content").item(0);
       let ftr = document.createElement("footer");
       maincontent.appendChild(ftr);
@@ -19,6 +28,7 @@ function globalOnload(cbk2) {
                       <a href='/logout'>Logout</a> | 
                       <a href='/config'>Account</a> | 
                       <a href='/status'>Status</a> | 
+                      <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
                       BetaOS Systems, 2023`;
       }
       ftr.appendChild(ele);
@@ -35,13 +45,14 @@ function globalOnload(cbk2) {
             cbk2();
         }
       );
-    }
+    },
+    true
   );
   let ele2 = document.getElementById("overlay");
   if (ele2)
     ele2.innerHTML = `
   <div class="internal">
-        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <p class="fsmed" id="alerttext">Error: AlertDialog configured incorrectly. Please contact BetaOS.</p>
         <button class="btn szHalf" onclick="closeAlert()" style="display: inline-block">
           <span class="alertlbl">Continue</span>
           <span class="material-symbols-outlined">arrow_forward_ios</span>
@@ -56,12 +67,21 @@ function globalOnload(cbk2) {
   else
     console.log("Alert dialogs disabled on this page");
 }
-function send(params, callback) {
+function send(params, callback, onLoadQ = false) {
+  let overlay = document.getElementById("overlayL");
+  if (overlay && !onLoadQ) {
+    overlay.style.left = "0vh";
+    overlay.style.opacity = "1";
+  }
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "server", true);
   xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
+      if (overlay) {
+        overlay.style.left = "200vh";
+        overlay.style.opacity = "0";
+      }
       if (failureTimeout)
         clearTimeout(failureTimeout);
       else
@@ -83,10 +103,16 @@ let cbk = () => {
 };
 let BLOCKCALLBACK = false;
 function alertDialog(str, callback, button = -1, failedReq = "") {
+  let overlay = document.getElementById("overlayL");
+  if (overlay) {
+    overlay.style.left = "200vh";
+    overlay.style.opacity = "0";
+  }
   let ele = document.getElementById("overlay");
   let p = document.getElementById("alerttext");
   if (!ele || !p) {
     console.log("ERROR: Alert dialogs not enabled in this page.");
+    callback();
     return;
   }
   ele.style.top = "0vh";
@@ -114,7 +140,7 @@ function closeAlert(overrideCallback = false) {
     console.log("Alert dialogs not enabled in this page");
     return;
   }
-  ele.style.top = "500vh";
+  ele.style.top = "200vh";
   dialogQ = false;
   if (cbk && !overrideCallback) {
     console.log("calling back");

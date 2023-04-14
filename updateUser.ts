@@ -1,5 +1,6 @@
 import {authDB, userRegex, hashingOptions} from './consts';
 const argon2 = require('argon2');
+import {userRequest} from './userRequest'
 
 export async function updateUser(user:string, oldPass:string, newPass:string, newPermLevel:number, token:string) {
   if (!user.match(userRegex)) {
@@ -48,4 +49,17 @@ export async function realias(newalias:string, token:string) {
     $set:{alias:newalias}
   });
   return {status:"SUCCESS", data:null, token:token};
+}
+
+export async function toggleTheme(token) {
+  let uInfo = await userRequest(token);
+  if (uInfo.status != "SUCCESS") {
+    return uInfo;
+  }
+  else {
+    await authDB.updateOne({user:uInfo.data.user, fieldName:"UserData"}, {
+      $set: {darkTheme: !uInfo.data.darkQ}
+    }, {upsert: true})
+    return {status:"SUCCESS", data:null, token:token};
+  }
 }

@@ -7,7 +7,7 @@ import {connectionSuccess} from './index';
 import {port, msgDB, authDB, frontendDir, roomRegex, rootDir, jsDir, uDB} from './consts';
 import {signup, validateLogin, logout} from './validateLogin';
 import { deleteAccount } from './delacc';
-import {updateUser, realias} from './updateUser'
+import {updateUser, realias, toggleTheme} from './updateUser'
 import {userRequest} from './userRequest';
 import {EE} from './EEHandler';
 import {addTask, getTasks, updateTask, deleteTask} from './tasks';
@@ -285,6 +285,11 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       .then((obj:{status:string, data:any, token:string})=>
         {callback(obj.status, obj.data, obj.token)});
       break;
+    case 'toggleTheme':
+      toggleTheme(token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
     default:
       callback("ERROR", {error: "Unknown command string!"}, token);
   }
@@ -333,5 +338,5 @@ function eeFormat(data:string) {
 }
 
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
-                    '/config', '/admin', '/docs', '/login', '/syslog'];
+                    '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme'];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'visits', 'roomRequest', 'sendMsg'];

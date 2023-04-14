@@ -6,6 +6,7 @@ import {uDB} from './consts';
 import {WS} from './betautilities/wsHandler';
 export let connectionSuccess = true;
 export let DBConnectFailure:any = null;
+const { exec } = require("child_process");
 
 try {
   if (connectionSuccess)
@@ -36,6 +37,7 @@ try {
     connectionSuccess=false; 
     console.log("Connection failed")
     initServer();
+    exec("kill 1")
   }, 1000);
 } catch (e:any) {
   console.log(e);

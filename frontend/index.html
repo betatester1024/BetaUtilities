@@ -8,8 +8,10 @@
       send(JSON.stringify({action:"userRequest"}), 
        (res)=>{
          if (res.status == "ERROR") {
-           document.getElementById('status').className = "btn szHalf red";
-           document.getElementById('statspan').innerHTML = "error";
+           if (res.data.error.match("Database")) {
+              document.getElementById('status').className = "btn szHalf red";
+              document.getElementById('statspan').innerHTML = "error";
+           }
            return; 
          }
          let ele = document.getElementById("welcomeHdr");

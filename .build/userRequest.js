@@ -32,7 +32,7 @@ async function userRequest(token) {
   if (Date.now() > tokenData.expiry) {
     return { status: "ERROR", data: { error: "Your session has expired!" }, token: "" };
   }
-  return { status: "SUCCESS", data: { user: tokenData.associatedUser, alias: userData.alias ?? userData.user, perms: userData.permLevel, expiry: tokenData.expiry, tasks: userData.tasks }, token };
+  return { status: "SUCCESS", data: { user: tokenData.associatedUser, alias: userData.alias ?? userData.user, perms: userData.permLevel, expiry: tokenData.expiry, tasks: userData.tasks, darkQ: userData.darkTheme ?? false }, token };
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

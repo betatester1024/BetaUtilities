@@ -17,16 +17,16 @@
             console.log("found")
             inp.style.cursor = "text";
             inp.readOnly = false;
-            inp.style.border="2px solid #0a84ff";
+            inp.style.border="2px solid var(--system-blue)";
             inp.focus({preventScroll:true});
-            spn.innerText =  "update";
+            spn.innerText =  "check";
             spn.onclick=()=>{modify(-1); 
                              update(i)};
           }
           else if (inp && spn) {
             inp.style.cursor = "pointer";
             inp.readOnly = true;
-            inp.style.border="2px solid #eee";
+            inp.style.border="2px solid var(--system-bg)";
             inp.blur();
             spn.innerText = "edit"
             spn.onclick=()=>{modify(i)};
@@ -70,7 +70,7 @@
               `<p> 
                 <span class="grn roundhover todo material-symbols-outlined" onclick="complete(${i})" title="Complete task">task_alt</span>
                 <input class="todo szTwoThirds" id="todo${i}" value="${res.data.tasks[i].replaceAll("\"", "&#34;")}" 
-                onchange="modify(-1); update(${i})" readonly="" onclick="modify(${i})" style="cursor: pointer; border: 2px solid rgb(238, 238, 238);">
+                onchange="modify(-1); update(${i})" readonly="" onclick="modify(${i})" style="cursor: pointer; border: 2px solid var(--system-bg);">
                 <span id="span${i}" title="Update task" class="ylw roundhover todo material-symbols-outlined" onclick="modify(${i})">edit</span>
                 <span title="Delete task" class="red nooutline roundhover todo material-symbols-outlined" onclick="del(${i})">delete</span>
               </p>`;
@@ -116,7 +116,8 @@
         cursor: pointer;
       }
       #mainDiv {
-        overflow: y scroll;max-height: 100vh;
+        overflow-y: scroll;
+        max-height: 100vh;
       }
     </style>
   </head>
@@ -129,7 +130,7 @@
       <div id="tasks">
       <p> 
         <span class="todo material-symbols-outlined" onclick="complete(0)">task_alt</span>
-        <input class="todo szTwoThirds" id="todo0" value="Loading your tasks..." onchange="modify(-1); send(JSON.stringify({action:'updateTODO0'}), ()=>{})" readonly="" onclick="modify(0)" style="cursor: pointer; border: 2px solid rgb(238, 238, 238);">
+        <input class="todo szTwoThirds" id="todo0" value="Loading your tasks..." onchange="modify(-1); send(JSON.stringify({action:'updateTODO0'}), ()=>{})" readonly="" onclick="modify(0)" style="cursor: pointer; border: 2px solid var(--system-bg);">
         <span id="span0" class="todo material-symbols-outlined" onclick="modify(0)">edit</span>
         <span class="todo material-symbols-outlined" onclick="del(0)">delete</span>
       </p>

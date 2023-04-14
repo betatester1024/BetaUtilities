@@ -12,8 +12,22 @@ html {
   --system-grey: #8c8c8c;
   --system-grey2:rgba(140, 140, 140, 0.1);
   --system-bg: #eee;
+  --system-overlay: rgba(200, 200, 200, 0.95);
   --system-transp: rgba(0, 0, 0, 0);
+  transition: all 1s ease-in-out;
   font-family: 'Noto Sans Display', monospace;
+}
+
+.dark {
+  --system-bg: #222;
+  --system-grey: #bfbfbf;
+  --system-grey2:rgba(191, 191, 191, 0.1);
+  --system-red2: rgba(238, 0, 0, 0.25);
+  --system-blue2: rgba(10, 132, 255, 0.25);
+  --system-blue3: rgba(10, 132, 255, 0.5);
+  --system-green2: rgba(0, 255, 0, 0.25);
+  --system-yellow2:rgba(255, 204, 31, 0.25);
+  --system-overlay: rgba(52, 52, 52, 0.95);
 }
 
 body {
@@ -62,7 +76,7 @@ h2 {
 .btn {
   display: inline-block;
   border-radius: 15px;
-  background-color: rgba(210, 210, 210, 0.2);
+  background-color: var(--system-grey2)/*rgba(210, 210, 210, 0.2)*/;
   border: none;
   color: var(--system-blue);
   transition: all 0.7s ease-in;
@@ -82,6 +96,9 @@ h2 {
 .btn:hover>div.anim {
   width: 90%;
   opacity: 1;
+}
+.btn > .material-symbols-outlined {
+  cursor: pointer;
 }
 input:focus + div.anim,
 input:hover + div.anim,
@@ -262,7 +279,7 @@ span.material-symbols-outlined {
   width: 100vw;
   text-align: center;
   transition: all 0.5s ease-in-out;
-  background-color: rgba(200, 200, 200, 0.95);
+  background-color: var(--system-overlay);
   top: 500vh;
   z-index: 1;
 }
@@ -311,6 +328,7 @@ textarea {
   border: 2px solid var(--system-blue);
   border-radius: 10px;
   resize: vertical;
+  background-color: var(--system-grey2);
 }
 
 .cancel {
@@ -325,4 +343,70 @@ textarea {
   .internal .btn {
     width: 3em;
   }
+}
+
+footer, #footer {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.overlayLoader {
+  transition: all 0.25s ease-in-out;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0px;
+  left: 500vh;
+  z-index: 1;
+  background-color: var(--system-bg);
+}
+
+.loader {
+  font-size: 30em !important;
+  color: var(--system-blue);
+  position: relative;
+  top: calc(50% - 0.5em);
+  left: calc(50% - 0.5em);
+  -webkit-animation: rotating 1s linear infinite;
+  -moz-animation: rotating 1s linear infinite;
+  -ms-animation: rotating 1s linear infinite;
+  -o-animation: rotating 1s linear infinite;
+  animation: rotating 1s linear infinite;
+}
+
+@-webkit-keyframes rotating /* Safari and Chrome */ {
+  from {
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+  to {
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+}
+@keyframes rotating {
+  from {
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+  to {
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+}
+
+.loadp {
+  margin: 0 auto;
+  width: 500px;
+  text-align: center;
+  position: relative;
+  top: 2em;
 }

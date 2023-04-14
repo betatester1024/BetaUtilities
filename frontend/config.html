@@ -31,6 +31,15 @@
         pwd.value="";
         pwd2.value="";
       }
+
+      function updateTheme() {
+        send(JSON.stringify({action:"toggleTheme"}), (res)=>{
+          if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});
+          else {
+            alertDialog("Theme updated!", ()=>{location.reload()}); 
+          }
+        })
+      }
       
     </script>
     <meta name="viewport" content="width=device-width">
@@ -68,9 +77,12 @@
           <button type=submit class="btn szFull grn">
             <span class="material-symbols-outlined">update</span>
             Update your information<div class="anim"></div></button>
-          <a class="btn szFull" href="/admin">
+          <a class="btn szHalf" href="/admin">
             <span class="material-symbols-outlined">arrow_forward_ios</span>
             Access admin panel<div class="anim"></div></a>
+          <button type="button" class="btn szHalf" onclick="updateTheme()">
+            <span class="material-symbols-outlined">light_mode</span>
+            Swap colour scheme<div class="anim"></div></button>
           <a class="btn szThird ylw" href="/logout">
             <span class="material-symbols-outlined">logout</span>
             Logout: <br>This session<div class="anim"></div></a>

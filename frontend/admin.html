@@ -49,8 +49,10 @@
       }
       
       function runCmd() {
-        if (document.getElementById("cmdInp").value.match("[^a-zA-Z_\\-]")) return;
-        location.href="/cmd?action="+document.getElementById("cmdInp").value;
+        let val = document.getElementById("cmdInp").value;
+        if (val.match("^[a-zA-Z_\\-]+$"))
+          location.href="/cmd?action="+val;
+        else alertDialog("Stop inputting nonsense in the command prompt.", ()=>{})
       }
     </script>
     <meta name="viewport" content="width=device-width">

@@ -30,7 +30,7 @@ var import_consts = require("./consts");
 var import_userRequest = require("./userRequest");
 var import_index = require("./index");
 function systemLog(thing) {
-  log(thing);
+  log(thing.toString());
 }
 ;
 function log(thing) {

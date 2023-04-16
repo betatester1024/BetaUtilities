@@ -84,6 +84,21 @@ async function initServer() {
     res.sendFile(import_consts.frontendDir + "/delAcc.html");
     (0, import_logging.incrRequests)();
   });
+  app.get("/whois", (req, res) => {
+    res.sendFile(import_consts.frontendDir + "/aboutme.html");
+    (0, import_logging.incrRequests)();
+  });
+  app.get("/cmd", urlencodedParser, async (req, res) => {
+    makeRequest(req.query.action, req.cookies.sessionID, null, (s, d, token) => {
+      console.log(d);
+      if (s == "SUCCESS")
+        res.sendFile(import_consts.frontendDir + "/actionComplete.html");
+      else {
+        res.sendFile(import_consts.frontendDir + "/error.html");
+      }
+    });
+    (0, import_logging.incrRequests)();
+  });
   app.get("*/favicon.ico", (req, res) => {
     res.sendFile(import_consts.rootDir + "/favicon.ico");
     (0, import_logging.incrRequests)();
@@ -234,6 +249,11 @@ function makeRequest(action, token, data, callback) {
         break;
       }
       (0, import_supportRooms.sendMsg)(data.msg.slice(0, 1024), data.room, token, callback);
+      break;
+    case "lookup":
+      (0, import_supportRooms.WHOIS)(token, data.user).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
       break;
     case "getLogs":
       (0, import_logging.getLogs)(token).then((obj) => {

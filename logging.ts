@@ -2,7 +2,7 @@ import {uDB} from './consts';
 import {userRequest} from './userRequest';
 import {connectionSuccess} from './index'
 
-export function systemLog(thing:string) {log(thing)};
+export function systemLog(thing:any) {log(thing.toString())};
 export function log(thing:string) {
   // let out:any;
   // if (thing && typeof thing != "number" && typeof thing != "string") out = JSON.stringify(thing);

@@ -1,11 +1,12 @@
 import {WS} from './wsHandler';
-
+import {systemLog} from '../logging';
 const fs = require('fs');
 //import {rooms} from './initialiser'
 // import {getUptimeStr, systemLog} from './misc';
 // import {allWords, validWords, todayLeetCODE, todayWordID} from './wordListHandle';
 const serviceKey = process.env['serviceKey'];
 import {uDB, authDB} from '../consts';
+import { supportHandler, Room } from '../supportRooms';
 const DB_USERS = authDB
 const serviceResponse = process.env['serviceResponse'];
 const DB3 = uDB
@@ -45,6 +46,7 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   if (msg.match(/!testfeature/gimu)) return "@" + sender;
   if (msg.match("^!uptime @" + this.nick.toLowerCase() + "$")) {
     this.clearCallReset();
+    
     return getUptimeStr(STARTTIME)+" (Total uptime: "+getUptimeStr()+")";
   }
 
@@ -228,10 +230,10 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   if (match2) {
     systemLog(match2);
     let newNick = match2[2]==null?"BetaUtilities":match2[2];
-    if (sysRooms.indexOf(match2[1])>=0) return "We're already in this room!";
+    if (supportHandler.mitoseable(match2[1])) return "We're already in this room!";
     try  {new WS("wss://euphoria.io/room/" + match2[1] + "/ws", newNick, match2[1], false);}
     catch (e) {systemLog((e))}
-    updateActive(match2[1], true);
+    supportHandler.addRoom(new Room("EUPH_ROOM", match2[1]))
     return "Sent @"+newNick+" to &"+match2[1];
   }
   if (msg.match("^!runstats [ ]*@" + this.nick.toLowerCase())) {
@@ -321,19 +323,18 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
     return encr;
   }
   
-  let exp = /^((?:(?:(?:https?|ftp):)?\/\/)?(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?)$/
+  let exp = /^((?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?)$/
   let exp2 = /^!unblock[ ]+((?:(?:(?:https?|ftp):)?\/\/)?(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?)$/
+  let exp3 = /^!unblock[ ]+((?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?)$/
   if (msg.length > 10000) return "ERROR: Your message is way too long.";
   match = this.callStatus == 2 ? msg.match(exp) : msg.match(exp2);
   if (match) {
     this.callStatus = -1;
+    // so damn cursed
     this.clearCallReset();
-    if (match[1].substring(0, 4) == "https://")
-      return "https://womginx.betatester1024.repl.co/main/" + match[1] +
-        "\\n[NEW] The FIREFOX-ON-REPLIT may provide more reliable unblocking! > https://replit.com/@betatester1024/firefox#main.py";
-    else
-      return "https://womginx.betatester1024.repl.co/main/https://" + match[1] +
-        "\\n[NEW] The FIREFOX-ON-REPLIT may provide more reliable unblocking! > https://replit.com/@betatester1024/firefox#main.py";
+    if (msg.match(exp3)) match = msg.match(exp3);
+    return "https://womginx.betatester1024.repl.co/main/https://" + match[1] +
+      "\\n[NEW] The FIREFOX-ON-REPLIT may provide more reliable unblocking! > https://replit.com/@betatester1024/firefox#main.py";
 
   }
   if (this.callStatus == 0 &&(msg == ":one:" || msg == "one" || msg == "1")) {
@@ -536,4 +537,47 @@ function norm(str:string) {
   str = str.replaceAll(/"/gm, "\\\"");
   
   return str.replaceAll(" ","");
+}
+
+export function wordleUpdate() {
+  
+}
+
+function getUptimeStr(STARTTIME:number=-1) {
+  if (STARTTIME < 0) {
+    let time = Number(fs.readFileSync('./runtime.txt'));
+    return formatTime(time);
+  }
+  let timeElapsed = Date.now() - STARTTIME;
+  let date = new Date(STARTTIME);
+  return (
+    `/me has been up since ${date.toUTCString()} (It's been ${formatTime(timeElapsed)})`
+  );
+}
+
+function formatTime(ms:number) {
+  // 1- Convert to seconds:
+  let seconds = ms / 1000;
+  // 2- Extract hours:
+  const days = Math.floor(seconds / 3600 / 24);
+  seconds = seconds % (3600 * 24);
+  const hours = Math.floor(seconds / 3600); // 3,600 seconds in 1 hour
+  seconds = seconds % 3600; // seconds remaining after extracting hours
+  // 3- Extract minutes:
+  const minutes = Math.floor(seconds / 60); // 60 seconds in 1 minute
+  // 4- Keep only seconds not extracted to minutes:
+  seconds = Math.floor(seconds);
+  seconds = seconds % 60;
+  return (
+    (days == 0 ? "" : days + " day"+(days==1?"":"s")+", ") +
+    format(hours) +
+    ":" +
+    format(minutes) +
+    ":" +
+    format(seconds)
+  );
+}
+
+function format(n:number) {
+  return n < 10 ? "0" + n : n;
 }

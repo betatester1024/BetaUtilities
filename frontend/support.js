@@ -23,9 +23,9 @@ function sendMsg() {
         Reloading your messages, a moment please...</h2>`;
         initClient();
       });
-    });
+    }, true);
   }
-  else send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME}}), ()=>{});
+  else send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME}}), ()=>{}, true);
   inp.value="";
 }
 let LOADEDQ2 = false;
@@ -81,7 +81,7 @@ async function initClient()
       let slashMe = false;
       msg = msg.replaceAll(/(&[a-zA-Z0-9]{1,20}[^;])/gm,">ROOM$1>")
       msg = msg.replaceAll(/(#[a-zA-Z0-9_\-]{1,20}[^;])/gm,">SUPPORT$1>")
-      msg = msg.replaceAll(/(;gt;;gt;.{0,20})/gm,">INTERNALLINK$1>");
+      msg = msg.replaceAll(/(;gt;;gt;[^ ]{0,20})/gm,">INTERNALLINK$1>");
       msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu,">LINK$<test>>")
       console.log(msg);
       if (msg.match("/me.*")) {

@@ -37,8 +37,8 @@ try {
     connectionSuccess=false; 
     console.log("Connection failed")
     initServer();
-    exec("kill 1")
-  }, 1000);
+    setTimeout(()=>{exec("kill 1")}, 10000);
+  }, 29000);
 } catch (e:any) {
   console.log(e);
 }

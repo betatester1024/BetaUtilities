@@ -19,6 +19,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var supportRooms_exports = {};
 __export(supportRooms_exports, {
   Room: () => Room,
+  WHOIS: () => WHOIS,
   createRoom: () => createRoom,
   deleteRoom: () => deleteRoom,
   roomRequest: () => roomRequest,
@@ -149,6 +150,13 @@ class supportHandler {
     }
     return false;
   }
+  static mitoseable(roomName) {
+    for (let i = 0; i < this.allRooms.length; i++) {
+      if (this.allRooms[i].name == roomName && this.allRooms[i].type == "EUPH_ROOM")
+        return true;
+    }
+    return false;
+  }
   static sendMsgTo(roomName, data) {
     for (let i = 0; i < this.connections.length; i++) {
       if (this.connections[i].roomName == roomName) {
@@ -246,9 +254,29 @@ function updateActive(name, activeQ) {
   else
     supportHandler.deleteRoom("EUPH_ROOM", name);
 }
+async function WHOIS(token, user) {
+  let userData = await import_consts.authDB.findOne({ fieldName: "UserData", user });
+  let userData2 = await import_consts.authDB.find({ fieldName: "UserData", alias: user }).toArray();
+  let out = [];
+  for (let i = 0; i < userData2.length; i++) {
+    out.push({
+      user: userData2[i].user,
+      tasks: userData2[i].tasksCompleted,
+      about: userData2[i].aboutme,
+      perms: userData2[i].permLevel
+    });
+  }
+  return { status: "SUCCESS", data: { account: {
+    perms: userData ? userData.permLevel : "N/A",
+    user,
+    tasks: userData ? userData.tasksCompleted : "N/A",
+    about: userData ? userData.aboutme : "Account not found"
+  }, users: out }, token };
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Room,
+  WHOIS,
   createRoom,
   deleteRoom,
   roomRequest,

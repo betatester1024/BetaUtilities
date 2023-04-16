@@ -14,7 +14,7 @@ import {addTask, getTasks, updateTask, deleteTask} from './tasks';
 import {getLogs, log, purgeLogs, visitCt, incrRequests} from './logging';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
-import {supportHandler, roomRequest, sendMsg, createRoom, deleteRoom} from './supportRooms'
+import {supportHandler, roomRequest, sendMsg, createRoom, deleteRoom, WHOIS} from './supportRooms'
 const urlencodedParser = bodyParser.urlencoded({ extended: false }) 
 var RateLimit = require('express-rate-limit');
 
@@ -74,6 +74,20 @@ export async function initServer() {
     res.sendFile(frontendDir+'/delAcc.html');
     incrRequests();
   });
+
+   app.get('/whois', (req:any, res:any) => {
+    res.sendFile(frontendDir+'/aboutme.html');
+    incrRequests();
+  });
+
+  app.get("/cmd", urlencodedParser, async (req:any, res:any) => {
+    makeRequest(req.query.action, req.cookies.sessionID, null, (s:string, d:any, token:string)=>{
+      console.log(d);
+      if (s == "SUCCESS") res.sendFile(frontendDir+'/actionComplete.html');
+      else {res.sendFile(frontendDir+'/error.html')}
+    })
+    incrRequests();
+  })
     
   app.get('*/favicon.ico', (req:Request, res:any)=> {
     res.sendFile(rootDir+'/favicon.ico')
@@ -239,6 +253,11 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
         callback("SUCCESS", null, token); break;
       }
       sendMsg(data.msg.slice(0, 1024), data.room, token, callback);
+      break;
+    case 'lookup':
+      WHOIS(token, data.user)
+      .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
       break;
     case "getLogs":
       getLogs(token)

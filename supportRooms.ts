@@ -120,6 +120,13 @@ export class supportHandler {
     }
     return false;
   }
+
+  static mitoseable(roomName:string) {
+     for (let i=0; i<this.allRooms.length; i++) {
+      if (this.allRooms[i].name == roomName && this.allRooms[i].type == "EUPH_ROOM") return true;
+    }
+    return false;
+  }
   static sendMsgTo(roomName:string, data:string) {
     for (let i=0; i<this.connections.length; i++) {
       if (this.connections[i].roomName == roomName) {
@@ -213,4 +220,22 @@ export async function deleteRoom(name:string, token:string) {
 export function updateActive(name:string, activeQ: boolean) {
   if (activeQ) supportHandler.addRoom(new Room("EUPH_ROOM", name));
   else supportHandler.deleteRoom("EUPH_ROOM", name);
+}
+
+export async function WHOIS(token:string, user:string) {
+  let userData = await authDB.findOne({fieldName:"UserData", user:user});
+  let userData2 = await authDB.find({fieldName:"UserData", alias:user}).toArray();
+  let out = [];
+  for (let i=0; i<userData2.length; i++) {
+    out.push({user:userData2[i].user, 
+              tasks: userData2[i].tasksCompleted,
+              about:userData2[i].aboutme,
+              perms: userData2[i].permLevel})
+  }
+  return {status:"SUCCESS", data:{account:{
+    perms:userData?userData.permLevel:"N/A", 
+    user:user, 
+    tasks:userData?userData.tasksCompleted:"N/A",
+    about:userData?userData.aboutme:"Account not found"
+  }, users:out}, token:token};
 }

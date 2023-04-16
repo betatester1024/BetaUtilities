@@ -18,11 +18,14 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var messageHandle_exports = {};
 __export(messageHandle_exports, {
-  replyMessage: () => replyMessage
+  replyMessage: () => replyMessage,
+  wordleUpdate: () => wordleUpdate
 });
 module.exports = __toCommonJS(messageHandle_exports);
 var import_wsHandler = require("./wsHandler");
+var import_logging = require("../logging");
 var import_consts = require("../consts");
+var import_supportRooms = require("../supportRooms");
 const fs = require("fs");
 const serviceKey = process.env["serviceKey"];
 const DB_USERS = import_consts.authDB;
@@ -41,7 +44,7 @@ function replyMessage(msg, sender, data) {
     this.incrPingCt();
   }
   if (msg == "!debugwordle") {
-    systemLog(validWords[todayWordID] + " " + todayLeetCODE.join(""));
+    (0, import_logging.systemLog)(validWords[todayWordID] + " " + todayLeetCODE.join(""));
     return "> See console <";
   }
   if (msg == "!conjure @" + this.nick.toLowerCase()) {
@@ -83,7 +86,7 @@ function replyMessage(msg, sender, data) {
         return;
       } else if (match3) {
         workingUsers2.push(norm(match3[1].toLowerCase()));
-        systemLog("WORKACTIVATE in room: " + this.roomName + " by " + sender);
+        (0, import_logging.systemLog)("WORKACTIVATE in room: " + this.roomName + " by " + sender);
         this.delaySendMsg("Will scream at @" + norm(match3[1]), data, 0);
       } else if (workingUsers2.indexOf(norm(sender.toLowerCase())) < 0) {
         workingUsers2.push(norm(sender.toLowerCase()));
@@ -130,7 +133,7 @@ function replyMessage(msg, sender, data) {
         return;
       } else if (match3) {
         sleepingUsers.push(norm(match3[1].toLowerCase()));
-        systemLog("SLEEPACTIVATE in room: " + this.roomName + " by " + sender);
+        (0, import_logging.systemLog)("SLEEPACTIVATE in room: " + this.roomName + " by " + sender);
         this.delaySendMsg("Will scream at @" + norm(match3[1]), data, 0);
       } else if (sleepingUsers.indexOf(norm(sender.toLowerCase())) < 0) {
         sleepingUsers.push(norm(sender.toLowerCase()));
@@ -193,21 +196,21 @@ function replyMessage(msg, sender, data) {
   let match = msg.match("^!remindme of (.+) in ([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?");
   if (match) {
     let remindMsg = match[1];
-    let exp3 = Date.now();
+    let exp4 = Date.now();
     if (match[2])
-      exp3 += Number(match[2].split("d")[0]) * 1e3 * 60 * 60 * 24;
+      exp4 += Number(match[2].split("d")[0]) * 1e3 * 60 * 60 * 24;
     if (match[3])
-      exp3 += Number(match[3].split("h")[0]) * 1e3 * 60 * 60;
+      exp4 += Number(match[3].split("h")[0]) * 1e3 * 60 * 60;
     if (match[4])
-      exp3 += Number(match[4].split("m")[0]) * 1e3 * 60;
+      exp4 += Number(match[4].split("m")[0]) * 1e3 * 60;
     if (match[5])
-      exp3 += Number(match[5].split("s")[0]) * 1e3;
-    if (exp3 == Date.now()) {
+      exp4 += Number(match[5].split("s")[0]) * 1e3;
+    if (exp4 == Date.now()) {
       return "No reminder time provided!";
     }
     DB3.insertOne({
       fieldName: "TIMER",
-      expiry: exp3,
+      expiry: exp4,
       notifyingUser: norm(sender),
       msg: remindMsg
     });
@@ -230,16 +233,16 @@ function replyMessage(msg, sender, data) {
   }
   let match2 = msg.match("@" + this.nick.toLowerCase() + " !mitoseto &([a-z0-9]+) as @(.+)");
   if (match2) {
-    systemLog(match2);
+    (0, import_logging.systemLog)(match2);
     let newNick = match2[2] == null ? "BetaUtilities" : match2[2];
-    if (sysRooms.indexOf(match2[1]) >= 0)
+    if (import_supportRooms.supportHandler.mitoseable(match2[1]))
       return "We're already in this room!";
     try {
       new import_wsHandler.WS("wss://euphoria.io/room/" + match2[1] + "/ws", newNick, match2[1], false);
     } catch (e) {
-      systemLog(e);
+      (0, import_logging.systemLog)(e);
     }
-    updateActive(match2[1], true);
+    import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("EUPH_ROOM", match2[1]));
     return "Sent @" + newNick + " to &" + match2[1];
   }
   if (msg.match("^!runstats [ ]*@" + this.nick.toLowerCase())) {
@@ -340,18 +343,18 @@ function replyMessage(msg, sender, data) {
       encr = "Cannot find SystemEncrypted string!";
     return encr;
   }
-  let exp = /^((?:(?:(?:https?|ftp):)?\/\/)?(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?)$/;
+  let exp = /^((?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?)$/;
   let exp2 = /^!unblock[ ]+((?:(?:(?:https?|ftp):)?\/\/)?(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?)$/;
+  let exp3 = /^!unblock[ ]+((?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?)$/;
   if (msg.length > 1e4)
     return "ERROR: Your message is way too long.";
   match = this.callStatus == 2 ? msg.match(exp) : msg.match(exp2);
   if (match) {
     this.callStatus = -1;
     this.clearCallReset();
-    if (match[1].substring(0, 4) == "https://")
-      return "https://womginx.betatester1024.repl.co/main/" + match[1] + "\\n[NEW] The FIREFOX-ON-REPLIT may provide more reliable unblocking! > https://replit.com/@betatester1024/firefox#main.py";
-    else
-      return "https://womginx.betatester1024.repl.co/main/https://" + match[1] + "\\n[NEW] The FIREFOX-ON-REPLIT may provide more reliable unblocking! > https://replit.com/@betatester1024/firefox#main.py";
+    if (msg.match(exp3))
+      match = msg.match(exp3);
+    return "https://womginx.betatester1024.repl.co/main/https://" + match[1] + "\\n[NEW] The FIREFOX-ON-REPLIT may provide more reliable unblocking! > https://replit.com/@betatester1024/firefox#main.py";
   }
   if (this.callStatus == 0 && (msg == ":one:" || msg == "one" || msg == "1")) {
     this.bumpCallReset(data);
@@ -563,8 +566,34 @@ function norm(str) {
   str = str.replaceAll(/"/gm, '\\"');
   return str.replaceAll(" ", "");
 }
+function wordleUpdate() {
+}
+function getUptimeStr(STARTTIME2 = -1) {
+  if (STARTTIME2 < 0) {
+    let time = Number(fs.readFileSync("./runtime.txt"));
+    return formatTime(time);
+  }
+  let timeElapsed = Date.now() - STARTTIME2;
+  let date = new Date(STARTTIME2);
+  return `/me has been up since ${date.toUTCString()} (It's been ${formatTime(timeElapsed)})`;
+}
+function formatTime(ms) {
+  let seconds = ms / 1e3;
+  const days = Math.floor(seconds / 3600 / 24);
+  seconds = seconds % (3600 * 24);
+  const hours = Math.floor(seconds / 3600);
+  seconds = seconds % 3600;
+  const minutes = Math.floor(seconds / 60);
+  seconds = Math.floor(seconds);
+  seconds = seconds % 60;
+  return (days == 0 ? "" : days + " day" + (days == 1 ? "" : "s") + ", ") + format(hours) + ":" + format(minutes) + ":" + format(seconds);
+}
+function format(n) {
+  return n < 10 ? "0" + n : n;
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  replyMessage
+  replyMessage,
+  wordleUpdate
 });
 //# sourceMappingURL=messageHandle.js.map

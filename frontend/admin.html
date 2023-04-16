@@ -48,6 +48,9 @@
         pwd.value="";
       }
       
+      function runCmd() {
+        location.href="/cmd?action="+document.getElementById("cmdInp").value;
+      }
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -56,6 +59,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
     <style>
+      #superadmin {
+        border-radius:50px;
+        width: 90%;
+        margin: 0 auto;
+        transition: all 1s ease;
+      }
     </style>
   </head>
   <body onload = "globalOnload(); onLoad()">
@@ -88,17 +97,29 @@
           <button type=submit class="btn szHalf grn">
             <span class="material-symbols-outlined">update</span>
             Create or update this account<div class="anim"></div></button>
+        </form>
           <button type="button" class="btn szHalf red" onclick="del()">
             <span class="material-symbols-outlined">delete_forever</span>
             Delete this account<div class="anim"></div></button>
           <a class="btn szFull" href="/account">
             <span class="material-symbols-outlined">arrow_back_ios</span>
             Return to your account<div class="anim"></div></a>
-          
+          <div class="red" id="superadmin">
+            <h2 class="fsmed">Super-administrative command area</h2>
+            <form action="javascript:runCmd()">
+              <div class="inpContainer">
+                <input id="cmdInp" placeholder="Enter commands here">
+                <div class="anim inp"></div>
+              </div>
+              <button type=submit class="btn">
+              <span class="material-symbols-outlined">arrow_forward_ios</span>
+              Run command<div class="anim"></div></button>
+            </form>
+          </div>
           <a class="btn szFull" href="/">
             <span class="material-symbols-outlined">arrow_back_ios</span>
             Return to home<div class="anim"></div></a>
-        </form>
+        
       </div>
     </div>
     <div class="overlay" id="overlay">

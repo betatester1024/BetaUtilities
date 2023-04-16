@@ -61,8 +61,10 @@ try {
     connectionSuccess = false;
     console.log("Connection failed");
     (0, import_server.initServer)();
-    exec("kill 1");
-  }, 1e3);
+    setTimeout(() => {
+      exec("kill 1");
+    }, 1e4);
+  }, 29e3);
 } catch (e) {
   console.log(e);
 }

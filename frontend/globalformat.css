@@ -23,11 +23,12 @@ html {
   --system-grey: #bfbfbf;
   --system-grey2:rgba(191, 191, 191, 0.1);
   --system-red2: rgba(238, 0, 0, 0.25);
-  --system-blue2: rgba(10, 132, 255, 0.25);
-  --system-blue3: rgba(10, 132, 255, 0.5);
+  --system-blue2: rgba(12, 200, 255, 0.25);
+  --system-blue3: rgba(12, 200, 255, 0.5);
   --system-green2: rgba(0, 255, 0, 0.25);
   --system-yellow2:rgba(255, 204, 31, 0.25);
   --system-overlay: rgba(52, 52, 52, 0.95);
+  --system-blue: #0cc8fe;
 }
 
 body {
@@ -358,7 +359,7 @@ footer, #footer {
   top: 0px;
   left: 500vh;
   z-index: 1;
-  background-color: var(--system-bg);
+  background-color: var(--system-grey2);
 }
 
 .loader {

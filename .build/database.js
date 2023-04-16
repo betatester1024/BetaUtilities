@@ -18,18 +18,51 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var database_exports = {};
 __export(database_exports, {
-  DB: () => DB,
+  DBMaintenance: () => DBMaintenance,
+  client: () => client,
+  connectDB: () => connectDB,
   database: () => database
 });
 module.exports = __toCommonJS(database_exports);
+var import_consts = require("./consts");
+var import_index = require("./index");
 const { MongoClient } = require("mongodb");
 const uri = "mongodb://SystemLogin:" + process.env["dbPwd"] + "@ac-rz8jdrl-shard-00-00.d8o7x8n.mongodb.net:27017,ac-rz8jdrl-shard-00-01.d8o7x8n.mongodb.net:27017,ac-rz8jdrl-shard-00-02.d8o7x8n.mongodb.net:27017/?ssl=true&replicaSet=atlas-3yyxq8-shard-0&authSource=admin&retryWrites=true&w=majority";
 const client = new MongoClient(uri);
+async function connectDB() {
+  try {
+    await client.connect();
+    clearTimeout(import_index.DBConnectFailure);
+    return null;
+  } catch (e) {
+    console.log(e);
+    return e;
+  }
+}
 const database = client.db("BetaOS-Database01");
-const DB = database.collection("BetaUtilities");
+async function DBMaintenance() {
+  let items = await import_consts.authDB.find({ fieldName: "Token" }).toArray();
+  for (let i = 0; i < items.length; i++) {
+    if (!items[i].expiry || items[i].expiry < Date.now()) {
+      console.log("Token from " + items[i].associatedUser + " has expired");
+      await import_consts.authDB.deleteOne(items[i]);
+    }
+  }
+  let items2 = await import_consts.msgDB.find({ fieldName: "MSG" }).toArray();
+  for (let i = 0; i < items2.length; i++) {
+    if (!items2[i].expiry || items2[i].expiry < Date.now()) {
+      console.log("Message from " + items2[i].sender + " has expired");
+      await import_consts.msgDB.deleteOne(items2[i]);
+    }
+  }
+  ;
+  setTimeout(DBMaintenance, 1e3);
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  DB,
+  DBMaintenance,
+  client,
+  connectDB,
   database
 });
 //# sourceMappingURL=database.js.map

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='./utils.js'></script>
+    <title>System Log | BetaOS Systems</title>
+    <script>
+      let LOADEDQ2 = false;
+      
+      function onLoad() {
+        setInterval(()=>{
+          ele = document.getElementById("txtarea");
+          let scrDistOKQ =  (ele.scrollTop) >= (ele.scrollHeight-ele.offsetHeight - 100)
+          send(JSON.stringify({action:"getLogs"}), (res)=>{
+            if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{location.href="/login?redirect=syslog"});
+            else {
+              document.getElementById("txtarea").value = res.data;
+            }    
+          }, true);
+          if (!LOADEDQ2 || scrDistOKQ)
+          {
+            ele.scrollTop = ele.scrollHeight;
+            // console.log("Scrolling to bottom.")
+            LOADEDQ2 = true;
+          }
+        },1000);
+      }
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      textarea {
+        height: 65%;
+      }
+    </style>
+  </head>
+  <body onload = "globalOnload(); onLoad()">
+    <div class="main_content">
+      <header>
+        <h2>System Log</h2>
+        <hr class="rounded">
+      </header>
+      <textarea id="txtarea" readonly></textarea>
+      <button class="btn red" onclick="alertDialog('Confirm purge logs?', ()=>{
+        send(JSON.stringify({action:'purgeLogs'}), (res)=>{
+          if (res.status!='SUCCESS') alertDialog('ERROR: '+res.data.error, ()=>{})
+          else alertDialog('Purge success!', ()=>{});
+        })
+      }, 2)">
+        <span class="material-symbols-outlined">delete_forever</span>
+        Purge logs<div class="anim"></div></button>
+      <a class="btn" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+    </div>
+    
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+        
+      </div>
+    </div>
+  </body>
+</html>

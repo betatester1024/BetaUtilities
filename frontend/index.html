@@ -1,118 +1,122 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <title>Welcome to BetaOS Services!</title>
-    <script src="login.js"></script>
-    <script> function onLoad() {
-      // alert(document.cookie);
-      if (document.cookie.match("session=[0-9.]+")) {
-        let ele = document.getElementById("loginbtn");
-        ele.innerHTML = "<span class=\"material-symbols-outlined\">logout</span> Logout<br><hr class=\"btnHr\"></hr>";
-        ele.onclick= ()=> {window.open('/logout', '_self');};
-        validateLogin("userReq", "");
-      } else {
-        let ele = document.getElementById("configbtn");
-        ele.innerHTML = "<span class=\"material-symbols-outlined\">person_add</span> Sign up<br><hr class=\"btnHr\"></hr>";
-        ele.onclick= ()=> {window.open('/signup', '_self');}
-      }
-      
-    }
-    function support() {
-      // let match=document.cookie.match("session=([0-9.]+)")
-      window.open('./support', '_self');
-    }
-    function log() {
-      let match=document.cookie.match("session=([0-9.]+)")
-      window.open('./syslog?token='+(match?match[1]:"NONE"), '_self');
-    }
+    <script src='./utils.js'></script>
+    <title>Welcome | BetaOS Services</title>
+    <script>
+      const accessLevels = ["error-level", "user", "admin", "super-admin"];
+      send(JSON.stringify({action:"userRequest"}), 
+       (res)=>{
+         if (res.status == "ERROR") {
+           if (res.data.error.match("Database")) {
+              document.getElementById('status').className = "btn szHalf red";
+              document.getElementById('statspan').innerHTML = "error";
+           }
+           return; 
+         }
+         let ele = document.getElementById("welcomeHdr");
+         ele.innerText = "Welcome "+res.data.user+"!"; 
+         let userInfo = document.createElement("h2");
+         setInterval(()=>{userInfo.innerHTML = "logged in as "+accessLevels[res.data.perms]+
+           (res.data.expiry<Date.now()?" (session expired)":
+            (res.data.expiry>100*365*24*69*60*1000?` (session expiring in 
+            <span class="material-symbols-outlined">all_inclusive</span> days)`:
+             " (session expiring in "+toTime(res.data.expiry-Date.now())+")"));
+          }, 100);
+         ele.append(userInfo);
+         userInfo.style.fontSize = "0.4em";
+         let loginBtn = document.getElementById("loginBtn")
+         let signupBtn = document.getElementById("signupBtn")
+         let adminBtn = document.getElementById("adminBtn")
+         let configBtn = document.getElementById("configBtn")
+         let logoutBtn = document.getElementById("logoutBtn");
+         loginBtn.style.display="none";
+         signupBtn.style.display="none";
+         logoutBtn.style.display="inline-block";
+         configBtn.style.display=res.data.perms>=1?"inline-block":"none";
+         adminBtn.style.display = res.data.perms==1?"none":"inline-block";
+         configBtn.className = res.data.perms>1?"btn szThird":"btn szTwoThirds";
+         console.log(signupIco.innerHTML);
+       });
     </script>
     <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
     <style>
-      html {
-/*         overflow-y: scroll;   */
+      
+      h1 {
+        font-size: 4em;
+        font-weight: 700;
+        margin: 0px;
+        width: 80%;
+        margin: auto;
       }
-      #mainDiv {
-        height: 100vh;
-      }
-      button {
-        width: min(6em, max(6em, 33%));
-/*         height: 2.5em; */
-        border-radius: 0.3em;
-        font-size: 2.5em;
-      }
-      span {
-        font-size: 1.25em !important;
-        position: relative;
-        top: 10px;
-      }
-      .material-symbols-outlined {
-        font-variation-settings:
-        'FILL' 0,
-        'wght' 500,
-        'GRAD' 0,
-        'opsz' 48
-      }
-      .full {
-        display: inline-block;
-        max-width: 18em;
-        width: min(16.5em, max(6em, 80%))
-      }
-      .half {
-        display: inline-block;
-        max-width: 9em;
-        width: min(9em, max(6em, 45%))
-      }
-      .two-thirds {
-        display: inline-block;
-        max-width: 12em;
-        width: min(12em, max(6em, 63%))
+      .btnRow {
+        width: 90%;
+        margin: auto;
       }
     </style>
   </head>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-  <body onload = "onLoad()">
-    <div id = "mainDiv">
-      <h1 id="header">Welcome.</h1>
-      <hr class="rounded"></hr>
-      <button onclick="window.open('./status', '_self');">
-        <span class="material-symbols-outlined">check</span>
-        Status<br><hr class="btnHr"></hr></button>
-      <button onclick="window.open('./login', '_self');" id="loginbtn">
-        <span class="material-symbols-outlined">login</span>
-        Login<br><hr class="btnHr"></hr></button>
-      <button onclick="window.open('./admin', '_self');" id="configbtn">
-        <span class="material-symbols-outlined">settings</span>
-        Config<br><hr class="btnHr"></hr></button>
-      <br>
-      <button onclick="support()" class="full">
-        <span class="material-symbols-outlined">help</span>
-        Support
-        <hr class="btnHr"></hr>
-      </button><br>
-      <button onclick="log()" class="half">
-        <span class="material-symbols-outlined">security</span>
-        SysLog
-        <hr class="btnHr"></hr>
-      </button>
-      <button onclick="window.open('/todo', '_self');" class="half">
-        <span class="material-symbols-outlined">checklist</span>
-        To do
-        <hr class="btnHr"></hr>
-      </button><br>
-      <button onclick="window.open('/404', '_self');">
-        <span class="material-symbols-outlined">schedule</span>
-        Pending
-        <hr class="btnHr"></hr>
-      </button>
-      <button onclick="window.open('./about')" class="two-thirds">
-        <span class="material-symbols-outlined">info</span>
-        About the Site
-        <hr class="btnHr"></hr>
-      </button>
+  <body onload = "globalOnload();">
+    <div class="main_content">
+      <header>
+        <h1 id="welcomeHdr">Welcome to BetaOS Services!</h1>
+        <hr class="rounded">
+      </header>
+      <div class="btnRow">
+        <a id="status" class="btn szHalf grn" href="/status">
+          <span id="statspan"class="material-symbols-outlined">published_with_changes </span>
+           Status<div class="anim"></div></a>
+        <a class="btn szHalf" href="/support">
+          <span class="material-symbols-outlined" id="loginIco">help</span>
+          Support<div class="anim"></div></a>
+        <a id="signupBtn" class="btn szTwoThirds" href="/signup">
+          <span class="material-symbols-outlined" id="signupIco">person_add</span>
+          Sign-up<div class="anim"></div></a>
+        <a id="loginBtn" class="btn szThird" href="/login">
+          <span class="material-symbols-outlined" id="loginIco">login</span>
+          Login<div class="anim"></div></a>
+        <a id="logoutBtn" class="btn szThird ylw" href="/logout" style="display:none">
+          <span class="material-symbols-outlined" id="signupIco">logout</span>
+          Logout<div class="anim"></div></a>
+        <a id="configBtn" class="btn szThird" href="/account" style="display:none">
+          <span class="material-symbols-outlined" id="loginIco">settings</span>
+          Account<div class="anim"></div></a>
+        <a id="adminBtn" class="btn szThird" href="/admin" style="display:none">
+          <span class="material-symbols-outlined" id="loginIco">security</span>
+          Admin<div class="anim"></div></a>
+        <a class="btn szTwoThirds grn" href="/todo">
+          <span class="material-symbols-outlined">checklist</span>
+          To do<div class="anim"></div></a>
+        <a class="btn szThird ylw" href="/syslog">
+          <span class="material-symbols-outlined">security</span>
+          SysLog<div class="anim"></div></a>
+        <a class="btn szHalf" href="/EE">
+          <span class="material-symbols-outlined">sync</span>
+          Page of Edits<div class="anim"></div></a>
+        <a class="btn szHalf" href="/EEdit">
+          <span class="material-symbols-outlined">edit</span>
+          Edit the page!<div class="anim"></div></a>
+        <a class="btn szThird" href="/about">
+          <span class="material-symbols-outlined">info</span>
+          About<div class="anim"></div></a>
+        <a class="btn szThird fsmed" href="/commands">
+          <span class="material-symbols-outlined">build</span>
+          Commands<div class="anim"></div></a>
+        <a class="btn szThird" href="/contact">
+          <span class="material-symbols-outlined">phone</span>
+          Contact<div class="anim"></div></a>
+        
+<!--         <a class="btn szHalf" href="/login">login4<div class="anim"></div></a>
+        <a class="btn szHalf" href="/login">Login5<div class="anim"></div></a>
+        <a class="btn szTwoThirds" href="/login">Login6<div class="anim"></div></a>
+        <a class="btn szThird" href="/login">Login7<div class="anim"></div></a>
+        <a class="btn szFull" href="/login">Login<div class="anim"></div></a> -->
+      </div>
     </div>
+    
   </body>
- </html>
+</html>

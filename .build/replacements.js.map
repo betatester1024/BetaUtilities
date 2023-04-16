@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../replacements.ts"],
-  "sourcesContent": ["export let replacements = [\n  {from: \":one:\", to: \"counter_1\"},\n  {from: \":two:\", to: \"counter_2\"},\n  {from: \":three:\", to: \"counter_3\"},\n  {from: \":four:\", to: \"counter_4\"},\n  {from: \":five:\", to: \"counter_5\"},\n  {from: \":six:\", to: \"counter_6\"},\n  {from: \":seven:\", to: \"counter_7\"},\n  {from: \":eight:\", to: \"counter_8\"},\n  {from: \":nine:\", to: \"counter_9\"},\n  {from: \":zero:\", to: \"counter_0\"},\n  {from: \":white_check_mark:\", to: \"check_circle\"},\n  {from: \":info:\", to: \"info\"},\n  {from: \":confirm:\", to:\"check\"},\n  {from: \":warn:\", to: \"warning\"},\n  {from: \":error:\", to:\"error\"},\n  {from: \":egg:\", to:\"egg_alt\"}\n]"],
-  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAO,IAAI,eAAe;AAAA,EACxB,EAAC,MAAM,SAAS,IAAI,YAAW;AAAA,EAC/B,EAAC,MAAM,SAAS,IAAI,YAAW;AAAA,EAC/B,EAAC,MAAM,WAAW,IAAI,YAAW;AAAA,EACjC,EAAC,MAAM,UAAU,IAAI,YAAW;AAAA,EAChC,EAAC,MAAM,UAAU,IAAI,YAAW;AAAA,EAChC,EAAC,MAAM,SAAS,IAAI,YAAW;AAAA,EAC/B,EAAC,MAAM,WAAW,IAAI,YAAW;AAAA,EACjC,EAAC,MAAM,WAAW,IAAI,YAAW;AAAA,EACjC,EAAC,MAAM,UAAU,IAAI,YAAW;AAAA,EAChC,EAAC,MAAM,UAAU,IAAI,YAAW;AAAA,EAChC,EAAC,MAAM,sBAAsB,IAAI,eAAc;AAAA,EAC/C,EAAC,MAAM,UAAU,IAAI,OAAM;AAAA,EAC3B,EAAC,MAAM,aAAa,IAAG,QAAO;AAAA,EAC9B,EAAC,MAAM,UAAU,IAAI,UAAS;AAAA,EAC9B,EAAC,MAAM,WAAW,IAAG,QAAO;AAAA,EAC5B,EAAC,MAAM,SAAS,IAAG,UAAS;AAC9B;",
-  "names": []
-}

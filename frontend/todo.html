@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='./utils.js'></script>
+    <title>Todo list | BetaOS Systems</title>
+    <script>
+      let TODOCT = 1;
+      let MODIFYN = -1;
+      function modify(n=MODIFYN) {
+        console.log("Modifying "+n)
+        MODIFYN = n;
+        // console.log(n);
+        for (let i=0; i<TODOCT; i++) {
+          let inp = document.getElementById("todo"+i)
+          let spn = document.getElementById("span"+i)
+          if (i==n && inp && spn) {
+            console.log("found")
+            inp.style.cursor = "text";
+            inp.readOnly = false;
+            inp.style.border="2px solid var(--system-blue)";
+            inp.focus({preventScroll:true});
+            spn.innerText =  "check";
+            spn.onclick=()=>{modify(-1); 
+                             update(i)};
+          }
+          else if (inp && spn) {
+            inp.style.cursor = "pointer";
+            inp.readOnly = true;
+            inp.style.border="2px solid var(--system-bg)";
+            inp.blur();
+            spn.innerText = "edit"
+            spn.onclick=()=>{modify(i)};
+          }
+        }
+      }
+      
+      function complete(n) {
+        // console.log("Modifying "+n)
+        send(JSON.stringify({action:"completeTODO", data:{id:n}}), (res)=>{
+          alertDialog("Task complete!", ()=>{getTodo()})});
+      }
+      
+      function add() {
+        send(JSON.stringify({action:"addTODO"}), ()=>{getTodo(true);});
+        MODIFYN = TODOCT;
+      }
+      
+      function del(n) {
+        alertDialog("Confirm task deletion?", ()=>{
+          send(JSON.stringify({action:"deleteTODO", data:{id:n}}), (res)=>{
+            alertDialog("Task deleted.", ()=>{getTodo()})});
+        }, 2)
+        
+      }
+
+      function update(i) {
+        send(JSON.stringify({action:'updateTODO', data:{id:i, 
+          updated:document.getElementById('todo'+i).value}}), ()=>{})
+      }
+
+      function getTodo(modifyQ=false) {
+        send(JSON.stringify({action:"getTodo"}), (res)=>{
+          if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{window.open('/login?redirect=todo', '_self')})
+          else {
+            TODOCT = res.data.tasks.length;
+            let taskele = document.getElementById("tasks");
+            taskele.innerHTML = "";
+            for (let i=0; i<res.data.tasks.length; i++) {
+              taskele.innerHTML+=
+              `<p> 
+                <span class="grn roundhover todo material-symbols-outlined" onclick="complete(${i})" title="Complete task">task_alt</span>
+                <input class="todo szTwoThirds" id="todo${i}" value="${res.data.tasks[i].replaceAll("\"", "&#34;")}" 
+                onchange="modify(-1); update(${i})" readonly="" onclick="modify(${i})" style="cursor: pointer; border: 2px solid var(--system-bg);">
+                <span id="span${i}" title="Update task" class="ylw roundhover todo material-symbols-outlined" onclick="modify(${i})">edit</span>
+                <span title="Delete task" class="red nooutline roundhover todo material-symbols-outlined" onclick="del(${i})">delete</span>
+              </p>`;
+            }
+            if (modifyQ) modify();
+          }
+        })
+        
+      }
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      p {
+        display: block;
+        width: unset;
+        margin: 0 auto;
+      }
+      input {
+        -webkit-transition: border 500ms ease-out;
+        -moz-transition: border 500ms ease-out;
+        -o-transition: border 500ms ease-out;
+        transition: border 500ms ease-out;
+        border: 2px solid #eee;
+        border-radius: 10px;
+        font-family: 'Noto Sans Display';
+        height: 1.7em !important;
+        width: calc(100% - 5.5em) !important;
+        height: 2.2em;      
+      }
+      .todo {
+        font-size: 2em;
+        cursor: pointer;
+      }
+      span.todo.material-symbols-outlined {
+        font-size: 3em !important;
+        position: relative;
+        top: 10px;
+        cursor: pointer;
+      }
+      #mainDiv {
+        overflow-y: scroll;
+        max-height: 100vh;
+      }
+    </style>
+  </head>
+  <body onload = "globalOnload(()=>{getTodo()});">
+    <div class="main_content">
+      <header>
+        <h2>To do list</h2>
+        <hr class="rounded">
+      </header>
+      <div id="tasks">
+      <p> 
+        <span class="todo material-symbols-outlined" onclick="complete(0)">task_alt</span>
+        <input class="todo szTwoThirds" id="todo0" value="Loading your tasks..." onchange="modify(-1); send(JSON.stringify({action:'updateTODO0'}), ()=>{})" readonly="" onclick="modify(0)" style="cursor: pointer; border: 2px solid var(--system-bg);">
+        <span id="span0" class="todo material-symbols-outlined" onclick="modify(0)">edit</span>
+        <span class="todo material-symbols-outlined" onclick="del(0)">delete</span>
+      </p>
+      </div>
+      <br>
+      <button class="btn grn" onclick="add()">
+        <span class="material-symbols-outlined">add_circle</span>
+        Add a task<div class="anim"></div></button>
+      <button class="btn" onclick="getTodo()">
+        <span class="material-symbols-outlined">refresh</span>
+        Refresh task list<div class="anim"></div></button><br>
+      <a class="btn" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+    </div>
+    
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

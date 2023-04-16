@@ -1,277 +1,361 @@
-// we have a front-end!
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
-const bodyParser = require('body-parser');  
-// Create application/x-www-form-urlencoded parser  
-const urlencodedParser = bodyParser.urlencoded({ extended: false })  
-const app = express();
-const port = 4000;
-import {sysRooms, hidRooms} from './initialiser';
-import { validate } from './accessControl';
-import {systemLog} from './misc';
-
+const express = require('express')
+const app = express()
+const crypto = require("crypto");
+const parse = require("co-body");
+ // for generating secure random #'s
+import {connectionSuccess} from './index';
+import {port, msgDB, authDB, frontendDir, roomRegex, rootDir, jsDir, uDB} from './consts';
+import {signup, validateLogin, logout} from './validateLogin';
+import { deleteAccount } from './delacc';
+import {updateUser, realias, toggleTheme} from './updateUser'
+import {userRequest} from './userRequest';
+import {EE} from './EEHandler';
+import {addTask, getTasks, updateTask, deleteTask} from './tasks';
+import {getLogs, log, purgeLogs, visitCt, incrRequests} from './logging';
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser')
+import {supportHandler, roomRequest, sendMsg, createRoom, deleteRoom, WHOIS} from './supportRooms'
+const urlencodedParser = bodyParser.urlencoded({ extended: false }) 
 var RateLimit = require('express-rate-limit');
 
-export let pushEvents: any[][] = [];
-export let hidEvents: any[][] = [];
-export let pushUserEvents: any[][] = [];
-export let hidUserEvents: any[][] = [];
-export let users: any[][] = [];
-export let hidUsers: any[][] = [];
-// import {pushEvents} from './initialiser';
-// 
-
-export async function updateServer() { 
-  systemLog("");
-  
-  systemLog("Server active!")
+export async function initServer() {
   var limiter = RateLimit({
-    windowMs: 10*1000, // 1 minute
+    windowMs: 10*1000, // 10 seconds
     max: 50,
     message: "Too many requests, please try again later.",
     statusCode: 429, // 429 status = Too Many Requests (RFC 6585)
   });
-  
-  // apply rate limiter to all requests
   app.use(limiter);
+  app.use(new cookieParser());
   
-  app.get('/', (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'index.html' ));
-  });
-  app.get('/favicon.ico', (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'favicon.ico' ));
-  });
-  app.get('/NotoSansDisplay-Variable.ttf', (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'NotoSansDisplay-Variable.ttf' ));
-  });
-  app.get('/status/status_raw.html', (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'status_raw.html' ));
-  });
+  app.get('/', (req:Request, res:any) => {
+    res.sendFile(frontendDir+'/index.html');
+    incrRequests();
+  })
   
-  app.get('/frontend.js', (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../.build/frontend', 'frontend.js' ));
+  app.get('/register', (req:any, res:any) => {
+    res.sendFile(frontendDir+'/signup.html');
+    incrRequests();
   });
 
-  app.get('/login.js', (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../.build/frontend', 'login.js' ));
+
+  app.get('/account', (req:any, res:any) => {
+    res.sendFile(frontendDir+'/config.html');
+    incrRequests();
   });
 
-  app.get('/login', (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'login.html' ));
-  });
-
-  app.get('/admin', (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'admin.html' ));
-  });
-
-  app.get('/logout', (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'logout.html' ));
-  });
-
-  app.get('/signup', (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'signup.html' ));
-  });
   
-  app.post('/login', urlencodedParser, function (req:any, res:any) {  
-   // Prepare output in JSON format  
-    if (req.body.action == "bMsg") res.end(JSON.stringify("ACCESS"));
-    validate(decodeURIComponent(req.body.user) as string, decodeURIComponent(req.body.pass) as string, req.body.action, req.body.access as string, res, req.body.token as string)
-   
+  app.get('/EE', (req:any, res:any) => {
+    EE(true, (_status:string, data:any, _token:string)=>{
+      res.set('Content-Type', 'text/html')
+      res.send(Buffer.from(eeFormat(data.data)));
+    }, "", "")
+    
+    incrRequests();
   });
 
-  app.get("/users?*", async (req:any, res:any) => {
+  
+
+  app.get('/support', (req:any, res:any) => {
+    let match = req.url.match('\\?room=('+roomRegex+")");
+    if (match) {
+      if (!supportHandler.checkFoundQ(match[1])) {
+        console.log("Room not found")
+        res.sendFile(frontendDir+"/room404.html");
+        return;
+      }
+      else res.sendFile(frontendDir+'/support.html');
+    }
+    else res.sendFile(frontendDir+'/supportIndex.html');
+    incrRequests();
+  });
+
+  app.get('/accountDel', (req:any, res:any) => {
+    res.sendFile(frontendDir+'/delAcc.html');
+    incrRequests();
+  });
+
+   app.get('/whois', (req:any, res:any) => {
+    res.sendFile(frontendDir+'/aboutme.html');
+    incrRequests();
+  });
+
+  app.get("/cmd", urlencodedParser, async (req:any, res:any) => {
+    makeRequest(req.query.action, req.cookies.sessionID, null, (s:string, d:any, token:string)=>{
+      console.log(d);
+      if (s == "SUCCESS") res.sendFile(frontendDir+'/actionComplete.html');
+      else {res.sendFile(frontendDir+'/error.html')}
+    })
+    incrRequests();
+  })
+    
+  app.get('*/favicon.ico', (req:Request, res:any)=> {
+    res.sendFile(rootDir+'/favicon.ico')
+    incrRequests();
+  })
+
+  
+  app.get('/support.js', (req:any, res:any) => {
+    res.sendFile(frontendDir+"support.js");
+    incrRequests();
+  })
+  
+  app.get('/*.js*', (req:any, res:any) => {
+    res.sendFile(jsDir+req.url);
+    incrRequests();
+  })
+
+  
+  app.get('/*.ts', (req:any, res:any) => {
+    res.sendFile(jsDir+req.url);
+    incrRequests();
+  })
+
+  app.get('/*.css', (req:any, res:any) => {
+    res.sendFile(frontendDir+req.url);
+    incrRequests();
+  })
+
+  app.get("/stream", (req:any, res:any) =>{
     res.set({
       'Cache-Control': 'no-cache',
       'Content-Type': 'text/event-stream',
       'Connection': 'keep-alive'
     });
     res.flushHeaders();
-
-    // Tell the client to retry every 10 seconds if connectivity is lost
-    
     res.write("retry:500\n\n");
-    // console.log(req.query.room)
-    
-    let roomIdx = sysRooms.indexOf("OnlineSUPPORT|"+req.query.room);
-    let roomIdx2 = hidRooms.indexOf("HIDDEN|"+req.query.room);
-    // console.log(roomIdx2);
-    if (roomIdx < 0 && roomIdx2 < 0) {
-      res.end();
-      console.log("Invalid room: "+req.query.room);
-      return;
-    }
-    // console.log(roomIdx);
-    if (roomIdx >= 0) pushUserEvents[roomIdx].push(res);
-    else hidUserEvents[roomIdx2].push(res);
+    // add the connection
+    supportHandler.addConnection(res, req.query.room, req.cookies.sessionID);
     res.on("close", () => {
-      if (roomIdx >= 0) pushUserEvents[roomIdx].splice(pushUserEvents[roomIdx].indexOf(res), 1);
-      else hidUserEvents[roomIdx2].splice(hidUserEvents[roomIdx2].indexOf(res), 1);
+      // clear the connection
+      supportHandler.removeConnection(res, req.query.room, req.cookies.sessionID);
       res.end();
       // console.log("Removed stream");
     });
   });
 
-  app.get("/stream?*", async (req:any, res:any) => {
-    res.set({
-      'Cache-Control': 'no-cache',
-      'Content-Type': 'text/event-stream',
-      'Connection': 'keep-alive'
-    });
-    res.flushHeaders();
-
-    // Tell the client to retry every 10 seconds if connectivity is lost
-    
-    res.write("retry:500\n\n");
-    // console.log(req.query.room)
-    
-    let roomIdx = sysRooms.indexOf("OnlineSUPPORT|"+req.query.room);
-    let roomIdx2 = hidRooms.indexOf("HIDDEN|"+req.query.room);
-    // console.log(roomIdx2);
-    if (roomIdx < 0 && roomIdx2 < 0) {
-      res.end();
-      console.log("Invalid room: "+req.query.room);
+  app.get('/*', (req:any, res:any) => {
+    let requrl = req.url.match("([^?]*)\\??.*")[1]
+    let idx = validPages.findIndex((obj)=>obj.toLowerCase()==requrl.toLowerCase());
+    if (idx>=0) res.sendFile(frontendDir+validPages[idx]+".html");
+    else res.sendFile(frontendDir+"404.html");
+    incrRequests();
+  })
+  
+  
+  app.post('/server', urlencodedParser, async (req:any, res:any) => {
+    incrRequests();
+    if (req.headers['content-length'] > 60000) {
+      res.set("Connection", "close");
+      res.status(413).end();
       return;
     }
-    // console.log(roomIdx);
-    if (roomIdx >= 0) {
-      pushEvents[roomIdx].push(res);
-      pushUserEvents[roomIdx].push(res);
-      
-      // console.log("User joined stream "+req.query.room)
-      validate("", "", "userReq", "internal", (id:string)=>{
-        sendMsgAllRooms(req.query.room, "+"+id+"\\n")
-        if (roomIdx >= 0) users[roomIdx].push(id);
-        else hidUsers[roomIdx2].push(id);
-      }, req.query.token);
-    }
-    else {
-      hidEvents[roomIdx2].push(res);
-      hidUserEvents[roomIdx2].push(res);
-      // console.log("User joined stream "+req.query.room)
-      validate("", "", "userReq", "internal", (id:string)=>{
-        sendMsgAllRooms(req.query.room, "+"+id+"\\n")
-        if (roomIdx >= 0) users[roomIdx].push(id);
-        else hidUsers[roomIdx2].push(id);
-      }, req.query.token);
-    }
-    res.on("close", () => {
-      if (roomIdx >= 0) pushEvents[roomIdx].splice(pushEvents[roomIdx].indexOf(res), 1);
-      else hidEvents[roomIdx2].splice(hidEvents[roomIdx2].indexOf(res), 1);
-      res.end();
-      // console.log("Removed stream "+req.query.room);
-      validate("", "", "userReq", "internal", (id:string)=>{
-        if (roomIdx >= 0) {
-          let idx = users[roomIdx].indexOf(id);
-          if (idx >= 0) users[roomIdx].splice(idx, 1);
-        } else {
-          let idx = hidUsers[roomIdx2].indexOf(id);
-          if (idx >= 0) hidUsers[roomIdx2].splice(idx, 1);
-        }
-        sendMsgAllRooms(req.query.room, "-"+id+"\\n")
-      }, req.query.token);
-    });
-  });
-
-  app.get("/testevents", (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'support_v2.html' ));
-  })
-
-  app.get('/status', (req:any, res:any) => {
-    let str = "BetaUtilities is in: ";
-    let prefixedRms = [];
-    let euphRooms = 0;
-    for (let i=0; i<sysRooms.length; i++) {
-      if (!sysRooms[i].match("\\|")) {
-        euphRooms++;
-        prefixedRms.push(`<a href="https://euphoria.io/room/${sysRooms[i]}">&${sysRooms[i]}</a>`);
+    var body = await parse.json(req);
+    if (!body) res.end(JSON.stringify({status:"ERROR", data:null}));
+    // let cookiematch = req.cookies.match("sessionID=[0-9a-zA-Z\\-]");
+    makeRequest(body.action, req.cookies.sessionID, body.data, (s:string, d:any, token:string)=>{
+      /*if(body.action=="login"||body.action == "logout" ||
+        body.action == "delAcc" || body.action == "signup")*/
+      if (ignoreLog.indexOf(body.action)>=0){}
+      else if (s=="SUCCESS") {
+        log("Action performed:"+body.action+", response:"+JSON.stringify(d));
       }
-      else {
-        let roomName = sysRooms[i].match("\\|(.+)")[1];
-        prefixedRms.push(`<a href="/support?room=${roomName}">#${roomName}</a>`);
-      }
-    }
-    for (let j = 0; j < prefixedRms.length - 1; j++) { str += prefixedRms[j] + ", "; }
-    str += (prefixedRms.length>1?"and ":"")+prefixedRms[prefixedRms.length - 1] + "!";
-    if (euphRooms == 0) {
-      str += "<br> ERROR: Rooms failed on <a href='https://euphoria.io'>euphoria</a>";
-    } // rooms failed
-    fs.writeFileSync("frontend/status_raw.html",str);
-    res.sendFile(path.join( __dirname, '../frontend', 'status.html' ));
+      else log("Action performed, error on "+body.action+", error:"+d.error);
+      res.cookie('sessionID', token?token:"", {httpOnly: true, secure:true, sameSite:"Strict"});
+      res.end(JSON.stringify({status:s, data:d}));
+    })
   });
-
-  app.get("/globalformat.css", (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'globalformat.css' ));
-  }); 
-
-  app.get("/support", (req:any, res:any) => {
-    let roomIdx = sysRooms.indexOf("OnlineSUPPORT|"+req.query.room);
-    let roomIdx2 = hidRooms.indexOf("HIDDEN|"+req.query.room);
-    // console.log(roomIdx, req.query.room)
-    if (roomIdx < 0 && roomIdx2 < 0 && req.query.room) {res.sendFile(path.join( __dirname, '../frontend', 'roomNotFound.html'))}
-    else if(req.query.room) res.sendFile(path.join( __dirname, '../frontend', 'support.html'));
-    else res.sendFile(path.join( __dirname, '../frontend', 'supportIndex.html'));
-    // validate("", "", "checkAccess", "", res, req.query.token)
-  })
-
-  app.get("/todo", (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'TODO.html' ));
-    // validate("", "", "checkAccess", "", res, req.query.token)
-  })
-  
-  app.get("/syslog", (req:any, res:any) => {
-    validate("", "", "checkAccess_A", "", res, req.query.token)
-  })
-
-  app.get('/about', (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'about.html' ));
-  });
-
-  app.get('/commands', (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'commands.html' ));
-  });
-
-  app.get('/contact', (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'contact.html' ));
-  });
-
-  app.get('/screwit', (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'bothered.html' ));
-  });
-
-  app.get('/screwit.js', (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', 'bothered.js' ));
-  });
-
-  app.get('*.js.map', (req:any, res:any)=> {
-    res.end();
-  })
-  
-  app.get('/*', (req:any, res:any) => {
-    res.sendFile(path.join( __dirname, '../frontend', '404.html' ));
-  });
-
-  // app.use(function(req:any, res:any, next:any) {
-  //     res.status(404).render('frontend/landing.html');
-  // });
-  // app.get()
   
   app.listen(port, () => {
-    systemLog(`Front-end is running on ${port}.`);
-  });
+    console.log(`BetaUtilities V2 listening on port ${port}`)
+  })
 }
 
-export function sendMsgAllRooms(room:string, msg:string) {
-  let roomId = sysRooms.indexOf("OnlineSUPPORT|"+room);
-  let roomId2 = hidRooms.indexOf("HIDDEN|"+room);
-  if (roomId<0 && roomId2<0) {
-    console.log("invalidROOM:"+room)
+function makeRequest(action:string|null, token:string, data:any|null, callback: (status:string, dat:any, token:string)=>any) {
+  if (!connectionSuccess) {
+    callback("ERROR", {error:"Database connection failure"}, token);
     return;
   }
-  else if (roomId >= 0) 
-    for (let i=0; i<pushEvents[roomId].length; i++) 
-      pushEvents[roomId][i].write("data:"+msg+"\n\n");
-  else 
-    for (let i=0; i<hidEvents[roomId2].length; i++) 
-      hidEvents[roomId2][i].write("data:"+msg+"\n\n");
+  switch (action) {
+    case 'test':
+      callback("SUCCESS", {abc:"def", def:5}, token);
+      break;
+    case 'login': 
+      // validate login-data before sending to server
+      data = data as {user:string, pass:string, persistQ:boolean};
+      validateLogin(data.user, data.pass, data.persistQ, token).
+        then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+      break;
+    case 'signup':
+      data = data as {user:string, pass:string};
+      signup(data.user, data.pass, token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});;
+      break;
+    case 'userRequest': 
+      userRequest(token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+      break;
+    case 'roomRequest':
+      let obj2 = roomRequest(token); // this one is synchronous
+      callback(obj2.status, obj2.data, obj2.token);
+      break;
+    case 'createRoom':
+      data = data as {name:string}
+      createRoom(data.name, token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+      break;
+    case 'deleteRoom':
+      data = data as {name:string}
+      deleteRoom(data.name, token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+      break;
+    case 'statusRequest':
+      let obj3 = roomRequest(token, true);
+      callback(obj3.status, obj3.data, obj3.token);
+      break;
+    case 'getEE':
+      EE(true, callback, token, "");
+      break;
+    case 'setEE':
+      data = data as {data:string}
+      EE(false, callback, token, data.data);
+      break;
+    case 'updateuser': 
+      data = data as {user:string, oldPass: string, pass:string, newPermLevel:string};
+      updateUser(data.user, data.oldPass, data.pass, data.newPermLevel, token)
+      .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+      break;
+    case 'delAcc':
+      data = data as {user:string, pass:string};
+      deleteAccount(data.user, data.pass, token)
+      .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+      break;
+    case 'logout':
+      logout(token)
+      .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+      break;
+    case 'logout_all':
+      logout(token, true)
+      .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+      break;
+    case 'sendMsg':
+      data = data as {msg:string, room:string};
+      if (data.msg.length == 0) {
+        callback("SUCCESS", null, token); break;
+      }
+      sendMsg(data.msg.slice(0, 1024), data.room, token, callback);
+      break;
+    case 'lookup':
+      WHOIS(token, data.user)
+      .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "getLogs":
+      getLogs(token)
+      .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "purgeLogs":
+      purgeLogs(token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "realias":
+      realias(data.alias, token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "visits":
+      visitCt(token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "addTODO":
+      addTask(token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "getTodo":
+      getTasks(token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "updateTODO":
+      updateTask(token, data.id, data.updated)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "deleteTODO":
+      deleteTask(token, data.id)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "completeTODO":
+      deleteTask(token, data.id, true)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case 'toggleTheme':
+      toggleTheme(token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    default:
+      callback("ERROR", {error: "Unknown command string!"}, token);
+  }
+  return; 
 }
+
+
+function eeFormat(data:string) {
+  return `<!DOCTYPE html>
+<html>
+  <head>
+    <script src='./utils.js'></script>
+    <title>Everyone Edits | BetaOS Systems</title>
+    <script>
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+    </style>
+  </head>
+  <body onload = "globalOnload();">
+    <div class="main_content">
+    <header>
+      <h2>Everybody edits!</h2>
+      <hr class="rounded">
+    </header>
+      ${data}
+    </div>
+    
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>`;
+}
+
+const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
+                    '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme'];
+const ignoreLog = ["getEE", "userRequest", 'getLogs', 'visits', 'roomRequest', 'sendMsg'];

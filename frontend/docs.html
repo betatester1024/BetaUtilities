@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='./utils.js'></script>
+    <title>Styling Documentation | BetaOS Systems</title>
+    <script>
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+    </style>
+  </head>
+  <body onload = "globalOnload();">
+    <div class="main_content">
+      <header>
+        <h2>Styling Documentation</h2>
+        <hr class="rounded">
+      </header>
+      <div class="btnRow">
+        <button class="btn szThird">1/3 size<div class="anim"></div></button>
+        <button class="btn szHalf">1/2 size<div class="anim"></div></button>
+        <button class="btn szTwoThirds">2/3 size<div class="anim"></div></button>
+        <button class="btn szFull">Full size<div class="anim"></div></button><br>
+        <button class="btn fssml">Font size: small<div class="anim"></div></button>
+        <button class="btn fsmed">Font size: medium<div class="anim"></div></button>
+        <button class="btn">Font size: default<div class="anim"></div></button>
+        <button class="btn fslg">Font size: large<div class="anim"></div></button><br>
+        <button class="btn grn">Colour: green<div class="anim"></div></button>
+        <button class="btn ylw">Colour: yellow<div class="anim"></div></button>
+        <button class="btn red">Colour: red<div class="anim"></div></button>
+        <button class="btn gry">Colour: grey<div class="anim"></div></button>
+        <button class="btn">Colour: default<div class="anim"></div></button><br>
+        <div class="inpContainer">
+          <input class="inp" placeholder="Input. Should be contained in a form." autofocus>
+          <div class="anim inp"></div>
+        </div>
+        <button class="btn szFull" onclick="alertDialog('This is the alert.', ()=>{alert('Alert callback')})">Alert: default<div class="anim"></div></button>
+        <button class="btn szFull grn" onclick="alertDialog('This is the second alert.', ()=>{alert('Alert callback two')}, 2)">Alert: cancellable<div class="anim"></div></button>
+      </div>
+      <a class="btn" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+    </div>
+    
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,37 +1,32 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>System commands</title>
-    <meta name="viewport" content="width=device-width">
-    <script src="/login.js">
-    </script>
+    <script src='./utils.js'></script>
+    <title>System Commands | BetaOS Systems</title>
     <script>
       function onLoad() {
         let ele = document.getElementById("ctntp");
-        ele.innerHTML = document.URL.match("nick=(.*)")?
-          ele.innerHTML.replaceAll(/BetaUtilities/gmui, document.URL.match("nick=(.*)")[1]):
-          ele.innerHTML;
+        // nasty hack
+        let match = decodeURIComponent((document.URL.match("nick=(.*)")??["","BetaOS_System"])[1]);
+        ele.innerHTML =ele.innerHTML.replaceAll(/BetaUtilities/gmu, match);
         ele = document.getElementById("h");
-        ele.innerHTML = document.URL.match("nick=(.*)")?
-          ele.innerHTML.replaceAll(/BetaUtilities/gmui, document.URL.match("nick=(.*)")[1]):
-          ele.innerHTML;
+        ele.innerHTML =ele.innerHTML.replaceAll(/BetaUtilities/gmu, match);
       }
     </script>
-    
+    <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100;400;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
-<!--     <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap">  -->
     <style>
-      body {
-        overflow-y: auto;
-      }
       #content {
         text-align: left;
       }
       p {
-        width: 100%; 
+        width: 95%; 
+        margin: 0 auto;
         font-size: large;
       }
       a {
@@ -42,30 +37,29 @@
         position: relative; 
         top:0.2em;
       }
-      button {
-        position: relative;
-        left: auto;
-        margin: 0 auto;
-        width: unset;
-        display: block;
+      kbd {
+        font-family: "Noto Sans Mono", monospace;
+        border-radius: 5px;
+        padding-left: 2px;
+        padding-right: 2px;
+        background-color: var(--system-blue2)
       }
-      .HOME {
-        width: 80vw;
+      h2 {
+        font-variant-caps: unset;
       }
     </style>
   </head>
-  
-  
-  <body onload = "onLoad();">
-    
-    <div id = "mainDiv">
-      <h1 id="h">@BetaUtilities commands</h1>
-      <hr class="rounded"></hr>
+  <body onload = "globalOnload(); onLoad()">
+    <div class="main_content">
+      <header>
+        <h2 id="h"><kbd>@BetaUtilities</kbd> Commands</h2>
+        <hr class="rounded">
+      </header>
       <div id="content">
 
         <p id="ctntp">
           BetaUtilities is a bot that connects to the online discussion site 
-          <a href="https://euphoria.io">Euphoria</a>'s "rooms". It automatically responds
+          <a href="https://euphoria.io">Euphoria</a> and the <a href="/support">Support system</a>'s' <kbd>room</kbd>s. It automatically responds
           to commands such as <kbd>!help</kbd> and provides a variety of features:<br>
           (The bot sometimes appears as a different username according to the room 
           it is currently in.)<br>
@@ -89,8 +83,8 @@
           <kbd>!runStats @BetaUtilities</kbd> - Shows you statistics on how many times BetaUtilities has been run,
           and how many times it has been @-mentionned. <br>
           <kbd>!creatorInfo</kbd>,<kbd>!version</kbd> - Pretty self-explanatory. <br>
-          <kbd>!instant</kbd> - Get the <a href="instant.leet.nu">Instant</a> room of the same name.
-          <kbd>!leet</kbd> - See this room in <a href="euphoria.leet.nu">EuphLeet</a>!
+          <kbd>!instant</kbd> - Get the <a href="instant.leet.nu">Instant</a> room of the same name.<br>
+          <kbd>!leet</kbd> - See this room in <a href="euphoria.leet.nu">EuphLeet</a>!<br>
           <kbd>!status @BetaUtilities</kbd> - Sends this site to the room.<br>
           <kbd>!issue/!bug/!feature/!syslog/!support</kbd> - Sends a link to the respective features on the site.<br>
           <kbd>!activeRooms @BetaUtilities</kbd> - Shows all the rooms BetaUtilities is active in. <br>
@@ -103,25 +97,31 @@
           <kbd>!wake</kbd>/<kbd>!wake @user</kbd>/<kbd>!play</kbd>/<kbd>!play @user</kbd> - 
           Stops screaming at you or any user. <br>
           <kbd>!issue</kbd>/<kbd>!bug</kbd>/<kbd>!feature</kbd> - File an issue/bug/feature request 
-          (same <a href="https://github.com/betatester1024/BetaUtilities/issues/new/choose">link</a>)
+          (same <a href="https://github.com/betatester1024/Betautilities/issues/new/choose">link</a>)<br>
           <kbd>!antispam</kbd> - Configures AntiSpam activation. Requires a code entry.<br>
           <kbd>!remindme of [MSG] in [1d2h3m4s] </kbd> - Reminds you of whatever you want after a specified time. 
           Pretty lenient with spaces.<br>
           <kbd>!about @[USER] </kbd> - Retrieves that user's about-message.<br>
           <kbd>!about set [MSG]</kbd> - Sets your about-message. Introduce yourself!<br>
-          <b>Some features are hidden! <a href="/contact">ask BetaOS</a> about them, or find
+          <b>Some features are hidden! !tell <kbd>@betatester1024</kbd> or find
           us in <a href="https://euphoria.io/room/xkcd">&xkcd</a>/<a href="/support?room=main_support">#main_support</a>
-          to ask about the features!</b>
+          to (maybe) find out more about them.</b>
         </p>
-                
-        <button class="HOME" onclick="window.close();">&#x00AB Close<br><hr class="btnHr"></hr></button>
+      </div>
+      <a class="btn" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+    </div>
+    
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
       </div>
     </div>
-<!--     <h1 class="beforeoverload" id="h1">Sorry, this is taking longer than expected.  -->
-<!--       <br> -->
-<!--       <a href = '/'> Return to home</a> -->
-<!--     </h1> -->
-<!--     <div id="alert" onclick = "clearalert()" onkeydown="clearalert()"><p id="alerttxt" style="width: 90%; font-size: 1.8em; color:#0a84ff;"></p><button style="position: relative; top: 50vh; height: 4em;"><u>> Continue <</u></button></div> -->
-<!--     <div id="overlay"></div> -->
   </body>
- </html>
+</html>

@@ -1,34 +1,47 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Logout</title>
-    
-    <script src="/login.js"></script>
-    <script> 
-    function onLoad() {
-      console.log("Logging user out");
-      setTimeout(()=>{validateLogin("logout")}, 1000);
-    }
+    <script src='./utils.js'></script>
+    <title>Logout | BetaOS Systems</title></title>
+    <script>
+      function logout() {
+        let redirect = document.URL.match("redirect=(.*)$");
+        let option = document.URL.match("options=all$");
+        send(JSON.stringify({action:option?"logout_all":"logout"}), (res)=>{
+          if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{window.open('/', '_self')});
+          else {
+            alertDialog("Successfully logged out!", ()=>{window.open('/', '_self');});
+          }
+        });
+      }
+      
     </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
     <style>
-
     </style>
   </head>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
-  <body onload = "onLoad()">
-    <div id = "mainDiv">
-      <h1>Logging you out now.</h1>
-      <hr class="rounded"></hr>
-      <h1>Awaiting server response...</h1>
+  <body onload = "globalOnload(()=>{logout()})">
+    <div class="main_content">
+      <header>
+        <h2>Logging you out...</h2>
+        <hr class="rounded">
+        <h1>A moment, please. Logging you out.</h1>
+      </header>
     </div>
-    <h1 class="overload">Sorry, this is taking longer than expected. 
-      <br>
-      <a href = './'> Return to home</a>
-    </h1>
-     <div id="alert" onclick = "clearalert()" onkeydown="clearalert()"><p id="alerttxt" style="width: 90%"></p><button style="position: relative; top: 50vh; height: 4em;"><u>> Continue <</u></button></div>
-    <div id="overlay"></div>
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
   </body>
- </html>
+</html>

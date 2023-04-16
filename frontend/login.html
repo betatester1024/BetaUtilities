@@ -1,56 +1,85 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Service Login</title>
-    <meta name="viewport" content="width=device-width">
-    <script src="../login.js">
-    </script>
-     <link rel="stylesheet" href="/globalformat.css">
-    <style>
-      #loginBTN {
-        width: 89vw;
-        border-radius: 3vh;
-        border: none !important;
+    <script src='./utils.js'></script>
+    <title>Login | BetaOS Systems</title>
+    <script>
+      const accessLevels = ["Error-level", "User", "Admin", "Super-admin"];
+      function login() {
+        let usr = document.getElementById("userInp");
+        let pwd = document.getElementById("pwdInp");
+        let ck = document.getElementById("ckInp");
+        let redirect = document.URL.match("redirect=(.*)$")
+        send(JSON.stringify({action:"login", data:{user:usr.value, pass:pwd.value, persistQ:ck.checked}}), (res)=>{
+          if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{});
+          else {
+            alertDialog("Welcome, "+usr.value +" ("+accessLevels[res.data.perms]+")", ()=>{
+              if (redirect) window.open(redirect[1], '_self');
+              else window.open("/", '_self');
+            });
+          }
+        });
+        pwd.value="";
       }
+      
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
     </style>
-   
   </head>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
-  <body onload = "onLoad(); setTimeout(()=>{document.getElementById('userINP').focus();}, 500);">
-    <div id = "mainDiv">
-      <h1>Login</h1>
-      <hr class="rounded"></hr>
-      <div id="login">
-      <form action = "javascript:validateLogin()";>
-        <div id="userDiv" onclick="document.getElementById('userINP').focus();"  onchange="document.getElementById('passINP').focus();">
-<!--           <p id="userP">Username:</p> -->
-          <input type="text" placeholder="Username" id="userINP"/>
-          <hr class="inpHr" id="userhr"></hr>
-        </div><div id="pwdDiv" onclick="document.getElementById('passINP').focus();">
-<!--           <p id="passP"> -->
-<!--             Password:</p> -->
-          <input type="password" id="passINP" placeholder="Password"/>
-          <hr class="inpHr"></hr>
-        </div>
-        <button onclick="window.open(document.URL.replace('login', 'signup'), '_self')" type="button">
-          Sign up instead<br>
-          <hr class="btnHr"></hr>
-        </button>
-        <button id="loginBTN" type="submit">
-          Log into BetaOS Services<br>
-          <hr class="btnHr"></hr>
+  <body onload = "globalOnload();">
+    <div class="main_content">
+      <header>
+        <h2>System Login</h2>
+        <hr class="rounded">
+      </header>
+      <div class="btnRow">
+        <form action="javascript:login()">
+          <div class="inpContainer">
+            <input id="userInp" placeholder="Username" autofocus >
+            <div class="anim inp"></div>
+          </div>
+          <div class="inpContainer">
+            <input id="pwdInp" type="password" placeholder="Password">
+            <div class="anim inp"></div>
+          </div>
+          <div class="inpContainer">
+            <label class="inpContainer">
+              <input id="ckInp" type="checkbox" placeholder="Password">
+              <span class="blu nohover fsmed">Stay logged in</span>
+              <div class="anim inp"></div>
+            </label>
+          </div>
+          <button type=submit class="btn szFull grn">
+            <span class="material-symbols-outlined">login</span>
+            Log into BetaOS Services<div class="anim"></div></button>
+<!--           <button type=button class="btn szFull" onclick="alertDialog('TEST')">
+            <span class="material-symbols-outlined">looks_one</span>
+            Test alert dialog<div class="anim"></div></button> -->
+          <button class="btn szFull"
+            onclick="window.open(document.URL.replace('login', 'signup'), '_self')">
+            <span class="material-symbols-outlined">arrow_forward_ios</span>
+            Sign up instead<div class="anim"></div></button>
+          <a class="btn szFull" href="/">
+            <span class="material-symbols-outlined">arrow_back_ios</span>
+            Return to home<div class="anim"></div></a>
+        </form>
+      </div>
+    </div>
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
         </button>
       </div>
-    </form>
-      <button class="HOME" onclick="window.open('../', '_self');">&#x00AB Return to home<br><hr class="btnHr"></hr></button>
     </div>
-    <h1 class="beforeoverload" id="h1">Sorry, this is taking longer than expected. 
-      <br>
-      <a href = './'> Return to home</a>
-    </h1>
-    <div id="alert" onclick = "clearalert()" onkeydown="clearalert()"><p id="alerttxt" style="width: 90%"></p><button style="position: relative; top: 50vh; height: 4em;"><u>> Continue <</u></button></div>
-    <div id="overlay"></div>
   </body>
- </html>
+</html>

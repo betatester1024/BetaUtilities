@@ -1,288 +1,58 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>BetaOS Support</title>
+    <script src='./utils.js'></script>
+    <title>Support | BetaOS Systems</title>
+    <script src = '/support.js'>
+    </script>
     <meta name="viewport" content="width=device-width">
-    <script src="/login.js">
-    </script>
-    <script>
-      function onLoad() {
-        validateLogin("refresh", "");
-        validateLogin("refresh_users", "");
-        // setInterval(()=>{validateLogin("refresh", "")}, 2500);
-        document.getElementById("alert").hidden=true;
-        document.getElementById("h1").hidden=true;
-        // console.log(document.cookie);
-        let match = document.cookie.match("__Secure-user=(.+)");
-        // console.log(match[1]);
-        if (match) CURRUSER = match[1];
-        match = document.cookie.match("__Secure-perms=([0-9]+)");
-        // console.log(match[1]);
-        if (match) CURRPERMS = match[1];
-        document.getElementById("header").innerHTML = "Support: #"+
-          document.URL.match("\\?room=(.*)")[1];
-      }
-      // system refresh auto!
-      let LOADEDQ2 = false;
-      async function initClient()
-      {
-        
-        try {
-        console.log("Starting client.")
-        const source = new EventSource('/stream?room='+
-                                       document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1]+
-                                       "&token="+sessionID);
-        source.addEventListener('message', message => {
-          console.log('Got', message);
-          ele = document.getElementById("users");
-          let modif = message.data;
-          let removed = modif.match("^\\-(.+)\\\\n");
-          let added = modif.match("^\\+(.+)\\\\n");
-          while (removed || added) {
-            if (removed) {
-              ele.innerHTML= ele.innerHTML.replace(removed[1]+"<br>", "");
-              console.log("removed"+removed[1])
-            }
-            if (added) {
-              ele.innerHTML+= added[1]+"<br>";
-              console.log("added"+added[1]);
-            }
-            modif = modif.replaceAll(/^\-(.+)\\n/gm, "");
-            modif = modif.replaceAll(/^\+(.+)\\n/gm, "");
-            removed = modif.match("^\\-(.+)\\\\n");
-            added = modif.match("^\\+(.+)\\\\n");
-          }
-          ele = document.getElementById("msgArea");
-          let scrDistOKQ =  (ele.scrollTop) >= (ele.scrollHeight-ele.offsetHeight - 100)
-          document.getElementById("msgArea").innerHTML+=modif;
-          
-          if (!LOADEDQ2 || scrDistOKQ)
-          {
-            ele.scrollTop = ele.scrollHeight;
-            // console.log("Scrolling to bottom.")
-            LOADEDQ2 = true;
-          }
-
-          
-        });
-        } catch (e) {
-          console.log("Restartng client ("+e+")")
-          setTimeout(initClient, 0);
-        }
-      } // initClient();
-      
-      // async function initClient2()
-      // {
-        
-      //   try {
-      //   console.log("Starting userlist-watcher.")
-      //   // const source = new EventSource('/users?room='+
-      //                                  // document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1]);
-
-      //   source.addEventListener('message', message => {
-      //     // console.log('Got', message);
-
-      //     ele = document.getElementById("users");
-      //     let modif = message.data;
-      //     let removed = modif.match("-(.)");
-      //     let added = modif.match("-(.)");
-      //     if (removed) {
-      //       ele.innerHTML= ele.innerHTML.replace(removed[1]+"<br>", "");
-      //     }
-      //     if (added) {
-      //       ele.innerHTML+= added[1]+"<br>";
-      //     }
-          
-      //   });
-      //   } catch (e) {
-      //     console.log("Restarting userlist-watcher ("+e+")")
-      //     setTimeout(initClient2, 0);
-      //   }
-      // } // initClient();
-      
-    </script>
-    <link rel="stylesheet" href="/globalformat.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!--     <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap">  -->
-    <style>
-
-
-      
-      #mainDiv {
-/*         animation: rotate 0.5s infinite; */
-      }
-      
-      @keyframes rotate {
-        0% {
-          transform: rotate(0deg)
-        }
-        100% {
-          transform: rotate(360deg)
-        }
-      }
-      
-      h1 {
-        font-size: 3.7em;
-      }
-      hr.rounded {
-        width: 97vw;
-      }
-      input {
-        height: 1.8em;
-        font-size: 1.7em;
-        width: 100%;
-      }
-      a {
-        font-size: 1em;
-        color: #0a84ff;
-        width: 87vw;
-      }
-      p {
-        width: 87vw;
-        font-size: 1em;
-/*         display: block; */
-        color: #000;
-        overflow-wrap: break-word;
-        inline-size: 87vw;
-/*         animation-name: newMsg; */
-/*         animation-duration: 10s; */
-      }
-      hr {
-        margin-top: 5px !important;
-/*         max-width: 80%; */
-      }
-      button#send {
-        position: relative;
-        top: -0.6em;
-        width: 9%;
-        height: 1.4em;
-        border-radius: 10px;
-        right: 0px;
-        display: inline-block;
-      }
-      #mainDiv {
-        white-space: nowrap;
-      }
-      span {
-        font-size: 1.4em !important;
-        position: relative;
-        top: 5px;
-      }
-      #textDiv {
-        display: inline-block;
-        width: 85vw;
-      }
-      #msgArea {
-        overflow-y: scroll;
-        height: 70vh;
-        text-align: left;
-        overflow-x: scroll;
-        width: 79vw;
-        position: relative;
-        left: 0vw;
-        margin-left: 0px;
-        display: inline-block;
-      }
-      .internMSG{
-        width: 100%;
-      }
-      b {
-        color: #000;
-      }
-      p.admin, 
-      b.admin {
-        color: #0a84ff; 
-/*         text-shadow: 0px 0px 1px #FBBC05; */
-      }
-      .beta{
-        color: #00ee00;
-/*         text-shadow: 0px 0px 1px #00ee00;  */
-      }
-      p.beta {
-        color: #0a84ff; 
-      }
-      
-
-      i.beta {
-        color: #00e000;
-        width: 100%;
-        font-weight: 600;
-      }
-      .slashMe{
-/*         background-color: #c9c9c9; */
-        font-style: italic;
-      }
-      .slashMe > b {
-        font-style: italic;
-      }
-      b {
-        background-color: #eee;
-      }
-
-      @keyframes newMsg {
-        0% {background-color: rgba(0, 200, 0, 1);}
-        100% {background-color: rgba(0, 200, 0, 0);}
-      }
-      img {
-        max-width: 200px;
-        max-height: 200px;
-        cursor: pointer;
-        border-radius: 5px;
-      }
-      .HOME {
-        width: 45vw;
-      }
-      #users {
-        font-family: NotoSansDisplay;
-        color: #0a84ff;
-        text-align: left;
-        width: 15vw;
-        position: relative;
-        height: 70vh;
-/*         top: 0vw; */
-        display: inline-block;
-        vertical-align: top;
-      }
-    </style>
+    <link rel="stylesheet" href="/globalformat.css">
+    <link rel="stylesheet" href="/supportformat.css">
   </head>
-  
-  
-  <body onload = "onLoad(); initClient(); setTimeout(()=>{document.getElementById('textINP').focus({ preventScroll: true });}, 500);" onkeyup="document.getElementById('textINP').focus()">
-    <div id = "mainDiv">
-      <h2 id="header">BetaOS Support</h2>
-      <hr class="rounded"></hr>
-      <div id="msgArea">
-        <b>Retrieving your messages...</b>
-        <hr class="btnHr"></hr>
-      </div>
-      <div id="users">Active users:</div>
-      <div>
-        <form action="javascript:sendMsg()">
-          <div id="textDiv" >
-            <input id="textINP" type="text" placeholder="Enter a message...">
-            <hr class="inpHr"></hr>
+  <body onload = "globalOnload(); onLoad(); initClient()">
+    <div class="main_content">
+      <header>
+        <h2 id="header">Support</h2>
+        <hr class="rounded">
+      </header>
+        <div id="containingDiv">
+          <div id="msgArea">
+            <h2 id="placeholder"><span class="material-symbols-outlined">schedule</span> Loading your messages, a moment please...</h2>
           </div>
-          <button id="send" type="button" onclick="sendMsg();">
-            <span class="material-symbols-outlined">send</span><br>
-  <!--           <hr class="btnHr"></hr> -->
+          <h2>Users</h2>
+          <div id="userList" class="blu"></div>
+        </div><br>
+        <form action="javascript:sendMsg()">
+          <div class="szFull" id="inpContainment">
+            <input id="msgInp" placeholder="Enter a message..." autofocus autocomplete="off" >
+            <div class="anim inp"></div>
+          </div>
+          <button class="btn szIco" id="sendBtn">
+            <span class="material-symbols-outlined">send</span>
+            <div class="anim"></div>
           </button>
         </form>
+      <a class="btn" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+      <a class="btn" href="/support">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        To room listing<div class="anim"></div></a>
       </div>
-      <button class="HOME" onclick="window.open('../', '_self');">&#x00AB Return to home<br><hr class="btnHr"></hr></button>
-      <button class="HOME" onclick="window.open('/support', '_self');">&#x00AB Room listing<br><hr class="btnHr"></hr></button>
     </div>
-    <h1 class="beforeoverload" id="h1">Sorry, this is taking longer than expected. 
-      <br>
-      <a href = '/'> Return to home</a>
-    </h1>
-    <div id="alert" onclick = "clearalert()" onkeydown="clearalert()">
-      <p id="alerttxt" style="width: 90%; font-size: 1.8em; color:#0a84ff;">
-      </p><button style="position: relative; top: 50vh; height: 4em;">
-        <u>> Continue <</u>
-      </button>
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
     </div>
-    <div id="overlay"></div>
   </body>
- </html>
+</html>

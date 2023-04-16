@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='./utils.js'></script>
+    <title>WHOIS Service | BetaOS Systems</title></title>
+    <script>      
+      const accessLevels = ["Error-level", "User", "Admin", "Super-admin"];
+      function lookup() {
+        send(JSON.stringify({action:"lookup", data:{user:document.getElementById('inp').value}}), (res)=>{
+          if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{})
+          else {
+            document.getElementById("username").innerText = "@"+res.data.account.user;
+            document.getElementById("username2").innerText = "Accounts with alias @"+res.data.account.user;
+            document.getElementById("about1").innerText = res.data.account.about??"None provided";
+            document.getElementById("permLevel").innerText = "Access-level: "+res.data.account.perms + 
+              (res.data.account.perms!="N/A"?` (${accessLevels[res.data.account.perms]})`:"");
+            document.getElementById("tasks").innerText = "Tasks completed: "+(res.data.account.tasks?res.data.account.tasks:"0");
+            document.getElementById("results").style.display="block";
+            console.log(res);
+            let parent = document.getElementById("alias");
+            parent.innerHTML = "";
+            for (let i=0; i<res.data.users.length; i++) {
+              let uEle = document.createElement("p");
+              uEle.innerText = "User: @";
+              let kEle2 = document.createElement("kbd");
+              kEle2.innerText = res.data.users[i].user;
+              uEle.appendChild(kEle2);
+              let aEle = document.createElement("p");
+              aEle.innerText = "About: ";
+              let kEle = document.createElement("kbd");
+              kEle.innerText = res.data.users[i].about??"None provided";
+              aEle.appendChild(kEle);
+              let pEle = document.createElement("p");
+              pEle.innerText = "Access-level: "+res.data.users[i].perms + 
+              (res.data.users[i].perms!="N/A"?` (${accessLevels[res.data.users[i].perms]})`:"");
+              let tEle = document.createElement("p");
+              tEle.innerText = "Tasks completed: "+(res.data.users[i].tasks?res.data.users[i].tasks:"0");
+              
+              
+              parent.appendChild(uEle);
+              parent.appendChild(aEle);
+              parent.appendChild(pEle);
+              parent.appendChild(tEle);
+              parent.innerHTML += "<br><br>";
+            }
+          }
+        })
+      }
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      #results {
+        width: 80%;
+        margin: 0 auto;
+        text-align: left;
+      }
+      p {
+        font-size: 1.5em;
+      }
+      footer > p {
+        font-size: 1em;
+      }
+    </style>
+  </head>
+  <body onload = "globalOnload();">
+    <div class="main_content">
+      <header>
+        <h2>BetaOS WHOIS Lookup Service</h2>
+        <hr class="rounded">
+      </header>
+      <form id="form" action="javascript:lookup()">
+        <div class="inpContainer szHalf" style="margin: 0px auto">
+          <input class="inp" id="inp" placeholder="Search..." autofocus>
+          <div class="anim inp"></div>
+        </div>
+        <button class="btn szHalf">
+          <span class="material-symbols-outlined">help</span>
+          WHOIS LOOKUP<div class="anim"></div></button>
+        <div id="results" style="display: none">
+          <h2 class="fsmed">Direct matches for account-name: </h2>
+          <p>User: <kbd id="username"></kbd></p>
+          <p>About: <kbd id="about1"></kbd></p>
+          <p id="permLevel"></p>
+          <p id="tasks"></p>
+          <h2 class="fsmed" id='username2'>Accounts with alias </h2>
+          <div id="alias"></div>
+        </div>
+      </form>
+      <a class="btn" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+    </div>
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

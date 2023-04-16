@@ -1,0 +1,30 @@
+BetaOS Systems features
+- online site:
+login, sign-up [DONE]
+user access classes: basic user, anonymous account, admin, super-admin
+anonymous accounts: access support, enter messages
+user permissions: update username in support, update account, delete account, access todo list
+administrators: update user accounts, view systemlog + all user permissions, add rooms, remove rooms
+super-administrators: arbitrary code execution, management of betautilities 
+login redirects to other parts of site
+
+config panel -- manage account
+support -- contains rooms
+in rooms: (using socket events)
+- betautilities commands
+- renick
+- whois user feature
+- /me, links, #rooms, &rooms, image embeds, @user
+- userlist (using socket events)
+- unlisted rooms
+
+to do list
+- complete, delete, modify, add
+
+status-page
+- connections to online support and betautilities
+
+- betautilities module
+- about site
+
+- hidden game

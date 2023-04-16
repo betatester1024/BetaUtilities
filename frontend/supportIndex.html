@@ -1,93 +1,117 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Where to find support?</title>
-    <meta name="viewport" content="width=device-width">
-    <script src="/login.js">
-    </script><script>
+    <script src='./utils.js'></script>
+    <title>Room listing | BetaOS Systems</title>
+    <script>
       function onLoad() {
-        validateLogin("ROOMLISTING", "")
-        validateLogin("userReq", "")
+        send(JSON.stringify({action:"roomRequest"}), (res)=>{
+          if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});
+          else {
+            let btns = "";
+            for (let i=0; i<res.data.length; i++) {
+              btns += `<a class="btn fsmed" style="width:12em" href="/support?room=${res.data[i].slice(1)}">${res.data[i]}<div class="anim"></div></a>`;
+            }
+            document.getElementById("rooms").innerHTML = btns;
+          }
+        });
+        send(JSON.stringify({action:"userRequest"}), (res)=>{
+          if (res.status == "SUCCESS") {
+            if (res.data.perms >= 2) {
+              document.getElementById("admin").style.display="block";
+            }
+          }
+        })
+      }
+
+      function deleterm() {
+        let inp = document.getElementById("inp2");
+        
+        send(JSON.stringify({action:"deleteRoom", data:{name:inp.value}}), (res)=>{
+          if (res.status != "SUCCESS") {alertDialog("Error: "+res.data.error, ()=>{});}
+          else {alertDialog("Action successful!", ()=>{onLoad();});}
+        })
+        inp.value="";
+        
+      }
+      function createRm() {
+        let inp = document.getElementById("inp2");
+        send(JSON.stringify({action:"createRoom", data:{name:inp.value}}), (res)=>{
+          if (res.status != "SUCCESS") {alertDialog("Error: "+res.data.error, ()=>{});}
+          else {alertDialog("Action successful!", ()=>{onLoad();});}
+        })
+        inp.value="";
+      }
+      function visit() {
+        window.open("/support?room="+document.getElementById("inp").value, '_self');
       }
     </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
     <style>
-      button {
-        max-width: 10em;
-      }
-      #mainDiv {
-        overflow-y: scroll;
-        max-height: 95vh;
-        width: calc(100vw - 10px);
-        text-align: center;
-      }
-      .unsetWidth{
-        width: 10em;
-      }
-      input {
-        text-align: center;
-        width: 10em;
-      }
-      #newRoom {
-        width: unset;
-      }
-      form {
-        width: 20em;
-        margin: 0 auto;
-      }
-      .hazard{
-        color: #ee0000;
-        border: 2px solid #ee0000;
-      }
-      .hazard > hr {
-        border: 2px solid #ee0000;
+      #rooms {
+        width: 95%;
+        margin: 0px auto;
       }
     </style>
   </head>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@500&display=swap"> 
-  <body onload = "onLoad();">
-    <div id = "mainDiv">
-      <h1>Support rooms</h1>
-      <hr class="rounded"></hr>
-      <form action = "javascript:window.open('/support?room='+document.getElementById('enterRoomInp').value, '_self');"> 
-        <div class="inputDiv">
-          <input id="enterRoomInp" placeholder="Enter room-name">
-          <hr class="inpHr">
+  <body onload = "globalOnload(); onLoad()">
+    <div class="main_content">
+      <header>
+        <h2 id="header">Support rooms</h2>
+        <hr class="rounded">
+      </header>
+      <form action="javascript:visit()">
+        <div class="inpContainer szHalf" style="margin: 0px auto">
+          <input class="inp" id="inp" placeholder="Search..." autofocus>
+          <div class="anim inp"></div>
         </div>
-        <button type="submit">
-          Enter room<br>
-          <hr class="btnHr"></hr>
-        </button>
+        <button class="btn szHalf">
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          Visit<div class="anim"></div></button>
       </form>
-      <div id="innerDiv"></div>
-      <div id="newRoom" hidden>
-        <br><br>
-        <h2>Administrative tools</h2>
-        <hr class="rounded"></hr>
-        <form action = "javascript:validateLogin('newRoom', '');"> 
-          <div class="inputDiv">
-            <input id="newroominp" placeholder="Room name...">
-            <hr class="inpHr">
-          </div>
-          <button type="submit">
-            Create room!<br>
-            <hr class="btnHr"></hr>
-          </button>
-          <button type="button" class="hazard" onclick="validateLogin('delRoom', '');">
-            Delete room<br>
-            <hr class="btnHr"></hr>
-          </button>
-        </form>
+      <a class="btn grn" href="aboutme">
+        <span class="material-symbols-outlined">arrow_forward_ios</span>
+        Visit WHOIS service <div class="anim"></div></a>
+      <div id="rooms">
+        
+        <h2><span class="material-symbols-outlined">schedule</span>
+          Loading rooms, please wait.</h2>
       </div>
-      <button class="HOME" onclick="window.open('../', '_self');">&#x00AB Return to home<br><hr class="btnHr"></hr></button>
+      <div id="admin" style="display: none">
+        <h2 class="fsmed">Administrative tools</h2>
+        <hr class="rounded">
+        <form action="javascript:createRm()">
+        <div class="inpContainer szTwoThirds" style="margin: 0px auto">
+          <input class="inp" id="inp2" placeholder="Room name..">
+          <div class="anim inp"></div>
+        </div>
+        <button class="btn szHalf grn">
+          <span class="material-symbols-outlined">add_circle</span>
+          Create room<div class="anim"></div></button>
+        <button type="button" class="btn szHalf red" onclick="alertDialog('Confirm room deletion?', deleterm, 2);">
+          <span class="material-symbols-outlined">delete</span>
+          Delete room<div class="anim"></div></button>
+        </form>
+        
+      </div>
+     <a class="btn" href="/">
+      <span class="material-symbols-outlined">arrow_back_ios</span>
+      Return to home<div class="anim"></div></a>
     </div>
-    <h1 class="beforeoverload" id="h1">Sorry, this is taking longer than expected. 
-      <br>
-      <a href = '/'> Return to home</a>
-    </h1>
-     <div id="alert" onclick = "clearalert()" onkeydown="clearalert()"><p id="alerttxt" style="width: 90%"></p><button style="position: relative; top: 50vh; height: 4em;"><u>> Continue <</u></button></div>
-    <div id="overlay"></div>
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
   </body>
- </html>
+</html>

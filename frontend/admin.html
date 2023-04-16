@@ -49,6 +49,7 @@
       }
       
       function runCmd() {
+        if (document.getElementById("cmdInp").value.match("[^a-zA-Z_\\-]")) return;
         location.href="/cmd?action="+document.getElementById("cmdInp").value;
       }
     </script>

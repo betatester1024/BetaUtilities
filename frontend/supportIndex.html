@@ -10,7 +10,7 @@
           else {
             let btns = "";
             for (let i=0; i<res.data.length; i++) {
-              btns += `<a class="btn fsmed" style="width:12em" href="/support?room=${res.data[i].slice(1)}">${res.data[i]}<div class="anim"></div></a>`;
+              btns += `<a class="btn fsmed override" style="width:12em" href="/support?room=${res.data[i].slice(1)}">${res.data[i]}<div class="anim"></div></a>`;
             }
             document.getElementById("rooms").innerHTML = btns;
           }
@@ -70,11 +70,11 @@
           <input class="inp" id="inp" placeholder="Search..." autofocus>
           <div class="anim inp"></div>
         </div>
-        <button class="btn szHalf">
+        <button class="btn szHalf override">
           <span class="material-symbols-outlined">arrow_forward_ios</span>
           Visit<div class="anim"></div></button>
       </form>
-      <a class="btn grn" href="aboutme">
+      <a class="btn grn override" href="aboutme">
         <span class="material-symbols-outlined">arrow_forward_ios</span>
         Visit WHOIS service <div class="anim"></div></a>
       <div id="rooms">
@@ -99,7 +99,7 @@
         </form>
         
       </div>
-     <a class="btn" href="/">
+     <a class="btn override" href="/">
       <span class="material-symbols-outlined">arrow_back_ios</span>
       Return to home<div class="anim"></div></a>
     </div>

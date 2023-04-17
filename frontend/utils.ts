@@ -1,13 +1,5 @@
 function globalOnload(cbk:()=>any) {
   document.onkeydown = keydown;
-  let overlay = document.createElement("div");
-  overlay.className = "overlayLoader"
-  overlay.id = "overlayL";
-  overlay.style.left="200vh";
-  overlay.style.opacity="1";
-  overlay.innerHTML = `<span class="material-symbols-outlined loader">sync</span>
-  <p class="loadp fslg grn nohover">Loading.</p>`
-  document.body.appendChild(overlay);
   send(JSON.stringify({ action: "userRequest" }),
     (res) => {
       document.documentElement.className = res.data.darkQ?"dark":"";
@@ -20,18 +12,19 @@ function globalOnload(cbk:()=>any) {
         ele.innerHTML = `<a href='/login'>Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
-                      BetaOS Systems, 2023`;
+                      BetaOS Systems V2, 2023`;
       else {
         ele.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
                       <a href='/logout'>Logout</a> | 
                       <a href='/config'>Account</a> | 
                       <a href='/status'>Status</a> | 
                       <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
-                      BetaOS Systems, 2023`;
+                      BetaOS Systems V2, 2023`;
       }
       ftr.appendChild(ele);
       send(JSON.stringify({ action: "visits" }),
         (res) => {
+          overlay.style.backgroundColor="var(--system-grey2)";
           if (res.status != "SUCCESS") {
             alertDialog("Database connection failure. Please contact BetaOS.", ()=>{});
             ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`
@@ -67,8 +60,9 @@ function globalOnload(cbk:()=>any) {
 function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false) {
   let overlay = document.getElementById("overlayL");
   if (overlay && !onLoadQ) {
-    overlay.style.left="0vh";
+    // overlay.style.left="0vh";
     overlay.style.opacity="1";
+    
   }
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "server", true);
@@ -76,8 +70,9 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
       if (overlay) {
-        overlay.style.left="200vh";
+        // overlay.style.left="200vh";
         overlay.style.opacity="0";
+        // TIME = setTimeout(()=>{overlay.style.display="block"}, 600);
       }
       if (failureTimeout) clearTimeout(failureTimeout);
       else closeAlert(true);
@@ -92,10 +87,14 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
 }
 
 let failureTimeout: NodeJS.Timeout | null;
+let TIME:NodeJS.Timeout|null;
 let dialogQ = false;
 let cbk: () => any = () => { };
 let BLOCKCALLBACK = false;
 function alertDialog(str: string, callback: () => any, button: number = -1, failedReq: string = "") {
+  if (TIME) clearTimeout(TIME);
+  TIME = null;
+  console.log("Timeout cleared")
   let overlay = document.getElementById("overlayL");
   if (overlay) {
     overlay.style.left="200vh";
@@ -169,3 +168,18 @@ function toTime(ms: number) {
 function padWithZero(n: number) {
   return n < 10 ? "0" + n : n;
 }
+
+let overlay:HTMLDivElement;
+addEventListener("DOMContentLoaded", function() {
+  overlay = document.createElement("div");
+  overlay.className = "overlayLoader"
+  overlay.id = "overlayL";
+  overlay.style.left="0vh";
+  overlay.style.backgroundColor="var(--system-bg)";
+  overlay.style.opacity="1";
+  overlay.innerHTML = `<span class="material-symbols-outlined loader">sync</span>
+  <p class="loadp fslg grn nohover">Loading.</p>`
+  // document.appendChild(document.createElement("body"));
+  document.body.appendChild(overlay);
+    // Your code goes here
+});

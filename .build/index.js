@@ -16,18 +16,19 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var v2_exports = {};
-__export(v2_exports, {
+var betatester1024_exports = {};
+__export(betatester1024_exports, {
   DBConnectFailure: () => DBConnectFailure,
   connectionSuccess: () => connectionSuccess
 });
-module.exports = __toCommonJS(v2_exports);
+module.exports = __toCommonJS(betatester1024_exports);
 var import_server = require("./server");
 var import_database = require("./database");
 var import_supportRooms = require("./supportRooms");
 var import_logging = require("./logging");
 var import_consts = require("./consts");
 var import_wsHandler = require("./betautilities/wsHandler");
+var import_wordler = require("./betautilities/wordler");
 let connectionSuccess = true;
 let DBConnectFailure = null;
 const { exec } = require("child_process");
@@ -39,6 +40,7 @@ try {
         return;
       (0, import_server.initServer)();
       (0, import_database.DBMaintenance)();
+      (0, import_wordler.serverUpdate)();
       (0, import_logging.log)("Systems restarted");
       import_consts.uDB.findOne({ fieldName: "ROOMS" }).then((obj) => {
         for (let i = 0; i < obj.euphRooms.length; i++) {
@@ -60,7 +62,9 @@ try {
   DBConnectFailure = setTimeout(() => {
     connectionSuccess = false;
     console.log("Connection failed");
+    (0, import_logging.log)("Services failed. Rebooting now.");
     (0, import_server.initServer)();
+    (0, import_wordler.serverUpdate)();
     setTimeout(() => {
       exec("kill 1");
     }, 1e4);

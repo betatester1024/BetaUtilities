@@ -337,14 +337,7 @@ textarea {
   position: relative;
 }
 
-@media screen and (max-width: 600px) {
-  .alertlbl {
-    display: none;
-  }
-  .internal .btn {
-    width: 3em;
-  }
-}
+
 
 footer, #footer {
   margin-top: 20px;
@@ -352,21 +345,24 @@ footer, #footer {
 }
 
 .overlayLoader {
-  transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-out;
   width: 100vw;
   height: 100vh;
   position: absolute;
   top: 0px;
-  left: 500vh;
+  left: 0vh;
+  opacity: 1;
   z-index: 1;
   background-color: var(--system-grey2);
+  pointer-events: none;
 }
 
 .loader {
-  font-size: 30em !important;
+  pointer-events: none;
+  font-size: 10em !important;
   color: var(--system-blue);
   position: relative;
-  top: calc(50% - 0.5em);
+  top: 50%;
   left: calc(50% - 0.5em);
   -webkit-animation: rotating 1s linear infinite;
   -moz-animation: rotating 1s linear infinite;
@@ -406,8 +402,40 @@ footer, #footer {
 
 .loadp {
   margin: 0 auto;
+  pointer-events: none;
   width: 500px;
   text-align: center;
   position: relative;
   top: 2em;
+}
+
+@media screen and (max-width: 600px) {
+  .alertlbl {
+    display: none;
+  }
+  .internal .btn {
+    width: 3em;
+  }
+  
+/*   .btn span {
+    display: inline-block;
+  }
+  .btn anim {
+    display: block;
+  } */
+}
+
+@media screen and (max-width: 800px) {
+  .btn:not(.override) {
+    font-size: 0px;
+    min-width: 0px;
+    width: unset;
+  }
+  .btn span:not(.override) {
+    font-size: 60px !important;
+  }
+
+  .btn div.anim {
+    margin-top: 15px;
+  }
 }

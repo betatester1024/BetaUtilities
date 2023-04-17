@@ -50,9 +50,12 @@ input {
 }
 button#sendBtn {
   position: relative;
-  top: -40px;
-  height: 2em;
+  top: -34px;
   padding-top: 0px !important;
+}
+
+#sendBtn > div.anim {
+  margin-bottom: 0px;
 }
 
 #msgArea > a, 

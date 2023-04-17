@@ -4,6 +4,7 @@ import {supportHandler, Room} from './supportRooms'
 import {log} from './logging';
 import {uDB} from './consts';
 import {WS} from './betautilities/wsHandler';
+import { serverUpdate } from './betautilities/wordler';
 export let connectionSuccess = true;
 export let DBConnectFailure:any = null;
 const { exec } = require("child_process");
@@ -15,6 +16,7 @@ try {
     if (!connectionSuccess) return;
     initServer();
     DBMaintenance();
+    serverUpdate();
     log("Systems restarted");
     uDB.findOne({fieldName:"ROOMS"}).then((obj:{euphRooms:string[], rooms:string[], hidRooms:string[]})=>{
       for (let i=0; i<obj.euphRooms.length; i++) {
@@ -36,7 +38,9 @@ try {
   DBConnectFailure = setTimeout(()=>{
     connectionSuccess=false; 
     console.log("Connection failed")
+    log("Services failed. Rebooting now.")
     initServer();
+    serverUpdate();
     setTimeout(()=>{exec("kill 1")}, 10000);
   }, 29000);
 } catch (e:any) {

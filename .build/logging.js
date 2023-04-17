@@ -38,6 +38,7 @@ function log(thing) {
     import_consts.uDB.insertOne({ fieldName: "SysLogV2", data: thing + "\n" });
 }
 async function incrRequests() {
+  console.log("Request made");
   if (import_index.connectionSuccess)
     import_consts.uDB.updateOne({ fieldName: "VISITS" }, { $inc: { visitCt: 1 } }, { upsert: true });
 }
@@ -51,7 +52,7 @@ async function visitCt(token) {
 async function getLogs(token) {
   let userData = await (0, import_userRequest.userRequest)(token);
   if (userData.status != "SUCCESS" || userData.data.perms < 2) {
-    return { status: "ERROR", data: { error: userData.data.error ?? "Insufficient permissions" }, token: userData.token };
+    return { status: "ERROR", data: { error: userData.data.error ?? "Insufficient permissions" }, token };
   }
   let out = "";
   let logs = await import_consts.uDB.find({ fieldName: "SysLogV2" }).toArray();
@@ -63,7 +64,7 @@ async function getLogs(token) {
 async function purgeLogs(token) {
   let userData = await (0, import_userRequest.userRequest)(token);
   if (userData.status != "SUCCESS" || userData.data.perms < 2) {
-    return { status: "ERROR", data: { error: userData.data.error ?? "Insufficient permissions" }, token: userData.token };
+    return { status: "ERROR", data: { error: userData.data.error ?? "Insufficient permissions" }, token };
   }
   await import_consts.uDB.deleteMany({ fieldName: "SysLogV2" });
   return { status: "SUCCESS", data: null, token };

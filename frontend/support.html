@@ -12,6 +12,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
     <link rel="stylesheet" href="/supportformat.css">
+    <style>
+      #inpContainment {
+        width: calc(90% - 90px);
+      }
+    </style>
   </head>
   <body onload = "globalOnload(); onLoad(); initClient()">
     <div class="main_content">
@@ -31,15 +36,15 @@
             <input id="msgInp" placeholder="Enter a message..." autofocus autocomplete="off" >
             <div class="anim inp"></div>
           </div>
-          <button class="btn szIco" id="sendBtn">
-            <span class="material-symbols-outlined">send</span>
+          <button class="btn szIco override" id="sendBtn">
+            <span class="material-symbols-outlined override">send</span>
             <div class="anim"></div>
           </button>
         </form>
-      <a class="btn" href="/">
+      <a class="btn override" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>
         Return to home<div class="anim"></div></a>
-      <a class="btn" href="/support">
+      <a class="btn override" href="/support">
         <span class="material-symbols-outlined">arrow_back_ios</span>
         To room listing<div class="anim"></div></a>
       </div>

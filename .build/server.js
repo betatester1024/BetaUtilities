@@ -176,12 +176,20 @@ function makeRequest(action, token, data, callback) {
       callback("SUCCESS", { abc: "def", def: 5 }, token);
       break;
     case "login":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
       data = data;
       (0, import_validateLogin.validateLogin)(data.user, data.pass, data.persistQ, token).then((obj) => {
         callback(obj.status, obj.data, obj.token);
       });
       break;
     case "signup":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
       data = data;
       (0, import_validateLogin.signup)(data.user, data.pass, token).then((obj) => {
         callback(obj.status, obj.data, obj.token);
@@ -198,12 +206,20 @@ function makeRequest(action, token, data, callback) {
       callback(obj2.status, obj2.data, obj2.token);
       break;
     case "createRoom":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
       data = data;
       (0, import_supportRooms.createRoom)(data.name, token).then((obj) => {
         callback(obj.status, obj.data, obj.token);
       });
       break;
     case "deleteRoom":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
       data = data;
       (0, import_supportRooms.deleteRoom)(data.name, token).then((obj) => {
         callback(obj.status, obj.data, obj.token);
@@ -217,16 +233,28 @@ function makeRequest(action, token, data, callback) {
       (0, import_EEHandler.EE)(true, callback, token, "");
       break;
     case "setEE":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
       data = data;
       (0, import_EEHandler.EE)(false, callback, token, data.data);
       break;
     case "updateuser":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
       data = data;
       (0, import_updateUser.updateUser)(data.user, data.oldPass, data.pass, data.newPermLevel, token).then((obj) => {
         callback(obj.status, obj.data, obj.token);
       });
       break;
     case "delAcc":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
       data = data;
       (0, import_delacc.deleteAccount)(data.user, data.pass, token).then((obj) => {
         callback(obj.status, obj.data, obj.token);
@@ -243,6 +271,10 @@ function makeRequest(action, token, data, callback) {
       });
       break;
     case "sendMsg":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
       data = data;
       if (data.msg.length == 0) {
         callback("SUCCESS", null, token);
@@ -251,6 +283,10 @@ function makeRequest(action, token, data, callback) {
       (0, import_supportRooms.sendMsg)(data.msg.slice(0, 1024), data.room, token, callback);
       break;
     case "lookup":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
       (0, import_supportRooms.WHOIS)(token, data.user).then((obj) => {
         callback(obj.status, obj.data, obj.token);
       });
@@ -266,6 +302,10 @@ function makeRequest(action, token, data, callback) {
       });
       break;
     case "realias":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
       (0, import_updateUser.realias)(data.alias, token).then((obj) => {
         callback(obj.status, obj.data, obj.token);
       });
@@ -286,16 +326,28 @@ function makeRequest(action, token, data, callback) {
       });
       break;
     case "updateTODO":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
       (0, import_tasks.updateTask)(token, data.id, data.updated).then((obj) => {
         callback(obj.status, obj.data, obj.token);
       });
       break;
     case "deleteTODO":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
       (0, import_tasks.deleteTask)(token, data.id).then((obj) => {
         callback(obj.status, obj.data, obj.token);
       });
       break;
     case "completeTODO":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
       (0, import_tasks.deleteTask)(token, data.id, true).then((obj) => {
         callback(obj.status, obj.data, obj.token);
       });
@@ -308,6 +360,7 @@ function makeRequest(action, token, data, callback) {
     default:
       callback("ERROR", { error: "Unknown command string!" }, token);
   }
+  console.log("request made");
   return;
 }
 function eeFormat(data) {

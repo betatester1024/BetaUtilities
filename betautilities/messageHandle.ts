@@ -3,7 +3,7 @@ import {systemLog} from '../logging';
 const fs = require('fs');
 //import {rooms} from './initialiser'
 // import {getUptimeStr, systemLog} from './misc';
-// import {allWords, validWords, todayLeetCODE, todayWordID} from './wordListHandle';
+import {allWords, validWords, todayLeetCODE, todayWordID} from './wordler';
 const serviceKey = process.env['serviceKey'];
 import {uDB, authDB} from '../consts';
 import { supportHandler, Room } from '../supportRooms';
@@ -49,7 +49,11 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
     
     return getUptimeStr(STARTTIME)+" (Total uptime: "+getUptimeStr()+")";
   }
+  let match_r = msg.match(/preview\.redd\.it\/(.*\.(jpg|png))/igmu);
+  if (match_r) {
 
+    return match_r[0].replace("preview.redd.it", "i.redd.it");
+  }
   if (msg == "!issue" || msg == "!bug" || msg == "!feature") {
     return "https://github.com/betatester1024/BetaUtilities/issues/new/choose"
   }
@@ -275,13 +279,8 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
   if (msg == "!activerooms @"+this.nick.toLowerCase()) {
     let str = "/me is in: ";
     let euphRooms = [];
-    for (let i=0; i<sysRooms.length; i++) {
-      if (!sysRooms[i].match("\\|")) euphRooms.push("&"+sysRooms[i]);
-      else if (!data) {euphRooms.push("#"+sysRooms[i].match("\\|(.+)")[1]);}
-    }
-    for (let j = 0; j < euphRooms.length - 1; j++) { str += euphRooms[j] + ", "; }
-    str += (euphRooms.length>1?"and ":"")+euphRooms[euphRooms.length - 1] + "!";
-    return str;
+    
+    return str+supportHandler.listAllRooms().join(", ")+"!";
   }
   if (msg == "!pong"||msg=="!pong @"+this.nick.toLowerCase()) {
     this.delaySendMsg(":egg:", data, 1500);
@@ -545,14 +544,14 @@ export function wordleUpdate() {
 
 function getUptimeStr(STARTTIME:number=-1) {
   if (STARTTIME < 0) {
-    let time = Number(fs.readFileSync('./runtime.txt'));
+    let time = Number(fs.readFileSync('./betautilities/runtime.txt'));
     return formatTime(time);
   }
   let timeElapsed = Date.now() - STARTTIME;
   let date = new Date(STARTTIME);
-  return (
-    `/me has been up since ${date.toUTCString()} (It's been ${formatTime(timeElapsed)})`
-  );
+  var usaTime = date.toLocaleString("en-US", {timeZone: "America/New_York"});
+  console.log('USA time: '+ usaTime);
+  return `/me has been up since ${date.toUTCString()} / EST: ${usaTime} | Time elapsed: ${formatTime(timeElapsed)}`
 }
 
 function formatTime(ms:number) {

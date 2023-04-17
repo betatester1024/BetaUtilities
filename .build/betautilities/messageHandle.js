@@ -24,6 +24,7 @@ __export(messageHandle_exports, {
 module.exports = __toCommonJS(messageHandle_exports);
 var import_wsHandler = require("./wsHandler");
 var import_logging = require("../logging");
+var import_wordler = require("./wordler");
 var import_consts = require("../consts");
 var import_supportRooms = require("../supportRooms");
 const fs = require("fs");
@@ -44,7 +45,7 @@ function replyMessage(msg, sender, data) {
     this.incrPingCt();
   }
   if (msg == "!debugwordle") {
-    (0, import_logging.systemLog)(validWords[todayWordID] + " " + todayLeetCODE.join(""));
+    (0, import_logging.systemLog)(import_wordler.validWords[import_wordler.todayWordID] + " " + import_wordler.todayLeetCODE.join(""));
     return "> See console <";
   }
   if (msg == "!conjure @" + this.nick.toLowerCase()) {
@@ -70,6 +71,10 @@ function replyMessage(msg, sender, data) {
   if (msg.match("^!uptime @" + this.nick.toLowerCase() + "$")) {
     this.clearCallReset();
     return getUptimeStr(STARTTIME) + " (Total uptime: " + getUptimeStr() + ")";
+  }
+  let match_r = msg.match(/preview\.redd\.it\/(.*\.(jpg|png))/igmu);
+  if (match_r) {
+    return match_r[0].replace("preview.redd.it", "i.redd.it");
   }
   if (msg == "!issue" || msg == "!bug" || msg == "!feature") {
     return "https://github.com/betatester1024/BetaUtilities/issues/new/choose";
@@ -289,18 +294,7 @@ function replyMessage(msg, sender, data) {
   if (msg == "!activerooms @" + this.nick.toLowerCase()) {
     let str = "/me is in: ";
     let euphRooms = [];
-    for (let i = 0; i < sysRooms.length; i++) {
-      if (!sysRooms[i].match("\\|"))
-        euphRooms.push("&" + sysRooms[i]);
-      else if (!data) {
-        euphRooms.push("#" + sysRooms[i].match("\\|(.+)")[1]);
-      }
-    }
-    for (let j = 0; j < euphRooms.length - 1; j++) {
-      str += euphRooms[j] + ", ";
-    }
-    str += (euphRooms.length > 1 ? "and " : "") + euphRooms[euphRooms.length - 1] + "!";
-    return str;
+    return str + import_supportRooms.supportHandler.listAllRooms().join(", ") + "!";
   }
   if (msg == "!pong" || msg == "!pong @" + this.nick.toLowerCase()) {
     this.delaySendMsg(":egg:", data, 1500);
@@ -505,10 +499,10 @@ function replyMessage(msg, sender, data) {
     return "ANTISPAM is currently: " + (this.bypass ? "OFF" : "ON");
   }
   if (this.callStatus == 8 && msg.match("^[a-z]{5}$")) {
-    if (allWords.indexOf(msg) >= 0) {
-      let correctWord = validWords[todayWordID].split("");
+    if (import_wordler.allWords.indexOf(msg) >= 0) {
+      let correctWord = import_wordler.validWords[import_wordler.todayWordID].split("");
       let out = "";
-      if (msg == validWords[todayWordID]) {
+      if (msg == import_wordler.validWords[import_wordler.todayWordID]) {
         setTimeout(() => {
           this.resetCall(data);
         }, 200);
@@ -532,7 +526,7 @@ function replyMessage(msg, sender, data) {
   }
   if (this.callStatus == 10 && msg.match("^[a-z0-9]{5}$")) {
     let out = "";
-    if (msg == todayLeetCODE.join("")) {
+    if (msg == import_wordler.todayLeetCODE.join("")) {
       setTimeout(() => {
         this.resetCall(data);
       }, 200);
@@ -542,9 +536,9 @@ function replyMessage(msg, sender, data) {
       return "Correct uh- character sequence! You won in: " + leetlentCt + " moves!";
     }
     for (let i = 0; i < 5; i++) {
-      if (msg.charAt(i) == todayLeetCODE[i])
+      if (msg.charAt(i) == import_wordler.todayLeetCODE[i])
         out += "\u{1F7E9}";
-      else if (todayLeetCODE.indexOf(msg.charAt(i)) >= 0)
+      else if (import_wordler.todayLeetCODE.indexOf(msg.charAt(i)) >= 0)
         out += "\u{1F7E8}";
       else
         out += "\u{1F7E5}";
@@ -570,12 +564,14 @@ function wordleUpdate() {
 }
 function getUptimeStr(STARTTIME2 = -1) {
   if (STARTTIME2 < 0) {
-    let time = Number(fs.readFileSync("./runtime.txt"));
+    let time = Number(fs.readFileSync("./betautilities/runtime.txt"));
     return formatTime(time);
   }
   let timeElapsed = Date.now() - STARTTIME2;
   let date = new Date(STARTTIME2);
-  return `/me has been up since ${date.toUTCString()} (It's been ${formatTime(timeElapsed)})`;
+  var usaTime = date.toLocaleString("en-US", { timeZone: "America/New_York" });
+  console.log("USA time: " + usaTime);
+  return `/me has been up since ${date.toUTCString()} / EST: ${usaTime} | Time elapsed: ${formatTime(timeElapsed)}`;
 }
 function formatTime(ms) {
   let seconds = ms / 1e3;

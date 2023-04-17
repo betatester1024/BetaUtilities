@@ -181,6 +181,7 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       callback("SUCCESS", {abc:"def", def:5}, token);
       break;
     case 'login': 
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
       // validate login-data before sending to server
       data = data as {user:string, pass:string, persistQ:boolean};
       validateLogin(data.user, data.pass, data.persistQ, token).
@@ -188,6 +189,7 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
           {callback(obj.status, obj.data, obj.token)});
       break;
     case 'signup':
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
       data = data as {user:string, pass:string};
       signup(data.user, data.pass, token)
         .then((obj:{status:string, data:any, token:string})=>
@@ -203,12 +205,14 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       callback(obj2.status, obj2.data, obj2.token);
       break;
     case 'createRoom':
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
       data = data as {name:string}
       createRoom(data.name, token)
         .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
       break;
     case 'deleteRoom':
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
       data = data as {name:string}
       deleteRoom(data.name, token)
         .then((obj:{status:string, data:any, token:string})=>
@@ -222,16 +226,19 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       EE(true, callback, token, "");
       break;
     case 'setEE':
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
       data = data as {data:string}
       EE(false, callback, token, data.data);
       break;
     case 'updateuser': 
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
       data = data as {user:string, oldPass: string, pass:string, newPermLevel:string};
       updateUser(data.user, data.oldPass, data.pass, data.newPermLevel, token)
       .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
       break;
     case 'delAcc':
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
       data = data as {user:string, pass:string};
       deleteAccount(data.user, data.pass, token)
       .then((obj:{status:string, data:any, token:string})=>
@@ -248,6 +255,7 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
           {callback(obj.status, obj.data, obj.token)});
       break;
     case 'sendMsg':
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
       data = data as {msg:string, room:string};
       if (data.msg.length == 0) {
         callback("SUCCESS", null, token); break;
@@ -255,6 +263,7 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       sendMsg(data.msg.slice(0, 1024), data.room, token, callback);
       break;
     case 'lookup':
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
       WHOIS(token, data.user)
       .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
@@ -270,6 +279,7 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
         {callback(obj.status, obj.data, obj.token)});
       break;
     case "realias":
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
       realias(data.alias, token)
       .then((obj:{status:string, data:any, token:string})=>
         {callback(obj.status, obj.data, obj.token)});
@@ -290,16 +300,19 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
         {callback(obj.status, obj.data, obj.token)});
       break;
     case "updateTODO":
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
       updateTask(token, data.id, data.updated)
       .then((obj:{status:string, data:any, token:string})=>
         {callback(obj.status, obj.data, obj.token)});
       break;
     case "deleteTODO":
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
       deleteTask(token, data.id)
       .then((obj:{status:string, data:any, token:string})=>
         {callback(obj.status, obj.data, obj.token)});
       break;
     case "completeTODO":
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
       deleteTask(token, data.id, true)
       .then((obj:{status:string, data:any, token:string})=>
         {callback(obj.status, obj.data, obj.token)});
@@ -312,6 +325,7 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
     default:
       callback("ERROR", {error: "Unknown command string!"}, token);
   }
+  console.log("request made")
   return; 
 }
 

@@ -1,9 +1,9 @@
 import {database} from "./database";
 const argon2 = require('argon2');
 
-export const rootDir:string = '/home/runner/v2/'
-export const frontendDir:string = '/home/runner/v2/frontend/'
-export const jsDir:string = '/home/runner/v2/.build/frontend/'
+export const rootDir:string = '/home/runner/betatester1024/'
+export const frontendDir:string = '/home/runner/betatester1024/frontend/'
+export const jsDir:string = '/home/runner/betatester1024/.build/frontend/'
 export const port = 3000
 export const userRegex = /^[0-9a-zA-Z_\\-]{1,20}$/
 export const roomRegex = "[0-9a-zA-Z_\\-]{1,20}"

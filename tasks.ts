@@ -8,7 +8,7 @@ export async function addTask(token:string) {
   else {
     if (uInfo.data.tasks) uInfo.data.tasks.push("");
     await authDB.updateOne({user:uInfo.data.user, fieldName:"UserData"}, {
-      $set: {tasks: uInfo.data.tasks??[]}
+      $set: {tasks: uInfo.data.tasks??[""]}
     }, {upsert: true})
     return {status:"SUCCESS", data:null, token:token};
   }
@@ -20,7 +20,7 @@ export async function getTasks(token:string) {
     return uInfo;
   }
   else {
-    return {status:"SUCCESS", data:{tasks:uInfo.data.tasks}, token:token};
+    return {status:"SUCCESS", data:{tasks:uInfo.data.tasks??[]}, token:token};
   }
 }
 

@@ -74,11 +74,11 @@
         <hr class="rounded" id="hr">
       </header>
       <p id="inner_content" class="fsmed">Loading... </p><br>
-      <button id="arenb" class="btn fssml2" onclick="window.open('/status?refresh='+document.getElementById('sel').value, '_self');">
+      <button id="arenb" class="btn fssml2 override" onclick="window.open('/status?refresh='+document.getElementById('sel').value, '_self');">
         <span class="material-symbols-outlined">sync</span>Enable AutoRefresh - every:
       <div class="anim"></div></button>
       
-      <button id="ardis" style="display: none" class="btn fssml2" onclick="window.open('/status', '_self');">
+      <button id="ardis" style="display: none" class="btn fssml2 override" onclick="window.open('/status', '_self');">
         <span class="material-symbols-outlined">sync_disabled</span>Disable AutoRefresh
       <div class="anim"></div></button>
       <select class="szThird" id="sel">
@@ -91,7 +91,7 @@
         <option value="300000">5min</option>
       </select><br>
         
-      <a class="btn fsmed" href="/">
+      <a class="btn fsmed override" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>
         Return to home<div class="anim"></div></a>
     </div>

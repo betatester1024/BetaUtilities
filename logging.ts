@@ -13,6 +13,7 @@ export function log(thing:string) {
 
 
 export async function incrRequests() {
+  console.log("Request made");
   if (connectionSuccess) uDB.updateOne({fieldName:"VISITS"}, {$inc:{visitCt:1}}, {upsert:true});
 }
 
@@ -27,7 +28,7 @@ export async function visitCt(token:string) {
 export async function getLogs(token:string) {
   let userData = await userRequest(token);
   if (userData.status != "SUCCESS" || userData.data.perms<2) {
-    return {status:"ERROR", data:{error:userData.data.error??"Insufficient permissions"}, token:userData.token};
+    return {status:"ERROR", data:{error:userData.data.error??"Insufficient permissions"}, token:token};
   } 
   let out = "";
   let logs = await uDB.find({fieldName:"SysLogV2"}).toArray();
@@ -40,7 +41,7 @@ export async function getLogs(token:string) {
 export async function purgeLogs(token:string) {
   let userData = await userRequest(token);
   if (userData.status != "SUCCESS" || userData.data.perms<2) {
-    return {status:"ERROR", data:{error:userData.data.error??"Insufficient permissions"}, token:userData.token};
+    return {status:"ERROR", data:{error:userData.data.error??"Insufficient permissions"}, token:token};
   } 
   await uDB.deleteMany({fieldName:"SysLogV2"});
   return {status:"SUCCESS", data:null, token:token};

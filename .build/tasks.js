@@ -34,7 +34,7 @@ async function addTask(token) {
     if (uInfo.data.tasks)
       uInfo.data.tasks.push("");
     await import_consts.authDB.updateOne({ user: uInfo.data.user, fieldName: "UserData" }, {
-      $set: { tasks: uInfo.data.tasks ?? [] }
+      $set: { tasks: uInfo.data.tasks ?? [""] }
     }, { upsert: true });
     return { status: "SUCCESS", data: null, token };
   }
@@ -44,7 +44,7 @@ async function getTasks(token) {
   if (uInfo.status != "SUCCESS") {
     return uInfo;
   } else {
-    return { status: "SUCCESS", data: { tasks: uInfo.data.tasks }, token };
+    return { status: "SUCCESS", data: { tasks: uInfo.data.tasks ?? [] }, token };
   }
 }
 async function updateTask(token, id, updated) {

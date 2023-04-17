@@ -1,14 +1,6 @@
 "use strict";
 function globalOnload(cbk2) {
   document.onkeydown = keydown;
-  let overlay = document.createElement("div");
-  overlay.className = "overlayLoader";
-  overlay.id = "overlayL";
-  overlay.style.left = "200vh";
-  overlay.style.opacity = "1";
-  overlay.innerHTML = `<span class="material-symbols-outlined loader">sync</span>
-  <p class="loadp fslg grn nohover">Loading.</p>`;
-  document.body.appendChild(overlay);
   send(
     JSON.stringify({ action: "userRequest" }),
     (res) => {
@@ -22,19 +14,20 @@ function globalOnload(cbk2) {
         ele.innerHTML = `<a href='/login'>Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
-                      BetaOS Systems, 2023`;
+                      BetaOS Systems V2, 2023`;
       else {
         ele.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
                       <a href='/logout'>Logout</a> | 
                       <a href='/config'>Account</a> | 
                       <a href='/status'>Status</a> | 
                       <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
-                      BetaOS Systems, 2023`;
+                      BetaOS Systems V2, 2023`;
       }
       ftr.appendChild(ele);
       send(
         JSON.stringify({ action: "visits" }),
         (res2) => {
+          overlay.style.backgroundColor = "var(--system-grey2)";
           if (res2.status != "SUCCESS") {
             alertDialog("Database connection failure. Please contact BetaOS.", () => {
             });
@@ -68,19 +61,17 @@ function globalOnload(cbk2) {
     console.log("Alert dialogs disabled on this page");
 }
 function send(params, callback, onLoadQ = false) {
-  let overlay = document.getElementById("overlayL");
-  if (overlay && !onLoadQ) {
-    overlay.style.left = "0vh";
-    overlay.style.opacity = "1";
+  let overlay2 = document.getElementById("overlayL");
+  if (overlay2 && !onLoadQ) {
+    overlay2.style.opacity = "1";
   }
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "server", true);
   xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
-      if (overlay) {
-        overlay.style.left = "200vh";
-        overlay.style.opacity = "0";
+      if (overlay2) {
+        overlay2.style.opacity = "0";
       }
       if (failureTimeout)
         clearTimeout(failureTimeout);
@@ -98,15 +89,20 @@ function send(params, callback, onLoadQ = false) {
   }, 1, params), 1e3);
 }
 let failureTimeout;
+let TIME;
 let dialogQ = false;
 let cbk = () => {
 };
 let BLOCKCALLBACK = false;
 function alertDialog(str, callback, button = -1, failedReq = "") {
-  let overlay = document.getElementById("overlayL");
-  if (overlay) {
-    overlay.style.left = "200vh";
-    overlay.style.opacity = "0";
+  if (TIME)
+    clearTimeout(TIME);
+  TIME = null;
+  console.log("Timeout cleared");
+  let overlay2 = document.getElementById("overlayL");
+  if (overlay2) {
+    overlay2.style.left = "200vh";
+    overlay2.style.opacity = "0";
   }
   let ele = document.getElementById("overlay");
   let p = document.getElementById("alerttext");
@@ -174,4 +170,16 @@ function toTime(ms) {
 function padWithZero(n) {
   return n < 10 ? "0" + n : n;
 }
+let overlay;
+addEventListener("DOMContentLoaded", function() {
+  overlay = document.createElement("div");
+  overlay.className = "overlayLoader";
+  overlay.id = "overlayL";
+  overlay.style.left = "0vh";
+  overlay.style.backgroundColor = "var(--system-bg)";
+  overlay.style.opacity = "1";
+  overlay.innerHTML = `<span class="material-symbols-outlined loader">sync</span>
+  <p class="loadp fslg grn nohover">Loading.</p>`;
+  document.body.appendChild(overlay);
+});
 //# sourceMappingURL=utils.js.map

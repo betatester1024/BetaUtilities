@@ -55,7 +55,7 @@ try {
           console.log("Loaded support room", obj.rooms[i]);
         }
         for (let i = 0; i < obj.hidRooms.length; i++) {
-          new import_webHandler.WebH(obj.rooms[i], true);
+          new import_webHandler.WebH(obj.hidRooms[i], true);
           console.log("Loaded hidden support room", obj.hidRooms[i]);
         }
       });

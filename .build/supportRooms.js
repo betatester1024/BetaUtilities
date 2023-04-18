@@ -22,6 +22,7 @@ __export(supportRooms_exports, {
   WHOIS: () => WHOIS,
   createRoom: () => createRoom,
   deleteRoom: () => deleteRoom,
+  pseudoConnection: () => pseudoConnection,
   roomRequest: () => roomRequest,
   sendMsg: () => sendMsg,
   sendMsg_B: () => sendMsg_B,
@@ -36,14 +37,19 @@ class Room {
   type;
   name;
   handler;
-  replyMsg;
-  constructor(type, name, responder = null, handler) {
+  constructor(type, name, responder = null, handler = null) {
     this.type = type;
     this.name = name;
     this.handler = handler;
-    this.replyMsg = responder;
   }
 }
+class pseudoConnection {
+  write(thing) {
+  }
+  close() {
+  }
+}
+;
 class supportHandler {
   static allRooms = [];
   static connections = [];
@@ -65,10 +71,12 @@ class supportHandler {
     if (idx >= 0)
       this.allRooms.splice(idx, 1);
   }
-  static async addConnection(ev, rn, token) {
+  static async addConnection(ev, rn, token, internalFlag = false) {
+    if (internalFlag)
+      token = "[SYSINTERNAL]";
     for (let i = 0; i < this.connections.length; i++) {
       if (this.connections[i].roomName == rn)
-        (0, import_userRequest.userRequest)(this.connections[i].tk).then((obj) => {
+        (0, import_userRequest.userRequest)(this.connections[i].tk, internalFlag).then((obj) => {
           if (obj.status == "SUCCESS")
             ev.write("data:+" + obj.data.alias + "(" + obj.data.perms + ")>\n\n");
           else
@@ -77,7 +85,7 @@ class supportHandler {
     }
     let thiscn = { event: ev, roomName: rn, tk: token, readyQ: false };
     this.connections.push(thiscn);
-    (0, import_userRequest.userRequest)(token).then((obj) => {
+    (0, import_userRequest.userRequest)(token, internalFlag).then((obj) => {
       if (obj.status == "SUCCESS")
         this.sendMsgTo(rn, "+" + obj.data.alias + "(" + obj.data.perms + ")");
       else
@@ -190,7 +198,7 @@ function sendMsg(msg, room, token, callback) {
       supportHandler.sendMsgTo(room, "[" + processAnon(token) + "](1)" + msg);
     for (let i = 0; i < supportHandler.allRooms.length; i++) {
       if (supportHandler.allRooms[i].name == room) {
-        supportHandler.allRooms[i].replyMsg(msg, obj.data.alias ?? processAnon(token), null).bind(supportHandler.allRooms[i].handler);
+        supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token));
       }
     }
     callback("SUCCESS", null, token);
@@ -199,7 +207,7 @@ function sendMsg(msg, room, token, callback) {
 async function sendMsg_B(msg, room) {
   await import_consts.msgDB.insertOne({
     fieldName: "MSG",
-    data: msg.replaceAll("\\n", "\n"),
+    data: msg,
     permLevel: 3,
     sender: "BetaOS_System",
     expiry: Date.now() + 3600 * 1e3,
@@ -303,6 +311,7 @@ async function WHOIS(token, user) {
   WHOIS,
   createRoom,
   deleteRoom,
+  pseudoConnection,
   roomRequest,
   sendMsg,
   sendMsg_B,

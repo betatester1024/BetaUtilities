@@ -151,8 +151,19 @@ export async function initServer() {
       return;
     }
     var body = await parse.json(req);
-    if (!body) res.end(JSON.stringify({status:"ERROR", data:null}));
+    if (!body) res.end(JSON.stringify({status:"ERROR", data:{error:"No command string"}}));
     // let cookiematch = req.cookies.match("sessionID=[0-9a-zA-Z\\-]");
+    // COOKIE ACCEPTANCE DIALOG 
+    if (body.action == "cookieRequest") {
+      res.end(JSON.stringify({data:req.cookies.acceptedQ??false}))
+      return;
+    }
+    if (body.action == "acceptCookies") {
+      res.cookie('acceptedQ', true, {httpOnly: true, secure:true, sameSite:"Strict"})
+      res.end(JSON.stringify(""));
+      return;
+    }
+    //////////////////////////
     makeRequest(body.action, req.cookies.sessionID, body.data, (s:string, d:any, token:string)=>{
       /*if(body.action=="login"||body.action == "logout" ||
         body.action == "delAcc" || body.action == "signup")*/

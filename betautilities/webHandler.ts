@@ -5,7 +5,7 @@ import {uDB} from '../consts';
 import {replyMessage} from './messageHandle';
 // import { updateActive } from './messageHandle';
 import {systemLog} from '../logging';
-import {supportHandler, sendMsg_B, Room} from '../supportRooms';
+import {supportHandler, sendMsg_B, Room, pseudoConnection} from '../supportRooms';
 const fs = require('fs');
 
 // const { getUserInfo } = require("@replit/repl-auth")
@@ -13,6 +13,7 @@ const fs = require('fs');
 
 export class WebH 
 {
+  connection:pseudoConnection;
   static CALLTIMEOUT = 30000;
   nick:string;
   pausedQ=false;
@@ -117,7 +118,7 @@ export class WebH
   onMessage(msg:string, snd:string) {
       let data = ""
       if (DATALOGGING) fs.writeFileSync('betautilities/msgLog.txt', fs.readFileSync('betautilities/msgLog.txt').toString()+((`(${this.roomName})[${snd}] ${msg}\n`)));
-      msg = msg.trim().toLowerCase();
+      msg = msg.trim().toLowerCase().replaceAll(/(@betaos|@betautilities|@betaos-system|@system)/gimu, "@betaos_system");
       // Required methods
       // !kill
       if (msg == "!kill @" + this.nick.toLowerCase()) {
@@ -174,22 +175,22 @@ export class WebH
         let outStr = this.replyMessage(msg.trim(), snd, data);
         if (this.failedQ && outStr != "") outStr = "/me is rebooting."
         if (outStr == "") return;
-        if (!this.bypass) {
-          this.callTimes.push(Date.now());
-          setTimeout(() => {this.callTimes.shift();}, 60*5*1000) // five minutes.
-        }
-        if (!this.bypass && this.callTimes.length >= 5) {
-          // if (i == 2)
-            if (this.callTimes.length < 10) {
-              outStr = this.transferOutQ?outStr+"\\n[ANTISPAM] Consider moving to &bots or &test for large-scale testing. Thank you for your understanding."
-                : outStr+" [ANTISPAM WARNING]";
-            } else {
-              outStr = outStr+"\\n[ANTISPAM] Automatically paused @"+this.nick;
-              this.pausedQ = true;
-              this.pauser = "BetaOS_ANTISPAM";
-              this.resetCall(data);
-            }
-        }
+        // if (!this.bypass) {
+        //   this.callTimes.push(Date.now());
+        //   setTimeout(() => {this.callTimes.shift();}, 60*5*1000) // five minutes.
+        // }
+        // if (!this.bypass && this.callTimes.length >= 5) {
+        //   // if (i == 2)
+        //     if (this.callTimes.length < 10) {
+        //       outStr = this.transferOutQ?outStr+"\\n[ANTISPAM] Consider moving to &bots or &test for large-scale testing. Thank you for your understanding."
+        //         : outStr+" [ANTISPAM WARNING]";
+        //     } else {
+        //       outStr = outStr+"\\n[ANTISPAM] Automatically paused @"+this.nick;
+        //       this.pausedQ = true;
+        //       this.pauser = "BetaOS_ANTISPAM";
+        //       this.resetCall(data);
+        //     }
+        // }
         this.sendMsg(outStr, data);
       }
   }
@@ -203,10 +204,10 @@ export class WebH
     setTimeout(() => {
       this.changeNick(this.nick)
       this.incrRunCt();
-      supportHandler.deleteRoom(this.hiddenQ?"HIDDEN_SUPPORT":"ONLINE_SUPPORT", this.roomName);
+      // supportHandler.createRoom(this.hiddenQ?"HIDDEN_SUPPORT":"ONLINE_SUPPORT", this.roomName);
       this.failedQ = false;
     }, 5000);
-    supportHandler.deleteRoom(this.hiddenQ?"HIDDEN_SUPPORT":"ONLINE_SUPPORT", this.roomName);
+    // supportHandler.deleteRoom(this.hiddenQ?"HIDDEN_SUPPORT":"ONLINE_SUPPORT", this.roomName);
   } // socketclose
 
   static resetTime = 1000;
@@ -218,13 +219,12 @@ export class WebH
   constructor(roomName: string, hiddenQ = false) {
     this.nick = "BetaOS_System";
     this.replyMessage = (msg:string, sender:string, data:any) => {
-      console.log(msg);
-      replyMessage(msg, sender, data)
-      
+      return replyMessage(this, msg, sender, data)
     };
     this.hiddenQ = hiddenQ;
     if (roomName.length > 21) return;
     this.roomName = roomName;
     supportHandler.addRoom(new Room(hiddenQ?"HIDDEN_SUPPORT":"ONLINE_SUPPORT", this.roomName, this.replyMessage, this));
+    supportHandler.addConnection(new pseudoConnection(), roomName, "", true);
   }
 }

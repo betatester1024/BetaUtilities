@@ -277,7 +277,9 @@ class WS {
       this.socket.close(1e3, "");
       (0, import_supportRooms.updateActive)(this.roomName, false);
     });
-    this.replyMessage = import_messageHandle.replyMessage;
+    this.replyMessage = (msg, sender, data) => {
+      return (0, import_messageHandle.replyMessage)(this, msg, sender, data);
+    };
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

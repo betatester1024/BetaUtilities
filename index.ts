@@ -32,7 +32,7 @@ try {
         console.log("Loaded support room", obj.rooms[i]);
       }
       for (let i=0; i<obj.hidRooms.length; i++) {
-        new WebH(obj.rooms[i], true);
+        new WebH(obj.hidRooms[i], true);
         // supportHandler.addRoom(new Room("HIDDEN_SUPPORT", obj.hidRooms[i]));
         console.log("Loaded hidden support room", obj.hidRooms[i]);
       }

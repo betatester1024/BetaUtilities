@@ -53,7 +53,8 @@ async function initClient() {
         removed = modif.match(rmvReg);
         added = modif.match(addReg);
       }
-      ele = document.getElementById("msgArea");
+      let area = document.getElementById("msgArea");
+      ele = document.createElement("p");
       let scrDistOKQ = ele.scrollTop >= ele.scrollHeight - ele.offsetHeight - 100;
       let msgs = modif.split(">");
       for (let i = 0; i < msgs.length; i++) {
@@ -64,7 +65,7 @@ async function initClient() {
         let newMsgSender = document.createElement("b");
         newMsgSender.innerText = matches[1];
         newMsgSender.className = classStr[matches[2]];
-        ele.appendChild(newMsgSender);
+        area.appendChild(newMsgSender);
         newMsgBody.className = classStr[matches[2]];
         let msg = " " + matches[3].replaceAll("&gt;", ";gt;");
         for (let i2 = 0; i2 < replacements.length; i2++) {
@@ -75,22 +76,24 @@ async function initClient() {
         msg = msg.replaceAll(/(#[a-zA-Z0-9_\-]{1,20}[^;])/gm, ">SUPPORT$1>");
         msg = msg.replaceAll(/(;gt;;gt;[^ ]{0,20})/gm, ">INTERNALLINK$1>");
         msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu, ">LINK$<test>>");
+        msg = msg.replaceAll(/\\n/gmiu, ">BR>");
         console.log(msg);
         if (msg.match("/me.*")) {
           msg = msg.slice(4);
           slashMe = true;
+          ele.className += " slashMe " + classStr[matches[2]];
         }
         let split = msg.split(">");
         let out = "";
         for (let i2 = 0; i2 < split.length; i2++) {
           if (i2 % 2 == 0) {
             let fragment = document.createElement("p");
-            fragment.className = classStr[matches[2]] + (slashMe ? " slashMe " : "");
+            fragment.className = classStr[matches[2]];
             fragment.innerText = split[i2].replaceAll(";gt;", ">");
             ele.appendChild(fragment);
           } else {
-            let pref = split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK)")[1];
-            let post = split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK)(.+)")[2];
+            let pref = split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)")[1];
+            let post = pref != "BR" ? split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)(.+)")[2] : "";
             if (pref == "EMOJI") {
               let replaced = document.createElement("span");
               replaced.title = ":" + findReplacement(post) + ":";
@@ -99,32 +102,35 @@ async function initClient() {
               ele.appendChild(replaced);
             } else if (pref == "LINK") {
               let replaced = document.createElement("a");
-              replaced.className = "supportMsg " + classStr[matches[2]] + (slashMe ? " slashMe " : "");
+              replaced.className = "supportMsg " + classStr[matches[2]];
               replaced.href = "https://" + post;
               replaced.innerText = post;
               ele.appendChild(replaced);
             } else if (pref == "ROOM") {
               let replaced = document.createElement("a");
-              replaced.className = "supportMsg " + classStr[matches[2]] + (slashMe ? " slashMe " : "");
+              replaced.className = "supportMsg " + classStr[matches[2]];
               replaced.href = "https://euphoria.io/room/" + post.slice(1);
               replaced.innerText = post;
               ele.appendChild(replaced);
             } else if (pref == "SUPPORT") {
               let replaced = document.createElement("a");
-              replaced.className = "supportMsg " + classStr[matches[2]] + (slashMe ? " slashMe " : "");
+              replaced.className = "supportMsg " + classStr[matches[2]];
               replaced.href = "/support?room=" + post.slice(1);
               replaced.innerText = post;
               ele.appendChild(replaced);
             } else if (pref == "INTERNALLINK") {
               let replaced = document.createElement("a");
-              replaced.className = "supportMsg " + classStr[matches[2]] + (slashMe ? " slashMe " : "");
+              replaced.className = "supportMsg " + classStr[matches[2]];
               replaced.href = post.slice(8);
               replaced.innerText = ">>" + post.slice(8);
               ele.appendChild(replaced);
+            } else if (pref == "BR") {
+              ele.appendChild(document.createElement("br"));
             }
           }
         }
-        ele.appendChild(document.createElement("br"));
+        area.appendChild(ele);
+        area.appendChild(document.createElement("br"));
         document.getElementById("placeholder").style.display = "none";
         if (!FOCUSSED) {
           UNREAD++;
@@ -132,7 +138,8 @@ async function initClient() {
         }
       }
       if (!LOADEDQ2 || scrDistOKQ) {
-        ele.scrollTop = ele.scrollHeight;
+        area.scrollTop = area.scrollHeight;
+        console.log("Scrolling to bottom.");
         LOADEDQ2 = true;
       }
     });

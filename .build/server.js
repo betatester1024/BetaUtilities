@@ -151,7 +151,16 @@ async function initServer() {
     }
     var body = await parse.json(req);
     if (!body)
-      res.end(JSON.stringify({ status: "ERROR", data: null }));
+      res.end(JSON.stringify({ status: "ERROR", data: { error: "No command string" } }));
+    if (body.action == "cookieRequest") {
+      res.end(JSON.stringify({ data: req.cookies.acceptedQ ?? false }));
+      return;
+    }
+    if (body.action == "acceptCookies") {
+      res.cookie("acceptedQ", true, { httpOnly: true, secure: true, sameSite: "Strict" });
+      res.end(JSON.stringify(""));
+      return;
+    }
     makeRequest(body.action, req.cookies.sessionID, body.data, (s, d, token) => {
       if (ignoreLog.indexOf(body.action) >= 0) {
       } else if (s == "SUCCESS") {

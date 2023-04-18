@@ -28,6 +28,7 @@ var import_supportRooms = require("../supportRooms");
 const DATALOGGING = true;
 const fs = require("fs");
 class WebH {
+  connection;
   static CALLTIMEOUT = 3e4;
   nick;
   pausedQ = false;
@@ -128,7 +129,7 @@ class WebH {
     if (DATALOGGING)
       fs.writeFileSync("betautilities/msgLog.txt", fs.readFileSync("betautilities/msgLog.txt").toString() + `(${this.roomName})[${snd}] ${msg}
 `);
-    msg = msg.trim().toLowerCase();
+    msg = msg.trim().toLowerCase().replaceAll(/(@betaos|@betautilities|@betaos-system|@system)/gimu, "@betaos_system");
     if (msg == "!kill @" + this.nick.toLowerCase()) {
       this.sendMsg("/me crashes", data);
       this.delaySendMsg("/me restarts", data, 200);
@@ -160,22 +161,6 @@ class WebH {
         outStr = "/me is rebooting.";
       if (outStr == "")
         return;
-      if (!this.bypass) {
-        this.callTimes.push(Date.now());
-        setTimeout(() => {
-          this.callTimes.shift();
-        }, 60 * 5 * 1e3);
-      }
-      if (!this.bypass && this.callTimes.length >= 5) {
-        if (this.callTimes.length < 10) {
-          outStr = this.transferOutQ ? outStr + "\\n[ANTISPAM] Consider moving to &bots or &test for large-scale testing. Thank you for your understanding." : outStr + " [ANTISPAM WARNING]";
-        } else {
-          outStr = outStr + "\\n[ANTISPAM] Automatically paused @" + this.nick;
-          this.pausedQ = true;
-          this.pauser = "BetaOS_ANTISPAM";
-          this.resetCall(data);
-        }
-      }
       this.sendMsg(outStr, data);
     }
   }
@@ -188,10 +173,8 @@ class WebH {
     setTimeout(() => {
       this.changeNick(this.nick);
       this.incrRunCt();
-      import_supportRooms.supportHandler.deleteRoom(this.hiddenQ ? "HIDDEN_SUPPORT" : "ONLINE_SUPPORT", this.roomName);
       this.failedQ = false;
     }, 5e3);
-    import_supportRooms.supportHandler.deleteRoom(this.hiddenQ ? "HIDDEN_SUPPORT" : "ONLINE_SUPPORT", this.roomName);
   }
   static resetTime = 1e3;
   onClose(event) {
@@ -200,14 +183,14 @@ class WebH {
   constructor(roomName, hiddenQ = false) {
     this.nick = "BetaOS_System";
     this.replyMessage = (msg, sender, data) => {
-      console.log(msg);
-      (0, import_messageHandle.replyMessage)(msg, sender, data);
+      return (0, import_messageHandle.replyMessage)(this, msg, sender, data);
     };
     this.hiddenQ = hiddenQ;
     if (roomName.length > 21)
       return;
     this.roomName = roomName;
     import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room(hiddenQ ? "HIDDEN_SUPPORT" : "ONLINE_SUPPORT", this.roomName, this.replyMessage, this));
+    import_supportRooms.supportHandler.addConnection(new import_supportRooms.pseudoConnection(), roomName, "", true);
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

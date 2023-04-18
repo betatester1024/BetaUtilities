@@ -95,6 +95,13 @@ p.slashMe {
   top: 1px;
 }
 
+.slashMe:not(p) {
+  font-style: italic;
+  position: relative;
+  background-color: var(--system-grey2);
+  top: -1px;
+}
+
 p.admin, p.user, p.error, 
 span.admin, span.user, span.error,
 a.admin, a.user, a.error {
@@ -102,11 +109,15 @@ a.admin, a.user, a.error {
   color: var(--system-blue);
 } 
 
+p {
+  display: inline-block;
+}
+
 b.admin{
   color: var(--system-blue);  
 }
 
-p.admin.slashMe, b.admin {
+.admin.slashMe, b.admin {
   background-color: var(--system-blue2);
 }
 p.superadmin, b.superadmin, span.superadmin, a.superadmin {
@@ -114,7 +125,7 @@ p.superadmin, b.superadmin, span.superadmin, a.superadmin {
   font-variant-caps: small-caps;
   font-size: large;
 }
-b.superadmin, p.superadmin.slashMe {
+b.superadmin, .superadmin.slashMe {
   background-color: var(--system-green2);
 }
 

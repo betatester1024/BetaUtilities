@@ -1,6 +1,3 @@
-## Notice
-⚠️**No updates will be released for BetaOS Services while a full rewrite takes place. Apologies for the inconvenience.**
-
 # BetaUtilities
 BetaUtilities for euphoria.io using WebSocket.
 

@@ -40,7 +40,9 @@ let leetlentCt = 1;
 let wordleCt = 1;
 let STARTTIME = Date.now();
 function replyMessage(msg, sender, data) {
+  console.log(msg);
   msg = msg.toLowerCase();
+  console.log(msg);
   if (msg.match("@" + this.nick.toLowerCase())) {
     this.incrPingCt();
   }
@@ -65,6 +67,10 @@ function replyMessage(msg, sender, data) {
     else
       this.delaySendMsg("/me reboots", data, 200);
     return "/me is rebooting";
+  }
+  let imgMatch = msg.match(/!unblockimg (.*)/);
+  if (imgMatch) {
+    return "https://external-content.duckduckgo.com/iu/?u=" + encodeURIComponent(imgMatch[1]);
   }
   if (msg.match(/!testfeature/gimu))
     return "@" + sender;

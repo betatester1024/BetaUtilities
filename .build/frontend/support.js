@@ -126,6 +126,10 @@ async function initClient() {
         }
         ele.appendChild(document.createElement("br"));
         document.getElementById("placeholder").style.display = "none";
+        if (!FOCUSSED) {
+          UNREAD++;
+          document.title = "(" + UNREAD + ") | Support | BetaOS Systems";
+        }
       }
       if (!LOADEDQ2 || scrDistOKQ) {
         ele.scrollTop = ele.scrollHeight;
@@ -162,4 +166,15 @@ function findReplacement(thing) {
       return replacements[i].from;
   }
 }
+window.addEventListener("blur", () => {
+  UNREADS = 0;
+  FOCUSSED = false;
+});
+window.addEventListener("focus", () => {
+  document.title = "Support | BetaOS Systems";
+  FOCUSSED = true;
+  UNREADS = 0;
+});
+let UNREAD = 0;
+let FOCUSSED = true;
 //# sourceMappingURL=support.js.map

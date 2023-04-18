@@ -24,24 +24,31 @@ __export(supportRooms_exports, {
   deleteRoom: () => deleteRoom,
   roomRequest: () => roomRequest,
   sendMsg: () => sendMsg,
+  sendMsg_B: () => sendMsg_B,
   supportHandler: () => supportHandler,
   updateActive: () => updateActive
 });
 module.exports = __toCommonJS(supportRooms_exports);
 var import_userRequest = require("./userRequest");
 var import_consts = require("./consts");
+var import_logging = require("./logging");
 class Room {
   type;
   name;
-  constructor(type, name) {
+  handler;
+  replyMsg;
+  constructor(type, name, responder = null, handler) {
     this.type = type;
     this.name = name;
+    this.handler = handler;
+    this.replyMsg = responder;
   }
 }
 class supportHandler {
   static allRooms = [];
   static connections = [];
   static addRoom(rm) {
+    (0, import_logging.log)("Room created!" + rm);
     let idx = this.allRooms.findIndex((r) => {
       return r.type == rm.type && r.name == rm.name;
     });
@@ -51,6 +58,7 @@ class supportHandler {
       this.allRooms.push(rm);
   }
   static deleteRoom(type, roomName) {
+    (0, import_logging.log)("Room deleted!" + type + roomName);
     let idx = this.allRooms.findIndex((r) => {
       return r.type == type && r.name == roomName;
     });
@@ -180,8 +188,24 @@ function sendMsg(msg, room, token, callback) {
       supportHandler.sendMsgTo(room, "[" + obj.data.alias + "](" + obj.data.perms + ")" + msg);
     else
       supportHandler.sendMsgTo(room, "[" + processAnon(token) + "](1)" + msg);
+    for (let i = 0; i < supportHandler.allRooms.length; i++) {
+      if (supportHandler.allRooms[i].name == room) {
+        supportHandler.allRooms[i].replyMsg(msg, obj.data.alias ?? processAnon(token), null).bind(supportHandler.allRooms[i].handler);
+      }
+    }
     callback("SUCCESS", null, token);
   });
+}
+async function sendMsg_B(msg, room) {
+  await import_consts.msgDB.insertOne({
+    fieldName: "MSG",
+    data: msg.replaceAll("\\n", "\n"),
+    permLevel: 3,
+    sender: "BetaOS_System",
+    expiry: Date.now() + 3600 * 1e3,
+    room
+  });
+  supportHandler.sendMsgTo(room, "[BetaOS_System](3)" + msg);
 }
 function processAnon(token) {
   return "Anonymous user";
@@ -281,6 +305,7 @@ async function WHOIS(token, user) {
   deleteRoom,
   roomRequest,
   sendMsg,
+  sendMsg_B,
   supportHandler,
   updateActive
 });

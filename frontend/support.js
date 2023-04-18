@@ -187,6 +187,10 @@ async function initClient()
       // if (split.length <= 2) ele.appendChild(newMsgBody);
       ele.appendChild(document.createElement("br"));
       document.getElementById("placeholder").style.display="none";
+      if (!FOCUSSED) {
+        UNREAD ++ 
+        document.title = "("+UNREAD+") | Support | BetaOS Systems"
+      }
     } // 
     
     if (!LOADEDQ2 || scrDistOKQ)
@@ -251,3 +255,18 @@ function findReplacement(thing) {
     if (replacements[i].to == thing) return replacements[i].from;
   }
 }
+
+window.addEventListener("blur", () => {
+  UNREADS = 0;
+  FOCUSSED = false;
+});
+
+// when the user's focus is back to your tab (website) again
+window.addEventListener("focus", () => {
+  document.title = "Support | BetaOS Systems";
+  FOCUSSED = true;
+  UNREADS = 0;
+});
+
+let UNREAD = 0;
+let FOCUSSED = true;

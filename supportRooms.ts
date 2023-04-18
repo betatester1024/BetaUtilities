@@ -1,11 +1,17 @@
 import {userRequest} from './userRequest';
 import {msgDB, authDB, uDB} from './consts';
+import {log} from './logging'
+import { WebH } from './betautilities/webHandler';
 export class Room {
   type:string;
   name:string;
-  constructor(type:string, name:string) {
+  handler: WebH|null;
+  replyMsg:((msg:string, sender:string, data:any)=>any)|null;
+  constructor(type:string, name:string, responder:((msg:string, sender:string, data:any)=>any)|null=null, handler: WebH) {
     this.type=type;
     this.name=name;
+    this.handler = handler;
+    this.replyMsg=responder;
   };
 
 }
@@ -14,11 +20,13 @@ export class supportHandler {
   static allRooms: Room[] = [];
   static connections: {event:any, roomName:string, tk:string, readyQ:boolean}[] = [];
   static addRoom(rm:Room) {
+    log("Room created!" + rm)
     let idx = this.allRooms.findIndex((r:any)=>{return r.type==rm.type && r.name==rm.name});
     if (idx >= 0) return;
     else this.allRooms.push(rm);
   }
   static deleteRoom(type:string, roomName:string) {
+    log("Room deleted!" +  type+ roomName);
     let idx = this.allRooms.findIndex((r:any)=>{return r.type==type && r.name==roomName});
     if (idx >= 0) this.allRooms.splice(idx, 1);
   }
@@ -133,8 +141,10 @@ export class supportHandler {
         // encode '>' -- used for message-breaks (yes, it is stupid.)
         data = data.replaceAll(">", "&gt;");
         this.connections[i].event.write("data:"+data+">\n\n")
+        
       }
     }
+    
   }  
 }
 
@@ -144,8 +154,20 @@ export function sendMsg(msg:string, room:string, token:string, callback: (status
                              sender:obj.data.alias??""+processAnon(token), expiry:Date.now()+3600*1000, room:room});
     if (obj.status == "SUCCESS") supportHandler.sendMsgTo(room, "["+obj.data.alias+"]("+obj.data.perms+")"+msg);
     else supportHandler.sendMsgTo(room, "["+processAnon(token)+"](1)"+msg);
+    for (let i=0; i<supportHandler.allRooms.length; i++) {
+      if (supportHandler.allRooms[i].name == room) {
+        supportHandler.allRooms[i].replyMsg(msg, obj.data.alias??processAnon(token), null).bind(supportHandler.allRooms[i].handler);
+      }
+ 
+    }
     callback("SUCCESS", null, token);
   });
+}
+
+export async function sendMsg_B(msg:string, room:string) {
+  await msgDB.insertOne({fieldName:"MSG", data:msg.replaceAll("\\n", "\n"), permLevel:3, 
+                           sender:"BetaOS_System", expiry:Date.now()+3600*1000, room:room});
+  supportHandler.sendMsgTo(room, "[BetaOS_System](3)"+msg);
 }
 
 function processAnon(token:string) {

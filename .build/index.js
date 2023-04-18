@@ -28,6 +28,7 @@ var import_supportRooms = require("./supportRooms");
 var import_logging = require("./logging");
 var import_consts = require("./consts");
 var import_wsHandler = require("./betautilities/wsHandler");
+var import_webHandler = require("./betautilities/webHandler");
 var import_wordler = require("./betautilities/wordler");
 let connectionSuccess = true;
 let DBConnectFailure = null;
@@ -50,12 +51,12 @@ try {
           console.log("Connected euph_room", obj.euphRooms[i]);
         }
         for (let i = 0; i < obj.rooms.length; i++) {
-          import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("ONLINE_SUPPORT", obj.rooms[i]));
+          new import_webHandler.WebH(obj.rooms[i], false);
           console.log("Loaded support room", obj.rooms[i]);
         }
         for (let i = 0; i < obj.hidRooms.length; i++) {
-          import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("HIDDEN_SUPPORT", obj.hidRooms[i]));
-          console.log("Loaded support room", obj.rooms[i]);
+          new import_webHandler.WebH(obj.rooms[i], true);
+          console.log("Loaded hidden support room", obj.hidRooms[i]);
         }
       });
     });

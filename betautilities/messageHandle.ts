@@ -24,8 +24,10 @@ let STARTTIME = Date.now();
 // export let rooms:string[] = [];
 
 
-export function replyMessage(this:WS, msg:string, sender:string, data:any):string {
+export function replyMessage(this:any, msg:string, sender:string, data:any):string {
+  console.log(msg);
   msg = msg.toLowerCase();
+  console.log(msg);
   if (msg.match ("@"+this.nick.toLowerCase())) {
     this.incrPingCt();
   }
@@ -42,6 +44,10 @@ export function replyMessage(this:WS, msg:string, sender:string, data:any):strin
     if (this.socket) setTimeout(()=>{this.socket.close()}, 120);
     else this.delaySendMsg("/me reboots", data, 200)
     return "/me is rebooting";
+  }
+  let imgMatch = msg.match(/!unblockimg (.*)/);
+  if (imgMatch) {
+    return "https://external-content.duckduckgo.com/iu/?u="+encodeURIComponent(imgMatch[1]);
   }
   if (msg.match(/!testfeature/gimu)) return "@" + sender;
   if (msg.match("^!uptime @" + this.nick.toLowerCase() + "$")) {

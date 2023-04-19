@@ -1,6 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
-const process = require('process');
+//const process = require('process');
 const {authenticate} = require('@google-cloud/local-auth');
 const {google} = require('googleapis');
 
@@ -9,8 +9,9 @@ const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
-const TOKEN_PATH = path.join(process.cwd(), 'token.json');
-const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
+import {TOKEN_PATH, CREDENTIALS_PATH} from './consts'
+// const TOKEN_PATH = path.join(process.cwd(), 'token.json');
+// const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
 
 /**
  * Reads previously authorized credentials from the save file.
@@ -33,7 +34,7 @@ async function loadSavedCredentialsIfExist() {
  * @param {OAuth2Client} client
  * @return {Promise<void>}
  */
-async function saveCredentials(client) {
+async function saveCredentials(client:any) {
   const content = await fs.readFile(CREDENTIALS_PATH);
   const keys = JSON.parse(content);
   const key = keys.installed || keys.web;
@@ -50,7 +51,7 @@ async function saveCredentials(client) {
  * Load or request or authorization to call APIs.
  *
  */
-async function authorize() {
+export async function authorize() {
   let client = await loadSavedCredentialsIfExist();
   if (client) {
     return client;
@@ -70,20 +71,16 @@ async function authorize() {
  *
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
-async function listLabels(auth) {
+async function listLabels(auth:any) {
   const gmail = google.gmail({version: 'v1', auth});
-  const res = await gmail.users.labels.list({
-    userId: 'me',
-  });
+  const res = await gmail.users.drafts.create({userID:"me"});
   const labels = res.data.labels;
   if (!labels || labels.length === 0) {
     console.log('No labels found.');
     return;
   }
   console.log('Labels:');
-  labels.forEach((label) => {
+  labels.forEach((label:any) => {
     console.log(`- ${label.name}`);
   });
 }
-
-authorize().then(listLabels).catch(console.error);

@@ -18,6 +18,8 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var consts_exports = {};
 __export(consts_exports, {
+  CREDENTIALS_PATH: () => CREDENTIALS_PATH,
+  TOKEN_PATH: () => TOKEN_PATH,
   authDB: () => authDB,
   expiry: () => expiry,
   frontendDir: () => frontendDir,
@@ -46,6 +48,8 @@ const userMaxLength = 9e99;
 const authDB = import_database.database.collection("SystemAUTH_V2");
 const msgDB = import_database.database.collection("SupportMessaging");
 const uDB = import_database.database.collection("BetaUtilities");
+const TOKEN_PATH = "/home/runner/betatester1024/TOKEN.json";
+const CREDENTIALS_PATH = "/home/runner/betatester1024/CREDENTIALS.json";
 const hashingOptions = {
   type: argon2.argon2d,
   memoryCost: 12288,
@@ -56,6 +60,8 @@ const hashingOptions = {
 const expiry = [9e99, 1e3 * 60 * 60 * 24, 1e3 * 60 * 60 * 24 * 30, 1e3 * 60 * 60];
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  CREDENTIALS_PATH,
+  TOKEN_PATH,
   authDB,
   expiry,
   frontendDir,

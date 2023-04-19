@@ -18,65 +18,34 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var mailer_exports = {};
 __export(mailer_exports, {
-  authorize: () => authorize
+  sendMail: () => sendMail
 });
 module.exports = __toCommonJS(mailer_exports);
-var import_consts = require("./consts");
-const fs = require("fs").promises;
-const path = require("path");
-const { authenticate } = require("@google-cloud/local-auth");
-const { google } = require("googleapis");
-const SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"];
-async function loadSavedCredentialsIfExist() {
-  try {
-    const content = await fs.readFile(import_consts.TOKEN_PATH);
-    const credentials = JSON.parse(content);
-    return google.auth.fromJSON(credentials);
-  } catch (err) {
-    return null;
-  }
-}
-async function saveCredentials(client) {
-  const content = await fs.readFile(import_consts.CREDENTIALS_PATH);
-  const keys = JSON.parse(content);
-  const key = keys.installed || keys.web;
-  const payload = JSON.stringify({
-    type: "authorized_user",
-    client_id: key.client_id,
-    client_secret: key.client_secret,
-    refresh_token: client.credentials.refresh_token
+var nodemailer = require("nodemailer");
+function sendMail() {
+  var transporter = nodemailer.createTransport({
+    service: "hotmail",
+    auth: {
+      user: "betaos-systems@hotmail.com",
+      pass: process.env["emlpwd"]
+    }
   });
-  await fs.writeFile(import_consts.TOKEN_PATH, payload);
-}
-async function authorize() {
-  let client = await loadSavedCredentialsIfExist();
-  if (client) {
-    return client;
-  }
-  client = await authenticate({
-    scopes: SCOPES,
-    keyfilePath: import_consts.CREDENTIALS_PATH
-  });
-  if (client.credentials) {
-    await saveCredentials(client);
-  }
-  return client;
-}
-async function listLabels(auth) {
-  const gmail = google.gmail({ version: "v1", auth });
-  const res = await gmail.users.drafts.create({ userID: "me" });
-  const labels = res.data.labels;
-  if (!labels || labels.length === 0) {
-    console.log("No labels found.");
-    return;
-  }
-  console.log("Labels:");
-  labels.forEach((label) => {
-    console.log(`- ${label.name}`);
+  var mailOptions = {
+    from: '"Our Code World " <betaos-systems@protonmail.com>',
+    to: "betaos-services@gmail.com",
+    subject: "Hello ",
+    text: "Hello world ",
+    html: "<b>Hello world </b><br> This is the first email sent with Nodemailer in Node.js"
+  };
+  transporter.sendMail(mailOptions, function(error, info) {
+    if (error) {
+      return console.log(error);
+    }
+    console.log("Message sent: " + info.response);
   });
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  authorize
+  sendMail
 });
 //# sourceMappingURL=mailer.js.map

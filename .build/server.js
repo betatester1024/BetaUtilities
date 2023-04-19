@@ -133,13 +133,23 @@ async function initServer() {
       res.end();
     });
   });
+  app.get("/oauth2callback", (req, res) => {
+    console.log("??");
+    console.log(req.url);
+  });
+  app.post("/oauth2callback", (req, res) => {
+    console.log("??");
+    console.log(req.url);
+  });
   app.get("/*", (req, res) => {
     let requrl = req.url.match("([^?]*)\\??.*")[1];
     let idx = validPages.findIndex((obj) => obj.toLowerCase() == requrl.toLowerCase());
     if (idx >= 0)
       res.sendFile(import_consts.frontendDir + validPages[idx] + ".html");
-    else
+    else {
+      res.status(404);
       res.sendFile(import_consts.frontendDir + "404.html");
+    }
     (0, import_logging.incrRequests)();
   });
   app.post("/server", urlencodedParser, async (req, res) => {
@@ -425,7 +435,8 @@ const validPages = [
   "/login",
   "/syslog",
   "/aboutme",
-  "/mailertest"
+  "/mailertest",
+  "/oauth2callback"
 ];
 const ignoreLog = ["getEE", "userRequest", "getLogs", "visits", "roomRequest", "sendMsg"];
 // Annotate the CommonJS export names for ESM import in node:

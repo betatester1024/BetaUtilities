@@ -1,86 +1,43 @@
-const fs = require('fs').promises;
-const path = require('path');
-//const process = require('process');
-const {authenticate} = require('@google-cloud/local-auth');
-const {google} = require('googleapis');
+var nodemailer = require('nodemailer');
 
-// If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
-// The file token.json stores the user's access and refresh tokens, and is
-// created automatically when the authorization flow completes for the first
-// time.
-import {TOKEN_PATH, CREDENTIALS_PATH} from './consts'
-// const TOKEN_PATH = path.join(process.cwd(), 'token.json');
-// const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
-
-/**
- * Reads previously authorized credentials from the save file.
- *
- * @return {Promise<OAuth2Client|null>}
- */
-async function loadSavedCredentialsIfExist() {
-  try {
-    const content = await fs.readFile(TOKEN_PATH);
-    const credentials = JSON.parse(content);
-    return google.auth.fromJSON(credentials);
-  } catch (err) {
-    return null;
-  }
-}
-
-/**
- * Serializes credentials to a file compatible with GoogleAUth.fromJSON.
- *
- * @param {OAuth2Client} client
- * @return {Promise<void>}
- */
-async function saveCredentials(client:any) {
-  const content = await fs.readFile(CREDENTIALS_PATH);
-  const keys = JSON.parse(content);
-  const key = keys.installed || keys.web;
-  const payload = JSON.stringify({
-    type: 'authorized_user',
-    client_id: key.client_id,
-    client_secret: key.client_secret,
-    refresh_token: client.credentials.refresh_token,
+// Create the transporter with the required configuration for Outlook
+// change the user and pass !
+export function sendMail() {
+  // var transporter = nodemailer.createTransport({
+  //     host: "smtp.office365.com", // hostname
+  //     secureConnection: true, // TLS requires secureConnection to be false
+  //     port: 587, // port for secure SMTP
+  //     // tls: {
+  //        // ciphers:'SSLv3'
+  //     // },
+  //     auth: {
+  //         user: 'outlook_6F821D19C58C4CEF@outlook.com',
+  //         pass: process.env['emlpwd']
+  //     }
+  // });
+  var transporter = nodemailer.createTransport({
+    service: "hotmail",
+    auth: {
+        user: "betaos-systems@hotmail.com",
+        pass: process.env['emlpwd']
+    }
   });
-  await fs.writeFile(TOKEN_PATH, payload);
-}
-
-/**
- * Load or request or authorization to call APIs.
- *
- */
-export async function authorize() {
-  let client = await loadSavedCredentialsIfExist();
-  if (client) {
-    return client;
-  }
-  client = await authenticate({
-    scopes: SCOPES,
-    keyfilePath: CREDENTIALS_PATH,
+  
+  // setup e-mail data, even with unicode symbols
+  var mailOptions = {
+      from: '"Our Code World " <betaos-systems@protonmail.com>', // sender address (who sends)
+      to: 'betaos-services@gmail.com', // list of receivers (who receives)
+      subject: 'Hello ', // Subject line
+      text: 'Hello world ', // plaintext body
+      html: '<b>Hello world </b><br> This is the first email sent with Nodemailer in Node.js' // html body
+  };
+  
+  // send mail with defined transport object
+  transporter.sendMail(mailOptions, function(error:any, info:any){
+      if(error){
+          return console.log(error);
+      }
+  
+      console.log('Message sent: ' + info.response);
   });
-  if (client.credentials) {
-    await saveCredentials(client);
-  }
-  return client;
-}
-
-/**
- * Lists the labels in the user's account.
- *
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- */
-async function listLabels(auth:any) {
-  const gmail = google.gmail({version: 'v1', auth});
-  const res = await gmail.users.drafts.create({userID:"me"});
-  const labels = res.data.labels;
-  if (!labels || labels.length === 0) {
-    console.log('No labels found.');
-    return;
-  }
-  console.log('Labels:');
-  labels.forEach((label:any) => {
-    console.log(`- ${label.name}`);
-  });
-}
+} 

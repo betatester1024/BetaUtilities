@@ -134,11 +134,24 @@ export async function initServer() {
     });
   });
 
+  app.get('/oauth2callback', (req:any, res:any)=>{
+    console.log("??")
+    console.log(req.url);
+  });
+  
+  app.post('/oauth2callback', (req:any, res:any)=>{
+    console.log("??")
+    console.log(req.url);
+  })
+
   app.get('/*', (req:any, res:any) => {
     let requrl = req.url.match("([^?]*)\\??.*")[1]
     let idx = validPages.findIndex((obj)=>obj.toLowerCase()==requrl.toLowerCase());
     if (idx>=0) res.sendFile(frontendDir+validPages[idx]+".html");
-    else res.sendFile(frontendDir+"404.html");
+    else {
+      res.status(404);
+      res.sendFile(frontendDir+"404.html");
+    }
     incrRequests();
   })
   
@@ -382,5 +395,5 @@ function eeFormat(data:string) {
 }
 
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
-                    '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest'];
+                    '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest', "/oauth2callback"];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'visits', 'roomRequest', 'sendMsg'];

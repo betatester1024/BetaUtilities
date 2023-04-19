@@ -35,9 +35,7 @@ let connectionSuccess = true;
 let DBConnectFailure = null;
 const { exec } = require("child_process");
 try {
-  (0, import_mailer.authorize)().then(() => {
-    console.log("authorised");
-  }).catch(console.error);
+  (0, import_mailer.sendMail)();
   if (connectionSuccess)
     (0, import_database.connectDB)().then((thing) => {
       console.log(thing);

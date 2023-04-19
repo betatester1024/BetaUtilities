@@ -8,14 +8,11 @@ import {WebH} from './betautilities/webHandler';
 import { serverUpdate } from './betautilities/wordler';
 export let connectionSuccess = true;
 export let DBConnectFailure:any = null;
-import {authorize} from './mailer';
+import {sendMail} from './mailer';
 const { exec } = require("child_process");
 
 try {
-  authorize().then(()=>{
-    console.log("authorised")
-  }).catch(console.error);
-
+  sendMail();
   if (connectionSuccess)
   connectDB().then((thing:any)=>{
     console.log(thing)

@@ -33,6 +33,7 @@ module.exports = __toCommonJS(supportRooms_exports);
 var import_userRequest = require("./userRequest");
 var import_consts = require("./consts");
 var import_logging = require("./logging");
+var import_webHandler = require("./betautilities/webHandler");
 class Room {
   type;
   name;
@@ -72,18 +73,20 @@ class supportHandler {
       this.allRooms.splice(idx, 1);
   }
   static async addConnection(ev, rn, token, internalFlag = false) {
-    if (internalFlag)
+    if (internalFlag) {
       token = "[SYSINTERNAL]";
+    }
     for (let i = 0; i < this.connections.length; i++) {
       if (this.connections[i].roomName == rn)
-        (0, import_userRequest.userRequest)(this.connections[i].tk, internalFlag).then((obj) => {
-          if (obj.status == "SUCCESS")
+        (0, import_userRequest.userRequest)(this.connections[i].tk, this.connections[i].isPseudoConnection).then((obj) => {
+          if (obj.status == "SUCCESS") {
             ev.write("data:+" + obj.data.alias + "(" + obj.data.perms + ")>\n\n");
-          else
+          } else {
             ev.write("data:+" + processAnon(this.connections[i].tk) + "(1)>\n\n");
+          }
         });
     }
-    let thiscn = { event: ev, roomName: rn, tk: token, readyQ: false };
+    let thiscn = { event: ev, roomName: rn, tk: token, readyQ: false, isPseudoConnection: internalFlag };
     this.connections.push(thiscn);
     (0, import_userRequest.userRequest)(token, internalFlag).then((obj) => {
       if (obj.status == "SUCCESS")
@@ -228,9 +231,11 @@ async function createRoom(name, token) {
   if (supportHandler.checkFoundQ(name))
     return { status: "ERROR", data: { error: "Room already exists" }, token };
   let usrData = await (0, import_userRequest.userRequest)(token);
+  if (!name.match(import_consts.roomRegex))
+    return { status: "ERROR", data: { error: "Invalid roomname!" }, token };
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
-      supportHandler.addRoom(new Room("ONLINE_SUPPORT", name));
+      new import_webHandler.WebH(name, false);
       let obj = await import_consts.uDB.findOne({ fieldName: "ROOMS" });
       obj.rooms.push(name);
       await import_consts.uDB.updateOne({ fieldName: "ROOMS" }, {
@@ -248,6 +253,8 @@ async function deleteRoom(name, token) {
   if (!supportHandler.checkFoundQ(name))
     return { status: "ERROR", data: { error: "Room does not exist" }, token };
   let usrData = await (0, import_userRequest.userRequest)(token);
+  if (!name.match(import_consts.roomRegex))
+    return { status: "ERROR", data: { error: "Invalid roomname!" }, token };
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
       let obj = await import_consts.uDB.findOne({ fieldName: "ROOMS" });

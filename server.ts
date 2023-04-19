@@ -382,5 +382,5 @@ function eeFormat(data:string) {
 }
 
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
-                    '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme'];
+                    '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest'];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'visits', 'roomRequest', 'sendMsg'];

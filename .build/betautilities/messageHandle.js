@@ -83,8 +83,14 @@ function replyMessage(hnd, msg, sender, data) {
   if (msg == "!issue" || msg == "!bug" || msg == "!feature") {
     return "https://github.com/betatester1024/BetaUtilities/issues/new/choose";
   }
-  if (msg.match(/(\s|^)abc(\s|$)/)) {
+  if (msg.match(/(\s|^)ass(\s|$)/)) {
     hnd.delaySendMsg("arse*", data, 0);
+  }
+  if (msg.match(/(\s|^)asses(\s|$)/)) {
+    hnd.delaySendMsg("arses*", data, 0);
+  }
+  if (msg.match(/(\s|^)asshole(s?)(\s|$)/)) {
+    hnd.delaySendMsg("arsehole*", data, 0);
   }
   import_consts.uDB.findOne({ fieldName: "WORKINGUSERS" }).then((obj) => {
     let match3 = msg.match("^!work @(.*)$");

@@ -44,6 +44,7 @@ try {
       (0, import_wordler.serverUpdate)();
       (0, import_logging.log)("Systems restarted");
       import_consts.uDB.findOne({ fieldName: "ROOMS" }).then((obj) => {
+        console.log(obj);
         for (let i = 0; i < obj.euphRooms.length; i++) {
           import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("EUPH_ROOM", obj.euphRooms[i]));
           new import_wsHandler.WS("wss://euphoria.io/room/" + obj.euphRooms[i] + "/ws", "BetaUtilities", obj.euphRooms[i], false);

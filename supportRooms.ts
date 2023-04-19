@@ -1,5 +1,5 @@
 import {userRequest} from './userRequest';
-import {msgDB, authDB, uDB} from './consts';
+import {msgDB, authDB, uDB, roomRegex} from './consts';
 import {log} from './logging'
 import { WebH } from './betautilities/webHandler';
 export class Room {
@@ -21,7 +21,7 @@ export class pseudoConnection {
 
 export class supportHandler {
   static allRooms: Room[] = [];
-  static connections: {event:any, roomName:string, tk:string, readyQ:boolean}[] = [];
+  static connections: {event:any, roomName:string, tk:string, readyQ:boolean, isPseudoConnection:boolean}[] = [];
   static addRoom(rm:Room) {
     log("Room created!" + rm)
     let idx = this.allRooms.findIndex((r:any)=>{return r.type==rm.type && r.name==rm.name});
@@ -35,16 +35,23 @@ export class supportHandler {
   }
   static async addConnection(ev:any, rn:string, token:string, internalFlag:boolean=false) {
     // send existing connections to THIS EVENT ONLY
-    if (internalFlag) token = "[SYSINTERNAL]";
+    if (internalFlag) 
+    {
+      token = "[SYSINTERNAL]";
+    }
     for (let i=0; i<this.connections.length; i++) {
       if (this.connections[i].roomName == rn)
-        userRequest(this.connections[i].tk, internalFlag).then((obj:{status:string, data:any, token:string})=>{
-          if (obj.status == "SUCCESS") ev.write("data:+"+obj.data.alias+"("+obj.data.perms+")>\n\n");
-          else ev.write("data:+"+processAnon(this.connections[i].tk)+"(1)>\n\n");
+        userRequest(this.connections[i].tk, this.connections[i].isPseudoConnection).then((obj:{status:string, data:any, token:string})=>{
+          if (obj.status == "SUCCESS") {
+            ev.write("data:+"+obj.data.alias+"("+obj.data.perms+")>\n\n");
+          }
+          else {
+            ev.write("data:+"+processAnon(this.connections[i].tk)+"(1)>\n\n");
+          }
         });
     }
     // add NEW CONNECTION
-    let thiscn = {event:ev, roomName:rn, tk:token, readyQ:false};
+    let thiscn = {event:ev, roomName:rn, tk:token, readyQ:false, isPseudoConnection:internalFlag};
     this.connections.push(thiscn);
     // TELL EVERYONE ELSE ABOUT THE NEW CONNECTION
     userRequest(token, internalFlag).then((obj:{status:string, data:any, token:string})=>{
@@ -188,10 +195,12 @@ export function roomRequest(token:string, all:boolean=false) {
 export async function createRoom(name:string, token:string) {
   if (supportHandler.checkFoundQ(name)) return {status:"ERROR", data:{error:"Room already exists"}, token:token};
   let usrData = await userRequest(token) as {status:string, data:{perms:number}};
-  
+  if (!name.match(roomRegex)) return {status:"ERROR", data:{error:"Invalid roomname!"}, token:token};
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
-      supportHandler.addRoom(new Room("ONLINE_SUPPORT", name));
+      
+      // supportHandler.addRoom(new Room("ONLINE_SUPPORT", name));
+      new WebH(name, false);
       let obj = await uDB.findOne({fieldName:"ROOMS"});
       obj.rooms.push(name);
       await uDB.updateOne({fieldName:"ROOMS"}, {
@@ -209,7 +218,7 @@ export async function createRoom(name:string, token:string) {
 export async function deleteRoom(name:string, token:string) {
   if (!supportHandler.checkFoundQ(name)) return {status:"ERROR", data:{error:"Room does not exist"}, token:token};
   let usrData = await userRequest(token) as {status:string, data:{perms:number}};
-  
+  if (!name.match(roomRegex)) return {status:"ERROR", data:{error:"Invalid roomname!"}, token:token};
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
 

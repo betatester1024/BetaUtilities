@@ -118,9 +118,10 @@ export class WebH
   onMessage(msg:string, snd:string) {
       let data = ""
       if (DATALOGGING) fs.writeFileSync('betautilities/msgLog.txt', fs.readFileSync('betautilities/msgLog.txt').toString()+((`(${this.roomName})[${snd}] ${msg}\n`)));
-      msg = msg.trim().toLowerCase().replaceAll(/(@betaos|@betautilities|@betaos-system|@system)/gimu, "@betaos_system");
+      msg = msg.toLowerCase().replaceAll(/(\s|^)((@betaos)|(@betautilities)|(@system))(\s|$)/gimu, " @"+this.nick.toLowerCase()+" ").trim()
       // Required methods
       // !kill
+    console.log(msg);
       if (msg == "!kill @" + this.nick.toLowerCase()) {
         this.sendMsg("/me crashes", data);
         this.delaySendMsg("/me restarts", data, 200);
@@ -225,6 +226,6 @@ export class WebH
     if (roomName.length > 21) return;
     this.roomName = roomName;
     supportHandler.addRoom(new Room(hiddenQ?"HIDDEN_SUPPORT":"ONLINE_SUPPORT", this.roomName, this.replyMessage, this));
-    supportHandler.addConnection(new pseudoConnection(), roomName, "", true);
+    supportHandler.addConnection(new pseudoConnection(), roomName, "[SYSINTERNAL]", true);
   }
 }

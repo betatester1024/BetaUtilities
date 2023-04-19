@@ -20,6 +20,7 @@ try {
     serverUpdate();
     log("Systems restarted");
     uDB.findOne({fieldName:"ROOMS"}).then((obj:{euphRooms:string[], rooms:string[], hidRooms:string[]})=>{
+      console.log(obj);
       for (let i=0; i<obj.euphRooms.length; i++) {
         supportHandler.addRoom(new Room("EUPH_ROOM", obj.euphRooms[i]));
         new WS("wss://euphoria.io/room/" + obj.euphRooms[i] +"/ws", "BetaUtilities", obj.euphRooms[i], false)

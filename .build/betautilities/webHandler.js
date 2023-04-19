@@ -129,7 +129,8 @@ class WebH {
     if (DATALOGGING)
       fs.writeFileSync("betautilities/msgLog.txt", fs.readFileSync("betautilities/msgLog.txt").toString() + `(${this.roomName})[${snd}] ${msg}
 `);
-    msg = msg.trim().toLowerCase().replaceAll(/(@betaos|@betautilities|@betaos-system|@system)/gimu, "@betaos_system");
+    msg = msg.toLowerCase().replaceAll(/(\s|^)((@betaos)|(@betautilities)|(@system))(\s|$)/gimu, " @" + this.nick.toLowerCase() + " ").trim();
+    console.log(msg);
     if (msg == "!kill @" + this.nick.toLowerCase()) {
       this.sendMsg("/me crashes", data);
       this.delaySendMsg("/me restarts", data, 200);
@@ -190,7 +191,7 @@ class WebH {
       return;
     this.roomName = roomName;
     import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room(hiddenQ ? "HIDDEN_SUPPORT" : "ONLINE_SUPPORT", this.roomName, this.replyMessage, this));
-    import_supportRooms.supportHandler.addConnection(new import_supportRooms.pseudoConnection(), roomName, "", true);
+    import_supportRooms.supportHandler.addConnection(new import_supportRooms.pseudoConnection(), roomName, "[SYSINTERNAL]", true);
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

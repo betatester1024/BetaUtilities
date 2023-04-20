@@ -22,6 +22,7 @@ __export(mailer_exports, {
 });
 module.exports = __toCommonJS(mailer_exports);
 var nodemailer = require("nodemailer");
+let fs = require("fs");
 function sendMail() {
   var transporter = nodemailer.createTransport({
     service: "hotmail",
@@ -31,11 +32,11 @@ function sendMail() {
     }
   });
   var mailOptions = {
-    from: '"Our Code World " <betaos-systems@protonmail.com>',
-    to: "betaos-services@gmail.com",
-    subject: "Hello ",
-    text: "Hello world ",
-    html: "<b>Hello world </b><br> This is the first email sent with Nodemailer in Node.js"
+    from: '"BetaOS System AutoMailer" <betaos-systems@hotmail.com>',
+    to: "betatester1025@protonmail.com",
+    subject: "This is a test.",
+    text: "Testing.",
+    html: fs.readFileSync("./mailtemplate.html")
   };
   transporter.sendMail(mailOptions, function(error, info) {
     if (error) {

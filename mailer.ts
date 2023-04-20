@@ -1,5 +1,5 @@
 var nodemailer = require('nodemailer');
-
+let fs = require('fs');
 // Create the transporter with the required configuration for Outlook
 // change the user and pass !
 export function sendMail() {
@@ -25,11 +25,11 @@ export function sendMail() {
   
   // setup e-mail data, even with unicode symbols
   var mailOptions = {
-      from: '"Our Code World " <betaos-systems@protonmail.com>', // sender address (who sends)
-      to: 'betaos-services@gmail.com', // list of receivers (who receives)
-      subject: 'Hello ', // Subject line
-      text: 'Hello world ', // plaintext body
-      html: '<b>Hello world </b><br> This is the first email sent with Nodemailer in Node.js' // html body
+      from: '"BetaOS System AutoMailer" <betaos-systems@hotmail.com>', // sender address (who sends)
+      to: 'betatester1025@protonmail.com', // list of receivers (who receives)
+      subject: 'This is a test.', // Subject line
+      text: 'Testing.', // plaintext body
+      html: fs.readFileSync('./mailtemplate.html') // html body
   };
   
   // send mail with defined transport object

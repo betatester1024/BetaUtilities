@@ -22,6 +22,7 @@ __export(supportRooms_exports, {
   WHOIS: () => WHOIS,
   createRoom: () => createRoom,
   deleteRoom: () => deleteRoom,
+  loadLogs: () => loadLogs,
   pseudoConnection: () => pseudoConnection,
   roomRequest: () => roomRequest,
   sendMsg: () => sendMsg,
@@ -53,6 +54,7 @@ class pseudoConnection {
 ;
 class supportHandler {
   static allRooms = [];
+  static connectionCt = 0;
   static connections = [];
   static addRoom(rm) {
     (0, import_logging.log)("Room created!" + rm);
@@ -73,6 +75,7 @@ class supportHandler {
       this.allRooms.splice(idx, 1);
   }
   static async addConnection(ev, rn, token, internalFlag = false) {
+    this.connectionCt++;
     if (internalFlag) {
       token = "[SYSINTERNAL]";
     }
@@ -86,7 +89,7 @@ class supportHandler {
           }
         });
     }
-    let thiscn = { event: ev, roomName: rn, tk: token, readyQ: false, isPseudoConnection: internalFlag };
+    let thiscn = { id: this.connectionCt, event: ev, roomName: rn, tk: token, readyQ: false, isPseudoConnection: internalFlag };
     this.connections.push(thiscn);
     (0, import_userRequest.userRequest)(token, internalFlag).then((obj) => {
       if (obj.status == "SUCCESS")
@@ -95,12 +98,15 @@ class supportHandler {
         this.sendMsgTo(rn, "+" + processAnon(obj.token) + "(1)");
     });
     console.log("added connection in " + rn);
-    let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn } }).toArray();
+    let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room: rn });
+    let msgCt = roomData ? roomData.msgCt : 0;
+    let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, msgID: { $gt: msgCt - 30 } }).toArray();
     let text = "";
+    ev.write("data:CONNECTIONID " + this.connectionCt + ">\n\n");
     for (let i = 0; i < msgs.length; i++) {
-      ev.write("data:[" + msgs[i].sender + "](" + msgs[i].permLevel + ")" + msgs[i].data + ">\n\n");
+      ev.write("data:{" + (msgs[i].msgID ?? -1) + "}[" + msgs[i].sender + "](" + msgs[i].permLevel + ")" + msgs[i].data + ">\n\n");
     }
-    text += "[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. Commands are available here: &gt;&gt;commands \nEnter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!>";
+    text += "{99999999999}[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. Commands are available here: &gt;&gt;commands \nEnter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!>";
     ev.write("data:" + text + "\n\n");
     thiscn.readyQ = true;
   }
@@ -184,21 +190,35 @@ class supportHandler {
       }
     }
   }
+  static sendMsgTo(connectionID, data) {
+    for (let i = 0; i < this.connections.length; i++) {
+      if (this.connections[i].id == connectionID) {
+        data = data.replaceAll(">", "&gt;");
+        this.connections[i].event.write("data:" + data + ">\n\n");
+      }
+    }
+  }
 }
 function sendMsg(msg, room, token, callback) {
   (0, import_userRequest.userRequest)(token).then(async (obj) => {
+    let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room });
+    let msgCt = roomData ? roomData.msgCt : 0;
     await import_consts.msgDB.insertOne({
       fieldName: "MSG",
       data: msg.replaceAll(">", "&gt;"),
       permLevel: obj.data.perms ?? 1,
       sender: obj.data.alias ?? "" + processAnon(token),
       expiry: Date.now() + 3600 * 1e3,
-      room
+      room,
+      msgID: msgCt
     });
+    await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
+      $inc: { msgCt: 1 }
+    }, { upsert: true });
     if (obj.status == "SUCCESS")
-      supportHandler.sendMsgTo(room, "[" + obj.data.alias + "](" + obj.data.perms + ")" + msg);
+      supportHandler.sendMsgTo(room, "{" + msgCt + "}[" + obj.data.alias + "](" + obj.data.perms + ")" + msg);
     else
-      supportHandler.sendMsgTo(room, "[" + processAnon(token) + "](1)" + msg);
+      supportHandler.sendMsgTo(room, "{" + msgCt + "}[" + processAnon(token) + "](1)" + msg);
     for (let i = 0; i < supportHandler.allRooms.length; i++) {
       if (supportHandler.allRooms[i].name == room) {
         supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token));
@@ -312,12 +332,15 @@ async function WHOIS(token, user) {
     about: userData ? userData.aboutme : "Account not found"
   }, users: out }, token };
 }
+async function loadLogs(room, id, from, token) {
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Room,
   WHOIS,
   createRoom,
   deleteRoom,
+  loadLogs,
   pseudoConnection,
   roomRequest,
   sendMsg,

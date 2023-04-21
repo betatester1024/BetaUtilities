@@ -367,7 +367,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     hnd.clearCallReset();
     return (
       "Important commands: !ping, !help, !pause, !restore, !kill, !pong, !uptime, !uuid. \\n " +
-      "Bot-specific commands: see https://betatester1024.repl.co/about!"
+      "Bot-specific commands: see https://betatester1024.repl.co/commands?nick=BetaUtilities"
     );
   }
   if (hnd.callStatus == 1 && (msg == ":two:" || msg == "two" || msg == "2")) {

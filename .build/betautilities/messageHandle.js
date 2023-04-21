@@ -367,7 +367,7 @@ function replyMessage(hnd, msg, sender, data) {
   }
   if (hnd.callStatus == 1 && (msg == ":one:" || msg == "one" || msg == "1")) {
     hnd.clearCallReset();
-    return "Important commands: !ping, !help, !pause, !restore, !kill, !pong, !uptime, !uuid. \\n Bot-specific commands: see https://betatester1024.repl.co/about!";
+    return "Important commands: !ping, !help, !pause, !restore, !kill, !pong, !uptime, !uuid. \\n Bot-specific commands: see https://betatester1024.repl.co/commands?nick=BetaUtilities";
   }
   if (hnd.callStatus == 1 && (msg == ":two:" || msg == "two" || msg == "2")) {
     hnd.delaySendMsg("/me crashes", data, 3e3);

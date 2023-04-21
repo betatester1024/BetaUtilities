@@ -53,7 +53,7 @@ function globalOnload(cbk2) {
     <p>We use only <kbd>strictly necessary cookies</kbd> to verify and persist 
     your login session, and to confirm your acceptance of these cookies. <br>
     By continuing to use this site, you consent to our use of these cookies.</p>
-    <button class='blu override btn fsmed' onclick="acceptCookies()">
+    <button class='blu btn fsmed' onclick="acceptCookies()">
     <span class="material-symbols-outlined">check</span>
     I understand
     <div class="anim"></div>

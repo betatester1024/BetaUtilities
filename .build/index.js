@@ -30,12 +30,10 @@ var import_consts = require("./consts");
 var import_wsHandler = require("./betautilities/wsHandler");
 var import_webHandler = require("./betautilities/webHandler");
 var import_wordler = require("./betautilities/wordler");
-var import_mailer = require("./mailer");
 let connectionSuccess = true;
 let DBConnectFailure = null;
 const { exec } = require("child_process");
 try {
-  (0, import_mailer.sendMail)();
   if (connectionSuccess)
     (0, import_database.connectDB)().then((thing) => {
       console.log(thing);

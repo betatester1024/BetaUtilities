@@ -14,7 +14,8 @@ import {addTask, getTasks, updateTask, deleteTask} from './tasks';
 import {getLogs, log, purgeLogs, visitCt, incrRequests} from './logging';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
-import {supportHandler, roomRequest, sendMsg, createRoom, deleteRoom, WHOIS} from './supportRooms'
+import {supportHandler, roomRequest, sendMsg, 
+        createRoom, deleteRoom, WHOIS, loadLogs} from './supportRooms'
 const urlencodedParser = bodyParser.urlencoded({ extended: false }) 
 var RateLimit = require('express-rate-limit');
 
@@ -338,6 +339,12 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
     case "completeTODO":
       if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
       deleteTask(token, data.id, true)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "loadLogs": // {"action":"loadLogs","room":"BetaOS","id":"11","from":24}
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+      loadLogs(data.room, data.id, data.from, token)
       .then((obj:{status:string, data:any, token:string})=>
         {callback(obj.status, obj.data, obj.token)});
       break;

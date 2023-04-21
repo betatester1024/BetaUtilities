@@ -371,6 +371,15 @@ function makeRequest(action, token, data, callback) {
         callback(obj.status, obj.data, obj.token);
       });
       break;
+    case "loadLogs":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
+      (0, import_supportRooms.loadLogs)(data.room, data.id, data.from, token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
     case "toggleTheme":
       (0, import_updateUser.toggleTheme)(token).then((obj) => {
         callback(obj.status, obj.data, obj.token);

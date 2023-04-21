@@ -450,6 +450,17 @@ footer, #footer {
   bottom: -200vh;
   background-color: var(--system-overlay);
   border-radius: 30px 30px 0px 0px;
+  width: calc(100% - 120px);
+  max-height: 50vh;
+  /* ove */
+  overflow-y: auto;
+}
+
+
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--system-bg);
 }
 
 #compliance p {

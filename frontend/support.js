@@ -8,6 +8,9 @@ function onLoad() {
   ROOMNAME = document.URL.match("\\?room=(.*)")[1];
 }
 // system refresh auto!
+
+let STARTID = -1;
+
 function sendMsg() {
   let inp = document.getElementById("msgInp");
   let match = inp.value.match("^!alias @(.+)");
@@ -44,8 +47,17 @@ async function initClient()
     console.log('Got', message);
     ele = document.getElementById("userList");
     let modif = message.data;
-    
-
+    let cnMatch = modif.match(/(>|^)CONNECTIONID ([0-9]+)>/);
+    if (cnMatch) {
+      
+      CONNECTIONID = cnMatch[2];
+    }    
+    modif = modif.replace(/(>|^)CONNECTIONID ([0-9]+)>/, "");
+    let lcMatch = modif.match(/LOADCOMPLETE>/);
+    if (lcMatch) {
+      loadStatus = -1;
+    }    
+    modif = modif.replace(/LOADCOMPLETE>/, "");
     let removed = rmvReg.exec(modif);
     let added = addReg.exec(modif)
     while (removed || added) {
@@ -60,29 +72,36 @@ async function initClient()
       removed = modif.match(rmvReg);
       added = modif.match(addReg);
     }
-    
+    console.log(modif);
     let area = document.getElementById("msgArea");
     ele = document.createElement("p");
     
     let scrDistOKQ =  (ele.scrollTop) >= (ele.scrollHeight-ele.offsetHeight - 100)
     let msgs = modif.split(">");
     for (let i=0; i<msgs.length; i++) {
-      let matches = msgs[i].match(/\[(.+)\]\(([0-9])\)(.*)/)
+      let matches = msgs[i].match(/{(-?[0-9]+)}\[(.+)\]\(([0-9])\)(.*)/)
       if (!matches) continue;
-      let newMsgBody = document.createElement("p");
+      PREPENDFLAG = false;
+      if (STARTID<0) STARTID = Number(matches[1]);
+      if (matches[1]<0) {
+        // console.log("PREPENDING")p
+        PREPENDFLAG = true;
+        if (loadStatus == 0) loadStatus = 1;
+      }
+      // let newMsgBody = document.createTextNode();
       let newMsgSender = document.createElement("b");
       // parse things
-      newMsgSender.innerText = matches[1];
-      newMsgSender.className = classStr[matches[2]];
-      area.appendChild(newMsgSender);
-      newMsgBody.className = classStr[matches[2]];
-      let msg = " "+matches[3].replaceAll("&gt;", ";gt;");
+      newMsgSender.innerText = matches[2];
+      newMsgSender.className = classStr[matches[3]];
+      if (!PREPENDFLAG) area.appendChild(newMsgSender);
+      // newMsgBody.className = classStr[matches[3]];
+      let msg = " "+matches[4].replaceAll("&gt;", ";gt;");
       for (let i=0; i<replacements.length; i++) {
         msg = msg.replaceAll(`:${replacements[i].from}:`, ">EMOJI"+replacements[i].to+">");
       }
       let slashMe = false;
-      msg = msg.replaceAll(/(&[a-zA-Z0-9]{1,20}[^;])/gm,">ROOM$1>")
-      msg = msg.replaceAll(/(#[a-zA-Z0-9_\-]{1,20}[^;])/gm,">SUPPORT$1>")
+      msg = msg.replaceAll(/(&[a-zA-Z0-9]{1,20})([^;]|$)/gm,">ROOM$1>$2")
+      msg = msg.replaceAll(/(#[a-zA-Z0-9_\-]{1,20})([^;]|$)/gm,">SUPPORT$1>$2")
       msg = msg.replaceAll(/(;gt;;gt;[^ ]{0,20})/gm,">INTERNALLINK$1>");
       msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu,">LINK$<test>>")
       msg = msg.replaceAll(/\\n/gmiu,">BR>")
@@ -90,17 +109,18 @@ async function initClient()
       if (msg.match("/me.*")) {
         msg = msg.slice(4);
         slashMe = true;
-        ele.className += " slashMe " + classStr[matches[2]];
+        ele.className += " slashMe " + classStr[matches[3]];
       }
+      ele.className = classStr[matches[3]];
       
       let split = msg.split(">");
       // console.log("message fragments:", split.length, split);
       let out= "";
       for (let i=0; i<split.length; i++) {
         if (i%2 == 0) {
-          let fragment = document.createElement("p");
-          fragment.className = classStr[matches[2]] //+ (slashMe?" slashMe ":"");
-          fragment.innerText = split[i].replaceAll(";gt;", ">");
+          let fragment = document.createTextNode(split[i].replaceAll(";gt;", ">"));
+          fragment.className = classStr[matches[3]] //+ (slashMe?" slashMe ":"");
+          // fragment.innerText = split[i].replaceAll(";gt;", ">");
           ele.appendChild(fragment);
         }
         else {
@@ -109,34 +129,34 @@ async function initClient()
           if (pref == "EMOJI") {
             let replaced = document.createElement("span");
             replaced.title = ":"+findReplacement(post)+":";
-            replaced.className="material-symbols-outlined supportMsg "+classStr[matches[2]] + (slashMe?" slashMe ":"");
+            replaced.className="material-symbols-outlined supportMsg "+classStr[matches[3]] + (slashMe?" slashMe ":"");
             replaced.innerText = post;
             ele.appendChild(replaced);
           }
           else if (pref == "LINK") {
             let replaced = document.createElement("a");
-            replaced.className="supportMsg "+classStr[matches[2]] //+ (slashMe?" slashMe ":"");
+            replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
             replaced.href = "https://"+post;
             replaced.innerText = post;
             ele.appendChild(replaced);
           }
           else if (pref == "ROOM") {
             let replaced = document.createElement("a");
-            replaced.className="supportMsg "+classStr[matches[2]] //+ (slashMe?" slashMe ":"");
+            replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
             replaced.href = "https://euphoria.io/room/"+post.slice(1);
             replaced.innerText = post;
             ele.appendChild(replaced);
           }
           else if (pref == "SUPPORT") {
             let replaced = document.createElement("a");
-            replaced.className="supportMsg "+classStr[matches[2]] //+ (slashMe?" slashMe ":"");
+            replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
             replaced.href = "/support?room="+post.slice(1);
             replaced.innerText = post;
             ele.appendChild(replaced);
           }
           else if (pref == "INTERNALLINK") {
             let replaced = document.createElement("a");
-            replaced.className="supportMsg "+classStr[matches[2]] //+ (slashMe?" slashMe ":"");
+            replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
             replaced.href = post.slice(8);
             replaced.innerText = ">>"+post.slice(8);
             ele.appendChild(replaced);
@@ -146,8 +166,17 @@ async function initClient()
           }
         }
       }
-      area.appendChild(ele);
-      area.appendChild(document.createElement("br"));
+      if (!PREPENDFLAG) {
+        // console.log("NOT")
+        area.appendChild(ele);
+        area.appendChild(document.createElement("br"));
+      }
+      else {
+        // console.log("PREPEND")
+        area.prepend(document.createElement("br"));
+        area.prepend(ele);
+        area.prepend(newMsgSender);
+      }
       document.getElementById("placeholder").style.display="none";
       if (!FOCUSSED) {
         UNREAD ++ 
@@ -198,11 +227,11 @@ const replacements = [
 //     while ((arr = regex.exec(msg)) !== null) {
 //       console.log(`Found ${arr[0]}. `, arr.index);
 //       let fragment = document.createElement("span");
-//       fragment.className = classStr[matches[2]];
+//       fragment.className = classStr[matches[3]];
 //       console.log(msg.slice(0, arr.index));
 //       if (msg.slice(0, arr.index)) replaceAll(msg.slice(0, arr.index), ele, matches);
 //       let replaced = document.createElement("span");
-//       replaced.className="material-symbols-outlined supportMsg "+classStr[matches[2]];
+//       replaced.className="material-symbols-outlined supportMsg "+classStr[matches[3]];
 //       replaced.innerText = replacements[j].to;
 //       console.log(replaced);
 //       ele.appendChild(replaced);
@@ -232,3 +261,12 @@ window.addEventListener("focus", () => {
 
 let UNREAD = 0;
 let FOCUSSED = true;
+
+function onScroll() {
+  
+  if (document.getElementById("msgArea").scrollTop < 30 && loadStatus<0) {
+    loadStatus = 0;
+    send(JSON.stringify({action:"loadLogs", room:ROOMNAME, id:CONNECTIONID, from:STARTID}), ()=>{});
+  }
+}
+let loadStatus = -1;

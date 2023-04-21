@@ -24,15 +24,18 @@ module.exports = __toCommonJS(mailer_exports);
 var nodemailer = require("nodemailer");
 let fs = require("fs");
 function sendMail() {
-  var transporter = nodemailer.createTransport({
-    service: "hotmail",
+  let transporter = nodemailer.createTransport({
+    pool: true,
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: true,
     auth: {
-      user: "betaos-systems@hotmail.com",
+      user: "betaos.services@gmail.com",
       pass: process.env["emlpwd"]
     }
   });
   var mailOptions = {
-    from: '"BetaOS System AutoMailer" <betaos-systems@hotmail.com>',
+    from: '"BetaOS System AutoMailer" <betaos.services@gmail.com>',
     to: "betatester1025@protonmail.com",
     subject: "This is a test.",
     text: "Testing.",

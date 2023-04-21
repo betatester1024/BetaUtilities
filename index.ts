@@ -12,7 +12,7 @@ import {sendMail} from './mailer';
 const { exec } = require("child_process");
 
 try {
-  sendMail();
+  // sendMail();
   if (connectionSuccess)
   connectDB().then((thing:any)=>{
     console.log(thing)

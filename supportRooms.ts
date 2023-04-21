@@ -21,6 +21,7 @@ export class pseudoConnection {
 
 export class supportHandler {
   static allRooms: Room[] = [];
+  static connectionCt = 0;
   static connections: {event:any, roomName:string, tk:string, readyQ:boolean, isPseudoConnection:boolean}[] = [];
   static addRoom(rm:Room) {
     log("Room created!" + rm)
@@ -35,6 +36,7 @@ export class supportHandler {
   }
   static async addConnection(ev:any, rn:string, token:string, internalFlag:boolean=false) {
     // send existing connections to THIS EVENT ONLY
+    this.connectionCt++;
     if (internalFlag) 
     {
       token = "[SYSINTERNAL]";
@@ -51,7 +53,7 @@ export class supportHandler {
         });
     }
     // add NEW CONNECTION
-    let thiscn = {event:ev, roomName:rn, tk:token, readyQ:false, isPseudoConnection:internalFlag};
+    let thiscn = {id:this.connectionCt, event:ev, roomName:rn, tk:token, readyQ:false, isPseudoConnection:internalFlag};
     this.connections.push(thiscn);
     // TELL EVERYONE ELSE ABOUT THE NEW CONNECTION
     userRequest(token, internalFlag).then((obj:{status:string, data:any, token:string})=>{
@@ -59,16 +61,19 @@ export class supportHandler {
       else this.sendMsgTo(rn, "+"+processAnon(obj.token)+"(1)");
     });
     console.log("added connection in "+rn);
-    let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}}).toArray();
+    let roomData = await msgDB.findOne({fieldName:"RoomInfo", room:rn});
+    let msgCt = roomData?roomData.msgCt:0;
+    let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: msgCt-30}}).toArray();
     let text = "";
+    ev.write("data:CONNECTIONID "+this.connectionCt+">\n\n");
     for (let i=0; i<msgs.length; i++) {
       // let userData = await authDB.findOne({fieldName:"UserData", user:msgs[i].sender})
       // if (!userData) text+= "["+msgs[i].sender+"](1)"+msgs[i].data+">";
       // if (!userData) ev.write("data:["+msgs[i].sender+"](1)"+msgs[i].data+">\n\n");
       // else text += "["+(userData.alias??msgs[i].sender)+"]("+userData.permLevel+")"+msgs[i].data+">";
-      ev.write("data:["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data+">\n\n");
+      ev.write("data:{"+/*(Math.random()<0.5?"-":"")+*/(msgs[i].msgID??-1)+"}["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data+">\n\n");
     }
-    text += "[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. "+
+    text += "{99999999999}[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. "+
       "Automated response services and utilities are provided by BetaOS System. "+
       "Commands are available here: &gt;&gt;commands \n"+
       "Enter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!>"
@@ -156,15 +161,32 @@ export class supportHandler {
       }
     }
     
+  }
+
+  static sendMsgTo(connectionID:number, data:string) {
+    for (let i=0; i<this.connections.length; i++) {
+      if (this.connections[i].id == connectionID) {
+        // encode '>' -- used for message-breaks (yes, it is stupid.)
+        data = data.replaceAll(">", "&gt;");
+        this.connections[i].event.write("data:"+data+">\n\n")
+        
+      }
+    }
   }  
 }
 
 export function sendMsg(msg:string, room:string, token:string, callback: (status:string, data:any, token:string)=>any) {
   userRequest(token).then(async (obj:{status:string, data:any, token:string})=>{
+    let roomData = await msgDB.findOne({fieldName:"RoomInfo", room:room});
+    let msgCt = roomData?roomData.msgCt:0;
     await msgDB.insertOne({fieldName:"MSG", data:msg.replaceAll(">", "&gt;"), permLevel:obj.data.perms??1, 
-                             sender:obj.data.alias??""+processAnon(token), expiry:Date.now()+3600*1000, room:room});
-    if (obj.status == "SUCCESS") supportHandler.sendMsgTo(room, "["+obj.data.alias+"]("+obj.data.perms+")"+msg);
-    else supportHandler.sendMsgTo(room, "["+processAnon(token)+"](1)"+msg);
+                             sender:obj.data.alias??""+processAnon(token), expiry:Date.now()+3600*1000, 
+                           room:room, msgID:msgCt});
+    await msgDB.updateOne({room:room, fieldName:"RoomInfo"}, {
+      $inc: {msgCt:1}
+    }, {upsert: true});
+    if (obj.status == "SUCCESS") supportHandler.sendMsgTo(room, "{"+msgCt+"}["+obj.data.alias+"]("+obj.data.perms+")"+msg);
+    else supportHandler.sendMsgTo(room, "{"+msgCt+"}["+processAnon(token)+"](1)"+msg);
     //console.log(supportHandler.allRooms);
     for (let i=0; i<supportHandler.allRooms.length; i++) {
       if (supportHandler.allRooms[i].name == room) {
@@ -276,3 +298,8 @@ export async function WHOIS(token:string, user:string) {
     about:userData?userData.aboutme:"Account not found"
   }, users:out}, token:token};
 }
+
+//loadLogs(data.room, data.id, data.from token)
+export async function loadLogs(room:string, id:string, from:number, token:string) {
+  
+} // loadLogs

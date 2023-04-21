@@ -15,17 +15,29 @@ export function sendMail() {
   //         pass: process.env['emlpwd']
   //     }
   // });
-  var transporter = nodemailer.createTransport({
-    service: "hotmail",
+  // var transporter = nodemailer.createTransport({
+  //   service: "gmail",
+  //   auth: {
+  //       user: "betaos.services@gmail.com",
+  //       pass: process.env['emlpwd']
+  //   }
+  // });
+
+  let transporter = nodemailer.createTransport({
+    pool: true,
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: true, // use TLS
     auth: {
-        user: "betaos-systems@hotmail.com",
-        pass: process.env['emlpwd']
-    }
+      user: "betaos.services@gmail.com",
+      pass: process.env['emlpwd'],
+    },
   });
+
   
   // setup e-mail data, even with unicode symbols
   var mailOptions = {
-      from: '"BetaOS System AutoMailer" <betaos-systems@hotmail.com>', // sender address (who sends)
+      from: '"BetaOS System AutoMailer" <betaos.services@gmail.com>', // sender address (who sends)
       to: 'betatester1025@protonmail.com', // list of receivers (who receives)
       subject: 'This is a test.', // Subject line
       text: 'Testing.', // plaintext body

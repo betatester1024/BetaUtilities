@@ -8,9 +8,9 @@ import {allWords, validWords, todayLeetCODE, todayWordID} from './wordler';
 const serviceKey = process.env['serviceKey'];
 import {uDB, authDB} from '../consts';
 import { supportHandler, Room } from '../supportRooms';
-const DB_USERS = authDB
+// const authDB = 
 const serviceResponse = process.env['serviceResponse'];
-const DB3 = uDB
+// const uDB = uDB
 let DATE = new Date();
 
 let VERSION = "ServiceVersion BETA 2.5671 | Build-time: "+
@@ -26,7 +26,7 @@ let STARTTIME = Date.now();
 
 
 export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any):string {
-  // console.log(this);
+  // console.log(sender);
   msg = msg.toLowerCase();
   if (msg.match ("@"+hnd.nick.toLowerCase())) {
     hnd.incrPingCt();
@@ -64,14 +64,18 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     return "https://github.com/betatester1024/BetaUtilities/issues/new/choose"
   }
 
-  if (msg.match(/(\s|^)ass(\s|$)/)) {
+  if (msg.match(/(\W|^)ass(\W|$)/)&& Math.random() < 0.2) {
     hnd.delaySendMsg("arse*", data, 0);
   }
-  if (msg.match(/(\s|^)asses(\s|$)/)) {
+  if (msg.match(/(\W|^)asses(\W|$)/)&& Math.random() < 0.2) {
     hnd.delaySendMsg("arses*", data, 0);
   }
-  if (msg.match(/(\s|^)asshole(s?)(\s|$)/)) {
+  if (msg.match(/(\W|^)asshole(s?)(\W|$)/) && Math.random() < 0.2) {
     hnd.delaySendMsg("arsehole*", data, 0);
+  }
+
+  if (msg.match(/(\W|^)dumbass(s?)(\W|$)/)&& Math.random() < 0.2) {
+    hnd.delaySendMsg("fucking imbecile*", data, 0);
   }
 
   uDB.findOne({fieldName:"WORKINGUSERS"}).then((obj:{working:string[]})=>{
@@ -186,7 +190,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
 
   let match4 = msg.match("^!about @(.+)");
   if (match4 && match4[1]) {
-    DB_USERS.findOne({fieldName:"AboutData", user:{$eq:norm(match4[1]).toLowerCase()}})
+    authDB.findOne({fieldName:"AboutData", user:{$eq:norm(match4[1]).toLowerCase()}})
       .then((obj:{about:string}) => {
       if (obj && obj.about) 
         hnd.delaySendMsg("About @"+norm(match4[1])+": "+
@@ -198,7 +202,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
 
   match4 = msg.match("^!about set (.+)");
   if (match4) {
-    DB_USERS.updateOne({fieldName:"AboutData", user:{$eq:norm(sender.toLowerCase())}},
+    authDB.updateOne({fieldName:"AboutData", user:{$eq:norm(sender.toLowerCase())}},
     {
       $set: {about: match4[1]},
       $currentDate: { lastModified: true }
@@ -206,25 +210,28 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     return "Set information for @"+norm(sender);
   }
 
-  let match = msg.match("^!remindme of (.+) in ([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?")
+  let match = msg.match("^!remind(me | +@[^ ]+ )()(.+)()([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?")
   if (match) {
-    let remindMsg = match[1];
-    // console.log(match[1]+","+match[2]+","+match[3]+","+match[4]+","+match[5]);
+    console.log(match);
+    let remindUser = match[1];
+    let remindMsg = match[3];
+    console.log(match[4]+","+match[5]+","+match[6]+","+match[7]+","+match[8]);
     let exp = Date.now();
-    if (match[2]) exp += Number(match[2].split("d")[0])*1000*60*60*24;
-    if (match[3]) exp += Number(match[3].split("h")[0])*1000*60*60;
-    if (match[4]) exp += Number(match[4].split("m")[0])*1000*60;
-    if (match[5]) exp += Number(match[5].split("s")[0])*1000;
+    if (match[5]) exp += Number(match[5].split("d")[0])*1000*60*60*24;
+    if (match[6]) exp += Number(match[6].split("h")[0])*1000*60*60;
+    if (match[7]) exp += Number(match[7].split("m")[0])*1000*60;
+    if (match[8]) exp += Number(match[8].split("s")[0])*1000;
     if (exp == Date.now()) {
       return "No reminder time provided!"
     }
-    DB3.insertOne({
+    uDB.insertOne({
       fieldName:"TIMER",
       expiry:exp, 
-      notifyingUser:norm(sender), 
-      msg:remindMsg
+      notifyingUser:remindUser=="me"?norm(sender):remindUser.slice(2, remindUser.length-1), 
+      msg:remindMsg,
+      author:remindUser=="me"?null:norm(sender)
     });
-    return "Will remind you.";
+    return "Will remind "+(remindUser=="me"?"you":remindUser.slice(2, remindUser.length-1))+" in "+((exp-Date.now())/60000).toFixed(2)+"min";
   }
 
   if (msg == "!renick") {
@@ -255,6 +262,9 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
   if (msg.match("^!runstats [ ]*@" + hnd.nick.toLowerCase())) {
     hnd.displayStats(data);
     return "Loading..."
+  }
+  if (msg == "!docs @"+hnd.nick.toLowerCase()) {
+    return "https://betatester1024.repl.co/commands?nick=BetaUtilities";
   }
   if (msg.match(/^!potato$/)) return "potato.io";
   if (msg == "!rating @" + hnd.nick.toLowerCase()) {

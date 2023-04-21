@@ -53,11 +53,21 @@ async function initClient()
       CONNECTIONID = cnMatch[2];
     }    
     modif = modif.replace(/(>|^)CONNECTIONID ([0-9]+)>/, "");
-    let lcMatch = modif.match(/LOADCOMPLETE>/);
+    let lcMatch = modif.match(/LOADCOMPLETE (-?[0-9]+)>/);
     if (lcMatch) {
-      loadStatus = -1;
+      let thing = document.getElementById("msgArea")
+      if (lcMatch[1]<0) {
+        let errorEle = document.createElement("b");
+        errorEle.className = ""
+        thing.prepend(errorEle);
+      }
+      else {
+        loadStatus = -1;
+        STARTID=lcMatch[1];
+      }
+      thing.scrollTop = thing.scrollTop + 100;
     }    
-    modif = modif.replace(/LOADCOMPLETE>/, "");
+    modif = modif.replace(/LOADCOMPLETE (-?[0-9]+)>/, "");
     let removed = rmvReg.exec(modif);
     let added = addReg.exec(modif)
     while (removed || added) {
@@ -76,7 +86,7 @@ async function initClient()
     let area = document.getElementById("msgArea");
     ele = document.createElement("p");
     
-    let scrDistOKQ =  (ele.scrollTop) >= (ele.scrollHeight-ele.offsetHeight - 100)
+    let scrDistOKQ =  (area.scrollTop) >= (area.scrollHeight-area.offsetHeight - 100)
     let msgs = modif.split(">");
     for (let i=0; i<msgs.length; i++) {
       let matches = msgs[i].match(/{(-?[0-9]+)}\[(.+)\]\(([0-9])\)(.*)/)
@@ -106,12 +116,12 @@ async function initClient()
       msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu,">LINK$<test>>")
       msg = msg.replaceAll(/\\n/gmiu,">BR>")
       console.log(msg);
-      if (msg.match("/me.*")) {
-        msg = msg.slice(4);
+      if (msg.match("[ \n]*/me(.*)")) {
+        msg = msg.match("[ \n]/me(.*)")[1];
         slashMe = true;
         ele.className += " slashMe " + classStr[matches[3]];
       }
-      ele.className = classStr[matches[3]];
+      else ele.className = classStr[matches[3]];
       
       let split = msg.split(">");
       // console.log("message fragments:", split.length, split);
@@ -248,7 +258,7 @@ function findReplacement(thing) {
 }
 
 window.addEventListener("blur", () => {
-  UNREADS = 0;
+  UNREAD = 0;
   FOCUSSED = false;
 });
 
@@ -256,7 +266,7 @@ window.addEventListener("blur", () => {
 window.addEventListener("focus", () => {
   document.title = "Support | BetaOS Systems";
   FOCUSSED = true;
-  UNREADS = 0;
+  UNREAD = 0;
 });
 
 let UNREAD = 0;
@@ -266,7 +276,7 @@ function onScroll() {
   
   if (document.getElementById("msgArea").scrollTop < 30 && loadStatus<0) {
     loadStatus = 0;
-    send(JSON.stringify({action:"loadLogs", room:ROOMNAME, id:CONNECTIONID, from:STARTID}), ()=>{});
+    send(JSON.stringify({action:"loadLogs", data:{room:ROOMNAME, id:CONNECTIONID, from:STARTID}}), ()=>{});
   }
 }
 let loadStatus = -1;

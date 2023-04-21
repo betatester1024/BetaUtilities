@@ -95,6 +95,11 @@ p.slashMe {
   top: 1px;
 }
 
+.slashMe > .material-symbols-outlined {
+  top: 2px;
+  background-color: none;
+}
+
 .slashMe:not(p) {
   font-style: italic;
   position: relative;

@@ -121,7 +121,7 @@ export class WebH
       msg = msg.toLowerCase().replaceAll(/(\s|^)((@betaos)|(@betautilities)|(@system))(\s|$)/gimu, " @"+this.nick.toLowerCase()+" ").trim()
       // Required methods
       // !kill
-    console.log(msg);
+      console.log/("received" +msg);
       if (msg == "!kill @" + this.nick.toLowerCase()) {
         this.sendMsg("/me crashes", data);
         this.delaySendMsg("/me restarts", data, 200);

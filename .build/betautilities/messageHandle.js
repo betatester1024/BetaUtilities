@@ -29,9 +29,7 @@ var import_consts = require("../consts");
 var import_supportRooms = require("../supportRooms");
 const fs = require("fs");
 const serviceKey = process.env["serviceKey"];
-const DB_USERS = import_consts.authDB;
 const serviceResponse = process.env["serviceResponse"];
-const DB3 = import_consts.uDB;
 let DATE = new Date();
 let VERSION = "ServiceVersion BETA 2.5671 | Build-time: " + DATE.toUTCString();
 const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! Press :three: to toggle ANTISPAM.\\n\\n Press :zero: to exit support at any time.`;
@@ -83,14 +81,17 @@ function replyMessage(hnd, msg, sender, data) {
   if (msg == "!issue" || msg == "!bug" || msg == "!feature") {
     return "https://github.com/betatester1024/BetaUtilities/issues/new/choose";
   }
-  if (msg.match(/(\s|^)ass(\s|$)/)) {
+  if (msg.match(/(\W|^)ass(\W|$)/) && Math.random() < 0.2) {
     hnd.delaySendMsg("arse*", data, 0);
   }
-  if (msg.match(/(\s|^)asses(\s|$)/)) {
+  if (msg.match(/(\W|^)asses(\W|$)/) && Math.random() < 0.2) {
     hnd.delaySendMsg("arses*", data, 0);
   }
-  if (msg.match(/(\s|^)asshole(s?)(\s|$)/)) {
+  if (msg.match(/(\W|^)asshole(s?)(\W|$)/) && Math.random() < 0.2) {
     hnd.delaySendMsg("arsehole*", data, 0);
+  }
+  if (msg.match(/(\W|^)dumbass(s?)(\W|$)/) && Math.random() < 0.2) {
+    hnd.delaySendMsg("fucking imbecile*", data, 0);
   }
   import_consts.uDB.findOne({ fieldName: "WORKINGUSERS" }).then((obj) => {
     let match3 = msg.match("^!work @(.*)$");
@@ -188,7 +189,7 @@ function replyMessage(hnd, msg, sender, data) {
   });
   let match4 = msg.match("^!about @(.+)");
   if (match4 && match4[1]) {
-    DB_USERS.findOne({ fieldName: "AboutData", user: { $eq: norm(match4[1]).toLowerCase() } }).then((obj) => {
+    import_consts.authDB.findOne({ fieldName: "AboutData", user: { $eq: norm(match4[1]).toLowerCase() } }).then((obj) => {
       if (obj && obj.about)
         hnd.delaySendMsg("About @" + norm(match4[1]) + ": " + obj.about.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, '\\"'), data, 0);
       else
@@ -198,7 +199,7 @@ function replyMessage(hnd, msg, sender, data) {
   }
   match4 = msg.match("^!about set (.+)");
   if (match4) {
-    DB_USERS.updateOne(
+    import_consts.authDB.updateOne(
       { fieldName: "AboutData", user: { $eq: norm(sender.toLowerCase()) } },
       {
         $set: { about: match4[1] },
@@ -208,28 +209,32 @@ function replyMessage(hnd, msg, sender, data) {
     );
     return "Set information for @" + norm(sender);
   }
-  let match = msg.match("^!remindme of (.+) in ([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?");
+  let match = msg.match("^!remind(me | +@[^ ]+ )()(.+)()([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?");
   if (match) {
-    let remindMsg = match[1];
+    console.log(match);
+    let remindUser = match[1];
+    let remindMsg = match[3];
+    console.log(match[4] + "," + match[5] + "," + match[6] + "," + match[7] + "," + match[8]);
     let exp4 = Date.now();
-    if (match[2])
-      exp4 += Number(match[2].split("d")[0]) * 1e3 * 60 * 60 * 24;
-    if (match[3])
-      exp4 += Number(match[3].split("h")[0]) * 1e3 * 60 * 60;
-    if (match[4])
-      exp4 += Number(match[4].split("m")[0]) * 1e3 * 60;
     if (match[5])
-      exp4 += Number(match[5].split("s")[0]) * 1e3;
+      exp4 += Number(match[5].split("d")[0]) * 1e3 * 60 * 60 * 24;
+    if (match[6])
+      exp4 += Number(match[6].split("h")[0]) * 1e3 * 60 * 60;
+    if (match[7])
+      exp4 += Number(match[7].split("m")[0]) * 1e3 * 60;
+    if (match[8])
+      exp4 += Number(match[8].split("s")[0]) * 1e3;
     if (exp4 == Date.now()) {
       return "No reminder time provided!";
     }
-    DB3.insertOne({
+    import_consts.uDB.insertOne({
       fieldName: "TIMER",
       expiry: exp4,
-      notifyingUser: norm(sender),
-      msg: remindMsg
+      notifyingUser: remindUser == "me" ? norm(sender) : remindUser.slice(2, remindUser.length - 1),
+      msg: remindMsg,
+      author: remindUser == "me" ? null : norm(sender)
     });
-    return "Will remind you.";
+    return "Will remind " + (remindUser == "me" ? "you" : remindUser.slice(2, remindUser.length - 1)) + " in " + ((exp4 - Date.now()) / 6e4).toFixed(2) + "min";
   }
   if (msg == "!renick") {
     hnd.changeNick(hnd.nick);
@@ -263,6 +268,9 @@ function replyMessage(hnd, msg, sender, data) {
   if (msg.match("^!runstats [ ]*@" + hnd.nick.toLowerCase())) {
     hnd.displayStats(data);
     return "Loading...";
+  }
+  if (msg == "!docs @" + hnd.nick.toLowerCase()) {
+    return "https://betatester1024.repl.co/commands?nick=BetaUtilities";
   }
   if (msg.match(/^!potato$/))
     return "potato.io";

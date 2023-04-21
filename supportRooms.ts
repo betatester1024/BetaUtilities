@@ -1,6 +1,7 @@
 import {userRequest} from './userRequest';
 import {msgDB, authDB, uDB, roomRegex} from './consts';
 import {log} from './logging'
+import {minID} from  './database';
 import { WebH } from './betautilities/webHandler';
 export class Room {
   type:string;
@@ -157,17 +158,17 @@ export class supportHandler {
         // encode '>' -- used for message-breaks (yes, it is stupid.)
         data = data.replaceAll(">", "&gt;");
         this.connections[i].event.write("data:"+data+">\n\n")
-        
       }
     }
     
   }
 
-  static sendMsgTo(connectionID:number, data:string) {
+  static sendMsgTo_ID(connectionID:number, data:string) {
     for (let i=0; i<this.connections.length; i++) {
       if (this.connections[i].id == connectionID) {
         // encode '>' -- used for message-breaks (yes, it is stupid.)
         data = data.replaceAll(">", "&gt;");
+        
         this.connections[i].event.write("data:"+data+">\n\n")
         
       }
@@ -180,13 +181,18 @@ export function sendMsg(msg:string, room:string, token:string, callback: (status
     let roomData = await msgDB.findOne({fieldName:"RoomInfo", room:room});
     let msgCt = roomData?roomData.msgCt:0;
     await msgDB.insertOne({fieldName:"MSG", data:msg.replaceAll(">", "&gt;"), permLevel:obj.data.perms??1, 
-                             sender:obj.data.alias??""+processAnon(token), expiry:Date.now()+3600*1000, 
+                             sender:obj.data.alias??""+processAnon(token), expiry:Date.now()+3600*1000*24*30, 
                            room:room, msgID:msgCt});
     await msgDB.updateOne({room:room, fieldName:"RoomInfo"}, {
       $inc: {msgCt:1}
     }, {upsert: true});
-    if (obj.status == "SUCCESS") supportHandler.sendMsgTo(room, "{"+msgCt+"}["+obj.data.alias+"]("+obj.data.perms+")"+msg);
-    else supportHandler.sendMsgTo(room, "{"+msgCt+"}["+processAnon(token)+"](1)"+msg);
+    if (obj.status == "SUCCESS") {
+      supportHandler.sendMsgTo(room, "{"+msgCt+"}["+obj.data.alias+"]("+obj.data.perms+")"+msg);
+    }
+    else {
+      //console.log("sending")
+      supportHandler.sendMsgTo(room, "{"+msgCt+"}["+processAnon(token)+"](1)"+msg);
+    }
     //console.log(supportHandler.allRooms);
     for (let i=0; i<supportHandler.allRooms.length; i++) {
       if (supportHandler.allRooms[i].name == room) {
@@ -200,9 +206,15 @@ export function sendMsg(msg:string, room:string, token:string, callback: (status
 }
 
 export async function sendMsg_B(msg:string, room:string) {
+  let roomData = await msgDB.findOne({fieldName:"RoomInfo", room:room});
+  let msgCt = roomData?roomData.msgCt:0;
   await msgDB.insertOne({fieldName:"MSG", data:msg, permLevel:3, 
-                           sender:"BetaOS_System", expiry:Date.now()+3600*1000, room:room});
-  supportHandler.sendMsgTo(room, "[BetaOS_System](3)"+msg);
+                           sender:"BetaOS_System", expiry:Date.now()+3600*1000*24*30, 
+                         room:room, msgID:msgCt});
+  await msgDB.updateOne({room:room, fieldName:"RoomInfo"}, {
+      $inc: {msgCt:1}
+    }, {upsert: true});
+  supportHandler.sendMsgTo(room, "{"+msgCt+"}[BetaOS_System](3)"+msg);
 }
 
 function processAnon(token:string) {
@@ -300,6 +312,21 @@ export async function WHOIS(token:string, user:string) {
 }
 
 //loadLogs(data.room, data.id, data.from token)
-export async function loadLogs(room:string, id:string, from:number, token:string) {
+export async function loadLogs(rn:string, id:string, from:number, token:string) {
+  from = +from;
+  console.log("LOADING LOGS FROM",from-30,"TO",from);
+  if (from<minID) return {status:"SUCCESS", data:null, token:token}
+                         // DO NOT RETURN LOADCOMPLETE.
   
+  let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: from-30, $lt: from}}).toArray();
+  console.log(msgs.length);
+  for (let i=msgs.length-1; i>=0; i--) {
+    // console.log(msgs[i]);
+    let dat = "{"+(-msgs[i].msgID)+"}["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data;
+    // console.log(dat);
+    supportHandler.sendMsgTo_ID(id, dat);
+  }
+  console.log("LOADING COMPLETE, LOADED"+msgs.length,"MESSAGES");
+  supportHandler.sendMsgTo_ID(id, "LOADCOMPLETE "+(from-30));
+  return {status:"SUCCESS", data:null, token:token};
 } // loadLogs

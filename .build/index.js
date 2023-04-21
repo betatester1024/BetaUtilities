@@ -32,6 +32,13 @@ var import_webHandler = require("./betautilities/webHandler");
 var import_wordler = require("./betautilities/wordler");
 let connectionSuccess = true;
 let DBConnectFailure = null;
+const localEuphRooms = [
+  "bots",
+  "room",
+  "memes",
+  "music",
+  "srs"
+];
 const { exec } = require("child_process");
 try {
   if (connectionSuccess)
@@ -50,6 +57,12 @@ try {
           new import_wsHandler.WS("wss://euphoria.io/room/" + obj.euphRooms[i] + "/ws", "BetaUtilities", obj.euphRooms[i], false);
           (0, import_logging.log)("Connected euph_room") + obj.euphRooms[i];
           console.log("Connected euph_room", obj.euphRooms[i]);
+        }
+        for (let i = 0; i < localEuphRooms.length; i++) {
+          import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("EUPH_ROOM", localEuphRooms[i]));
+          new import_wsHandler.WS("wss://euphoria.io/room/" + localEuphRooms[i] + "/ws", "BetaUtilities", localEuphRooms[i], false);
+          (0, import_logging.log)("Connected euph_room") + localEuphRooms[i];
+          console.log("Connected euph_room", localEuphRooms[i]);
         }
         for (let i = 0; i < obj.rooms.length; i++) {
           new import_webHandler.WebH(obj.rooms[i], false);

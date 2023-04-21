@@ -34,6 +34,7 @@ module.exports = __toCommonJS(supportRooms_exports);
 var import_userRequest = require("./userRequest");
 var import_consts = require("./consts");
 var import_logging = require("./logging");
+var import_database = require("./database");
 var import_webHandler = require("./betautilities/webHandler");
 class Room {
   type;
@@ -190,7 +191,7 @@ class supportHandler {
       }
     }
   }
-  static sendMsgTo(connectionID, data) {
+  static sendMsgTo_ID(connectionID, data) {
     for (let i = 0; i < this.connections.length; i++) {
       if (this.connections[i].id == connectionID) {
         data = data.replaceAll(">", "&gt;");
@@ -208,17 +209,18 @@ function sendMsg(msg, room, token, callback) {
       data: msg.replaceAll(">", "&gt;"),
       permLevel: obj.data.perms ?? 1,
       sender: obj.data.alias ?? "" + processAnon(token),
-      expiry: Date.now() + 3600 * 1e3,
+      expiry: Date.now() + 3600 * 1e3 * 24 * 30,
       room,
       msgID: msgCt
     });
     await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
       $inc: { msgCt: 1 }
     }, { upsert: true });
-    if (obj.status == "SUCCESS")
+    if (obj.status == "SUCCESS") {
       supportHandler.sendMsgTo(room, "{" + msgCt + "}[" + obj.data.alias + "](" + obj.data.perms + ")" + msg);
-    else
+    } else {
       supportHandler.sendMsgTo(room, "{" + msgCt + "}[" + processAnon(token) + "](1)" + msg);
+    }
     for (let i = 0; i < supportHandler.allRooms.length; i++) {
       if (supportHandler.allRooms[i].name == room) {
         supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token));
@@ -228,15 +230,21 @@ function sendMsg(msg, room, token, callback) {
   });
 }
 async function sendMsg_B(msg, room) {
+  let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room });
+  let msgCt = roomData ? roomData.msgCt : 0;
   await import_consts.msgDB.insertOne({
     fieldName: "MSG",
     data: msg,
     permLevel: 3,
     sender: "BetaOS_System",
-    expiry: Date.now() + 3600 * 1e3,
-    room
+    expiry: Date.now() + 3600 * 1e3 * 24 * 30,
+    room,
+    msgID: msgCt
   });
-  supportHandler.sendMsgTo(room, "[BetaOS_System](3)" + msg);
+  await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
+    $inc: { msgCt: 1 }
+  }, { upsert: true });
+  supportHandler.sendMsgTo(room, "{" + msgCt + "}[BetaOS_System](3)" + msg);
 }
 function processAnon(token) {
   return "Anonymous user";
@@ -332,7 +340,20 @@ async function WHOIS(token, user) {
     about: userData ? userData.aboutme : "Account not found"
   }, users: out }, token };
 }
-async function loadLogs(room, id, from, token) {
+async function loadLogs(rn, id, from, token) {
+  from = +from;
+  console.log("LOADING LOGS FROM", from - 30, "TO", from);
+  if (from < import_database.minID)
+    return { status: "SUCCESS", data: null, token };
+  let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, msgID: { $gt: from - 30, $lt: from } }).toArray();
+  console.log(msgs.length);
+  for (let i = msgs.length - 1; i >= 0; i--) {
+    let dat = "{" + -msgs[i].msgID + "}[" + msgs[i].sender + "](" + msgs[i].permLevel + ")" + msgs[i].data;
+    supportHandler.sendMsgTo_ID(id, dat);
+  }
+  console.log("LOADING COMPLETE, LOADED" + msgs.length, "MESSAGES");
+  supportHandler.sendMsgTo_ID(id, "LOADCOMPLETE " + (from - 30));
+  return { status: "SUCCESS", data: null, token };
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

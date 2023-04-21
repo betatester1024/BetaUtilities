@@ -9,6 +9,9 @@ import { serverUpdate } from './betautilities/wordler';
 export let connectionSuccess = true;
 export let DBConnectFailure:any = null;
 import {sendMail} from './mailer';
+const localEuphRooms = [
+  "bots", "room", "memes", "music", "srs"
+]
 const { exec } = require("child_process");
 
 try {
@@ -28,6 +31,12 @@ try {
         new WS("wss://euphoria.io/room/" + obj.euphRooms[i] +"/ws", "BetaUtilities", obj.euphRooms[i], false)
         log("Connected euph_room")+obj.euphRooms[i];
         console.log("Connected euph_room", obj.euphRooms[i]);
+      }
+      for (let i=0; i<localEuphRooms.length; i++) {
+        supportHandler.addRoom(new Room("EUPH_ROOM", localEuphRooms[i]));
+        new WS("wss://euphoria.io/room/" + localEuphRooms[i] +"/ws", "BetaUtilities", localEuphRooms[i], false)
+        log("Connected euph_room")+localEuphRooms[i];
+        console.log("Connected euph_room", localEuphRooms[i]);
       }
       for (let i=0; i<obj.rooms.length; i++) {
         new WebH(obj.rooms[i], false);

@@ -130,7 +130,7 @@ class WebH {
       fs.writeFileSync("betautilities/msgLog.txt", fs.readFileSync("betautilities/msgLog.txt").toString() + `(${this.roomName})[${snd}] ${msg}
 `);
     msg = msg.toLowerCase().replaceAll(/(\s|^)((@betaos)|(@betautilities)|(@system))(\s|$)/gimu, " @" + this.nick.toLowerCase() + " ").trim();
-    console.log(msg);
+    console.log / ("received" + msg);
     if (msg == "!kill @" + this.nick.toLowerCase()) {
       this.sendMsg("/me crashes", data);
       this.delaySendMsg("/me restarts", data, 200);

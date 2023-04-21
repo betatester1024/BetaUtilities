@@ -21,10 +21,12 @@ __export(database_exports, {
   DBMaintenance: () => DBMaintenance,
   client: () => client,
   connectDB: () => connectDB,
-  database: () => database
+  database: () => database,
+  minID: () => minID
 });
 module.exports = __toCommonJS(database_exports);
 var import_consts = require("./consts");
+var import_wsHandler = require("./betautilities/wsHandler");
 var import_index = require("./index");
 const { MongoClient } = require("mongodb");
 const uri = `mongodb+srv://SystemLogin:${process.env["dbPwd"]}@betaos-datacluster00.d8o7x8n.mongodb.net/?retryWrites=true&w=majority`;
@@ -39,6 +41,7 @@ async function connectDB() {
     return e;
   }
 }
+let minID = -1;
 const database = client.db("BetaOS-Database01");
 async function DBMaintenance() {
   let items = await import_consts.authDB.find({ fieldName: "Token" }).toArray();
@@ -53,9 +56,24 @@ async function DBMaintenance() {
     if (!items2[i].expiry || items2[i].expiry < Date.now()) {
       console.log("Message from " + items2[i].sender + " has expired");
       await import_consts.msgDB.deleteOne(items2[i]);
+      minID = Math.max(minID, items[2].msgID);
+      console.log(minID);
     }
   }
   ;
+  import_consts.uDB.find({ fieldName: "TIMER" }).toArray().then(
+    (objs) => {
+      for (let i = 0; i < objs.length; i++) {
+        if (Date.now() > objs[i].expiry || objs[i].expiry == null) {
+          import_consts.uDB.deleteOne({ fieldName: "TIMER", expiry: objs[i].expiry });
+          console.log("NOTIFYING");
+          import_wsHandler.WS.notifRoom.socket.send(
+            import_wsHandler.WS.toSendInfo("!tell @" + objs[i].notifyingUser + " You are reminded of: " + objs[i].msg.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, '\\"') + ". This reminder sent by " + (objs[i].author ?? "yourself, probably."))
+          );
+        }
+      }
+    }
+  );
   setTimeout(DBMaintenance, 1e3);
 }
 // Annotate the CommonJS export names for ESM import in node:
@@ -63,6 +81,7 @@ async function DBMaintenance() {
   DBMaintenance,
   client,
   connectDB,
-  database
+  database,
+  minID
 });
 //# sourceMappingURL=database.js.map

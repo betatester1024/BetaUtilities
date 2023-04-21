@@ -330,3 +330,5 @@ export async function loadLogs(rn:string, id:string, from:number, token:string) 
   supportHandler.sendMsgTo_ID(id, "LOADCOMPLETE "+(from-30));
   return {status:"SUCCESS", data:null, token:token};
 } // loadLogs
+
+export async function 

@@ -209,7 +209,7 @@ function replyMessage(hnd, msg, sender, data) {
     );
     return "Set information for @" + norm(sender);
   }
-  let match = msg.match("^!remind(me | +@[^ ]+ )()(.+)()([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?");
+  let match = msg.match("^!remind(me | +@[^ ]+ )()(.+)([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?");
   if (match) {
     console.log(match);
     let remindUser = match[1];
@@ -230,11 +230,11 @@ function replyMessage(hnd, msg, sender, data) {
     import_consts.uDB.insertOne({
       fieldName: "TIMER",
       expiry: exp4,
-      notifyingUser: remindUser == "me" ? norm(sender) : remindUser.slice(2, remindUser.length - 1),
+      notifyingUser: remindUser == "me " ? norm(sender) : remindUser.slice(2, remindUser.length - 1),
       msg: remindMsg,
-      author: remindUser == "me" ? null : norm(sender)
+      author: remindUser == "me " ? null : norm(sender)
     });
-    return "Will remind " + (remindUser == "me" ? "you" : remindUser.slice(2, remindUser.length - 1)) + " in " + ((exp4 - Date.now()) / 6e4).toFixed(2) + "min";
+    return "Will remind " + (remindUser == "me " ? "you" : remindUser.slice(2, remindUser.length - 1)) + " in " + ((exp4 - Date.now()) / 6e4).toFixed(2) + "min";
   }
   if (msg == "!renick") {
     hnd.changeNick(hnd.nick);

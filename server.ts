@@ -348,6 +348,12 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       .then((obj:{status:string, data:any, token:string})=>
         {callback(obj.status, obj.data, obj.token)});
       break;
+    case "delMsg":
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+      delMsg(data.room, data.id, data.from, token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
     case 'toggleTheme':
       toggleTheme(token)
       .then((obj:{status:string, data:any, token:string})=>

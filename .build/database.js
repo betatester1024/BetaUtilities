@@ -56,7 +56,7 @@ async function DBMaintenance() {
     if (!items2[i].expiry || items2[i].expiry < Date.now()) {
       console.log("Message from " + items2[i].sender + " has expired");
       await import_consts.msgDB.deleteOne(items2[i]);
-      minID = Math.max(minID, items[2].msgID);
+      minID = Math.max(minID, items2[i].msgID);
       console.log(minID);
     }
   }

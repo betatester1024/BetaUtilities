@@ -1,4 +1,3 @@
-
 # BetaUtilities
 BetaUtilities for euphoria.io using WebSocket.
 

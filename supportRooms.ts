@@ -1,55 +1,80 @@
 import {userRequest} from './userRequest';
-import {msgDB, authDB, uDB} from './consts';
+import {msgDB, authDB, uDB, roomRegex} from './consts';
+import {log} from './logging'
+import {minID} from  './database';
+import { WebH } from './betautilities/webHandler';
 export class Room {
   type:string;
   name:string;
-  constructor(type:string, name:string) {
+  handler: WebH|null;
+  constructor(type:string, name:string, responder:((msg:string, sender:string, data:any)=>any)|null=null, handler: WebH|null=null) {
     this.type=type;
     this.name=name;
+    this.handler = handler;
   };
 
 }
 
+export class pseudoConnection {
+  write(thing:any) {}
+  close () {}
+};
+
 export class supportHandler {
   static allRooms: Room[] = [];
-  static connections: {event:any, roomName:string, tk:string, readyQ:boolean}[] = [];
+  static connectionCt = 0;
+  static connections: {event:any, roomName:string, tk:string, readyQ:boolean, isPseudoConnection:boolean}[] = [];
   static addRoom(rm:Room) {
+    log("Room created!" + rm)
     let idx = this.allRooms.findIndex((r:any)=>{return r.type==rm.type && r.name==rm.name});
     if (idx >= 0) return;
     else this.allRooms.push(rm);
   }
   static deleteRoom(type:string, roomName:string) {
+    log("Room deleted!" +  type+ roomName);
     let idx = this.allRooms.findIndex((r:any)=>{return r.type==type && r.name==roomName});
     if (idx >= 0) this.allRooms.splice(idx, 1);
   }
-  static async addConnection(ev:any, rn:string, token:string) {
+  static async addConnection(ev:any, rn:string, token:string, internalFlag:boolean=false) {
     // send existing connections to THIS EVENT ONLY
+    this.connectionCt++;
+    if (internalFlag) 
+    {
+      token = "[SYSINTERNAL]";
+    }
     for (let i=0; i<this.connections.length; i++) {
       if (this.connections[i].roomName == rn)
-        userRequest(this.connections[i].tk).then((obj:{status:string, data:any, token:string})=>{
-          if (obj.status == "SUCCESS") ev.write("data:+"+obj.data.alias+"("+obj.data.perms+")>\n\n");
-          else ev.write("data:+"+processAnon(this.connections[i].tk)+"(1)>\n\n");
+        userRequest(this.connections[i].tk, this.connections[i].isPseudoConnection).then((obj:{status:string, data:any, token:string})=>{
+          if (obj.status == "SUCCESS") {
+            ev.write("data:+"+obj.data.alias+"("+obj.data.perms+")>\n\n");
+          }
+          else {
+            ev.write("data:+"+processAnon(this.connections[i].tk)+"(1)>\n\n");
+          }
         });
     }
     // add NEW CONNECTION
-    let thiscn = {event:ev, roomName:rn, tk:token, readyQ:false};
+    let thiscn = {id:this.connectionCt, event:ev, roomName:rn, tk:token, readyQ:false, isPseudoConnection:internalFlag};
     this.connections.push(thiscn);
     // TELL EVERYONE ELSE ABOUT THE NEW CONNECTION
-    userRequest(token).then((obj:{status:string, data:any, token:string})=>{
+    userRequest(token, internalFlag).then((obj:{status:string, data:any, token:string})=>{
       if (obj.status == "SUCCESS") this.sendMsgTo(rn, "+"+obj.data.alias+"("+obj.data.perms+")");
       else this.sendMsgTo(rn, "+"+processAnon(obj.token)+"(1)");
     });
     console.log("added connection in "+rn);
-    let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}}).toArray();
+    let roomData = await msgDB.findOne({fieldName:"RoomInfo", room:rn});
+    let msgCt = roomData?roomData.msgCt:0;
+    let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: msgCt-30}}).toArray();
     let text = "";
+    ev.write("data:CONNECTIONID "+this.connectionCt+">\n\n");
     for (let i=0; i<msgs.length; i++) {
       // let userData = await authDB.findOne({fieldName:"UserData", user:msgs[i].sender})
       // if (!userData) text+= "["+msgs[i].sender+"](1)"+msgs[i].data+">";
       // if (!userData) ev.write("data:["+msgs[i].sender+"](1)"+msgs[i].data+">\n\n");
       // else text += "["+(userData.alias??msgs[i].sender)+"]("+userData.permLevel+")"+msgs[i].data+">";
-      ev.write("data:["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data+">\n\n");
+      ev.write("data:{"+/*(Math.random()<0.5?"-":"")+*/(msgs[i].msgID??-1)+"}["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data+">\n\n");
     }
-    text += "[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. "+
+    text += "{99999999999}[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. "+
       "Automated response services and utilities are provided by BetaOS System. "+
       "Commands are available here: &gt;&gt;commands \n"+
       "Enter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!>"
@@ -135,17 +160,61 @@ export class supportHandler {
         this.connections[i].event.write("data:"+data+">\n\n")
       }
     }
+    
+  }
+
+  static sendMsgTo_ID(connectionID:number, data:string) {
+    for (let i=0; i<this.connections.length; i++) {
+      if (this.connections[i].id == connectionID) {
+        // encode '>' -- used for message-breaks (yes, it is stupid.)
+        data = data.replaceAll(">", "&gt;");
+        
+        this.connections[i].event.write("data:"+data+">\n\n")
+        
+      }
+    }
   }  
 }
 
 export function sendMsg(msg:string, room:string, token:string, callback: (status:string, data:any, token:string)=>any) {
   userRequest(token).then(async (obj:{status:string, data:any, token:string})=>{
+    let roomData = await msgDB.findOne({fieldName:"RoomInfo", room:room});
+    let msgCt = roomData?roomData.msgCt:0;
     await msgDB.insertOne({fieldName:"MSG", data:msg.replaceAll(">", "&gt;"), permLevel:obj.data.perms??1, 
-                             sender:obj.data.alias??""+processAnon(token), expiry:Date.now()+3600*1000, room:room});
-    if (obj.status == "SUCCESS") supportHandler.sendMsgTo(room, "["+obj.data.alias+"]("+obj.data.perms+")"+msg);
-    else supportHandler.sendMsgTo(room, "["+processAnon(token)+"](1)"+msg);
+                             sender:obj.data.alias??""+processAnon(token), expiry:Date.now()+3600*1000*24*30, 
+                           room:room, msgID:msgCt});
+    await msgDB.updateOne({room:room, fieldName:"RoomInfo"}, {
+      $inc: {msgCt:1}
+    }, {upsert: true});
+    if (obj.status == "SUCCESS") {
+      supportHandler.sendMsgTo(room, "{"+msgCt+"}["+obj.data.alias+"]("+obj.data.perms+")"+msg);
+    }
+    else {
+      //console.log("sending")
+      supportHandler.sendMsgTo(room, "{"+msgCt+"}["+processAnon(token)+"](1)"+msg);
+    }
+    //console.log(supportHandler.allRooms);
+    for (let i=0; i<supportHandler.allRooms.length; i++) {
+      if (supportHandler.allRooms[i].name == room) {
+        // console.log("sending"+msg);
+        supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias??processAnon(token))
+      }
+ 
+    }
     callback("SUCCESS", null, token);
   });
+}
+
+export async function sendMsg_B(msg:string, room:string) {
+  let roomData = await msgDB.findOne({fieldName:"RoomInfo", room:room});
+  let msgCt = roomData?roomData.msgCt:0;
+  await msgDB.insertOne({fieldName:"MSG", data:msg, permLevel:3, 
+                           sender:"BetaOS_System", expiry:Date.now()+3600*1000*24*30, 
+                         room:room, msgID:msgCt});
+  await msgDB.updateOne({room:room, fieldName:"RoomInfo"}, {
+      $inc: {msgCt:1}
+    }, {upsert: true});
+  supportHandler.sendMsgTo(room, "{"+msgCt+"}[BetaOS_System](3)"+msg);
 }
 
 function processAnon(token:string) {
@@ -160,10 +229,12 @@ export function roomRequest(token:string, all:boolean=false) {
 export async function createRoom(name:string, token:string) {
   if (supportHandler.checkFoundQ(name)) return {status:"ERROR", data:{error:"Room already exists"}, token:token};
   let usrData = await userRequest(token) as {status:string, data:{perms:number}};
-  
+  if (!name.match(roomRegex)) return {status:"ERROR", data:{error:"Invalid roomname!"}, token:token};
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
-      supportHandler.addRoom(new Room("ONLINE_SUPPORT", name));
+      
+      // supportHandler.addRoom(new Room("ONLINE_SUPPORT", name));
+      new WebH(name, false);
       let obj = await uDB.findOne({fieldName:"ROOMS"});
       obj.rooms.push(name);
       await uDB.updateOne({fieldName:"ROOMS"}, {
@@ -181,7 +252,7 @@ export async function createRoom(name:string, token:string) {
 export async function deleteRoom(name:string, token:string) {
   if (!supportHandler.checkFoundQ(name)) return {status:"ERROR", data:{error:"Room does not exist"}, token:token};
   let usrData = await userRequest(token) as {status:string, data:{perms:number}};
-  
+  if (!name.match(roomRegex)) return {status:"ERROR", data:{error:"Invalid roomname!"}, token:token};
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
 
@@ -239,3 +310,25 @@ export async function WHOIS(token:string, user:string) {
     about:userData?userData.aboutme:"Account not found"
   }, users:out}, token:token};
 }
+
+//loadLogs(data.room, data.id, data.from token)
+export async function loadLogs(rn:string, id:string, from:number, token:string) {
+  from = +from;
+  console.log("LOADING LOGS FROM",from-30,"TO",from);
+  if (from<minID) return {status:"SUCCESS", data:null, token:token}
+                         // DO NOT RETURN LOADCOMPLETE.
+  
+  let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: from-30, $lt: from}}).toArray();
+  console.log(msgs.length);
+  for (let i=msgs.length-1; i>=0; i--) {
+    // console.log(msgs[i]);
+    let dat = "{"+(-msgs[i].msgID)+"}["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data;
+    // console.log(dat);
+    supportHandler.sendMsgTo_ID(id, dat);
+  }
+  console.log("LOADING COMPLETE, LOADED"+msgs.length,"MESSAGES");
+  supportHandler.sendMsgTo_ID(id, "LOADCOMPLETE "+(from-30));
+  return {status:"SUCCESS", data:null, token:token};
+} // loadLogs
+
+// export async function 

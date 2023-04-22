@@ -14,7 +14,8 @@ import {addTask, getTasks, updateTask, deleteTask} from './tasks';
 import {getLogs, log, purgeLogs, visitCt, incrRequests} from './logging';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
-import {supportHandler, roomRequest, sendMsg, createRoom, deleteRoom, WHOIS} from './supportRooms'
+import {supportHandler, roomRequest, sendMsg, 
+        createRoom, deleteRoom, WHOIS, loadLogs} from './supportRooms'
 const urlencodedParser = bodyParser.urlencoded({ extended: false }) 
 var RateLimit = require('express-rate-limit');
 
@@ -134,11 +135,24 @@ export async function initServer() {
     });
   });
 
+  app.get('/oauth2callback', (req:any, res:any)=>{
+    console.log("??")
+    console.log(req.url);
+  });
+  
+  app.post('/oauth2callback', (req:any, res:any)=>{
+    console.log("??")
+    console.log(req.url);
+  })
+
   app.get('/*', (req:any, res:any) => {
     let requrl = req.url.match("([^?]*)\\??.*")[1]
     let idx = validPages.findIndex((obj)=>obj.toLowerCase()==requrl.toLowerCase());
     if (idx>=0) res.sendFile(frontendDir+validPages[idx]+".html");
-    else res.sendFile(frontendDir+"404.html");
+    else {
+      res.status(404);
+      res.sendFile(frontendDir+"404.html");
+    }
     incrRequests();
   })
   
@@ -151,8 +165,19 @@ export async function initServer() {
       return;
     }
     var body = await parse.json(req);
-    if (!body) res.end(JSON.stringify({status:"ERROR", data:null}));
+    if (!body) res.end(JSON.stringify({status:"ERROR", data:{error:"No command string"}}));
     // let cookiematch = req.cookies.match("sessionID=[0-9a-zA-Z\\-]");
+    // COOKIE ACCEPTANCE DIALOG 
+    if (body.action == "cookieRequest") {
+      res.end(JSON.stringify({data:req.cookies.acceptedQ??false}))
+      return;
+    }
+    if (body.action == "acceptCookies") {
+      res.cookie('acceptedQ', true, {httpOnly: true, secure:true, sameSite:"Strict"})
+      res.end(JSON.stringify(""));
+      return;
+    }
+    //////////////////////////
     makeRequest(body.action, req.cookies.sessionID, body.data, (s:string, d:any, token:string)=>{
       /*if(body.action=="login"||body.action == "logout" ||
         body.action == "delAcc" || body.action == "signup")*/
@@ -317,6 +342,18 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       .then((obj:{status:string, data:any, token:string})=>
         {callback(obj.status, obj.data, obj.token)});
       break;
+    case "loadLogs": // {"action":"loadLogs","room":"BetaOS","id":"11","from":24}
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+      loadLogs(data.room, data.id, data.from, token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "delMsg":
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+      delMsg(data.room, data.id, data.from, token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
     case 'toggleTheme':
       toggleTheme(token)
       .then((obj:{status:string, data:any, token:string})=>
@@ -371,5 +408,5 @@ function eeFormat(data:string) {
 }
 
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
-                    '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme'];
+                    '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest', "/oauth2callback"];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'visits', 'roomRequest', 'sendMsg'];

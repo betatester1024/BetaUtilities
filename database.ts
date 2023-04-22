@@ -1,5 +1,6 @@
 const { MongoClient } = require("mongodb");
-import {authDB, msgDB} from './consts';
+import {authDB, msgDB, uDB} from './consts';
+import {WS} from './betautilities/wsHandler';
 
 // Replace the uri string with your connection string.
 const uri = 
@@ -22,6 +23,7 @@ export async function connectDB() {
     
   }
 }
+export let minID = -1;
 export const database = client.db('BetaOS-Database01');
 // export const DB = database.collection('BetaUtilities');
 
@@ -33,12 +35,27 @@ export async function DBMaintenance() {
       await authDB.deleteOne(items[i]);
     }
   }
-  let items2:{sender:string, expiry:number}[] = await msgDB.find({fieldName:"MSG"}).toArray();
+  let items2:{sender:string, expiry:number, msgID:number}[] = await msgDB.find({fieldName:"MSG"}).toArray();
   for (let i=0; i<items2.length; i++) {
     if (!items2[i].expiry || items2[i].expiry < Date.now()) {
       console.log("Message from "+items2[i].sender + " has expired");
       await msgDB.deleteOne(items2[i]);
+      minID = Math.max(minID, items2[i].msgID);
+      console.log(minID)
     }
   };
+  uDB.find({fieldName:"TIMER"}).toArray().then(
+  (objs:{expiry:number, notifyingUser:string, msg:string}[])=>{
+    for (let i=0; i<objs.length; i++) {
+      if (Date.now()>objs[i].expiry || objs[i].expiry == null) {
+        uDB.deleteOne({fieldName:"TIMER",expiry:objs[i].expiry})
+        console.log("NOTIFYING");
+        WS.notifRoom.socket.send(
+          WS.toSendInfo("!tell @"+objs[i].notifyingUser+" You are reminded of: "+
+                        objs[i].msg.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, "\\\"")+
+                       ". This reminder sent by "+(objs[i].author??"yourself, probably.")));
+      }
+    }
+  });
   setTimeout(DBMaintenance, 1000);
 }

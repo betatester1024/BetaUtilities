@@ -292,7 +292,9 @@ export class WS
       // systemLog(("ERROR for room-ID: "+this.roomName)
       updateActive(this.roomName, false);
     })
-    this.replyMessage = replyMessage;
+    this.replyMessage = (msg:string, sender:string, data:any) => {
+      return replyMessage(this, msg, sender, data);
+    }
     
   }
 }

@@ -12,6 +12,8 @@ export const userMaxLength = 9e99
 export const authDB = database.collection("SystemAUTH_V2")
 export const msgDB = database.collection("SupportMessaging")
 export const uDB = database.collection("BetaUtilities")
+export const TOKEN_PATH = '/home/runner/betatester1024/TOKEN.json';
+export const CREDENTIALS_PATH = '/home/runner/betatester1024/CREDENTIALS.json';
 export const hashingOptions = {
    type: argon2.argon2d,
    memoryCost: 12288,

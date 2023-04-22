@@ -28,9 +28,17 @@ var import_supportRooms = require("./supportRooms");
 var import_logging = require("./logging");
 var import_consts = require("./consts");
 var import_wsHandler = require("./betautilities/wsHandler");
+var import_webHandler = require("./betautilities/webHandler");
 var import_wordler = require("./betautilities/wordler");
 let connectionSuccess = true;
 let DBConnectFailure = null;
+const localEuphRooms = [
+  "bots",
+  "room",
+  "memes",
+  "music",
+  "srs"
+];
 const { exec } = require("child_process");
 try {
   if (connectionSuccess)
@@ -43,19 +51,26 @@ try {
       (0, import_wordler.serverUpdate)();
       (0, import_logging.log)("Systems restarted");
       import_consts.uDB.findOne({ fieldName: "ROOMS" }).then((obj) => {
+        console.log(obj);
         for (let i = 0; i < obj.euphRooms.length; i++) {
           import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("EUPH_ROOM", obj.euphRooms[i]));
           new import_wsHandler.WS("wss://euphoria.io/room/" + obj.euphRooms[i] + "/ws", "BetaUtilities", obj.euphRooms[i], false);
           (0, import_logging.log)("Connected euph_room") + obj.euphRooms[i];
           console.log("Connected euph_room", obj.euphRooms[i]);
         }
+        for (let i = 0; i < localEuphRooms.length; i++) {
+          import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("EUPH_ROOM", localEuphRooms[i]));
+          new import_wsHandler.WS("wss://euphoria.io/room/" + localEuphRooms[i] + "/ws", "BetaUtilities", localEuphRooms[i], false);
+          (0, import_logging.log)("Connected euph_room") + localEuphRooms[i];
+          console.log("Connected euph_room", localEuphRooms[i]);
+        }
         for (let i = 0; i < obj.rooms.length; i++) {
-          import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("ONLINE_SUPPORT", obj.rooms[i]));
+          new import_webHandler.WebH(obj.rooms[i], false);
           console.log("Loaded support room", obj.rooms[i]);
         }
         for (let i = 0; i < obj.hidRooms.length; i++) {
-          import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("HIDDEN_SUPPORT", obj.hidRooms[i]));
-          console.log("Loaded support room", obj.rooms[i]);
+          new import_webHandler.WebH(obj.hidRooms[i], true);
+          console.log("Loaded hidden support room", obj.hidRooms[i]);
         }
       });
     });

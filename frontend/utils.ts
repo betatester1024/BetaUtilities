@@ -32,21 +32,39 @@ function globalOnload(cbk:()=>any) {
           document.getElementById("footer").innerHTML += " | <kbd>"+res.data.data+"</kbd>";
           if (cbk) cbk();
         }
-      ) 
+      )
+      send(JSON.stringify({action:"cookieRequest"}), (res)=>{
+        if (res.data.toString() == "false") {
+          console.log("thing");
+          document.getElementById("compliance").style.bottom="0px";
+          // document.getElementById("compliance").style.top="unset";
+        }
+      })
     }, true);
 
-  
+  document.body.innerHTML += `
+  <div id="compliance">
+    <h2 class="blu nohover">BetaOS Services uses cookies to operate.</h2>
+    <p>We use only <kbd>strictly necessary cookies</kbd> to verify and persist 
+    your login session, and to confirm your acceptance of these cookies. <br>
+    By continuing to use this site, you consent to our use of these cookies.</p>
+    <button class='blu btn fsmed' onclick="acceptCookies()">
+    <span class="material-symbols-outlined">check</span>
+    I understand
+    <div class="anim"></div>
+    </button>
+  </div>`
   let ele2 = document.getElementById("overlay");
   if (ele2)
     ele2.innerHTML = `
   <div class="internal">
         <p class="fsmed" id="alerttext">Error: AlertDialog configured incorrectly. Please contact BetaOS.</p>
-        <button class="btn szHalf" onclick="closeAlert()" style="display: inline-block">
+        <button class="btn szHalf override" onclick="closeAlert()" style="display: inline-block">
           <span class="alertlbl">Continue</span>
           <span class="material-symbols-outlined">arrow_forward_ios</span>
           <div class="anim"></div>
         </button>
-        <button class="btn szHalf red" id="cancelBtn" style="display: none" onclick="closeAlert(true)">
+        <button class="btn szHalf red override" id="cancelBtn" style="display: none" onclick="closeAlert(true)">
           <span class="alertlbl">Cancel</span>
           <span class="material-symbols-outlined">cancel</span>
           <div class="anim"></div>
@@ -86,6 +104,13 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
   failureTimeout = setTimeout(() => alertDialog(`This is taking longer than expected.`, () => { }, 1, params), 1000);
 }
 
+function acceptCookies() {
+  send(JSON.stringify({action:"acceptCookies"}), (res)=> {
+    
+  });
+  document.getElementById("compliance").style.bottom="-200vh";
+}
+
 let failureTimeout: NodeJS.Timeout | null;
 let TIME:NodeJS.Timeout|null;
 let dialogQ = false;
@@ -113,7 +138,8 @@ function alertDialog(str: string, callback: () => any, button: number = -1, fail
   p.innerText = str;
   document.getElementById("cancelBtn").style.display = "none";
   if (button == 1) {
-    p.innerHTML += `<button class='btn szThird fssml' onclick='location.reload()'>Refresh?
+    p.innerHTML += `<button class='btn szThird fssml' id="refresh" onclick='location.reload()'>
+    <span class="material-symbols-outlined">history</span> Refresh?
     <div class="anim"></div></button>`
     console.log("Failed request: " + failedReq);
     BLOCKCALLBACK = true;

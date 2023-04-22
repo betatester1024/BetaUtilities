@@ -133,13 +133,23 @@ async function initServer() {
       res.end();
     });
   });
+  app.get("/oauth2callback", (req, res) => {
+    console.log("??");
+    console.log(req.url);
+  });
+  app.post("/oauth2callback", (req, res) => {
+    console.log("??");
+    console.log(req.url);
+  });
   app.get("/*", (req, res) => {
     let requrl = req.url.match("([^?]*)\\??.*")[1];
     let idx = validPages.findIndex((obj) => obj.toLowerCase() == requrl.toLowerCase());
     if (idx >= 0)
       res.sendFile(import_consts.frontendDir + validPages[idx] + ".html");
-    else
+    else {
+      res.status(404);
       res.sendFile(import_consts.frontendDir + "404.html");
+    }
     (0, import_logging.incrRequests)();
   });
   app.post("/server", urlencodedParser, async (req, res) => {
@@ -151,7 +161,16 @@ async function initServer() {
     }
     var body = await parse.json(req);
     if (!body)
-      res.end(JSON.stringify({ status: "ERROR", data: null }));
+      res.end(JSON.stringify({ status: "ERROR", data: { error: "No command string" } }));
+    if (body.action == "cookieRequest") {
+      res.end(JSON.stringify({ data: req.cookies.acceptedQ ?? false }));
+      return;
+    }
+    if (body.action == "acceptCookies") {
+      res.cookie("acceptedQ", true, { httpOnly: true, secure: true, sameSite: "Strict" });
+      res.end(JSON.stringify(""));
+      return;
+    }
     makeRequest(body.action, req.cookies.sessionID, body.data, (s, d, token) => {
       if (ignoreLog.indexOf(body.action) >= 0) {
       } else if (s == "SUCCESS") {
@@ -352,6 +371,24 @@ function makeRequest(action, token, data, callback) {
         callback(obj.status, obj.data, obj.token);
       });
       break;
+    case "loadLogs":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
+      (0, import_supportRooms.loadLogs)(data.room, data.id, data.from, token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
+    case "delMsg":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
+      delMsg(data.room, data.id, data.from, token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
     case "toggleTheme":
       (0, import_updateUser.toggleTheme)(token).then((obj) => {
         callback(obj.status, obj.data, obj.token);
@@ -415,7 +452,9 @@ const validPages = [
   "/docs",
   "/login",
   "/syslog",
-  "/aboutme"
+  "/aboutme",
+  "/mailertest",
+  "/oauth2callback"
 ];
 const ignoreLog = ["getEE", "userRequest", "getLogs", "visits", "roomRequest", "sendMsg"];
 // Annotate the CommonJS export names for ESM import in node:

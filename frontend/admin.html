@@ -49,10 +49,27 @@
       }
       
       function runCmd() {
-        let val = document.getElementById("cmdInp").value;
-        if (val.match("^[a-zA-Z_\\-]+$"))
-          location.href="/cmd?action="+val;
-        else alertDialog("Stop inputting nonsense in the command prompt.", ()=>{})
+        let cmd = document.getElementById("cmdInp").value;
+        let dat = document.getElementById("datInp").value;
+        try {
+          switch(cmd) {
+            case "delMsg" data = {id:dat}; break;
+            // case ""
+          }
+          if (cmd == "help") {
+            alertDialog(`delMsg [MESSAGE]`)
+            return;
+          }
+          send(JSON.stringify({action:cmd, data:data}), (res)=>{
+            console.log(res);
+            alertDialog("Please check console.", ()=>{})
+          })
+        } catch(e) {
+          alertDialog("Error: "+e);
+        }
+        // if (val.match("^[a-zA-Z_\\-]+$"))
+          // location.href=";
+        // else alertDialog("Stop inputting nonsense in the command prompt.", ()=>{})
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -100,10 +117,11 @@
           <button type=submit class="btn szHalf grn">
             <span class="material-symbols-outlined">update</span>
             Create or update this account<div class="anim"></div></button>
-        </form>
           <button type="button" class="btn szHalf red" onclick="alertDialog('Confirm account deletion?', del, 2)">
             <span class="material-symbols-outlined">delete_forever</span>
             Delete this account<div class="anim"></div></button>
+        </form>
+          
           <a class="btn szFull override" href="/account">
             <span class="material-symbols-outlined">arrow_back_ios</span>
             Return to your account<div class="anim"></div></a>
@@ -111,7 +129,8 @@
             <h2 class="fsmed">Super-administrative command area</h2>
             <form action="javascript:runCmd()">
               <div class="inpContainer">
-                <input id="cmdInp" placeholder="Enter commands here">
+                <input class="szHalf" id="cmdInp" placeholder="Command">
+                <input class="szHalf" id="datInp" placeholder="Data">
                 <div class="anim inp"></div>
               </div>
               <button type=submit class="btn">

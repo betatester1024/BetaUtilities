@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="/supportformat.css">
     <style>
       #inpContainment {
-        width: calc(90% - 90px);
+        width: calc(96% - 100px);
       }
     </style>
   </head>
@@ -25,11 +25,11 @@
         <hr class="rounded">
       </header>
         <div id="containingDiv">
-          <div id="msgArea">
+          <div id="msgArea" onscroll="onScroll()">
             <h2 id="placeholder"><span class="material-symbols-outlined">schedule</span> Loading your messages, a moment please...</h2>
           </div>
           <h2>Users</h2>
-          <div id="userList" class="blu"></div>
+          <div id="userList" class="blu nohover"></div>
         </div><br>
         <form action="javascript:sendMsg()">
           <div class="szFull" id="inpContainment">

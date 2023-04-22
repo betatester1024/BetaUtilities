@@ -13,7 +13,7 @@ export function log(thing:string) {
 
 
 export async function incrRequests() {
-  console.log("Request made");
+  // console.log("Request made");
   if (connectionSuccess) uDB.updateOne({fieldName:"VISITS"}, {$inc:{visitCt:1}}, {upsert:true});
 }
 

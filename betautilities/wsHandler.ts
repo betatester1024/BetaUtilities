@@ -133,7 +133,7 @@ export class WS
       let msg = data["data"]["content"].toLowerCase().trim();
       let snd = data["data"]["sender"]["name"];
       if (this.DATALOGGING) {
-        console.log("LOG");
+        // console.log("LOG");
         fs.writeFileSync('./msgLog.txt', fs.readFileSync('./msgLog.txt').toString()+((`(${this.roomName})[${snd}] ${msg}\n`)));
       }
       // Required methods

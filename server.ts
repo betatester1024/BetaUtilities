@@ -136,13 +136,13 @@ export async function initServer() {
   });
 
   app.get('/oauth2callback', (req:any, res:any)=>{
-    console.log("??")
-    console.log(req.url);
+    // console.log("??")
+    // console.log(req.url);
   });
   
   app.post('/oauth2callback', (req:any, res:any)=>{
-    console.log("??")
-    console.log(req.url);
+    // console.log("??")
+    // console.log(req.url);
   })
 
   app.get('/*', (req:any, res:any) => {
@@ -409,4 +409,4 @@ function eeFormat(data:string) {
 
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
                     '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest', "/oauth2callback"];
-const ignoreLog = ["getEE", "userRequest", 'getLogs', 'visits', 'roomRequest', 'sendMsg'];
+const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 'roomRequest', 'sendMsg'];

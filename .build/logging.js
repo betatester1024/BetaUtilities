@@ -38,7 +38,6 @@ function log(thing) {
     import_consts.uDB.insertOne({ fieldName: "SysLogV2", data: thing + "\n" });
 }
 async function incrRequests() {
-  console.log("Request made");
   if (import_index.connectionSuccess)
     import_consts.uDB.updateOne({ fieldName: "VISITS" }, { $inc: { visitCt: 1 } }, { upsert: true });
 }

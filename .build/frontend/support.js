@@ -50,7 +50,9 @@ async function initClient() {
         let thing = document.getElementById("msgArea");
         if (lcMatch[1] < 0) {
           let errorEle = document.createElement("b");
-          errorEle.className = "";
+          errorEle.className = "red";
+          errorEle.innerText = "No more messages to load";
+          errorEle.style.display = "block";
           thing.prepend(errorEle);
         } else {
           loadStatus = -1;

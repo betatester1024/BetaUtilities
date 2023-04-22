@@ -331,4 +331,4 @@ export async function loadLogs(rn:string, id:string, from:number, token:string) 
   return {status:"SUCCESS", data:null, token:token};
 } // loadLogs
 
-export async function 
+// export async function 

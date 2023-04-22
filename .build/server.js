@@ -380,6 +380,15 @@ function makeRequest(action, token, data, callback) {
         callback(obj.status, obj.data, obj.token);
       });
       break;
+    case "delMsg":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
+      delMsg(data.room, data.id, data.from, token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
     case "toggleTheme":
       (0, import_updateUser.toggleTheme)(token).then((obj) => {
         callback(obj.status, obj.data, obj.token);

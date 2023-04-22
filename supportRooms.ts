@@ -61,8 +61,8 @@ export class supportHandler {
       if (obj.status == "SUCCESS") this.sendMsgTo(rn, "+"+obj.data.alias+"("+obj.data.perms+")");
       else this.sendMsgTo(rn, "+"+processAnon(obj.token)+"(1)");
     });
-    console.log("added connection in "+rn);
-    let roomData = await msgDB.findOne({fieldName:"RoomInfo", room:rn});
+    // console.log("added connection in "+rn);
+    let roomData = await msgDB.findOne({fieldName:"RoomInfo", room:{$eq:rn}});
     let msgCt = roomData?roomData.msgCt:0;
     let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: msgCt-30}}).toArray();
     let text = "";
@@ -88,7 +88,7 @@ export class supportHandler {
     userRequest(token).then((obj:{status:string, data:any, token:string})=>{
       if (obj.status == "SUCCESS") this.sendMsgTo(rn, "-"+obj.data.alias+"("+obj.data.perms+")");
       else this.sendMsgTo(rn, "-"+processAnon(obj.token)+"(1)");
-      console.log("removed connection in "+rn); 
+      // console.log("removed connection in "+rn); 
     });
   }
   

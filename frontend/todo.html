@@ -75,6 +75,9 @@
                 <span title="Delete task" class="red nooutline roundhover todo material-symbols-outlined" onclick="del(${i})">delete</span>
               </p>`;
             }
+            if (res.data.tasks.length == 0) 
+              taskele.innerHTML = `<h2 class="blu nohover fsmed">
+              No tasks found, create one by clicking below!</h2>`
             if (modifyQ) modify();
           }
         })

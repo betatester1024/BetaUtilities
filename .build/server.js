@@ -134,12 +134,8 @@ async function initServer() {
     });
   });
   app.get("/oauth2callback", (req, res) => {
-    console.log("??");
-    console.log(req.url);
   });
   app.post("/oauth2callback", (req, res) => {
-    console.log("??");
-    console.log(req.url);
   });
   app.get("/*", (req, res) => {
     let requrl = req.url.match("([^?]*)\\??.*")[1];
@@ -456,7 +452,7 @@ const validPages = [
   "/mailertest",
   "/oauth2callback"
 ];
-const ignoreLog = ["getEE", "userRequest", "getLogs", "visits", "roomRequest", "sendMsg"];
+const ignoreLog = ["getEE", "userRequest", "getLogs", "loadLogs", "visits", "roomRequest", "sendMsg"];
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   initServer

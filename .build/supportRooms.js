@@ -98,8 +98,7 @@ class supportHandler {
       else
         this.sendMsgTo(rn, "+" + processAnon(obj.token) + "(1)");
     });
-    console.log("added connection in " + rn);
-    let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room: rn });
+    let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
     let msgCt = roomData ? roomData.msgCt : 0;
     let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, msgID: { $gt: msgCt - 30 } }).toArray();
     let text = "";
@@ -120,7 +119,6 @@ class supportHandler {
         this.sendMsgTo(rn, "-" + obj.data.alias + "(" + obj.data.perms + ")");
       else
         this.sendMsgTo(rn, "-" + processAnon(obj.token) + "(1)");
-      console.log("removed connection in " + rn);
     });
   }
   static listRooms(euphOnlyQ, onlineOnlyQ) {

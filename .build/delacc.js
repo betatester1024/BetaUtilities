@@ -44,7 +44,7 @@ async function deleteAccount(user, pass, token) {
   if (pass.length == 0) {
     return { status: "ERROR", data: { error: "No password provided!" }, token };
   } else if (await argon2.verify(usrInfo.pwd, pass)) {
-    await import_consts.authDB.deleteOne({ fieldName: "Token", token });
+    await import_consts.authDB.deleteOne({ fieldName: "Token", token: { $eq: token } });
     await import_consts.authDB.deleteOne({ fieldName: "UserData", user });
     return { status: "SUCCESS", data: null, token: "" };
   } else {

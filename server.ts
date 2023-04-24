@@ -16,7 +16,8 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
 import {uptime} from './betautilities/messageHandle'
 import {supportHandler, roomRequest, sendMsg, 
-        createRoom, deleteRoom, WHOIS, loadLogs} from './supportRooms'
+        createRoom, deleteRoom, WHOIS, loadLogs, 
+        delMsg, updateDefaultLoad, hidRoom, purge} from './supportRooms'
 const urlencodedParser = bodyParser.urlencoded({ extended: false }) 
 var RateLimit = require('express-rate-limit');
 
@@ -351,7 +352,25 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       break;
     case "delMsg":
       if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      delMsg(data.room, data.id, data.from, token)
+      delMsg(data.id, data.room, token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break
+    case "updateDefaultLoad":
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+      updateDefaultLoad(data.new, token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "hidRoom":
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+      hidRoom(data.name, token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
+    case "purge":
+      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+      purge(data.name, token)
       .then((obj:{status:string, data:any, token:string})=>
         {callback(obj.status, obj.data, obj.token)});
       break;

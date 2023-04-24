@@ -25,7 +25,7 @@ var import_consts = require("./consts");
 const argon2 = require("argon2");
 async function userRequest(token, internalFlag = false) {
   if (token == "[SYSINTERNAL]" && internalFlag)
-    return { status: "SUCCESS", data: { user: "BetaOS_System", alias: "BetaOS_System", perms: 3, expiry: 9e99, tasks: [], darkQ: false } };
+    return { status: "SUCCESS", data: { user: "BetaOS_System", alias: "BetaOS_System", perms: 3, expiry: 9e99, tasks: [], darkQ: false }, token: "SYSINTERNAL" };
   let tokenData = await import_consts.authDB.findOne({ fieldName: "Token", token });
   if (!tokenData) {
     return { status: "ERROR", data: { error: "Your session could not be found!" }, token: "" };

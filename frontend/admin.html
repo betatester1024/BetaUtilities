@@ -51,18 +51,26 @@
       function runCmd() {
         let cmd = document.getElementById("cmdInp").value;
         let dat = document.getElementById("datInp").value;
+        let dat2 = document.getElementById("datInp2").value;
+        console.log(cmd, dat, dat2);
         try {
           switch(cmd) {
-            case "delMsg" data = {id:dat}; break;
-            // case ""
+            case "delMsg": data = {id:dat, room:dat2}; break;
+            case "updateDefaultLoad": data={new:dat.split(",")}; break;
+            case "hidRoom": data = {name:dat}; break;
+            case "purge": data= {name:dat}; break;
+            case "help":
+              alertDialog(`Command syntax: \ndelMsg [MESSAGE] [ROOM] 
+              updateDefaultLoad [ROOM1],[ROOM2],[ROOM3],...
+              hidRoom [ROOMNAME]
+              purge [ROOMNAME]`, ()=>{});
+            default: return;
           }
-          if (cmd == "help") {
-            alertDialog(`delMsg [MESSAGE]`)
-            return;
-          }
+          
           send(JSON.stringify({action:cmd, data:data}), (res)=>{
             console.log(res);
-            alertDialog("Please check console.", ()=>{})
+            let msg = res.status == "SUCCESS"?res.data:res.data.error;
+            alertDialog("Status: "+res.status+"\nResponse: "+msg, ()=>{})
           })
         } catch(e) {
           alertDialog("Error: "+e);
@@ -84,6 +92,9 @@
         width: 90%;
         margin: 0 auto;
         transition: all 1s ease;
+      }
+      .inpContainer {
+        text-align: center !important;
       }
     </style>
   </head>
@@ -129,8 +140,9 @@
             <h2 class="fsmed">Super-administrative command area</h2>
             <form action="javascript:runCmd()">
               <div class="inpContainer">
-                <input class="szHalf" id="cmdInp" placeholder="Command">
-                <input class="szHalf" id="datInp" placeholder="Data">
+                <input class="szThird" id="cmdInp" placeholder="Command">
+                <input class="szThird" id="datInp" placeholder="Field 1">
+                <input class="szThird" id="datInp2" placeholder="Field 2">
                 <div class="anim inp"></div>
               </div>
               <button type=submit class="btn">

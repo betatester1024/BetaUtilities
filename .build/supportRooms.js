@@ -4,8 +4,8 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
+  for (var name2 in all)
+    __defProp(target, name2, { get: all[name2], enumerable: true });
 };
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
@@ -21,14 +21,18 @@ __export(supportRooms_exports, {
   Room: () => Room,
   WHOIS: () => WHOIS,
   createRoom: () => createRoom,
+  delMsg: () => delMsg,
   deleteRoom: () => deleteRoom,
+  hidRoom: () => hidRoom,
   loadLogs: () => loadLogs,
   pseudoConnection: () => pseudoConnection,
+  purge: () => purge,
   roomRequest: () => roomRequest,
   sendMsg: () => sendMsg,
   sendMsg_B: () => sendMsg_B,
   supportHandler: () => supportHandler,
-  updateActive: () => updateActive
+  updateActive: () => updateActive,
+  updateDefaultLoad: () => updateDefaultLoad
 });
 module.exports = __toCommonJS(supportRooms_exports);
 var import_userRequest = require("./userRequest");
@@ -40,9 +44,9 @@ class Room {
   type;
   name;
   handler;
-  constructor(type, name, responder = null, handler = null) {
+  constructor(type, name2, responder = null, handler = null) {
     this.type = type;
-    this.name = name;
+    this.name = name2;
     this.handler = handler;
   }
 }
@@ -253,17 +257,17 @@ function roomRequest(token, all = false) {
   else
     return { status: "SUCCESS", data: supportHandler.listOnlineRooms(), token };
 }
-async function createRoom(name, token) {
-  if (supportHandler.checkFoundQ(name))
+async function createRoom(name2, token) {
+  if (supportHandler.checkFoundQ(name2))
     return { status: "ERROR", data: { error: "Room already exists" }, token };
   let usrData = await (0, import_userRequest.userRequest)(token);
-  if (!name.match(import_consts.roomRegex))
+  if (!name2.match("^" + import_consts.roomRegex + "$"))
     return { status: "ERROR", data: { error: "Invalid roomname!" }, token };
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
-      new import_webHandler.WebH(name, false);
+      new import_webHandler.WebH(name2, false);
       let obj = await import_consts.uDB.findOne({ fieldName: "ROOMS" });
-      obj.rooms.push(name);
+      obj.rooms.push(name2);
       await import_consts.uDB.updateOne({ fieldName: "ROOMS" }, {
         $set: {
           rooms: obj.rooms
@@ -275,18 +279,18 @@ async function createRoom(name, token) {
   } else
     return usrData;
 }
-async function deleteRoom(name, token) {
-  if (!supportHandler.checkFoundQ(name))
+async function deleteRoom(name2, token) {
+  if (!supportHandler.checkFoundQ(name2))
     return { status: "ERROR", data: { error: "Room does not exist" }, token };
   let usrData = await (0, import_userRequest.userRequest)(token);
-  if (!name.match(import_consts.roomRegex))
+  if (!name2.match("^" + import_consts.roomRegex + "$"))
     return { status: "ERROR", data: { error: "Invalid roomname!" }, token };
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
       let obj = await import_consts.uDB.findOne({ fieldName: "ROOMS" });
-      let idx = obj.rooms.indexOf(name);
+      let idx = obj.rooms.indexOf(name2);
       if (idx >= 0) {
-        supportHandler.deleteRoom("ONLINE_SUPPORT", name);
+        supportHandler.deleteRoom("ONLINE_SUPPORT", name2);
         obj.rooms.splice(idx, 1);
         await import_consts.uDB.updateOne({ fieldName: "ROOMS" }, {
           $set: {
@@ -295,9 +299,9 @@ async function deleteRoom(name, token) {
         }, { upsert: true });
         return { status: "SUCCESS", data: null, token };
       } else {
-        let idx2 = obj.hidRooms.indexOf(name);
+        let idx2 = obj.hidRooms.indexOf(name2);
         if (idx2 >= 0) {
-          supportHandler.deleteRoom("HIDDEN_SUPPORT", name);
+          supportHandler.deleteRoom("HIDDEN_SUPPORT", name2);
           obj.hidRooms.splice(idx2, 1);
         } else
           return { status: "ERROR", data: { error: "Database inconsistency detected" }, token };
@@ -313,11 +317,11 @@ async function deleteRoom(name, token) {
   } else
     return usrData;
 }
-function updateActive(name, activeQ) {
+function updateActive(name2, activeQ) {
   if (activeQ)
-    supportHandler.addRoom(new Room("EUPH_ROOM", name));
+    supportHandler.addRoom(new Room("EUPH_ROOM", name2));
   else
-    supportHandler.deleteRoom("EUPH_ROOM", name);
+    supportHandler.deleteRoom("EUPH_ROOM", name2);
 }
 async function WHOIS(token, user) {
   let userData = await import_consts.authDB.findOne({ fieldName: "UserData", user });
@@ -353,18 +357,85 @@ async function loadLogs(rn, id, from, token) {
   supportHandler.sendMsgTo_ID(id, "LOADCOMPLETE " + (from - 30));
   return { status: "SUCCESS", data: null, token };
 }
+async function delMsg(id, room, token) {
+  if (!supportHandler.checkFoundQ(name))
+    return { status: "ERROR", data: { error: "Room does not exist" }, token };
+  let usrData = await (0, import_userRequest.userRequest)(token);
+  if (usrData.status != "SUCCESS")
+    return usrData;
+  if (usrData.perms < 2)
+    return { status: "ERROR", data: { error: "Insufficient permissions!" }, token };
+  await import_consts.msgDB.deleteOne({ fieldName: "MSG", msgID: Number(id), room });
+  return { status: "SUCCESS", data: null, token };
+}
+async function updateDefaultLoad(name2, token) {
+  let usrData = await (0, import_userRequest.userRequest)(token);
+  if (usrData.status != "SUCCESS")
+    return usrData;
+  if (usrData.data.perms < 3)
+    return { status: "ERROR", data: { error: "Insufficient permissions!" }, token };
+  for (let i = 0; i < name2.length; i++) {
+    if (!name2[i].match("^" + import_consts.roomRegex + "$"))
+      return { status: "ERROR", data: { error: "Invalid room-name(s)" }, token };
+  }
+  await import_consts.uDB.updateOne({ fieldName: "ROOMS" }, { $set: {
+    euphRooms: name2
+  } });
+  return { status: "SUCCESS", data: null, token };
+}
+async function hidRoom(name2, token) {
+  console.log(name2);
+  if (supportHandler.checkFoundQ(name2))
+    return { status: "ERROR", data: { error: "Room already exists" }, token };
+  let usrData = await (0, import_userRequest.userRequest)(token);
+  if (!name2.match("^" + import_consts.roomRegex + "$"))
+    return { status: "ERROR", data: { error: "Invalid roomname!" }, token };
+  if (usrData.status == "SUCCESS") {
+    if (usrData.data.perms >= 2) {
+      new import_webHandler.WebH(name2, false);
+      let obj = await import_consts.uDB.findOne({ fieldName: "ROOMS" });
+      obj.hidRooms.push(name2);
+      await import_consts.uDB.updateOne({ fieldName: "ROOMS" }, {
+        $set: {
+          hidRooms: obj.hidRooms
+        }
+      }, { upsert: true });
+      return { status: "SUCCESS", data: null, token };
+    } else
+      return { status: "ERROR", data: { error: "Access denied!" }, token };
+  } else
+    return usrData;
+}
+async function purge(name2, token) {
+  if (!supportHandler.checkFoundQ(name2))
+    return { status: "ERROR", data: { error: "Room does not exist" }, token };
+  let usrData = await (0, import_userRequest.userRequest)(token);
+  if (usrData.status != "SUCCESS")
+    return usrData;
+  if (usrData.data.perms < 3)
+    return { status: "ERROR", data: { error: "Insufficient permissions!" }, token };
+  await import_consts.msgDB.deleteMany({ fieldName: "MSG", room: name2 });
+  await import_consts.msgDB.updateOne({ fieldName: "RoomInfo", room: name2 }, { $set: {
+    msgCt: 0
+  } });
+  return { status: "SUCCESS", data: null, token };
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Room,
   WHOIS,
   createRoom,
+  delMsg,
   deleteRoom,
+  hidRoom,
   loadLogs,
   pseudoConnection,
+  purge,
   roomRequest,
   sendMsg,
   sendMsg_B,
   supportHandler,
-  updateActive
+  updateActive,
+  updateDefaultLoad
 });
 //# sourceMappingURL=supportRooms.js.map

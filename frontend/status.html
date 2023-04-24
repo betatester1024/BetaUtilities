@@ -49,7 +49,7 @@
           TOTAL = res.data.total;
           THEN = Date.now();
           setInterval(()=>{
-            console.log("updating")
+            // console.log("updating")
             TIMEELAPSED = Date.now() - THEN;
             document.getElementById("uptime").innerHTML = 
               `<span class="material-symbols-outlined">check_circle</span>
@@ -57,6 +57,13 @@
               (Total: ${toTime(TOTAL+TIMEELAPSED)})`;
           }, 100);
         })
+      }
+      function updateUptime() {
+        send(JSON.stringify({action:"uptime"}), (res)=>{
+          UPTIME = res.data.up;
+          TOTAL = res.data.total;
+          THEN = Date.now();
+        });
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -88,12 +95,15 @@
         <hr class="rounded" id="hr">
       </header>
       <h2 class="fsmed" id="uptime"></h2>
+      <button class="btn fssml2" onclick="updateUptime()">
+        <span class="material-symbols-outlined">sync</span>
+        Refresh uptime<div class="anim"></div></button>
       <p id="inner_content" class="fsmed">Loading... </p><br>
-      <button id="arenb" class="btn fssml2 override" onclick="window.open('/status?refresh='+document.getElementById('sel').value, '_self');">
+      <button id="arenb" class="btn fssml2" onclick="window.open('/status?refresh='+document.getElementById('sel').value, '_self');">
         <span class="material-symbols-outlined">sync</span>Enable AutoRefresh - every:
       <div class="anim"></div></button>
       
-      <button id="ardis" style="display: none" class="btn fssml2 override" onclick="window.open('/status', '_self');">
+      <button id="ardis" style="display: none" class="btn fssml2" onclick="window.open('/status', '_self');">
         <span class="material-symbols-outlined">sync_disabled</span>Disable AutoRefresh
       <div class="anim"></div></button>
       <select class="szThird" id="sel">

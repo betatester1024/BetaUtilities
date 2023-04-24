@@ -10,7 +10,7 @@ export let connectionSuccess = true;
 export let DBConnectFailure:any = null;
 import {sendMail} from './mailer';
 const localEuphRooms = [
-  "bots", "room", "memes", "music", "srs"
+  // "bots", "room", "memes", "music", "srs"
 ]
 const { exec } = require("child_process");
 

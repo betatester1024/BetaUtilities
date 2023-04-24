@@ -386,6 +386,33 @@ function makeRequest(action, token, data, callback) {
         callback(obj.status, obj.data, obj.token);
       });
       break;
+    case "updateDefaultLoad":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
+      (0, import_supportRooms.updateDefaultLoad)(data.new, token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
+    case "hidRoom":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
+      (0, import_supportRooms.hidRoom)(data.name, token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
+    case "purge":
+      if (!data) {
+        callback("ERROR", { error: "No data provided" }, token);
+        break;
+      }
+      (0, import_supportRooms.purge)(data.name, token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
     case "uptime":
       (0, import_messageHandle.uptime)(token).then((obj) => {
         callback(obj.status, obj.data, obj.token);

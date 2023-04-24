@@ -229,7 +229,7 @@ export function roomRequest(token:string, all:boolean=false) {
 export async function createRoom(name:string, token:string) {
   if (supportHandler.checkFoundQ(name)) return {status:"ERROR", data:{error:"Room already exists"}, token:token};
   let usrData = await userRequest(token) as {status:string, data:{perms:number}};
-  if (!name.match(roomRegex)) return {status:"ERROR", data:{error:"Invalid roomname!"}, token:token};
+  if (!name.match("^"+roomRegex+"$")) return {status:"ERROR", data:{error:"Invalid roomname!"}, token:token};
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
       
@@ -252,7 +252,7 @@ export async function createRoom(name:string, token:string) {
 export async function deleteRoom(name:string, token:string) {
   if (!supportHandler.checkFoundQ(name)) return {status:"ERROR", data:{error:"Room does not exist"}, token:token};
   let usrData = await userRequest(token) as {status:string, data:{perms:number}};
-  if (!name.match(roomRegex)) return {status:"ERROR", data:{error:"Invalid roomname!"}, token:token};
+  if (!name.match("^"+roomRegex+"$")) return {status:"ERROR", data:{error:"Invalid roomname!"}, token:token};
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
 
@@ -319,7 +319,6 @@ export async function loadLogs(rn:string, id:string, from:number, token:string) 
                          // DO NOT RETURN LOADCOMPLETE.
   
   let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: from-30, $lt: from}}).toArray();
-  console.log(msgs.length);
   for (let i=msgs.length-1; i>=0; i--) {
     // console.log(msgs[i]);
     let dat = "{"+(-msgs[i].msgID)+"}["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data;
@@ -333,16 +332,62 @@ export async function loadLogs(rn:string, id:string, from:number, token:string) 
 
 export async function delMsg(id:string, room:string, token:string) {
   // console.log({fieldName:"MSG", msgID:id, room:room});
+  if (!supportHandler.checkFoundQ(name)) return {status:"ERROR", data:{error:"Room does not exist"}, token:token};
+  let usrData = await userRequest(token) as {status:string, data:{perms:number}};
+  if (usrData.status != "SUCCESS") return usrData;
+  if (usrData.perms < 2) return {status:"ERROR", data:{error:"Insufficient permissions!"}, token:token};
   await msgDB.deleteOne({fieldName:"MSG", msgID:Number(id), room:room});
   return {status:"SUCCESS", data:null, token:token};
 }
 
 export async function updateDefaultLoad(name:string[], token:string) {
-  
+  let usrData = await userRequest(token) as {status:string, data:{perms:number}};
+  if (usrData.status != "SUCCESS") return usrData;
+  // console.log(usrData.data.perms);
+  if (usrData.data.perms < 3) return {status:"ERROR", data:{error:"Insufficient permissions!"}, token:token};
+  for (let i=0; i<name.length; i++) {
+    if (!name[i].match("^"+roomRegex+"$")) return {status:"ERROR", data:{error:"Invalid room-name(s)"}, token:token}
+  }
+  await uDB.updateOne({fieldName:"ROOMS"}, {$set:{
+    euphRooms:name
+  }});
+  return {status:"SUCCESS", data:null, token:token};
 }
 
 export async function hidRoom(name:string, token:string) {
-  
+  console.log(name);
+  if (supportHandler.checkFoundQ(name)) return {status:"ERROR", data:{error:"Room already exists"}, token:token};
+  let usrData = await userRequest(token) as {status:string, data:{perms:number}};
+  if (!name.match("^"+roomRegex+"$")) return {status:"ERROR", data:{error:"Invalid roomname!"}, token:token};
+  if (usrData.status == "SUCCESS") {
+    if (usrData.data.perms >= 2) {
+      
+      // supportHandler.addRoom(new Room("ONLINE_SUPPORT", name));
+      new WebH(name, false);
+      let obj = await uDB.findOne({fieldName:"ROOMS"});
+      obj.hidRooms.push(name);
+      await uDB.updateOne({fieldName:"ROOMS"}, {
+        $set: {
+          hidRooms: obj.hidRooms
+        },
+      }, {upsert:true});
+      return {status:"SUCCESS", data:null, token:token}
+    }
+    else return {status:"ERROR", data:{error:"Access denied!"}, token:token};
+  }
+  else return usrData;
 }
 
-export async purge(name:string, token:string)
+export async function purge(name:string, token:string) {
+  if (!supportHandler.checkFoundQ(name)) return {status:"ERROR", data:{error:"Room does not exist"}, token:token};
+  let usrData = await userRequest(token) as {status:string, data:{perms:number}};
+  if (usrData.status != "SUCCESS") return usrData;
+  // console.log(usrData.data.perms);
+  if (usrData.data.perms < 3) return {status:"ERROR", data:{error:"Insufficient permissions!"}, token:token};
+
+  await msgDB.deleteMany({fieldName:"MSG", room:name});
+  await msgDB.updateOne({fieldName:"RoomInfo", room:name}, {$set:{
+    msgCt:0
+  }})
+  return {status:"SUCCESS", data:null, token:token};
+}

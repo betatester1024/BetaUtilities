@@ -32,13 +32,7 @@ var import_webHandler = require("./betautilities/webHandler");
 var import_wordler = require("./betautilities/wordler");
 let connectionSuccess = true;
 let DBConnectFailure = null;
-const localEuphRooms = [
-  "bots",
-  "room",
-  "memes",
-  "music",
-  "srs"
-];
+const localEuphRooms = [];
 const { exec } = require("child_process");
 try {
   if (connectionSuccess)

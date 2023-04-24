@@ -19,6 +19,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var messageHandle_exports = {};
 __export(messageHandle_exports, {
   replyMessage: () => replyMessage,
+  uptime: () => uptime,
   wordleUpdate: () => wordleUpdate
 });
 module.exports = __toCommonJS(messageHandle_exports);
@@ -74,7 +75,7 @@ function replyMessage(hnd, msg, sender, data) {
     hnd.clearCallReset();
     return getUptimeStr(STARTTIME) + " (Total uptime: " + getUptimeStr() + ")";
   }
-  let match_r = msg.match(/preview\.redd\.it\/(.*\.(jpg|png))/igmu);
+  let match_r = msg.match(/preview\.redd\.it\/(.*\.(jpg|png|jpeg|gif|bmp))/igmu);
   if (match_r) {
     return match_r[0].replace("preview.redd.it", "i.redd.it");
   }
@@ -580,6 +581,10 @@ function norm(str) {
 }
 function wordleUpdate() {
 }
+async function uptime(token) {
+  let time = Number(fs.readFileSync("./betautilities/runtime.txt"));
+  return { status: "SUCCESS", data: { up: Date.now() - STARTTIME, total: time }, token };
+}
 function getUptimeStr(STARTTIME2 = -1) {
   if (STARTTIME2 < 0) {
     let time = Number(fs.readFileSync("./betautilities/runtime.txt"));
@@ -608,6 +613,7 @@ function format(n) {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   replyMessage,
+  uptime,
   wordleUpdate
 });
 //# sourceMappingURL=messageHandle.js.map

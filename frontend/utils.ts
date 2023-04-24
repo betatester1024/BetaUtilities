@@ -30,16 +30,18 @@ function globalOnload(cbk:()=>any) {
             ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`
           }// this means the database died 
           document.getElementById("footer").innerHTML += " | <kbd>"+res.data.data+"</kbd>";
-          if (cbk) cbk();
+          send(JSON.stringify({action:"cookieRequest"}), (res)=>{
+            if (res.data.toString() == "false") {
+              console.log("thing");
+              document.getElementById("compliance").style.bottom="0px";
+              
+              // document.getElementById("compliance").style.top="unset";
+            }
+            if (cbk) cbk();
+          })
         }
       )
-      send(JSON.stringify({action:"cookieRequest"}), (res)=>{
-        if (res.data.toString() == "false") {
-          console.log("thing");
-          document.getElementById("compliance").style.bottom="0px";
-          // document.getElementById("compliance").style.top="unset";
-        }
-      })
+      
     }, true);
 
   document.body.innerHTML += `

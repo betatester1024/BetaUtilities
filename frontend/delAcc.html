@@ -6,6 +6,7 @@
     <script>
       let DELUSER = "ErrorUser";
       function onLoad() {
+        document.getElementById('userInp').focus();
         send(JSON.stringify({action:"userRequest"}), (res)=> {
           if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{window.open('/login?redirect=config', '_self')});
           else {
@@ -43,7 +44,7 @@
     <style>
     </style>
   </head>
-  <body onload = "globalOnload(); onLoad()">
+  <body onload = "globalOnload(()=>{onLoad(); }); ">
     <div class="main_content">
       <header>
         <h2>Account deletion</h2>
@@ -52,7 +53,7 @@
       <div class="btnRow">
         <form action="javascript:del()">
           <div class="inpContainer">
-            <input id="userInp" placeholder="Re-enter your username to delete account." autofocus>
+            <input id="userInp" placeholder="Re-enter your username to delete account.">
             <div class="anim inp"></div>
           </div>
           <div class="inpContainer">

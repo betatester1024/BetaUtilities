@@ -55,7 +55,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     
     return getUptimeStr(STARTTIME)+" (Total uptime: "+getUptimeStr()+")";
   }
-  let match_r = msg.match(/preview\.redd\.it\/(.*\.(jpg|png))/igmu);
+  let match_r = msg.match(/preview\.redd\.it\/(.*\.(jpg|png|jpeg|gif|bmp))/igmu);
   if (match_r) {
 
     return match_r[0].replace("preview.redd.it", "i.redd.it");
@@ -564,6 +564,10 @@ export function wordleUpdate() {
   
 }
 
+export async function uptime(token:string) {
+  let time = Number(fs.readFileSync('./betautilities/runtime.txt'));
+  return {status:"SUCCESS", data:{up:Date.now() - STARTTIME, total:time}, token:token};
+}
 function getUptimeStr(STARTTIME:number=-1) {
   if (STARTTIME < 0) {
     let time = Number(fs.readFileSync('./betautilities/runtime.txt'));

@@ -5,6 +5,7 @@
     <title>Status | BetaOS Systems</title>
     <script>
       function onLoad() {
+        console.log("onloading")
         send(JSON.stringify({action:"statusRequest"}), (res)=>{
           // if (res.status != "SUCCESS") {
           //   alertDialog("Error: "+res.data.error);
@@ -43,6 +44,19 @@
           document.getElementById("sel").style.display="none";
           setTimeout(()=>{location.reload()}, match[1]);
         }
+        send(JSON.stringify({action:"uptime"}), (res)=>{
+          UPTIME = res.data.up;
+          TOTAL = res.data.total;
+          THEN = Date.now();
+          setInterval(()=>{
+            console.log("updating")
+            TIMEELAPSED = Date.now() - THEN;
+            document.getElementById("uptime").innerHTML = 
+              `<span class="material-symbols-outlined">check_circle</span>
+              Uptime: ${toTime(UPTIME+TIMEELAPSED)} 
+              (Total: ${toTime(TOTAL+TIMEELAPSED)})`;
+          }, 100);
+        })
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -67,12 +81,13 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload(); onLoad()">
+  <body onload = "globalOnload(()=>{onLoad()});">
     <div class="main_content">
       <header>
         <h2 id="hdr" class="gry nohover">Status: Loading</h2>
         <hr class="rounded" id="hr">
       </header>
+      <h2 class="fsmed" id="uptime"></h2>
       <p id="inner_content" class="fsmed">Loading... </p><br>
       <button id="arenb" class="btn fssml2 override" onclick="window.open('/status?refresh='+document.getElementById('sel').value, '_self');">
         <span class="material-symbols-outlined">sync</span>Enable AutoRefresh - every:

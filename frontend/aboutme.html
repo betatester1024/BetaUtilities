@@ -67,7 +67,7 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload();">
+  <body onload = "globalOnload(()=>{console.log(); document.getElementById('inp').focus();});">
     <div class="main_content">
       <header>
         <h2>BetaOS WHOIS Lookup Service</h2>
@@ -75,7 +75,7 @@
       </header>
       <form id="form" action="javascript:lookup()">
         <div class="inpContainer szHalf" style="margin: 0px auto">
-          <input class="inp" id="inp" placeholder="Search..." autofocus>
+          <input class="inp" id="inp" placeholder="Search...">
           <div class="anim inp"></div>
         </div>
         <button class="btn szHalf override">

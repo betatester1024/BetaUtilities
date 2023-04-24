@@ -14,14 +14,16 @@
             }
             document.getElementById("rooms").innerHTML = btns;
           }
-        });
-        send(JSON.stringify({action:"userRequest"}), (res)=>{
-          if (res.status == "SUCCESS") {
-            if (res.data.perms >= 2) {
-              document.getElementById("admin").style.display="block";
+          send(JSON.stringify({action:"userRequest"}), (res)=>{
+            if (res.status == "SUCCESS") {
+              if (res.data.perms >= 2) {
+                document.getElementById("admin").style.display="block";
+              }
             }
-          }
-        })
+            document.getElementById("inp").focus();
+          })
+        });
+        
       }
 
       function deleterm() {
@@ -59,7 +61,7 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload(); onLoad()">
+  <body onload = "globalOnload(()=>{onLoad();});">
     <div class="main_content">
       <header>
         <h2 id="header">Support rooms</h2>
@@ -67,7 +69,7 @@
       </header>
       <form action="javascript:visit()">
         <div class="inpContainer szHalf" style="margin: 0px auto">
-          <input class="inp" id="inp" placeholder="Search..." autofocus>
+          <input class="inp" id="inp" placeholder="Search...">
           <div class="anim inp"></div>
         </div>
         <button class="btn szHalf override">

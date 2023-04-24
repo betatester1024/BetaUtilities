@@ -18,7 +18,7 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload(); onLoad(); initClient()">
+  <body onload = "globalOnload(()=>{onLoad(); initClient()}); ">
     <div class="main_content">
       <header>
         <h2 id="header">Support</h2>
@@ -33,7 +33,7 @@
         </div><br>
         <form action="javascript:sendMsg()">
           <div class="szFull" id="inpContainment">
-            <input id="msgInp" placeholder="Enter a message..." autofocus autocomplete="off" >
+            <input id="msgInp" placeholder="Enter a message..." autocomplete="off" >
             <div class="anim inp"></div>
           </div>
           <button class="btn szIco override" id="sendBtn">

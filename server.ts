@@ -14,6 +14,7 @@ import {addTask, getTasks, updateTask, deleteTask} from './tasks';
 import {getLogs, log, purgeLogs, visitCt, incrRequests} from './logging';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
+import {uptime} from './betautilities/messageHandle'
 import {supportHandler, roomRequest, sendMsg, 
         createRoom, deleteRoom, WHOIS, loadLogs} from './supportRooms'
 const urlencodedParser = bodyParser.urlencoded({ extended: false }) 
@@ -354,6 +355,11 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       .then((obj:{status:string, data:any, token:string})=>
         {callback(obj.status, obj.data, obj.token)});
       break;
+    case "uptime":
+      uptime(token)
+      .then((obj:{status:string, data:any, token:string})=>
+        {callback(obj.status, obj.data, obj.token)});
+      break;
     case 'toggleTheme':
       toggleTheme(token)
       .then((obj:{status:string, data:any, token:string})=>
@@ -362,7 +368,7 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
     default:
       callback("ERROR", {error: "Unknown command string!"}, token);
   }
-  console.log("request made")
+  // console.log("request made")
   return; 
 }
 

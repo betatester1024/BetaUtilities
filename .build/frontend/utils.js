@@ -34,16 +34,16 @@ function globalOnload(cbk2) {
             ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`;
           }
           document.getElementById("footer").innerHTML += " | <kbd>" + res2.data.data + "</kbd>";
-          if (cbk2)
-            cbk2();
+          send(JSON.stringify({ action: "cookieRequest" }), (res3) => {
+            if (res3.data.toString() == "false") {
+              console.log("thing");
+              document.getElementById("compliance").style.bottom = "0px";
+            }
+            if (cbk2)
+              cbk2();
+          });
         }
       );
-      send(JSON.stringify({ action: "cookieRequest" }), (res2) => {
-        if (res2.data.toString() == "false") {
-          console.log("thing");
-          document.getElementById("compliance").style.bottom = "0px";
-        }
-      });
     },
     true
   );

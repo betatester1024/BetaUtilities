@@ -32,7 +32,7 @@
     <style>
     </style>
   </head>
-  <body onload = "globalOnload();">
+  <body onload = "globalOnload(()=>{document.getElementById('userInp').focus()});">
     <div class="main_content">
       <header>
         <h2>Sign up</h2>
@@ -41,7 +41,7 @@
       <div class="btnRow">
         <form action="javascript:signup()">
           <div class="inpContainer">
-            <input id="userInp" placeholder="Username" autofocus>
+            <input id="userInp" placeholder="Username">
             <div class="anim inp"></div>
           </div>
           <div class="inpContainer">

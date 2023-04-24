@@ -6,6 +6,7 @@ function onLoad() {
   document.getElementById("header").innerHTML = "Support: #"+
     document.URL.match("\\?room=(.*)")[1];
   ROOMNAME = document.URL.match("\\?room=(.*)")[1];
+  
 }
 // system refresh auto!
 
@@ -209,6 +210,7 @@ async function initClient()
     console.log("Restartng client ("+e+")")
     setTimeout(initClient, 0);
   }
+  document.getElementById("msgInp").focus();
 } // initClient();
 
 

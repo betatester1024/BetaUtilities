@@ -30,6 +30,7 @@ var import_userRequest = require("./userRequest");
 var import_EEHandler = require("./EEHandler");
 var import_tasks = require("./tasks");
 var import_logging = require("./logging");
+var import_messageHandle = require("./betautilities/messageHandle");
 var import_supportRooms = require("./supportRooms");
 const express = require("express");
 const app = express();
@@ -385,6 +386,11 @@ function makeRequest(action, token, data, callback) {
         callback(obj.status, obj.data, obj.token);
       });
       break;
+    case "uptime":
+      (0, import_messageHandle.uptime)(token).then((obj) => {
+        callback(obj.status, obj.data, obj.token);
+      });
+      break;
     case "toggleTheme":
       (0, import_updateUser.toggleTheme)(token).then((obj) => {
         callback(obj.status, obj.data, obj.token);
@@ -393,7 +399,6 @@ function makeRequest(action, token, data, callback) {
     default:
       callback("ERROR", { error: "Unknown command string!" }, token);
   }
-  console.log("request made");
   return;
 }
 function eeFormat(data) {

@@ -5,39 +5,41 @@
     <title>Welcome | BetaOS Services</title>
     <script>
       const accessLevels = ["error-level", "user", "admin", "super-admin"];
-      send(JSON.stringify({action:"userRequest"}), 
-       (res)=>{
-         if (res.status == "ERROR") {
-           if (res.data.error.match("Database")) {
-              document.getElementById('status').className = "btn szHalf red";
-              document.getElementById('statspan').innerHTML = "error";
-           }
-           return; 
-         }
-         let ele = document.getElementById("welcomeHdr");
-         ele.innerText = "Welcome "+res.data.user+"!"; 
-         let userInfo = document.createElement("h2");
-         setInterval(()=>{userInfo.innerHTML = "logged in as "+accessLevels[res.data.perms]+
-           (res.data.expiry<Date.now()?" (session expired)":
-            (res.data.expiry>100*365*24*69*60*1000?` (session expiring in 
-            <span class="material-symbols-outlined">all_inclusive</span> days)`:
-             " (session expiring in "+toTime(res.data.expiry-Date.now())+")"));
-          }, 100);
-         ele.append(userInfo);
-         userInfo.style.fontSize = "30px";
-         let loginBtn = document.getElementById("loginBtn")
-         let signupBtn = document.getElementById("signupBtn")
-         let adminBtn = document.getElementById("adminBtn")
-         let configBtn = document.getElementById("configBtn")
-         let logoutBtn = document.getElementById("logoutBtn");
-         loginBtn.style.display="none";
-         signupBtn.style.display="none";
-         logoutBtn.style.display="inline-block";
-         configBtn.style.display=res.data.perms>=1?"inline-block":"none";
-         adminBtn.style.display = res.data.perms==1?"none":"inline-block";
-         configBtn.className = res.data.perms>1?"btn szThird":"btn szTwoThirds";
-         console.log(signupIco.innerHTML);
-       });
+      function onLoad() {
+        send(JSON.stringify({action:"userRequest"}), 
+        (res)=>{
+          if (res.status == "ERROR") {
+            if (res.data.error.match("Database")) {
+               document.getElementById('status').className = "btn szHalf red";
+               document.getElementById('statspan').innerHTML = "error";
+            }
+            return; 
+          }
+          let ele = document.getElementById("welcomeHdr");
+          ele.innerText = "Welcome "+res.data.user+"!"; 
+          let userInfo = document.createElement("h2");
+          setInterval(()=>{userInfo.innerHTML = "logged in as "+accessLevels[res.data.perms]+
+            (res.data.expiry<Date.now()?" (session expired)":
+             (res.data.expiry>100*365*24*69*60*1000?` (session expiring in 
+             <span class="material-symbols-outlined">all_inclusive</span> days)`:
+              " (session expiring in "+toTime(res.data.expiry-Date.now())+")"));
+           }, 100);
+          ele.append(userInfo);
+          userInfo.style.fontSize = "30px";
+          let loginBtn = document.getElementById("loginBtn")
+          let signupBtn = document.getElementById("signupBtn")
+          let adminBtn = document.getElementById("adminBtn")
+          let configBtn = document.getElementById("configBtn")
+          let logoutBtn = document.getElementById("logoutBtn");
+          loginBtn.style.display="none";
+          signupBtn.style.display="none";
+          logoutBtn.style.display="inline-block";
+          configBtn.style.display=res.data.perms>=1?"inline-block":"none";
+          adminBtn.style.display = res.data.perms==1?"none":"inline-block";
+          configBtn.className = res.data.perms>1?"btn szThird":"btn szTwoThirds";
+          console.log(signupIco.innerHTML);
+        });
+      }
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -63,7 +65,7 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload();">
+  <body onload = "globalOnload(()=>{onLoad()});">
     <div class="main_content">
       <header>
         <h1 id="welcomeHdr">Welcome to BetaOS Services!</h1>

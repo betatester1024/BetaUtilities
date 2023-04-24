@@ -14,7 +14,7 @@
     <style>
     </style>
   </head>
-  <body onload = "globalOnload();">
+  <body onload = "globalOnload(()=>{document.getElementById('inp').focus();});">
     <div class="main_content">
       <header>
         <h2>Editable page</h2>
@@ -35,7 +35,7 @@
         <button class="btn gry">Colour: grey<div class="anim"></div></button>
         <button class="btn">Colour: default<div class="anim"></div></button><br>
         <div class="inpContainer">
-          <input class="inp" placeholder="Input. Should be contained in a form." autofocus>
+          <input class="inp" placeholder="Input. Should be contained in a form.">
           <div class="anim inp"></div>
         </div>
         <button class="btn szFull" onclick="alertDialog('This is the alert.', ()=>{alert('Alert callback')})">Alert: default<div class="anim"></div></button>

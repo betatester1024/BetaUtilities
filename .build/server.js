@@ -382,7 +382,7 @@ function makeRequest(action, token, data, callback) {
         callback("ERROR", { error: "No data provided" }, token);
         break;
       }
-      delMsg(data.room, data.id, data.from, token).then((obj) => {
+      (0, import_supportRooms.delMsg)(data.id, data.room, token).then((obj) => {
         callback(obj.status, obj.data, obj.token);
       });
       break;

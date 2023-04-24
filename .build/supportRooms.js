@@ -21,6 +21,7 @@ __export(supportRooms_exports, {
   Room: () => Room,
   WHOIS: () => WHOIS,
   createRoom: () => createRoom,
+  delMsg: () => delMsg,
   deleteRoom: () => deleteRoom,
   loadLogs: () => loadLogs,
   pseudoConnection: () => pseudoConnection,
@@ -353,11 +354,17 @@ async function loadLogs(rn, id, from, token) {
   supportHandler.sendMsgTo_ID(id, "LOADCOMPLETE " + (from - 30));
   return { status: "SUCCESS", data: null, token };
 }
+async function delMsg(id, room, token) {
+  console.log({ fieldName: "MSG", msgID: id, room });
+  await import_consts.msgDB.deleteOne({ fieldName: "MSG", msgID: Number(id), room });
+  return { status: "SUCCESS", data: null, token };
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Room,
   WHOIS,
   createRoom,
+  delMsg,
   deleteRoom,
   loadLogs,
   pseudoConnection,

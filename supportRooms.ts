@@ -331,4 +331,18 @@ export async function loadLogs(rn:string, id:string, from:number, token:string) 
   return {status:"SUCCESS", data:null, token:token};
 } // loadLogs
 
-// export async function 
+export async function delMsg(id:string, room:string, token:string) {
+  // console.log({fieldName:"MSG", msgID:id, room:room});
+  await msgDB.deleteOne({fieldName:"MSG", msgID:Number(id), room:room});
+  return {status:"SUCCESS", data:null, token:token};
+}
+
+export async function updateDefaultLoad(name:string[], token:string) {
+  
+}
+
+export async function hidRoom(name:string, token:string) {
+  
+}
+
+export async purge(name:string, token:string)

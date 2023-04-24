@@ -183,6 +183,7 @@ async function initClient() {
     console.log("Restartng client (" + e + ")");
     setTimeout(initClient, 0);
   }
+  document.getElementById("msgInp").focus();
 }
 const replacements = [
   { from: "one", to: "counter_1" },

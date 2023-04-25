@@ -11,6 +11,7 @@
       function closeDialog() {
         document.getElementById("timerInp").style.top = "200vh";
         document.getElementById("startBtn").focus();
+
       }
       function openDialog() {
         document.getElementById("timerInp").style.top = "0vh";
@@ -22,7 +23,8 @@
         if (!h.checkValidity()||!m.checkValidity()||!s.checkValidity()) alertDialog("Invalid input!", ()=>{})
         else {
           closeDialog();
-          
+          resetTimer();
+          resetUI();
           TOTALTIME = h.value*3600*1000 + m.value*60*1000 + s.value*1000;
           STARTTIME = Date.now();
           redraw()

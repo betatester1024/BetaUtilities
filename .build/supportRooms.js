@@ -348,7 +348,6 @@ async function loadLogs(rn, id, from, token) {
   if (from < import_database.minID)
     return { status: "SUCCESS", data: null, token };
   let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, msgID: { $gt: from - 30, $lt: from } }).toArray();
-  console.log(msgs.length);
   for (let i = msgs.length - 1; i >= 0; i--) {
     let dat = "{" + -msgs[i].msgID + "}[" + msgs[i].sender + "](" + msgs[i].permLevel + ")" + msgs[i].data;
     supportHandler.sendMsgTo_ID(id, dat);

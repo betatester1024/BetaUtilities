@@ -482,7 +482,7 @@ const validPages = [
   "/syslog",
   "/aboutme",
   "/mailertest",
-  "/oauth2callback"
+  "/about"
 ];
 const ignoreLog = ["getEE", "userRequest", "getLogs", "loadLogs", "visits", "roomRequest", "sendMsg"];
 // Annotate the CommonJS export names for ESM import in node:

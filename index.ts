@@ -23,7 +23,9 @@ try {
     initServer();
     DBMaintenance();
     serverUpdate();
-    log("Systems restarted");
+    let now = new Date(Date.now());
+    
+    log("----------------------Systems restarted at "+now.toLocaleString("en-US", {timeZone: "America/New_York"})+"-------------------");
     uDB.findOne({fieldName:"ROOMS"}).then((obj:{euphRooms:string[], rooms:string[], hidRooms:string[]})=>{
       console.log(obj);
       for (let i=0; i<obj.euphRooms.length; i++) {

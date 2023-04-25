@@ -115,12 +115,12 @@ async function initClient()
       let slashMe = false;
       msg = msg.replaceAll(/(&[a-zA-Z0-9]{1,20})([^;]|$)/gm,">ROOM$1>$2")
       msg = msg.replaceAll(/(#[a-zA-Z0-9_\-]{1,20})([^;]|$)/gm,">SUPPORT$1>$2")
-      msg = msg.replaceAll(/(;gt;;gt;[^ ]{0,20})/gm,">INTERNALLINK$1>");
+      msg = msg.replaceAll(/(;gt;;gt;[^ ]{0,90})/gm,">INTERNALLINK$1>");
       msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu,">LINK$<test>>")
       msg = msg.replaceAll(/\\n/gmiu,">BR>")
       console.log(msg);
-      if (msg.match("[ \n]*/me(.*)")) {
-        msg = msg.match("[ \n]/me(.*)")[1];
+      if (msg.match("^[ \n]*/me(.*)")) {
+        msg = msg.match("^[ \n]*/me(.*)")[1];
         slashMe = true;
         ele.className += " slashMe " + classStr[matches[3]];
       }

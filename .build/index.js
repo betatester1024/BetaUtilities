@@ -43,7 +43,8 @@ try {
       (0, import_server.initServer)();
       (0, import_database.DBMaintenance)();
       (0, import_wordler.serverUpdate)();
-      (0, import_logging.log)("Systems restarted");
+      let now = new Date(Date.now());
+      (0, import_logging.log)("----------------------Systems restarted at " + now.toLocaleString("en-US", { timeZone: "America/New_York" }) + "-------------------");
       import_consts.uDB.findOne({ fieldName: "ROOMS" }).then((obj) => {
         console.log(obj);
         for (let i = 0; i < obj.euphRooms.length; i++) {

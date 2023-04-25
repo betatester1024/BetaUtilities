@@ -14,12 +14,14 @@ html {
   --system-bg: #eee;
   --system-overlay: rgba(200, 200, 200, 0.95);
   --system-transp: rgba(0, 0, 0, 0);
+  --system-black: #222;
   transition: all 1s ease-in-out;
   font-family: 'Noto Sans Display', monospace;
 }
 
 .dark {
   --system-bg: #222;
+  --system-black: #eee;
   --system-grey: #bfbfbf;
   --system-grey2:rgba(191, 191, 191, 0.1);
   --system-red2: rgba(238, 0, 0, 0.25);
@@ -245,6 +247,20 @@ input[type=checkbox]:hover + span{
 
 a:active {
   color: var(--system-blue3) !important;
+}
+
+.btn:active {
+  transition: color 0.05s linear;
+  color: var(--system-black) !important;
+  /* -webkit-filter: invert(100%); */
+  /* filter: invert(100%); */
+  /* color: white; */
+  /* mix-blend-mode: difference; */
+}
+
+.nowrap {
+  display: inline-block;
+  white-space: nowrap;
 }
 
 label {

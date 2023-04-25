@@ -31,6 +31,7 @@ __export(supportRooms_exports, {
   sendMsg: () => sendMsg,
   sendMsg_B: () => sendMsg_B,
   supportHandler: () => supportHandler,
+  updateAbout: () => updateAbout,
   updateActive: () => updateActive,
   updateDefaultLoad: () => updateDefaultLoad
 });
@@ -172,11 +173,15 @@ class supportHandler {
     }
   }
   static checkFoundQ(roomName) {
-    for (let i = 0; i < this.allRooms.length; i++) {
-      if (this.allRooms[i].name == roomName && this.allRooms[i].type != "EUPH_ROOM")
-        return true;
+    try {
+      for (let i = 0; i < this.allRooms.length; i++) {
+        if (this.allRooms[i].name == roomName && this.allRooms[i].type != "EUPH_ROOM")
+          return true;
+      }
+      return false;
+    } catch (e) {
+      console.log("Error:", e);
     }
-    return false;
   }
   static mitoseable(roomName) {
     for (let i = 0; i < this.allRooms.length; i++) {
@@ -343,80 +348,108 @@ async function WHOIS(token, user) {
   }, users: out }, token };
 }
 async function loadLogs(rn, id, from, token) {
-  from = +from;
-  console.log("LOADING LOGS FROM", from - 30, "TO", from);
-  if (from < import_database.minID)
+  try {
+    from = +from;
+    console.log("LOADING LOGS FROM", from - 30, "TO", from);
+    if (from < import_database.minID)
+      return { status: "SUCCESS", data: null, token };
+    let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, msgID: { $gt: from - 30, $lt: from } }).toArray();
+    for (let i = msgs.length - 1; i >= 0; i--) {
+      let dat = "{" + -msgs[i].msgID + "}[" + msgs[i].sender + "](" + msgs[i].permLevel + ")" + msgs[i].data;
+      supportHandler.sendMsgTo_ID(id, dat);
+    }
+    console.log("LOADING COMPLETE, LOADED" + msgs.length, "MESSAGES");
+    supportHandler.sendMsgTo_ID(id, "LOADCOMPLETE " + (from - 30));
     return { status: "SUCCESS", data: null, token };
-  let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, msgID: { $gt: from - 30, $lt: from } }).toArray();
-  console.log(msgs.length);
-  for (let i = msgs.length - 1; i >= 0; i--) {
-    let dat = "{" + -msgs[i].msgID + "}[" + msgs[i].sender + "](" + msgs[i].permLevel + ")" + msgs[i].data;
-    supportHandler.sendMsgTo_ID(id, dat);
+  } catch (e) {
+    console.log("Error:", e);
   }
-  console.log("LOADING COMPLETE, LOADED" + msgs.length, "MESSAGES");
-  supportHandler.sendMsgTo_ID(id, "LOADCOMPLETE " + (from - 30));
-  return { status: "SUCCESS", data: null, token };
 }
 async function delMsg(id, room, token) {
-  if (!supportHandler.checkFoundQ(name))
-    return { status: "ERROR", data: { error: "Room does not exist" }, token };
-  let usrData = await (0, import_userRequest.userRequest)(token);
-  if (usrData.status != "SUCCESS")
-    return usrData;
-  if (usrData.perms < 2)
-    return { status: "ERROR", data: { error: "Insufficient permissions!" }, token };
-  await import_consts.msgDB.deleteOne({ fieldName: "MSG", msgID: Number(id), room });
-  return { status: "SUCCESS", data: null, token };
+  try {
+    if (!supportHandler.checkFoundQ(name))
+      return { status: "ERROR", data: { error: "Room does not exist" }, token };
+    let usrData = await (0, import_userRequest.userRequest)(token);
+    if (usrData.status != "SUCCESS")
+      return usrData;
+    if (usrData.perms < 2)
+      return { status: "ERROR", data: { error: "Insufficient permissions!" }, token };
+    await import_consts.msgDB.deleteOne({ fieldName: "MSG", msgID: Number(id), room });
+    return { status: "SUCCESS", data: null, token };
+  } catch (e) {
+    console.log("Error:", e);
+  }
 }
 async function updateDefaultLoad(name2, token) {
-  let usrData = await (0, import_userRequest.userRequest)(token);
-  if (usrData.status != "SUCCESS")
-    return usrData;
-  if (usrData.data.perms < 3)
-    return { status: "ERROR", data: { error: "Insufficient permissions!" }, token };
-  for (let i = 0; i < name2.length; i++) {
-    if (!name2[i].match("^" + import_consts.roomRegex + "$"))
-      return { status: "ERROR", data: { error: "Invalid room-name(s)" }, token };
+  try {
+    let usrData = await (0, import_userRequest.userRequest)(token);
+    if (usrData.status != "SUCCESS")
+      return usrData;
+    if (usrData.data.perms < 3)
+      return { status: "ERROR", data: { error: "Insufficient permissions!" }, token };
+    for (let i = 0; i < name2.length; i++) {
+      if (!name2[i].match("^" + import_consts.roomRegex + "$"))
+        return { status: "ERROR", data: { error: "Invalid room-name(s)" }, token };
+    }
+    await import_consts.uDB.updateOne({ fieldName: "ROOMS" }, { $set: {
+      euphRooms: name2
+    } });
+    return { status: "SUCCESS", data: null, token };
+  } catch (e) {
+    console.log("Error:", e);
   }
-  await import_consts.uDB.updateOne({ fieldName: "ROOMS" }, { $set: {
-    euphRooms: name2
-  } });
-  return { status: "SUCCESS", data: null, token };
 }
 async function hidRoom(name2, token) {
-  console.log(name2);
-  if (supportHandler.checkFoundQ(name2))
-    return { status: "ERROR", data: { error: "Room already exists" }, token };
-  let usrData = await (0, import_userRequest.userRequest)(token);
-  if (!name2.match("^" + import_consts.roomRegex + "$"))
-    return { status: "ERROR", data: { error: "Invalid roomname!" }, token };
-  if (usrData.status == "SUCCESS") {
-    if (usrData.data.perms >= 2) {
-      new import_webHandler.WebH(name2, false);
-      let obj = await import_consts.uDB.findOne({ fieldName: "ROOMS" });
-      obj.hidRooms.push(name2);
-      await import_consts.uDB.updateOne({ fieldName: "ROOMS" }, {
-        $set: {
-          hidRooms: obj.hidRooms
-        }
-      }, { upsert: true });
-      return { status: "SUCCESS", data: null, token };
+  try {
+    console.log(name2);
+    if (supportHandler.checkFoundQ(name2))
+      return { status: "ERROR", data: { error: "Room already exists" }, token };
+    let usrData = await (0, import_userRequest.userRequest)(token);
+    if (!name2.match("^" + import_consts.roomRegex + "$"))
+      return { status: "ERROR", data: { error: "Invalid roomname!" }, token };
+    if (usrData.status == "SUCCESS") {
+      if (usrData.data.perms >= 2) {
+        new import_webHandler.WebH(name2, false);
+        let obj = await import_consts.uDB.findOne({ fieldName: "ROOMS" });
+        obj.hidRooms.push(name2);
+        await import_consts.uDB.updateOne({ fieldName: "ROOMS" }, {
+          $set: {
+            hidRooms: obj.hidRooms
+          }
+        }, { upsert: true });
+        return { status: "SUCCESS", data: null, token };
+      } else
+        return { status: "ERROR", data: { error: "Access denied!" }, token };
     } else
-      return { status: "ERROR", data: { error: "Access denied!" }, token };
-  } else
-    return usrData;
+      return usrData;
+  } catch (e) {
+    console.log("Error:", e);
+  }
 }
 async function purge(name2, token) {
-  if (!supportHandler.checkFoundQ(name2))
-    return { status: "ERROR", data: { error: "Room does not exist" }, token };
+  try {
+    if (!supportHandler.checkFoundQ(name2))
+      return { status: "ERROR", data: { error: "Room does not exist" }, token };
+    let usrData = await (0, import_userRequest.userRequest)(token);
+    if (usrData.status != "SUCCESS")
+      return usrData;
+    if (usrData.data.perms < 3)
+      return { status: "ERROR", data: { error: "Insufficient permissions!" }, token };
+    await import_consts.msgDB.deleteMany({ fieldName: "MSG", room: name2 });
+    await import_consts.msgDB.updateOne({ fieldName: "RoomInfo", room: name2 }, { $set: {
+      msgCt: 0
+    } });
+    return { status: "SUCCESS", data: null, token };
+  } catch (e) {
+    console.log("Error:", e);
+  }
+}
+async function updateAbout(about, token) {
   let usrData = await (0, import_userRequest.userRequest)(token);
   if (usrData.status != "SUCCESS")
     return usrData;
-  if (usrData.data.perms < 3)
-    return { status: "ERROR", data: { error: "Insufficient permissions!" }, token };
-  await import_consts.msgDB.deleteMany({ fieldName: "MSG", room: name2 });
-  await import_consts.msgDB.updateOne({ fieldName: "RoomInfo", room: name2 }, { $set: {
-    msgCt: 0
+  await import_consts.authDB.updateOne({ fieldName: "UserData", user: usrData.data.user }, { $set: {
+    aboutme: about
   } });
   return { status: "SUCCESS", data: null, token };
 }
@@ -435,6 +468,7 @@ async function purge(name2, token) {
   sendMsg,
   sendMsg_B,
   supportHandler,
+  updateAbout,
   updateActive,
   updateDefaultLoad
 });

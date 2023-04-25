@@ -140,10 +140,14 @@ export class supportHandler {
   }
   
   static checkFoundQ(roomName:string) {
-    for (let i=0; i<this.allRooms.length; i++) {
-      if (this.allRooms[i].name == roomName && this.allRooms[i].type != "EUPH_ROOM") return true;
+    try {
+      for (let i=0; i<this.allRooms.length; i++) {
+        if (this.allRooms[i].name == roomName && this.allRooms[i].type != "EUPH_ROOM") return true;
+      }
+      return false;
+    } catch (e:any) {
+    console.log("Error:",e);
     }
-    return false;
   }
 
   static mitoseable(roomName:string) {
@@ -313,6 +317,7 @@ export async function WHOIS(token:string, user:string) {
 
 //loadLogs(data.room, data.id, data.from token)
 export async function loadLogs(rn:string, id:string, from:number, token:string) {
+  try {
   from = +from;
   console.log("LOADING LOGS FROM",from-30,"TO",from);
   if (from<minID) return {status:"SUCCESS", data:null, token:token}
@@ -328,9 +333,13 @@ export async function loadLogs(rn:string, id:string, from:number, token:string) 
   console.log("LOADING COMPLETE, LOADED"+msgs.length,"MESSAGES");
   supportHandler.sendMsgTo_ID(id, "LOADCOMPLETE "+(from-30));
   return {status:"SUCCESS", data:null, token:token};
+  } catch (e:any) {
+    console.log("Error:",e);
+  }
 } // loadLogs
 
 export async function delMsg(id:string, room:string, token:string) {
+  try {
   // console.log({fieldName:"MSG", msgID:id, room:room});
   if (!supportHandler.checkFoundQ(name)) return {status:"ERROR", data:{error:"Room does not exist"}, token:token};
   let usrData = await userRequest(token) as {status:string, data:{perms:number}};
@@ -338,9 +347,13 @@ export async function delMsg(id:string, room:string, token:string) {
   if (usrData.perms < 2) return {status:"ERROR", data:{error:"Insufficient permissions!"}, token:token};
   await msgDB.deleteOne({fieldName:"MSG", msgID:Number(id), room:room});
   return {status:"SUCCESS", data:null, token:token};
+  } catch (e:any) {
+    console.log("Error:",e);
+  }
 }
 
 export async function updateDefaultLoad(name:string[], token:string) {
+  try {
   let usrData = await userRequest(token) as {status:string, data:{perms:number}};
   if (usrData.status != "SUCCESS") return usrData;
   // console.log(usrData.data.perms);
@@ -352,9 +365,13 @@ export async function updateDefaultLoad(name:string[], token:string) {
     euphRooms:name
   }});
   return {status:"SUCCESS", data:null, token:token};
+  } catch (e:any) {
+    console.log("Error:",e);
+  }
 }
 
 export async function hidRoom(name:string, token:string) {
+  try {
   console.log(name);
   if (supportHandler.checkFoundQ(name)) return {status:"ERROR", data:{error:"Room already exists"}, token:token};
   let usrData = await userRequest(token) as {status:string, data:{perms:number}};
@@ -376,9 +393,13 @@ export async function hidRoom(name:string, token:string) {
     else return {status:"ERROR", data:{error:"Access denied!"}, token:token};
   }
   else return usrData;
+  } catch (e:any) {
+    console.log("Error:",e);
+  }
 }
 
 export async function purge(name:string, token:string) {
+  try {
   if (!supportHandler.checkFoundQ(name)) return {status:"ERROR", data:{error:"Room does not exist"}, token:token};
   let usrData = await userRequest(token) as {status:string, data:{perms:number}};
   if (usrData.status != "SUCCESS") return usrData;
@@ -390,4 +411,16 @@ export async function purge(name:string, token:string) {
     msgCt:0
   }})
   return {status:"SUCCESS", data:null, token:token};
+  } catch (e:any) {
+    console.log("Error:",e);
+  }
+}
+
+export async function updateAbout(about:string, token:string) {
+  let usrData = await userRequest(token) as {status:string, data:{perms:number}};
+  if (usrData.status != "SUCCESS") return usrData;
+  await authDB.updateOne({fieldName:"UserData", user:usrData.data.user}, {$set:{
+    aboutme: about
+  }})
+  return {status:"SUCCESS", data:null, token:token}
 }

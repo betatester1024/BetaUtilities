@@ -43,7 +43,16 @@
               parent.appendChild(tEle);
               parent.innerHTML += "<br><br>";
             }
+            if (res.data.users.length == 0) document.getElementById("username2").innerHTML = "No users found with alias "+res.data.account.user;
           }
+        })
+      }
+      function updateAboutMe() {
+        let data = document.getElementById("inp2").value;
+        send(JSON.stringify({action:"updateAboutMe", data:{new:data}}), (res)=>{
+          if (res.status !="SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});
+          else alertDialog("Success!", ()=>{});
+          document.getElementById("inp2").value="";
         })
       }
     </script>
@@ -91,6 +100,18 @@
           <div id="alias"></div>
         </div>
       </form>
+      <div style = "border: 2px solid var(--system-green); margin: 20px; border-radius: 15px;"> 
+        <h2 class="fsmed grn nohover">Update your about-me info</h2>
+        <form action="javascript:updateAboutMe()">
+          <div class="nowrap inpContainer szTwoThirds" style="margin: 0px auto">
+            <input class="inp" id="inp2" placeholder="Update your about-me...">
+            <div class="anim inp"></div>
+          </div>
+          <button class="btn fsmed">
+            <span class="material-symbols-outlined">update</span>
+            <div class="anim"></div></button>
+        </form>
+      </div>
       <a class="btn override" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>
         Return to home<div class="anim"></div></a>

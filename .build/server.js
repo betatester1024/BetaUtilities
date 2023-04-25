@@ -187,244 +187,258 @@ function makeRequest(action, token, data, callback) {
     callback("ERROR", { error: "Database connection failure" }, token);
     return;
   }
-  switch (action) {
-    case "test":
-      callback("SUCCESS", { abc: "def", def: 5 }, token);
-      break;
-    case "login":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+  try {
+    switch (action) {
+      case "test":
+        callback("SUCCESS", { abc: "def", def: 5 }, token);
         break;
-      }
-      data = data;
-      (0, import_validateLogin.validateLogin)(data.user, data.pass, data.persistQ, token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "signup":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "login":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        data = data;
+        (0, import_validateLogin.validateLogin)(data.user, data.pass, data.persistQ, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
         break;
-      }
-      data = data;
-      (0, import_validateLogin.signup)(data.user, data.pass, token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      ;
-      break;
-    case "userRequest":
-      (0, import_userRequest.userRequest)(token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "roomRequest":
-      let obj2 = (0, import_supportRooms.roomRequest)(token);
-      callback(obj2.status, obj2.data, obj2.token);
-      break;
-    case "createRoom":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "signup":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        data = data;
+        (0, import_validateLogin.signup)(data.user, data.pass, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        ;
         break;
-      }
-      data = data;
-      (0, import_supportRooms.createRoom)(data.name, token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "deleteRoom":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "userRequest":
+        (0, import_userRequest.userRequest)(token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
         break;
-      }
-      data = data;
-      (0, import_supportRooms.deleteRoom)(data.name, token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "statusRequest":
-      let obj3 = (0, import_supportRooms.roomRequest)(token, true);
-      callback(obj3.status, obj3.data, obj3.token);
-      break;
-    case "getEE":
-      (0, import_EEHandler.EE)(true, callback, token, "");
-      break;
-    case "setEE":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "roomRequest":
+        let obj2 = (0, import_supportRooms.roomRequest)(token);
+        callback(obj2.status, obj2.data, obj2.token);
         break;
-      }
-      data = data;
-      (0, import_EEHandler.EE)(false, callback, token, data.data);
-      break;
-    case "updateuser":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "createRoom":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        data = data;
+        (0, import_supportRooms.createRoom)(data.name, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
         break;
-      }
-      data = data;
-      (0, import_updateUser.updateUser)(data.user, data.oldPass, data.pass, data.newPermLevel, token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "delAcc":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "deleteRoom":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        data = data;
+        (0, import_supportRooms.deleteRoom)(data.name, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
         break;
-      }
-      data = data;
-      (0, import_delacc.deleteAccount)(data.user, data.pass, token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "logout":
-      (0, import_validateLogin.logout)(token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "logout_all":
-      (0, import_validateLogin.logout)(token, true).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "sendMsg":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "statusRequest":
+        let obj3 = (0, import_supportRooms.roomRequest)(token, true);
+        callback(obj3.status, obj3.data, obj3.token);
         break;
-      }
-      data = data;
-      if (data.msg.length == 0) {
-        callback("SUCCESS", null, token);
+      case "getEE":
+        (0, import_EEHandler.EE)(true, callback, token, "");
         break;
-      }
-      (0, import_supportRooms.sendMsg)(data.msg.slice(0, 1024), data.room, token, callback);
-      break;
-    case "lookup":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "setEE":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        data = data;
+        (0, import_EEHandler.EE)(false, callback, token, data.data);
         break;
-      }
-      (0, import_supportRooms.WHOIS)(token, data.user).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "getLogs":
-      (0, import_logging.getLogs)(token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "purgeLogs":
-      (0, import_logging.purgeLogs)(token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "realias":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "updateuser":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        data = data;
+        (0, import_updateUser.updateUser)(data.user, data.oldPass, data.pass, data.newPermLevel, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
         break;
-      }
-      (0, import_updateUser.realias)(data.alias, token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "visits":
-      (0, import_logging.visitCt)(token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "addTODO":
-      (0, import_tasks.addTask)(token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "getTodo":
-      (0, import_tasks.getTasks)(token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "updateTODO":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "delAcc":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        data = data;
+        (0, import_delacc.deleteAccount)(data.user, data.pass, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
         break;
-      }
-      (0, import_tasks.updateTask)(token, data.id, data.updated).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "deleteTODO":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "logout":
+        (0, import_validateLogin.logout)(token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
         break;
-      }
-      (0, import_tasks.deleteTask)(token, data.id).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "completeTODO":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "logout_all":
+        (0, import_validateLogin.logout)(token, true).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
         break;
-      }
-      (0, import_tasks.deleteTask)(token, data.id, true).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "loadLogs":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "sendMsg":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        data = data;
+        if (data.msg.length == 0) {
+          callback("SUCCESS", null, token);
+          break;
+        }
+        (0, import_supportRooms.sendMsg)(data.msg.slice(0, 1024), data.room, token, callback);
         break;
-      }
-      (0, import_supportRooms.loadLogs)(data.room, data.id, data.from, token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "delMsg":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "lookup":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        (0, import_supportRooms.WHOIS)(token, data.user).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
         break;
-      }
-      (0, import_supportRooms.delMsg)(data.id, data.room, token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "updateDefaultLoad":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "getLogs":
+        (0, import_logging.getLogs)(token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
         break;
-      }
-      (0, import_supportRooms.updateDefaultLoad)(data.new, token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "hidRoom":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "purgeLogs":
+        (0, import_logging.purgeLogs)(token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
         break;
-      }
-      (0, import_supportRooms.hidRoom)(data.name, token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "purge":
-      if (!data) {
-        callback("ERROR", { error: "No data provided" }, token);
+      case "realias":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        (0, import_updateUser.realias)(data.alias, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
         break;
-      }
-      (0, import_supportRooms.purge)(data.name, token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "uptime":
-      (0, import_messageHandle.uptime)(token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    case "toggleTheme":
-      (0, import_updateUser.toggleTheme)(token).then((obj) => {
-        callback(obj.status, obj.data, obj.token);
-      });
-      break;
-    default:
-      callback("ERROR", { error: "Unknown command string!" }, token);
+      case "visits":
+        (0, import_logging.visitCt)(token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "addTODO":
+        (0, import_tasks.addTask)(token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "getTodo":
+        (0, import_tasks.getTasks)(token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "updateTODO":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        (0, import_tasks.updateTask)(token, data.id, data.updated).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "deleteTODO":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        (0, import_tasks.deleteTask)(token, data.id).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "completeTODO":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        (0, import_tasks.deleteTask)(token, data.id, true).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "loadLogs":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        (0, import_supportRooms.loadLogs)(data.room, data.id, data.from, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "delMsg":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        (0, import_supportRooms.delMsg)(data.id, data.room, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "updateDefaultLoad":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        (0, import_supportRooms.updateDefaultLoad)(data.new, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "hidRoom":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        (0, import_supportRooms.hidRoom)(data.name, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "purge":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        (0, import_supportRooms.purge)(data.name, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "uptime":
+        (0, import_messageHandle.uptime)(token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "toggleTheme":
+        (0, import_updateUser.toggleTheme)(token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "updateAboutMe":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        (0, import_supportRooms.updateAbout)(data.new, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+        break;
+      default:
+        callback("ERROR", { error: "Unknown command string!" }, token);
+    }
+  } catch (e) {
+    console.log("Error:", e);
   }
   return;
 }
@@ -482,7 +496,7 @@ const validPages = [
   "/syslog",
   "/aboutme",
   "/mailertest",
-  "/about"
+  "/timer"
 ];
 const ignoreLog = ["getEE", "userRequest", "getLogs", "loadLogs", "visits", "roomRequest", "sendMsg"];
 // Annotate the CommonJS export names for ESM import in node:

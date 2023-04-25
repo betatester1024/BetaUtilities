@@ -258,6 +258,11 @@ a:active {
   /* mix-blend-mode: difference; */
 }
 
+.nowrap {
+  display: inline-block;
+  white-space: nowrap;
+}
+
 label {
   cursor: pointer;
 }

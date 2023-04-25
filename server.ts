@@ -17,7 +17,8 @@ const cookieParser = require('cookie-parser')
 import {uptime} from './betautilities/messageHandle'
 import {supportHandler, roomRequest, sendMsg, 
         createRoom, deleteRoom, WHOIS, loadLogs, 
-        delMsg, updateDefaultLoad, hidRoom, purge} from './supportRooms'
+        delMsg, updateDefaultLoad, hidRoom, purge,
+       updateAbout} from './supportRooms'
 const urlencodedParser = bodyParser.urlencoded({ extended: false }) 
 var RateLimit = require('express-rate-limit');
 
@@ -203,189 +204,200 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
     callback("ERROR", {error:"Database connection failure"}, token);
     return;
   }
-  switch (action) {
-    case 'test':
-      callback("SUCCESS", {abc:"def", def:5}, token);
-      break;
-    case 'login': 
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      // validate login-data before sending to server
-      data = data as {user:string, pass:string, persistQ:boolean};
-      validateLogin(data.user, data.pass, data.persistQ, token).
-        then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
-      break;
-    case 'signup':
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      data = data as {user:string, pass:string};
-      signup(data.user, data.pass, token)
+  try {
+    switch (action) {
+      case 'test':
+        callback("SUCCESS", {abc:"def", def:5}, token);
+        break;
+      case 'login': 
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        // validate login-data before sending to server
+        data = data as {user:string, pass:string, persistQ:boolean};
+        validateLogin(data.user, data.pass, data.persistQ, token).
+          then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case 'signup':
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        data = data as {user:string, pass:string};
+        signup(data.user, data.pass, token)
+          .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});;
+        break;
+      case 'userRequest': 
+        userRequest(token)
+          .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case 'roomRequest':
+        let obj2 = roomRequest(token); // this one is synchronous
+        callback(obj2.status, obj2.data, obj2.token);
+        break;
+      case 'createRoom':
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        data = data as {name:string}
+        createRoom(data.name, token)
+          .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case 'deleteRoom':
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        data = data as {name:string}
+        deleteRoom(data.name, token)
+          .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case 'statusRequest':
+        let obj3 = roomRequest(token, true);
+        callback(obj3.status, obj3.data, obj3.token);
+        break;
+      case 'getEE':
+        EE(true, callback, token, "");
+        break;
+      case 'setEE':
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        data = data as {data:string}
+        EE(false, callback, token, data.data);
+        break;
+      case 'updateuser': 
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        data = data as {user:string, oldPass: string, pass:string, newPermLevel:string};
+        updateUser(data.user, data.oldPass, data.pass, data.newPermLevel, token)
         .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});;
-      break;
-    case 'userRequest': 
-      userRequest(token)
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case 'delAcc':
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        data = data as {user:string, pass:string};
+        deleteAccount(data.user, data.pass, token)
+        .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case 'logout':
+        logout(token)
+        .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case 'logout_all':
+        logout(token, true)
+        .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case 'sendMsg':
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        data = data as {msg:string, room:string};
+        if (data.msg.length == 0) {
+          callback("SUCCESS", null, token); break;
+        }
+        sendMsg(data.msg.slice(0, 1024), data.room, token, callback);
+        break;
+      case 'lookup':
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        WHOIS(token, data.user)
+        .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case "getLogs":
+        getLogs(token)
+        .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case "purgeLogs":
+        purgeLogs(token)
         .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
-      break;
-    case 'roomRequest':
-      let obj2 = roomRequest(token); // this one is synchronous
-      callback(obj2.status, obj2.data, obj2.token);
-      break;
-    case 'createRoom':
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      data = data as {name:string}
-      createRoom(data.name, token)
+        break;
+      case "realias":
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        realias(data.alias, token)
         .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
-      break;
-    case 'deleteRoom':
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      data = data as {name:string}
-      deleteRoom(data.name, token)
+        break;
+      case "visits":
+        visitCt(token)
         .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
-      break;
-    case 'statusRequest':
-      let obj3 = roomRequest(token, true);
-      callback(obj3.status, obj3.data, obj3.token);
-      break;
-    case 'getEE':
-      EE(true, callback, token, "");
-      break;
-    case 'setEE':
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      data = data as {data:string}
-      EE(false, callback, token, data.data);
-      break;
-    case 'updateuser': 
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      data = data as {user:string, oldPass: string, pass:string, newPermLevel:string};
-      updateUser(data.user, data.oldPass, data.pass, data.newPermLevel, token)
-      .then((obj:{status:string, data:any, token:string})=>
+        break;
+      case "addTODO":
+        addTask(token)
+        .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
-      break;
-    case 'delAcc':
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      data = data as {user:string, pass:string};
-      deleteAccount(data.user, data.pass, token)
-      .then((obj:{status:string, data:any, token:string})=>
+        break;
+      case "getTodo":
+        getTasks(token)
+        .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
-      break;
-    case 'logout':
-      logout(token)
-      .then((obj:{status:string, data:any, token:string})=>
+        break;
+      case "updateTODO":
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        updateTask(token, data.id, data.updated)
+        .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
-      break;
-    case 'logout_all':
-      logout(token, true)
-      .then((obj:{status:string, data:any, token:string})=>
+        break;
+      case "deleteTODO":
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        deleteTask(token, data.id)
+        .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
-      break;
-    case 'sendMsg':
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      data = data as {msg:string, room:string};
-      if (data.msg.length == 0) {
-        callback("SUCCESS", null, token); break;
-      }
-      sendMsg(data.msg.slice(0, 1024), data.room, token, callback);
-      break;
-    case 'lookup':
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      WHOIS(token, data.user)
-      .then((obj:{status:string, data:any, token:string})=>
+        break;
+      case "completeTODO":
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        deleteTask(token, data.id, true)
+        .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
-      break;
-    case "getLogs":
-      getLogs(token)
-      .then((obj:{status:string, data:any, token:string})=>
+        break;
+      case "loadLogs": // {"action":"loadLogs","room":"BetaOS","id":"11","from":24}
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        loadLogs(data.room, data.id, data.from, token)
+        .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
-      break;
-    case "purgeLogs":
-      purgeLogs(token)
-      .then((obj:{status:string, data:any, token:string})=>
-        {callback(obj.status, obj.data, obj.token)});
-      break;
-    case "realias":
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      realias(data.alias, token)
-      .then((obj:{status:string, data:any, token:string})=>
-        {callback(obj.status, obj.data, obj.token)});
-      break;
-    case "visits":
-      visitCt(token)
-      .then((obj:{status:string, data:any, token:string})=>
-        {callback(obj.status, obj.data, obj.token)});
-      break;
-    case "addTODO":
-      addTask(token)
-      .then((obj:{status:string, data:any, token:string})=>
-        {callback(obj.status, obj.data, obj.token)});
-      break;
-    case "getTodo":
-      getTasks(token)
-      .then((obj:{status:string, data:any, token:string})=>
-        {callback(obj.status, obj.data, obj.token)});
-      break;
-    case "updateTODO":
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      updateTask(token, data.id, data.updated)
-      .then((obj:{status:string, data:any, token:string})=>
-        {callback(obj.status, obj.data, obj.token)});
-      break;
-    case "deleteTODO":
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      deleteTask(token, data.id)
-      .then((obj:{status:string, data:any, token:string})=>
-        {callback(obj.status, obj.data, obj.token)});
-      break;
-    case "completeTODO":
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      deleteTask(token, data.id, true)
-      .then((obj:{status:string, data:any, token:string})=>
-        {callback(obj.status, obj.data, obj.token)});
-      break;
-    case "loadLogs": // {"action":"loadLogs","room":"BetaOS","id":"11","from":24}
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      loadLogs(data.room, data.id, data.from, token)
-      .then((obj:{status:string, data:any, token:string})=>
-        {callback(obj.status, obj.data, obj.token)});
-      break;
-    case "delMsg":
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      delMsg(data.id, data.room, token)
-      .then((obj:{status:string, data:any, token:string})=>
-        {callback(obj.status, obj.data, obj.token)});
-      break
-    case "updateDefaultLoad":
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      updateDefaultLoad(data.new, token)
-      .then((obj:{status:string, data:any, token:string})=>
-        {callback(obj.status, obj.data, obj.token)});
-      break;
-    case "hidRoom":
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      hidRoom(data.name, token)
-      .then((obj:{status:string, data:any, token:string})=>
-        {callback(obj.status, obj.data, obj.token)});
-      break;
-    case "purge":
-      if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-      purge(data.name, token)
-      .then((obj:{status:string, data:any, token:string})=>
-        {callback(obj.status, obj.data, obj.token)});
-      break;
-    case "uptime":
-      uptime(token)
-      .then((obj:{status:string, data:any, token:string})=>
-        {callback(obj.status, obj.data, obj.token)});
-      break;
-    case 'toggleTheme':
-      toggleTheme(token)
-      .then((obj:{status:string, data:any, token:string})=>
-        {callback(obj.status, obj.data, obj.token)});
-      break;
-    default:
-      callback("ERROR", {error: "Unknown command string!"}, token);
+        break;
+      case "delMsg":
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        delMsg(data.id, data.room, token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+        break
+      case "updateDefaultLoad":
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        updateDefaultLoad(data.new, token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+        break;
+      case "hidRoom":
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        hidRoom(data.name, token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+        break;
+      case "purge":
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        purge(data.name, token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+        break;
+      case "uptime":
+        uptime(token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+        break;
+      case 'toggleTheme':
+        toggleTheme(token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+        break;
+      case "updateAboutMe":
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        updateAbout(data.new, token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+        break;
+        break;
+      default:
+        callback("ERROR", {error: "Unknown command string!"}, token);
+    }
+  } catch (e:any) {
+    console.log("Error:", e);
   }
   // console.log("request made")
   return; 
@@ -433,5 +445,5 @@ function eeFormat(data:string) {
 }
 
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
-                    '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest', "/about"];
+                    '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest', "/timer"];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 'roomRequest', 'sendMsg'];

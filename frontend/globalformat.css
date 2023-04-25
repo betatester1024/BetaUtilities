@@ -93,10 +93,10 @@ h2 {
   margin: 5px;
   text-decoration: none;
 }
-.btn:hover {
+.btn:hover, .btn:focus, .btn:active,  {
   background-color: var(--system-blue2);
 }
-.btn:hover>div.anim {
+.btn:hover>div.anim, .btn:focus>div.anim, .btn:active>div.anim {
   width: 90%;
   opacity: 1;
 }
@@ -122,6 +122,10 @@ div.anim {
   transition: all 0.5s ease-in-out;
 }
 
+input:invalid + div.anim {
+  border: 2.3px solid var(--system-red);
+}
+
 div.anim.inp {
   margin-left: 0px;
 }
@@ -138,11 +142,26 @@ div.anim.inp {
 .szFull {
   width: max(88%, 10em)
 }
+.szFull.noMin {
+  width: 90%;
+}
+.szHalf.noMin {
+  width: 42%;
+}
+.szThird.noMin {
+  width: 26%;
+}
+.szTwoThirds.noMin {
+  width: 58%;
+}
+.szNone {
+  width: 0px;
+}
 
 .grn {
   color: var(--system-green);
 }
-.grn:hover {
+.grn:hover, .grn:focus {
   background-color: var(--system-green2);
 }
 .grn > .anim {
@@ -151,18 +170,18 @@ div.anim.inp {
 .ylw {
   color: var(--system-yellow);
 }
-.ylw:hover {
+.ylw:hover, .ylw:focus {
   background-color: var(--system-yellow2);
 /*   color: #000; */
 }
 .ylw > .anim{
   border: 2.3px solid var(--system-yellow);
 }
-.red {
+.red, input:invalid {
   color: var(--system-red);
   border: 3px solid var(--system-red);
 }
-.red:hover {
+.red:hover, .red:focus, input:invalid {
   background-color: var(--system-red2);
 }
 .red > .anim {
@@ -172,7 +191,7 @@ div.anim.inp {
 .gry {
   color: var(--system-grey);
 }
-.gry:hover {
+.gry:hover, .gry:focus {
   background-color: var(--system-grey2);
 }
 .gry > .anim {
@@ -182,20 +201,20 @@ div.anim.inp {
 .blu {
   color: var(--system-blue);
 }
-.blu:hover {
+.blu:hover, .blu:focus{
   background-color: var(--system-blue2);
 }
 .blu > .anim {
   border: 2.3px solid var(--system-blue);
 }
-.nohover:hover {
+.nohover:hover, .nohover:focus {
   background-color: unset !important;
 }
 
 .roundhover {
   transition: all 0.2s ease-in-out;
 }
-.roundhover:hover {
+.roundhover:hover, .roundhover:focus{
   border-radius: 20%;
   
 }
@@ -229,8 +248,12 @@ input, select {
   border-radius: 10px;
   width: 100%;
   cursor: text;
+  
 }
 
+input[type=number] {
+  appearance: textfield;
+}
 input[type=checkbox] {
   cursor: pointer;
   width: 0.6em;
@@ -277,6 +300,11 @@ option {
 
 input:focus, select:focus {
   border: 3px solid var(--system-blue);
+/*   cursor: text; */
+}
+
+input:focus:invalid{
+  border: 3px solid var(--system-red);
 /*   cursor: text; */
 }
 

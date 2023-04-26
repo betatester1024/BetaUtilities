@@ -26,12 +26,11 @@ __export(consts_exports, {
   hashingOptions: () => hashingOptions,
   jsDir: () => jsDir,
   msgDB: () => msgDB,
+  pasteDB: () => pasteDB,
   port: () => port,
-  pwdMaxLength: () => pwdMaxLength,
   roomRegex: () => roomRegex,
   rootDir: () => rootDir,
   uDB: () => uDB,
-  userMaxLength: () => userMaxLength,
   userRegex: () => userRegex
 });
 module.exports = __toCommonJS(consts_exports);
@@ -43,11 +42,10 @@ const jsDir = "/home/runner/betatester1024/.build/frontend/";
 const port = 3e3;
 const userRegex = /^[0-9a-zA-Z_\\-]{1,20}$/;
 const roomRegex = "[0-9a-zA-Z_\\-]{1,20}";
-const pwdMaxLength = 9e99;
-const userMaxLength = 9e99;
 const authDB = import_database.database.collection("SystemAUTH_V2");
 const msgDB = import_database.database.collection("SupportMessaging");
 const uDB = import_database.database.collection("BetaUtilities");
+const pasteDB = import_database.database.collection("PasteIt");
 const TOKEN_PATH = "/home/runner/betatester1024/TOKEN.json";
 const CREDENTIALS_PATH = "/home/runner/betatester1024/CREDENTIALS.json";
 const hashingOptions = {
@@ -57,7 +55,7 @@ const hashingOptions = {
   parallelism: 1,
   hashLength: 50
 };
-const expiry = [9e99, 1e3 * 60 * 60 * 24, 1e3 * 60 * 60 * 24 * 30, 1e3 * 60 * 60];
+const expiry = [0, 1e3 * 60 * 60 * 24, 1e3 * 60 * 60, 1e3 * 60 * 5];
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   CREDENTIALS_PATH,
@@ -68,12 +66,11 @@ const expiry = [9e99, 1e3 * 60 * 60 * 24, 1e3 * 60 * 60 * 24 * 30, 1e3 * 60 * 60
   hashingOptions,
   jsDir,
   msgDB,
+  pasteDB,
   port,
-  pwdMaxLength,
   roomRegex,
   rootDir,
   uDB,
-  userMaxLength,
   userRegex
 });
 //# sourceMappingURL=consts.js.map

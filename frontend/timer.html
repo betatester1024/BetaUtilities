@@ -95,8 +95,10 @@
       }
       function windowResize() {
         let canv = document.getElementById("timer");
-        canv.width = Math.min(window.innerWidth*0.9, window.innerHeight*0.9);
-        canv.height= Math.min(window.innerWidth*0.9, window.innerHeight*0.9);
+        canv.width = Math.min(window.innerWidth*0.8, window.innerHeight*0.8);
+        canv.height= Math.min(window.innerWidth*0.8, window.innerHeight*0.8);
+        STARTTIME = Date.now();
+        redraw(true);
       }
       function stopTimer() {
         clearInterval(TIMERID);

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='./utils.js'></script>
+    <title>Paste search | BetaOS Systems</title></title>
+    <script>      
+      function lookup() {
+        location.href="/paste/"+document.getElementById("inp").value;
+      }
+      function edit() {
+        location.href="/paste?edit="+document.getElementById("inp").value;
+      }
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+    </style>
+  </head>
+  <body onload = "globalOnload(()=>{console.log(); document.getElementById('inp').focus();});">
+    <div class="main_content">
+      <header>
+        <h2>Paste Search</h2>
+        <hr class="rounded">
+      </header>
+      <form id="form" action="javascript:lookup()">
+        <div class="inpContainer szHalf" style="margin: 0px auto">
+          <input class="inp" id="inp" placeholder="Search...">
+          <div class="anim inp"></div>
+        </div>
+        <button class="btn szHalf override">
+          <span class="material-symbols-outlined">search</span>
+          Find your paste<div class="anim"></div></button>
+        <button class="btn szHalf override" type="button" onclick="edit()">
+          <span class="material-symbols-outlined">edit</span>
+          Edit your paste<div class="anim"></div></button>
+      </form>
+      </div>
+      <a class="btn override" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+    </div>
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

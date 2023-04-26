@@ -3,11 +3,13 @@ const argon2 = require('argon2');
 import {userRequest} from './userRequest'
 
 export async function updateUser(user:string, oldPass:string, newPass:string, newPermLevel:number, token:string) {
+  let NOUPDATE = false;
   if (!user.match(userRegex)) {
     return {status:"ERROR", data:{error:"Invalid user string!"}, token:token}
   }
   if (newPass.length == 0) {
-    return {status:"ERROR", data:{error:"No password provided!"}, token:token}
+    NOUPDATE = true;
+    // return {status:"ERROR", data:{error:"No password provided!"}, token:token}
   }
   let tokenData:{associatedUser:string, expiry:number} = await authDB.findOne({fieldName:"Token", token:token});
   if (!tokenData) {
@@ -23,7 +25,11 @@ export async function updateUser(user:string, oldPass:string, newPass:string, ne
      && newPermLevel < userData.permLevel) {
     // administrators can update other accounts but not other admins
     await authDB.updateOne({fieldName:"UserData", user:user}, 
-        {$set:{pwd:await argon2.hash(newPass, hashingOptions), permLevel:newPermLevel}}, {upsert:true});
+        {$set:{permLevel:newPermLevel}}, {upsert:true});
+    if (!NOUPDATE) {
+      await authDB.updateOne({fieldName:"UserData", user:user}, 
+        {$set:{pwd: await argon2.hash(newPass, hashingOptions)}}, {upsert:true});
+    }
     return {status:"SUCCESS", data:{perms: newPermLevel}, token:token};
   }
   else if (await argon2.verify(userData.pwd, oldPass)) { 

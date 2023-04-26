@@ -10,7 +10,7 @@ import { deleteAccount } from './delacc';
 import {updateUser, realias, toggleTheme} from './updateUser'
 import {userRequest} from './userRequest';
 import {EE} from './EEHandler';
-import {paste, findPaste} from './paste';
+import {paste, findPaste, editPaste} from './paste';
 import {addTask, getTasks, updateTask, deleteTask} from './tasks';
 import {getLogs, log, purgeLogs, visitCt, incrRequests} from './logging';
 const bodyParser = require('body-parser');
@@ -420,12 +420,12 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
         .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
         break;
-        // case "editPaste":
-        // if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        // findPaste(data.content, data.name, data.pwd, token)
-        // .then((obj:{status:string, data:any, token:string})=>
-        //   {callback(obj.status, obj.data, obj.token)});
-        // break;
+      case "editPaste":
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        editPaste(data.content, data.name, data.pwd, token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+        break;
       default:
         callback("ERROR", {error: "Unknown command string!"}, token);
     }
@@ -479,5 +479,5 @@ function eeFormat(data:string) {
 
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
                     '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest',
-                    "/timer", "/newpaste"];
+                    "/timer", "/newpaste", "/pastesearch"];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 'roomRequest', 'sendMsg'];

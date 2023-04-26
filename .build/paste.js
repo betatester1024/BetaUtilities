@@ -52,16 +52,19 @@ async function findPaste(loc, pwd, token) {
 async function editPaste(content, loc, pwd, token) {
   if (!loc.match(pasteMatch))
     return { status: "ERROR", data: { error: "Invalid paste-name." }, token };
-  if (pwd.length == 0)
-    return { status: "ERROR", data: { error: "No password provided." }, token };
   let hashed = await argon2.hash(pwd, import_consts.hashingOptions);
   let existingDoc = await import_consts.pasteDB.findOne({ fieldName: "PASTE", name: loc });
   if (!existingDoc)
     return { status: "ERROR", data: { error: "Paste does not exist!" }, token };
-  import_consts.pasteDB.updateOne({ fieldName: "PASTE", name: loc }, { $set: {
-    data: content,
-    pwd: hashed
-  } });
+  if (pwd.length == 0)
+    import_consts.pasteDB.updateOne({ fieldName: "PASTE", name: loc }, { $set: {
+      data: content
+    } });
+  else
+    await import_consts.pasteDB.updateOne({ fieldName: "PASTE", name: loc }, { $set: {
+      data: content,
+      pwd: hashed
+    } });
   return { status: "SUCCESS", data: null, token };
 }
 // Annotate the CommonJS export names for ESM import in node:

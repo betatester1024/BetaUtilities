@@ -41,10 +41,10 @@
       }
       function openDialog() {
         document.getElementById("pwdInp").style.top = "0vh";
-        setTimeout(()=>{document.getElementById("inp_pwd").focus()}, 200);
+        // setTimeout(()=>{document.getElementById("inp_pwd").focus()}, 200);
       }
       function onLoad() {
-        let match = document.URL.match("\\?edit=[0-9a-zA-Z_\\-]{1,30}$");
+        let match = document.URL.match("\\?edit=([0-9a-zA-Z_\\-]{1,30})$");
         if (match) {
           document.getElementById("h2").innerText= "PasteIt! Editor"
           openDialog();
@@ -53,6 +53,11 @@
             <span class="material-symbols-outlined">update</span>
             <div class="anim"></div>`;
           btn.onclick=update;
+          let loc = document.getElementById("loc");
+          loc.value=match[1];
+          document.getElementById("form").action="javascript:update()";
+          loc.disabled=true;
+          
         }
       }
     </script>
@@ -100,7 +105,7 @@
       </header>
       <textarea id="text"></textarea>
       <h2 class="fsmed">Paste details</h2>
-        <form style="text-align: center; margin: 10px auto;" action="javascript:validate()">
+        <form id="form" style="text-align: center; margin: 10px auto;" action="javascript:validate()">
           <div class="inpContainer szHalf nowrap pwdCtn">
             <input class="inp sz100 noMin" id="inp" type="password" placeholder="Password">
             <div class="anim inp"></div>
@@ -112,11 +117,16 @@
           <button style="display: none;">
           </button>
         </form>
-      <button id="pasteIt" onclick="validate()" class="btn grn">
+      <button id="pasteIt" onclick="validate()" class="btn szHalf grn">
         PasteIt!
-        <span class="material-symbols-outlined">arrow_forward</span>
+        <span class="material-symbols-outlined">publish</span>
         <div class="anim"></div>
       </button>
+      <a href="/pasteSearch" class="btn szHalf blu">
+        Find/Edit Paste
+        <span class="material-symbols-outlined">download</span>
+        <div class="anim"></div>
+      </a>
       
       <a class="btn override" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>

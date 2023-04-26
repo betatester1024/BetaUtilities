@@ -21,7 +21,10 @@
       }
       function openDialog() {
         document.getElementById("pwdInp").style.top = "0vh";
-        setTimeout(()=>{document.getElementById("inp").focus()}, 200);
+        // setTimeout(()=>{document.getElementById("inp").focus()}, 200);
+      }
+      function editthis() {
+        location.href=document.URL.replaceAll("/paste/", "/paste?edit=");
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -67,9 +70,12 @@
         <hr class="rounded">
       </header>
       <textarea id="text" readonly></textarea>
-      <a class="btn grn" href="/paste">
+      <a class="btn szHalf grn" href="/paste">
         <span class="material-symbols-outlined">add</span>
         Create a new paste<div class="anim"></div></a>
+      <button class="btn szHalf grn" onclick="editthis()">
+        <span class="material-symbols-outlined">edit</span>
+        Edit paste<div class="anim"></div></button>
       <a class="btn override" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>
         Return to home<div class="anim"></div></a>

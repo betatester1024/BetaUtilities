@@ -460,6 +460,15 @@ function makeRequest(action, token, data, callback) {
           callback(obj.status, obj.data, obj.token);
         });
         break;
+      case "editPaste":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        (0, import_paste.editPaste)(data.content, data.name, data.pwd, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
       default:
         callback("ERROR", { error: "Unknown command string!" }, token);
     }
@@ -523,7 +532,8 @@ const validPages = [
   "/aboutme",
   "/mailertest",
   "/timer",
-  "/newpaste"
+  "/newpaste",
+  "/pastesearch"
 ];
 const ignoreLog = ["getEE", "userRequest", "getLogs", "loadLogs", "visits", "roomRequest", "sendMsg"];
 // Annotate the CommonJS export names for ESM import in node:

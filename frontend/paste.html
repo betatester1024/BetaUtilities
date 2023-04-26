@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='/utils.js'></script>
+    <title>PasteIt | BetaOS Systems</title></title>
+    <script>   
+      function validate() {
+        closeDialog();
+        let pwd = document.getElementById("inp").value;
+        send(JSON.stringify({action:"findPaste", data:{pwd:pwd, name:document.URL.match(/\/paste\/(.*)$/)[1]}}), (res)=>{
+          document.getElementById("inp").value="";
+          if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{openDialog()});
+          else {
+            document.getElementById("text").value=res.data;
+          }
+        })
+      }
+      function closeDialog() {
+        document.getElementById("pwdInp").style.top = "200vh";
+        // document.getElementById("startBtn").focus();
+      }
+      function openDialog() {
+        document.getElementById("pwdInp").style.top = "0vh";
+        setTimeout(()=>{document.getElementById("inp").focus()}, 200);
+      }
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      input {
+        background-color: var(--system-grey2)
+      }
+      .pwdCtn {
+        margin-left: 0px !important;
+        margin-right: 0px !important;
+        text-align: center !important;
+      }
+      .btn {
+        transition: all 0.4s ease;
+      }
+      #pwdInp {
+        top: 100vh; 
+        /* height: unset; */
+        z-index: 0;
+      }
+      #pwdInp > .internal {
+        /* position: relative; */
+        /* top: 20px; */
+        height: unset;
+        margin: 10px auto;
+        border-radius: 15px;
+        width: 90%;
+        background-color: var(--system-bg);
+        padding: 15px;
+      }
+    </style>
+  </head>
+  <body onload = "globalOnload(()=>{console.log();openDialog();});">
+    <div class="main_content">
+      <header>
+        <h2>PasteIt!</h2>
+        <hr class="rounded">
+      </header>
+      <textarea id="text" readonly></textarea>
+      <a class="btn grn" href="/paste">
+        <span class="material-symbols-outlined">add</span>
+        Create a new paste<div class="anim"></div></a>
+      <a class="btn override" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+    </div>
+    <div class="overlay" id="overlay"></div>
+    <div class="overlay" id="pwdInp">
+      <div class="internal">
+        <h2 class="fsmed">Enter password for paste:</h2>
+        <form style="text-align: center; margin: 10px auto;" action="javascript:validate()">
+          <div class="inpContainer szFull nowrap pwdCtn">
+            <input class="inp sz100 noMin" id="inp" type="password" placeholder="Password">
+            <div class="anim inp"></div>
+          </div>
+          <button style="display: none;">
+          </button>
+        </form>
+        
+      </div>
+      <button onclick="validate()" class="btn grn">
+        Unlock paste
+        <span class="material-symbols-outlined">arrow_forward</span>
+        <div class="anim"></div>
+      </button><br>
+      <a class="btn grn" href="/paste">
+        <span class="material-symbols-outlined">add</span>
+        Create a new paste<div class="anim"></div></a>
+      <a class="btn override" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+    </div>
+  </body>
+</html>

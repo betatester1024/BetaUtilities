@@ -142,6 +142,9 @@ div.anim.inp {
 .szFull {
   width: max(88%, 10em)
 }
+.sz100 {
+  width: 96%;
+}
 .szFull.noMin {
   width: 90%;
 }

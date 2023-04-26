@@ -27,11 +27,12 @@ var import_consts = require("./consts");
 var import_userRequest = require("./userRequest");
 const argon2 = require("argon2");
 async function updateUser(user, oldPass, newPass, newPermLevel, token) {
+  let NOUPDATE = false;
   if (!user.match(import_consts.userRegex)) {
     return { status: "ERROR", data: { error: "Invalid user string!" }, token };
   }
   if (newPass.length == 0) {
-    return { status: "ERROR", data: { error: "No password provided!" }, token };
+    NOUPDATE = true;
   }
   let tokenData = await import_consts.authDB.findOne({ fieldName: "Token", token });
   if (!tokenData) {
@@ -45,9 +46,16 @@ async function updateUser(user, oldPass, newPass, newPermLevel, token) {
   if (userData.permLevel >= 2 && (!newUserData || newUserData.permLevel < userData.permLevel) && newPermLevel < userData.permLevel) {
     await import_consts.authDB.updateOne(
       { fieldName: "UserData", user },
-      { $set: { pwd: await argon2.hash(newPass, import_consts.hashingOptions), permLevel: newPermLevel } },
+      { $set: { permLevel: newPermLevel } },
       { upsert: true }
     );
+    if (!NOUPDATE) {
+      await import_consts.authDB.updateOne(
+        { fieldName: "UserData", user },
+        { $set: { pwd: await argon2.hash(newPass, import_consts.hashingOptions) } },
+        { upsert: true }
+      );
+    }
     return { status: "SUCCESS", data: { perms: newPermLevel }, token };
   } else if (await argon2.verify(userData.pwd, oldPass)) {
     await import_consts.authDB.updateOne(

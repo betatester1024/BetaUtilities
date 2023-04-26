@@ -28,6 +28,7 @@ var import_delacc = require("./delacc");
 var import_updateUser = require("./updateUser");
 var import_userRequest = require("./userRequest");
 var import_EEHandler = require("./EEHandler");
+var import_paste = require("./paste");
 var import_tasks = require("./tasks");
 var import_logging = require("./logging");
 var import_messageHandle = require("./betautilities/messageHandle");
@@ -98,6 +99,14 @@ async function initServer() {
         res.sendFile(import_consts.frontendDir + "/error.html");
       }
     });
+    (0, import_logging.incrRequests)();
+  });
+  app.get("/paste", (req, res) => {
+    res.sendFile(import_consts.frontendDir + "/newpaste.html");
+    (0, import_logging.incrRequests)();
+  });
+  app.get("/paste/*", (req, res) => {
+    res.sendFile(import_consts.frontendDir + "/paste.html");
     (0, import_logging.incrRequests)();
   });
   app.get("*/favicon.ico", (req, res) => {
@@ -433,6 +442,23 @@ function makeRequest(action, token, data, callback) {
           callback(obj.status, obj.data, obj.token);
         });
         break;
+      case "paste":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        (0, import_paste.paste)(data.content, data.name, data.pwd, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "findPaste":
+        if (!data) {
+          callback("ERROR", { error: "No data provided" }, token);
+          break;
+        }
+        (0, import_paste.findPaste)(data.name, data.pwd, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
         break;
       default:
         callback("ERROR", { error: "Unknown command string!" }, token);
@@ -496,7 +522,8 @@ const validPages = [
   "/syslog",
   "/aboutme",
   "/mailertest",
-  "/timer"
+  "/timer",
+  "/newpaste"
 ];
 const ignoreLog = ["getEE", "userRequest", "getLogs", "loadLogs", "visits", "roomRequest", "sendMsg"];
 // Annotate the CommonJS export names for ESM import in node:

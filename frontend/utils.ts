@@ -85,7 +85,7 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
     
   }
   var xhr = new XMLHttpRequest();
-  xhr.open("POST", "server", true);
+  xhr.open("POST", "/server", true);
   xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {

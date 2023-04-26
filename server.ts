@@ -10,6 +10,7 @@ import { deleteAccount } from './delacc';
 import {updateUser, realias, toggleTheme} from './updateUser'
 import {userRequest} from './userRequest';
 import {EE} from './EEHandler';
+import {paste, findPaste} from './paste';
 import {addTask, getTasks, updateTask, deleteTask} from './tasks';
 import {getLogs, log, purgeLogs, visitCt, incrRequests} from './logging';
 const bodyParser = require('body-parser');
@@ -47,7 +48,6 @@ export async function initServer() {
     res.sendFile(frontendDir+'/config.html');
     incrRequests();
   });
-
   
   app.get('/EE', (req:any, res:any) => {
     EE(true, (_status:string, data:any, _token:string)=>{
@@ -90,6 +90,22 @@ export async function initServer() {
       if (s == "SUCCESS") res.sendFile(frontendDir+'/actionComplete.html');
       else {res.sendFile(frontendDir+'/error.html')}
     })
+    incrRequests();
+  })
+
+
+  app.get("/paste", (req:any, res:any) => {
+    res.sendFile(frontendDir+"/newpaste.html");
+    incrRequests();
+  })
+  
+  // app.get("/paste/", (req:any, res:any) => {
+  //   res.sendFile(frontendDir+"/newpaste.html");
+  //   incrRequests();
+  // })
+  
+  app.get("/paste/*", (req:any, res:any) => {
+    res.sendFile(frontendDir+"/paste.html");
     incrRequests();
   })
     
@@ -392,7 +408,24 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
         .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
         break;
+      case "paste":
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        paste(data.content, data.name, data.pwd, token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
         break;
+      case "findPaste":
+        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        findPaste(data.name, data.pwd, token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+        break;
+        // case "editPaste":
+        // if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
+        // findPaste(data.content, data.name, data.pwd, token)
+        // .then((obj:{status:string, data:any, token:string})=>
+        //   {callback(obj.status, obj.data, obj.token)});
+        // break;
       default:
         callback("ERROR", {error: "Unknown command string!"}, token);
     }
@@ -445,5 +478,6 @@ function eeFormat(data:string) {
 }
 
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
-                    '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest', "/timer"];
+                    '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest',
+                    "/timer", "/newpaste"];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 'roomRequest', 'sendMsg'];

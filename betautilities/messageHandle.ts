@@ -49,7 +49,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
   if (imgMatch) {
     return "https://external-content.duckduckgo.com/iu/?u="+encodeURIComponent(imgMatch[1]);
   }
-  if (msg.match(/!testfeature/gimu)) return "@" + sender;
+  if (msg.match(/!pasteit!?/gimu)) return "https://betatester1024.repl.co/paste";
   if (msg.match("^!uptime @" + hnd.nick.toLowerCase() + "$")) {
     hnd.clearCallReset();
     

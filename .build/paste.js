@@ -24,6 +24,7 @@ __export(paste_exports, {
 });
 module.exports = __toCommonJS(paste_exports);
 var import_consts = require("./consts");
+var import_userRequest = require("./userRequest");
 const argon2 = require("argon2");
 const pasteMatch = /^[0-9a-zA-Z_\-]{1,30}$/;
 async function paste(content, loc, pwd, token) {
@@ -35,7 +36,9 @@ async function paste(content, loc, pwd, token) {
   let existingDoc = await import_consts.pasteDB.findOne({ fieldName: "PASTE", name: loc });
   if (existingDoc)
     return { status: "ERROR", data: { error: "Paste already exists! Please select another name." }, token };
-  import_consts.pasteDB.insertOne({ fieldName: "PASTE", data: content, pwd: hashed, name: loc });
+  let userData = await (0, import_userRequest.userRequest)(token);
+  let user = userData.status == "SUCCESS" ? userData.data.user : null;
+  import_consts.pasteDB.insertOne({ fieldName: "PASTE", data: content, pwd: hashed, name: loc, author: user });
   return { status: "SUCCESS", data: null, token };
 }
 async function findPaste(loc, pwd, token) {
@@ -56,6 +59,13 @@ async function editPaste(content, loc, pwd, token) {
   let existingDoc = await import_consts.pasteDB.findOne({ fieldName: "PASTE", name: loc });
   if (!existingDoc)
     return { status: "ERROR", data: { error: "Paste does not exist!" }, token };
+  let userInfo = await (0, import_userRequest.userRequest)(token);
+  if (userInfo.status != "SUCCESS")
+    return userInfo;
+  if (!existingDoc.author)
+    return { status: "ERROR", data: { error: "This paste was either created before 2023-04-27, or was created anonymously. It is not editable." }, token };
+  else if (userInfo.data.user != existingDoc.author)
+    return { status: "ERROR", data: { error: "You are not the author of the paste and cannot edit it." }, token };
   if (pwd.length == 0)
     import_consts.pasteDB.updateOne({ fieldName: "PASTE", name: loc }, { $set: {
       data: content

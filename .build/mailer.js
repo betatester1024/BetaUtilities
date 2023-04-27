@@ -18,38 +18,31 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var mailer_exports = {};
 __export(mailer_exports, {
-  sendMail: () => sendMail
+  mail: () => mail
 });
 module.exports = __toCommonJS(mailer_exports);
-var nodemailer = require("nodemailer");
-let fs = require("fs");
-function sendMail() {
-  let transporter = nodemailer.createTransport({
-    pool: true,
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: true,
-    auth: {
-      user: "betaos.services@gmail.com",
-      pass: process.env["emlpwd"]
+var import_courier = require("@trycourier/courier");
+const courier = (0, import_courier.CourierClient)({ authorizationToken: process.env["authToken"] });
+async function mail() {
+  const { requestId } = await courier.send({
+    message: {
+      to: {
+        email: "betatester1025@protonmail.com"
+      },
+      content: {
+        title: "This is a test ",
+        body: "Self-test one oh one"
+      },
+      routing: {
+        method: "single",
+        channels: ["email"]
+      }
     }
   });
-  var mailOptions = {
-    from: '"BetaOS System AutoMailer" <betaos.services@gmail.com>',
-    to: "betatester1025@protonmail.com",
-    subject: "This is a test.",
-    text: "Testing.",
-    html: fs.readFileSync("./mailtemplate.html")
-  };
-  transporter.sendMail(mailOptions, function(error, info) {
-    if (error) {
-      return console.log(error);
-    }
-    console.log("Message sent: " + info.response);
-  });
+  console.log(requestId);
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  sendMail
+  mail
 });
 //# sourceMappingURL=mailer.js.map

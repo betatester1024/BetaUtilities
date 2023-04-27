@@ -113,6 +113,10 @@ async function initServer() {
     res.sendFile(import_consts.rootDir + "/favicon.ico");
     (0, import_logging.incrRequests)();
   });
+  app.get("*/icon.png", (req, res) => {
+    res.sendFile(import_consts.rootDir + "/temp.png");
+    (0, import_logging.incrRequests)();
+  });
   app.get("/support.js", (req, res) => {
     res.sendFile(import_consts.frontendDir + "support.js");
     (0, import_logging.incrRequests)();

@@ -114,6 +114,11 @@ export async function initServer() {
     incrRequests();
   })
 
+  app.get('*/icon.png', (req:Request, res:any)=> {
+    res.sendFile(rootDir+'/temp.png')
+    incrRequests();
+  })
+
   
   app.get('/support.js', (req:any, res:any) => {
     res.sendFile(frontendDir+"support.js");

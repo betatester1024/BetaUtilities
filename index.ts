@@ -2,20 +2,21 @@ import {initServer} from './server';
 import {DBMaintenance, connectDB, client} from './database';
 import {supportHandler, Room} from './supportRooms'
 import {log} from './logging';
+
 import {uDB} from './consts';
 import {WS} from './betautilities/wsHandler';
 import {WebH} from './betautilities/webHandler';
 import { serverUpdate } from './betautilities/wordler';
 export let connectionSuccess = true;
 export let DBConnectFailure:any = null;
-import {sendMail} from './mailer';
+import {mail} from './mailer';
 const localEuphRooms = [
   // "bots", "room", "memes", "music", "srs"
 ]
 const { exec } = require("child_process");
 
 try {
-  // sendMail();
+  // mail();
   if (connectionSuccess)
   connectDB().then((thing:any)=>{
     console.log(thing)

@@ -111,7 +111,8 @@ class supportHandler {
     for (let i = 0; i < msgs.length; i++) {
       ev.write("data:{" + (msgs[i].msgID ?? -1) + "}[" + msgs[i].sender + "](" + msgs[i].permLevel + ")" + msgs[i].data + ">\n\n");
     }
-    text += "{99999999999}[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. Commands are available here: &gt;&gt;commands \nEnter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!>";
+    text += `{${msgCt + 1}}[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. Commands are available here: &gt;&gt;commands 
+Enter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!>`;
     ev.write("data:" + text + "\n\n");
     thiscn.readyQ = true;
   }
@@ -349,10 +350,13 @@ async function WHOIS(token, user) {
 }
 async function loadLogs(rn, id, from, token) {
   try {
+    let roomInfo = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
     from = +from;
     console.log("LOADING LOGS FROM", from - 30, "TO", from);
-    if (from < import_database.minID)
+    if (from < import_database.minID || roomInfo && roomInfo.minCt && from < roomInfo.minCt) {
+      supportHandler.sendMsgTo_ID(id, "LOADCOMPLETE -1");
       return { status: "SUCCESS", data: null, token };
+    }
     let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, msgID: { $gt: from - 30, $lt: from } }).toArray();
     for (let i = msgs.length - 1; i >= 0; i--) {
       let dat = "{" + -msgs[i].msgID + "}[" + msgs[i].sender + "](" + msgs[i].permLevel + ")" + msgs[i].data;

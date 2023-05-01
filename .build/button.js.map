@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../button.ts"],
+  "sourcesContent": ["export async function clickIt(token:string) {\n  console.log(\"clicking.\");\n}"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,eAAsB,QAAQ,OAAc;AAC1C,UAAQ,IAAI,WAAW;AACzB;",
+  "names": []
+}

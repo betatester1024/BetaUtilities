@@ -479,6 +479,11 @@ function makeRequest(action, token, data, callback) {
           callback(obj.status, obj.data, obj.token);
         });
         break;
+      case "leaderboard":
+        (0, import_button.getLeaderboard)(token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
       default:
         callback("ERROR", { error: "Unknown command string!" }, token);
     }
@@ -546,7 +551,17 @@ const validPages = [
   "/pastesearch",
   "/clickit"
 ];
-const ignoreLog = ["getEE", "userRequest", "getLogs", "loadLogs", "visits", "roomRequest", "sendMsg"];
+const ignoreLog = [
+  "getEE",
+  "userRequest",
+  "getLogs",
+  "loadLogs",
+  "visits",
+  "roomRequest",
+  "sendMsg",
+  "clickIt",
+  "leaderboard"
+];
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   initServer

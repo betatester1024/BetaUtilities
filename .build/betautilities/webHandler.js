@@ -162,6 +162,22 @@ class WebH {
         outStr = "/me is rebooting.";
       if (outStr == "")
         return;
+      if (!this.bypass) {
+        this.callTimes.push(Date.now());
+        setTimeout(() => {
+          this.callTimes.shift();
+        }, 60 * 5 * 1e3);
+      }
+      if (!this.bypass && this.callTimes.length >= 5) {
+        if (this.callTimes.length < 10) {
+          outStr = this.transferOutQ ? outStr + "\\n[ANTISPAM] Consider moving to &bots or &test for large-scale testing. Thank you for your understanding." : outStr + " [ANTISPAM WARNING]";
+        } else {
+          outStr = outStr + "\\n[ANTISPAM] Automatically paused @" + this.nick;
+          this.pausedQ = true;
+          this.pauser = "BetaOS_ANTISPAM";
+          this.resetCall(data);
+        }
+      }
       this.sendMsg(outStr, data);
     }
   }

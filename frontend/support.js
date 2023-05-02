@@ -207,6 +207,7 @@ async function initClient()
     
   });
   } catch (e) {
+    alert(e);
     console.log("Restartng client ("+e+")")
     setTimeout(initClient, 0);
   }

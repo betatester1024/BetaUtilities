@@ -15,7 +15,7 @@ import {addTask, getTasks, updateTask, deleteTask} from './tasks';
 import {getLogs, log, purgeLogs, visitCt, incrRequests} from './logging';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
-import {clickIt} from './button';
+import {clickIt, getLeaderboard} from './button';
 import {uptime} from './betautilities/messageHandle'
 import {supportHandler, roomRequest, sendMsg, 
         createRoom, deleteRoom, WHOIS, loadLogs, 
@@ -437,6 +437,12 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
         .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
         break;
+      case "leaderboard":
+        // console.log("leaderboard requested");
+        getLeaderboard(token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+        break;
       default:
         callback("ERROR", {error: "Unknown command string!"}, token);
     }
@@ -491,4 +497,5 @@ function eeFormat(data:string) {
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
                     '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest',
                     "/timer", "/newpaste", "/pastesearch", '/clickit'];
-const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 'roomRequest', 'sendMsg'];
+const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
+                   'roomRequest', 'sendMsg', 'clickIt', 'leaderboard'];

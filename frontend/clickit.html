@@ -4,6 +4,14 @@
     <script src='./utils.js'></script>
     <title>ClickIt! | BetaOS Systems</title></title>
     <script>
+      function clickIt() {
+        send(JSON.stringify({action:"clickIt"}), (res)=>{
+          document.getElementById("thebutton").blur();
+          send(JSON.stringify({action:"leaderboard"}), (res2)=>{
+            alert(res2.data);
+          })
+        })  
+      }
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -23,50 +31,15 @@
         <h2 class="fsmed">Click<sup>it!</sup></h2>
         <hr class="rounded">
       </header>
-      <button class="btn szFull grn" onclick="clickIt()">
+      <button id="thebutton" class="btn szFull grn" onclick="clickIt()">
         <span class="material-symbols-outlined">arrow_selector_tool</span>
         Clickit!<div class="anim"></div>
       </button>
-      <button class="btn szHalf override" id="resetBtn" onclick="resetTimer(); resetUI()" style="display:none">
-        <span class="material-symbols-outlined">history</span>
-        Reset<div class="anim"></div>
-      </button>
-      <button class="btn szNone" style="display: none" id="pauseBtn" onclick="pauseTimer()">Pause</button>
       <a class="btn override" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>
         Return to home<div class="anim"></div></a>
     </div>
     <div class="overlay" id="overlay">
-    </div>
-    <div class="overlay" id="timerInp">
-      <div class="internal">
-        <h2 class="fsmed">Enter a time: </h2>
-        <form style="text-align: center; margin: 10px auto;" action="javascript:updateTime()">
-          <div class="inpContainer szThird nowrap timerCtn">
-            <input class="inp szFull noMin" id="h" type="number" value="0" max="99" min="0" placeholder="Hrs">
-            <div class="anim inp"></div>
-          </div>
-          <div class="inpContainer szThird nowrap timerCtn">
-            <input class="inp szFull noMin" id="m" type="number" value="0" max="99" min="0" placeholder="Min">
-            <div class="anim inp"></div>
-          </div>
-          <div class="inpContainer szThird nowrap timerCtn">
-            <input class="inp szFull noMin" id="s" type="number" value="0" max="99" min="0" placeholder="Sec">
-            <div class="anim inp"></div>
-          </div><br>
-          <button style="display: none;">
-          </button>
-        </form>
-        
-      </div>
-      <button onclick="updateTime()" class="btn grn">
-        <span class="material-symbols-outlined">check</span>
-        <div class="anim"></div>
-      </button>
-      <button onclick="closeDialog()" class="btn red nooutline">
-        <span class="material-symbols-outlined">close</span>
-        <div class="anim"></div>
-      </button>
     </div>
   </body>
 </html>

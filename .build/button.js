@@ -18,14 +18,28 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var button_exports = {};
 __export(button_exports, {
-  clickIt: () => clickIt
+  clickIt: () => clickIt,
+  getLeaderboard: () => getLeaderboard
 });
 module.exports = __toCommonJS(button_exports);
+var import_userRequest = require("./userRequest");
+var import_consts = require("./consts");
 async function clickIt(token) {
-  console.log("clicking.");
+  let userData = await (0, import_userRequest.userRequest)(token);
+  if (userData.status != "SUCCESS") {
+    return userData;
+  }
+  await import_consts.uDB.updateOne({ fieldName: "BUTTON", user: userData.data.user }, { $inc: { clickedCt: 1 } });
+  return { status: "SUCCESS", data: null, token };
+}
+async function getLeaderboard(token) {
+  let data = await import_consts.uDB.findOne({ fieldName: "BUTTON" });
+  let allClickingUsers = await import_consts.uDB.find({ fieldName: "BUTTON" }).sort({ clickedCt: -1 }).toArray();
+  return { status: "SUCCESS", data: allClickingUsers, token };
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  clickIt
+  clickIt,
+  getLeaderboard
 });
 //# sourceMappingURL=button.js.map

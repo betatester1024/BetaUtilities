@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": ["../button.ts"],
-  "sourcesContent": ["export async function clickIt(token:string) {\n  console.log(\"clicking.\");\n}"],
-  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,eAAsB,QAAQ,OAAc;AAC1C,UAAQ,IAAI,WAAW;AACzB;",
+  "sourcesContent": ["import {userRequest} from './userRequest';\nimport {uDB} from './consts'\nexport async function clickIt(token:string) {\n  let userData = await userRequest(token);\n  if (userData.status != \"SUCCESS\") {\n    return userData;\n  }\n  await uDB.updateOne({fieldName:\"BUTTON\", user:userData.data.user}, {$inc:{clickedCt:1}});\n  return {status:\"SUCCESS\", data:null, token:token};\n}\n\nexport async function getLeaderboard(token:string) {\n  // i forgot the bloody closing brackets\n  // console.log(\"leaderboard requested\");\n  let data = await uDB.findOne({fieldName:\"BUTTON\"});\n  let allClickingUsers = await uDB.find({fieldName:\"BUTTON\"}).sort({clickedCt:-1}).toArray();\n  // console.log(allClickingUsers);\n  return {status:\"SUCCESS\", data:allClickingUsers, token:token};\n}"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,yBAA0B;AAC1B,oBAAkB;AAClB,eAAsB,QAAQ,OAAc;AAC1C,MAAI,WAAW,UAAM,gCAAY,KAAK;AACtC,MAAI,SAAS,UAAU,WAAW;AAChC,WAAO;AAAA,EACT;AACA,QAAM,kBAAI,UAAU,EAAC,WAAU,UAAU,MAAK,SAAS,KAAK,KAAI,GAAG,EAAC,MAAK,EAAC,WAAU,EAAC,EAAC,CAAC;AACvF,SAAO,EAAC,QAAO,WAAW,MAAK,MAAM,MAAW;AAClD;AAEA,eAAsB,eAAe,OAAc;AAGjD,MAAI,OAAO,MAAM,kBAAI,QAAQ,EAAC,WAAU,SAAQ,CAAC;AACjD,MAAI,mBAAmB,MAAM,kBAAI,KAAK,EAAC,WAAU,SAAQ,CAAC,EAAE,KAAK,EAAC,WAAU,GAAE,CAAC,EAAE,QAAQ;AAEzF,SAAO,EAAC,QAAO,WAAW,MAAK,kBAAkB,MAAW;AAC9D;",
   "names": []
 }

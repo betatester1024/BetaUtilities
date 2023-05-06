@@ -59,7 +59,7 @@ function cueBot(hnd, msg, sender, data) {
   }
   if (msg.match(/\btree\b/) && Math.random() < 0.1) {
     hnd.changeNick("CueBot");
-    hnd.delaySendMsg(`*stick`, data, 0);
+    hnd.delaySendMsg(`*stick tower`, data, 0);
     setTimeout(() => {
       hnd.changeNick(hnd.nick);
     }, 200);
@@ -307,7 +307,7 @@ function cueBot(hnd, msg, sender, data) {
     }, 200);
     ;
   }
-  if (msg.match(/^!(get-date)|(getdate)|(date)$/)) {
+  if (msg.match(/^!((get-date)|(getdate)|(date))$/)) {
     hnd.changeNick("CueBot");
     hnd.delaySendMsg(random(["March 32nd", "September 30th", "September 23rd", "January 1st", "December 25th", "April 2nd", "Quintillius 3rd", "no thank you"]), data, 0);
     setTimeout(() => {

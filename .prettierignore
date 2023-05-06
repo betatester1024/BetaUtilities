@@ -1,0 +1,6 @@
+.config
+.build
+.cache
+.upm
+.tmp
+.git

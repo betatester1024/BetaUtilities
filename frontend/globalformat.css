@@ -15,7 +15,7 @@ html {
   --system-overlay: rgba(200, 200, 200, 0.95);
   --system-transp: rgba(0, 0, 0, 0);
   --system-black: #222;
-  transition: all 1s ease-in-out;
+  transition: all 1s ease;
   font-family: 'Noto Sans Display', monospace;
 }
 
@@ -61,7 +61,7 @@ hr.redrounded {
   width: 100vw;
   margin: 0 auto;
   text-align: center;
-/*   transition: all 0.5s ease-in-out; */
+/*   transition: all 0.5s ease; */
   overflow: auto;
 }
 
@@ -119,7 +119,7 @@ div.anim {
   border: 2.3px solid var(--system-blue);
   margin: 10px auto;
   border-radius: 2px;
-  transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease;
 }
 
 input:invalid + div.anim {
@@ -215,7 +215,7 @@ div.anim.inp {
 }
 
 .roundhover {
-  transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease;
 }
 .roundhover:hover, .roundhover:focus{
   border-radius: 20%;
@@ -247,7 +247,7 @@ input, select {
   font-weight: 500;
   color: var(--system-blue);
   font-family: 'Noto Sans Display';
-  transition: 0.2s all ease-in-out;
+  transition: 0.2s all ease;
   border-radius: 10px;
   width: 100%;
   cursor: text;
@@ -326,14 +326,29 @@ span.material-symbols-outlined {
   height: 100vh;
   width: 100vw;
   text-align: center;
-  transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease;
   background-color: var(--system-overlay);
-  top: 500vh;
+  /* top: 500vh; */
+  top: 0px;
+  opacity: 0;
   z-index: 1;
+  pointer-events: none;
 }
-#alerttext {
-  height: 75%;
-  border-radius: 20px;
+.overlay_dialog {
+  position: absolute;
+  /* height: 100vh; */
+  width: 100vw;
+  text-align: center;
+  transition: all 0.5s ease;
+  /* background-color: var(--system-overlay); */
+  /* top: 500vh; */
+  top: 0px;
+  z-index: 2;
+}
+#alerttext_v2 {
+  max-height: 50%;
+  overflow-y: auto;
+  border-radius: 20px 0px 0px 20px;
   background-color: var(--system-bg);
   margin-bottom: 0px;
   width: 90%;
@@ -341,11 +356,27 @@ span.material-symbols-outlined {
   margin-right: auto;
   padding: 10px;
   margin-top: 20px;
+  z-index: 3;
+  
 }
+#internal_alerts {
+  margin: auto;
+  height: 100%;
+  position: relative;
+  top: 50%;
+  transition: all 0.5s ease;
+}
+
 .overlay .internal {
   margin: auto;
   height: 100%;
 }
+/* }
+.overlay > .internal {
+  margin: auto;
+  height: 100%;
+  position: relative;
+} */
 
 .fssml {
   font-size: 1em;
@@ -392,7 +423,7 @@ footer, #footer {
 }
 
 .overlayLoader {
-  transition: all 0.25s ease-out;
+  transition: all 1s ease-out;
   width: 100vw;
   height: 100vh;
   position: absolute;
@@ -438,7 +469,7 @@ footer, #footer {
   .alertlbl {
     display: none;
   }
-  .internal .btn {
+  #internal_alerts .btn, .internal .btn {
     width: 3em;
   }
   
@@ -466,7 +497,7 @@ footer, #footer {
 }
 
 #compliance {
-  transition: all 0.7s ease-in-out; /*cubic-bezier( 1, 0.33, 0.3, 1.24 );/*ease-in-out;*/
+  transition: all 0.7s ease; /*cubic-bezier( 1, 0.33, 0.3, 1.24 );/*ease;*/
 /*   transition-delay: 3s; */
   position: absolute;
   padding: 60px;

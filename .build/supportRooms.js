@@ -240,11 +240,19 @@ function sendMsg(msg, room, token, callback) {
 async function sendMsg_B(msg, room) {
   let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room });
   let msgCt = roomData ? roomData.msgCt : 0;
+  let betaNick = "";
+  for (let i = 0; i < supportHandler.allRooms.length; i++) {
+    if (supportHandler.allRooms[i].name == room) {
+      betaNick = supportHandler.allRooms[i].handler.displayNick ?? "[BetaOS_ERROR]";
+      break;
+    }
+  }
+  console.log(betaNick);
   await import_consts.msgDB.insertOne({
     fieldName: "MSG",
-    data: msg,
+    data: msg.replaceAll("\n\n", "\n"),
     permLevel: 3,
-    sender: "BetaOS_System",
+    sender: betaNick,
     expiry: Date.now() + 3600 * 1e3 * 24 * 30,
     room,
     msgID: msgCt
@@ -252,7 +260,7 @@ async function sendMsg_B(msg, room) {
   await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
     $inc: { msgCt: 1 }
   }, { upsert: true });
-  supportHandler.sendMsgTo(room, "{" + msgCt + "}[BetaOS_System](3)" + msg);
+  supportHandler.sendMsgTo(room, "{" + msgCt + "}[" + betaNick + "](3)" + msg);
 }
 function processAnon(token) {
   return "Anonymous user";
@@ -359,7 +367,8 @@ async function loadLogs(rn, id, from, token) {
     }
     let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, msgID: { $gt: from - 30, $lt: from } }).toArray();
     for (let i = msgs.length - 1; i >= 0; i--) {
-      let dat = "{" + -msgs[i].msgID + "}[" + msgs[i].sender + "](" + msgs[i].permLevel + ")" + msgs[i].data;
+      console.log(msgs[i].msgID);
+      let dat = "{-" + msgs[i].msgID + "}[" + msgs[i].sender + "](" + msgs[i].permLevel + ")" + msgs[i].data;
       supportHandler.sendMsgTo_ID(id, dat);
     }
     console.log("LOADING COMPLETE, LOADED" + msgs.length, "MESSAGES");

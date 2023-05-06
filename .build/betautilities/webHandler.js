@@ -31,6 +31,7 @@ class WebH {
   connection;
   static CALLTIMEOUT = 3e4;
   nick;
+  displayNick;
   pausedQ = false;
   roomName;
   hiddenQ;
@@ -113,6 +114,8 @@ class WebH {
     this.incrRunCt();
   }
   sendMsg(msg, user) {
+    if (msg.length == 0)
+      return;
     (0, import_supportRooms.sendMsg_B)(msg, this.roomName);
     this.incrRunCt();
   }
@@ -123,6 +126,8 @@ class WebH {
   initNick() {
   }
   changeNick(nick) {
+    this.displayNick = nick;
+    console.log("nick changed to", nick);
   }
   onMessage(msg, snd) {
     let data = "";
@@ -130,7 +135,6 @@ class WebH {
       fs.writeFileSync("betautilities/msgLog.txt", fs.readFileSync("betautilities/msgLog.txt").toString() + `(${this.roomName})[${snd}] ${msg}
 `);
     msg = msg.toLowerCase().replaceAll(/(\s|^)((@betaos)|(@betautilities)|(@system))(\s|$)/gimu, " @" + this.nick.toLowerCase() + " ").trim();
-    console.log / ("received" + msg);
     if (msg == "!kill @" + this.nick.toLowerCase()) {
       this.sendMsg("/me crashes", data);
       this.delaySendMsg("/me restarts", data, 200);
@@ -199,6 +203,7 @@ class WebH {
   }
   constructor(roomName, hiddenQ = false) {
     this.nick = "BetaOS_System";
+    this.displayNick = "BetaOS_System";
     this.replyMessage = (msg, sender, data) => {
       return (0, import_messageHandle.replyMessage)(this, msg, sender, data);
     };

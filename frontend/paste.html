@@ -16,11 +16,16 @@
         })
       }
       function closeDialog() {
-        document.getElementById("pwdInp").style.top = "200vh";
+        let div = document.getElementById("pwdInp");
+        div.style.top = "50vh";
+        div.style.opacity = "0";
+        
         // document.getElementById("startBtn").focus();
       }
       function openDialog() {
-        document.getElementById("pwdInp").style.top = "0vh";
+        let div = document.getElementById("pwdInp");
+        div.style.top = "0vh";
+        div.style.opacity = "1";
         // setTimeout(()=>{document.getElementById("inp").focus()}, 200);
       }
       function editthis() {
@@ -49,7 +54,8 @@
       #pwdInp {
         top: 100vh; 
         /* height: unset; */
-        z-index: 0;
+        z-index: 1;
+        pointer-events: auto;
       }
       #pwdInp > .internal {
         /* position: relative; */
@@ -63,7 +69,7 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload(()=>{console.log();openDialog();});">
+  <body onload = "globalOnload(()=>{openDialog();});">
     <div class="main_content">
       <header>
         <h2>PasteIt!</h2>

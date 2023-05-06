@@ -16,6 +16,8 @@ function sendMsg() {
         });
       else
         alertDialog("Updated alias!", () => {
+          STARTID = -1;
+          loadStatus = -1;
           document.getElementById("msgArea").innerHTML = `<h2 id="placeholder">
         <span class="material-symbols-outlined">update</span> 
         Reloading your messages, a moment please...</h2>`;
@@ -87,7 +89,7 @@ async function initClient() {
         PREPENDFLAG = false;
         if (STARTID < 0)
           STARTID = Number(matches[1]);
-        if (matches[1] < 0) {
+        if (matches[1][0] == "-") {
           PREPENDFLAG = true;
           if (loadStatus == 0)
             loadStatus = 1;
@@ -135,6 +137,7 @@ async function initClient() {
               replaced.className = "supportMsg " + classStr[matches[3]];
               replaced.href = "https://" + post;
               replaced.innerText = post;
+              replaced.setAttribute("target", "_blank");
               ele.appendChild(replaced);
             } else if (pref == "ROOM") {
               let replaced = document.createElement("a");
@@ -180,6 +183,7 @@ async function initClient() {
       }
     });
   } catch (e) {
+    alert(e);
     console.log("Restartng client (" + e + ")");
     setTimeout(initClient, 0);
   }
@@ -202,7 +206,10 @@ const replacements = [
   { from: "confirm", to: "check" },
   { from: "warn", to: "warning" },
   { from: "error", to: "error" },
-  { from: "egg", to: "egg_alt" }
+  { from: "egg", to: "egg_alt" },
+  { from: "rotating_light", to: "e911_emergency" },
+  { from: "sparkles", to: "magic_button" },
+  { from: "mask", to: "medical_mask" }
 ];
 function findReplacement(thing) {
   for (let i = 0; i < replacements.length; i++) {

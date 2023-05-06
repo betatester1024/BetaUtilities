@@ -23,15 +23,15 @@ __export(mailer_exports, {
 module.exports = __toCommonJS(mailer_exports);
 var import_courier = require("@trycourier/courier");
 const courier = (0, import_courier.CourierClient)({ authorizationToken: process.env["authToken"] });
-async function mail() {
+async function mail(email, token2) {
   const { requestId } = await courier.send({
     message: {
       to: {
-        email: "betatester1025@protonmail.com"
+        email
       },
       content: {
-        title: "This is a test ",
-        body: "Self-test one oh one"
+        title: "Password Reset Request",
+        body: "Click the following link to reset your password: https://www.example.com/reset-password?token=" + token2
       },
       routing: {
         method: "single",
@@ -41,6 +41,8 @@ async function mail() {
   });
   console.log(requestId);
 }
+const token = generateTokenForUser();
+mail(userEmail, token);
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   mail

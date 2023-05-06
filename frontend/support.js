@@ -22,6 +22,8 @@ function sendMsg() {
     send(JSON.stringify({action:"realias", data:{alias:match[1]}}), (res)=>{
       if (res.status != "SUCCESS") alertDialog("ERROR: "+res.data.error, ()=>{});
       else alertDialog("Updated alias!", ()=>{
+        STARTID = -1;
+        loadStatus = -1;
         document.getElementById("msgArea").innerHTML = `<h2 id="placeholder">
         <span class="material-symbols-outlined">update</span> 
         Reloading your messages, a moment please...</h2>`;
@@ -96,7 +98,7 @@ async function initClient()
       if (!matches) continue;
       PREPENDFLAG = false;
       if (STARTID<0) STARTID = Number(matches[1]);
-      if (matches[1]<0) {
+      if (matches[1][0]=="-") {
         // console.log("PREPENDING")p
         PREPENDFLAG = true;
         if (loadStatus == 0) loadStatus = 1;
@@ -151,6 +153,7 @@ async function initClient()
             replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
             replaced.href = "https://"+post;
             replaced.innerText = post;
+            replaced.setAttribute("target", "_blank");
             ele.appendChild(replaced);
           }
           else if (pref == "ROOM") {
@@ -171,6 +174,7 @@ async function initClient()
             let replaced = document.createElement("a");
             replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
             replaced.href = post.slice(8);
+            // replaced.setAttribute("target", "_blank");
             replaced.innerText = ">>"+post.slice(8);
             ele.appendChild(replaced);
           }
@@ -232,7 +236,10 @@ const replacements = [
   {from: "confirm", to:"check"},
   {from: "warn", to: "warning"},
   {from: "error", to:"error"},
-  {from: "egg", to:"egg_alt"}
+  {from: "egg", to:"egg_alt"},
+  {from: "rotating_light", to:"e911_emergency"},
+  {from: "sparkles", to:"magic_button"},
+  {from: "mask", to:"medical_mask"}
 ]
 
 // function replaceAll(msg, ele, matches) {

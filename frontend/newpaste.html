@@ -36,12 +36,17 @@
         })
       }
       function closeDialog() {
-        document.getElementById("pwdInp").style.top = "200vh";
+        let div = document.getElementById("pwdInp");
+        div.style.top = "50vh";
+        div.style.opacity = "0";
+        
         // document.getElementById("startBtn").focus();
       }
       function openDialog() {
-        document.getElementById("pwdInp").style.top = "0vh";
-        // setTimeout(()=>{document.getElementById("inp_pwd").focus()}, 200);
+        let div = document.getElementById("pwdInp");
+        div.style.top = "0vh";
+        div.style.opacity = "1";
+        // setTimeout(()=>{document.getElementById("inp").focus()}, 200);
       }
       function onLoad() {
         let match = document.URL.match("\\?edit=([0-9a-zA-Z_\\-]{1,30})$");
@@ -57,7 +62,7 @@
           loc.value=match[1];
           document.getElementById("form").action="javascript:update()";
           loc.disabled=true;
-          
+          document.getElementById("inp").placeholder="(Unchanged)"
         }
         else document.getElementById('pwdInp').style.display="none";
       }
@@ -85,6 +90,7 @@
         top: 100vh; 
         /* height: unset; */
         z-index: 0;
+        pointer-events: auto;
       }
       #pwdInp > .internal {
         /* position: relative; */

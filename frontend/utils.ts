@@ -58,10 +58,11 @@ function globalOnload(cbk:()=>any) {
   </div>`
   let ele2 = document.getElementById("overlay");
   if (ele2)
-    ele2.innerHTML = `
-  <div class="internal">
-        <p class="fsmed" id="alerttext">Error: AlertDialog configured incorrectly. Please contact BetaOS.</p>
-        <button class="btn szHalf override" onclick="closeAlert()" style="display: inline-block">
+  //   ele2.innerHTML = 
+  document.body.innerHTML += `
+  <div class="internal" id="internal_alerts" style="opacity: 0; z-index: 3;">
+        <p class="fsmed" id="alerttext_v2">Error: AlertDialog configured incorrectly. Please contact BetaOS.</p>
+        <div style="text-align: center;"><button class="btn szHalf override" onclick="closeAlert()" style="display: inline-block">
           <span class="alertlbl">Continue</span>
           <span class="material-symbols-outlined">arrow_forward_ios</span>
           <div class="anim"></div>
@@ -70,7 +71,7 @@ function globalOnload(cbk:()=>any) {
           <span class="alertlbl">Cancel</span>
           <span class="material-symbols-outlined">cancel</span>
           <div class="anim"></div>
-        </button>
+        </button></div>
       </div>`;
   else console.log("Alert dialogs disabled on this page");
   // update the alert-dialogs to allow cancel buttons
@@ -124,20 +125,26 @@ function alertDialog(str: string, callback: () => any, button: number = -1, fail
   console.log("Timeout cleared")
   let overlay = document.getElementById("overlayL");
   if (overlay) {
-    overlay.style.left="200vh";
     overlay.style.opacity="0";
   }
   let ele = document.getElementById("overlay") as HTMLDivElement;
-  let p = document.getElementById("alerttext") as HTMLParagraphElement;
+  ele.innerHTML="";
+  let p = document.getElementById("alerttext_v2") as HTMLParagraphElement;
   if (!ele || !p) {
     console.log("ERROR: Alert dialogs not enabled in this page.")
     callback();
     return;
   }
-  ele.style.top = "0vh";
+  
+  ele.style.opacity="1";
+  ele = document.getElementById("internal_alerts");
+  ele.style.opacity="1";
+  ele.style.top = "-100vh";
+  ele.style.pointerEvents="auto";
   dialogQ = true;
   cbk = callback;
   p.innerText = str;
+  p.innerHTML += "<p style='margin: 10px auto' class='gry nohover'>(Press any key to dismiss)</p>"
   document.getElementById("cancelBtn").style.display = "none";
   if (button == 1) {
     p.innerHTML += `<button class='btn szThird fssml' id="refresh" onclick='location.reload()'>
@@ -161,7 +168,12 @@ function closeAlert(overrideCallback: boolean = false) {
     console.log("Alert dialogs not enabled in this page");
     return;
   }
-  ele.style.top = "200vh";
+  ele.style.opacity=0;
+  ele.style.pointerEvents="none";
+  ele = document.getElementById("internal_alerts");
+  ele.style.top = "-50vh";
+  ele.style.opacity=0;
+  ele.style.pointerEvents="none";
   dialogQ = false;
   if (cbk && !overrideCallback) {
     console.log("calling back")
@@ -202,7 +214,7 @@ addEventListener("DOMContentLoaded", function() {
   overlay = document.createElement("div");
   overlay.className = "overlayLoader"
   overlay.id = "overlayL";
-  overlay.style.left="0vh";
+  // overlay.style.left="0vh";
   overlay.style.backgroundColor="var(--system-bg)";
   overlay.style.opacity="1";
   overlay.innerHTML = `<span class="material-symbols-outlined loader">sync</span>
@@ -211,3 +223,5 @@ addEventListener("DOMContentLoaded", function() {
   document.body.appendChild(overlay);
     // Your code goes here
 });
+
+

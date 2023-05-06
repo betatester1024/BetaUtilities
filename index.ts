@@ -2,7 +2,7 @@ import {initServer} from './server';
 import {DBMaintenance, connectDB, client} from './database';
 import {supportHandler, Room} from './supportRooms'
 import {log} from './logging';
-
+const fs = require('fs');
 import {uDB} from './consts';
 import {WS} from './betautilities/wsHandler';
 import {WebH} from './betautilities/webHandler';
@@ -17,6 +17,7 @@ const { exec } = require("child_process");
 
 try {
   // mail();
+  // let fs = 
   if (connectionSuccess)
   connectDB().then((thing:any)=>{
     console.log(thing)

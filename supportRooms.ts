@@ -212,13 +212,23 @@ export function sendMsg(msg:string, room:string, token:string, callback: (status
 export async function sendMsg_B(msg:string, room:string) {
   let roomData = await msgDB.findOne({fieldName:"RoomInfo", room:room});
   let msgCt = roomData?roomData.msgCt:0;
-  await msgDB.insertOne({fieldName:"MSG", data:msg, permLevel:3, 
-                           sender:"BetaOS_System", expiry:Date.now()+3600*1000*24*30, 
+  let betaNick="";
+  for (let i=0; i<supportHandler.allRooms.length; i++) {
+    if (supportHandler.allRooms[i].name == room) {
+      // console.log("sending"+msg);
+      betaNick=supportHandler.allRooms[i].handler.displayNick??"[BetaOS_ERROR]";
+      break;
+    }
+
+  }
+  console.log(betaNick);
+  await msgDB.insertOne({fieldName:"MSG", data:msg.replaceAll("\n\n", "\n"), permLevel:3, 
+                           sender:betaNick, expiry:Date.now()+3600*1000*24*30, 
                          room:room, msgID:msgCt});
   await msgDB.updateOne({room:room, fieldName:"RoomInfo"}, {
       $inc: {msgCt:1}
     }, {upsert: true});
-  supportHandler.sendMsgTo(room, "{"+msgCt+"}[BetaOS_System](3)"+msg);
+  supportHandler.sendMsgTo(room, "{"+msgCt+"}["+betaNick+"](3)"+msg);
 }
 
 function processAnon(token:string) {
@@ -327,8 +337,8 @@ export async function loadLogs(rn:string, id:string, from:number, token:string) 
   }
   let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: from-30, $lt: from}}).toArray();
   for (let i=msgs.length-1; i>=0; i--) {
-    // console.log(msgs[i]);
-    let dat = "{"+(-msgs[i].msgID)+"}["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data;
+    console.log(msgs[i].msgID);
+    let dat = "{-"+(msgs[i].msgID)+"}["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data;
     // console.log(dat);
     supportHandler.sendMsgTo_ID(id, dat);
   }

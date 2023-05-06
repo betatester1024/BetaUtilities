@@ -25,6 +25,7 @@ __export(messageHandle_exports, {
 module.exports = __toCommonJS(messageHandle_exports);
 var import_wsHandler = require("./wsHandler");
 var import_logging = require("../logging");
+var import_cuebot = require("./cuebot");
 var import_wordler = require("./wordler");
 var import_consts = require("../consts");
 var import_supportRooms = require("../supportRooms");
@@ -43,6 +44,7 @@ function replyMessage(hnd, msg, sender, data) {
   if (msg.match("@" + hnd.nick.toLowerCase())) {
     hnd.incrPingCt();
   }
+  (0, import_cuebot.cueBot)(hnd, msg, sender, data);
   if (msg == "!debugwordle") {
     (0, import_logging.systemLog)(import_wordler.validWords[import_wordler.todayWordID] + " " + import_wordler.todayLeetCODE.join(""));
     return "> See console <";
@@ -91,7 +93,10 @@ function replyMessage(hnd, msg, sender, data) {
   if (msg.match(/(\W|^)asshole(s?)(\W|$)/) && Math.random() < 0.2) {
     hnd.delaySendMsg("arsehole*", data, 0);
   }
-  if (msg.match(/(\W|^)dumbass(s?)(\W|$)/) && Math.random() < 0.2) {
+  if (msg.match(/(\W|^)dumbass(es?)(\W|$)/) && Math.random() < 0.2) {
+    hnd.delaySendMsg("fucking imbecile*", data, 0);
+  }
+  if (msg.match(/(\W|^)asshat(s?)(\W|$)/) && Math.random() < 0.2) {
     hnd.delaySendMsg("fucking imbecile*", data, 0);
   }
   import_consts.uDB.findOne({ fieldName: "WORKINGUSERS" }).then((obj) => {
@@ -108,7 +113,7 @@ function replyMessage(hnd, msg, sender, data) {
       } else if (workingUsers2.indexOf(norm(sender.toLowerCase())) < 0) {
         workingUsers2.push(norm(sender.toLowerCase()));
         hnd.changeNick("WorkBot V2");
-        setTimeout(() => hnd.changeNick(hnd.nick), 10);
+        setTimeout(() => hnd.changeNick(hnd.nick), 200);
       } else {
         hnd.delaySendMsg("Wait, you're already in the work- GET TO WORK.", data, 0);
         return;
@@ -130,7 +135,7 @@ function replyMessage(hnd, msg, sender, data) {
     if (workingUsers2.indexOf(norm(sender.toLowerCase())) >= 0) {
       hnd.changeNick("WorkBot V2");
       hnd.delaySendMsg("GET TO WORK.", data, 0);
-      hnd.changeNick(hnd.nick);
+      setTimeout(() => hnd.changeNick(hnd.nick), 200);
     }
     ;
     import_consts.uDB.updateOne(
@@ -155,7 +160,7 @@ function replyMessage(hnd, msg, sender, data) {
       } else if (sleepingUsers.indexOf(norm(sender.toLowerCase())) < 0) {
         sleepingUsers.push(norm(sender.toLowerCase()));
         hnd.changeNick("SleepBot V2");
-        setTimeout(() => hnd.changeNick(hnd.nick), 10);
+        setTimeout(() => hnd.changeNick(hnd.nick), 200);
       } else {
         hnd.delaySendMsg("Wait, you're already in the- GO TO SLEEP", data, 0);
         return;
@@ -177,7 +182,7 @@ function replyMessage(hnd, msg, sender, data) {
     if (sleepingUsers.indexOf(norm(sender.toLowerCase())) >= 0) {
       hnd.changeNick("SleepBot V2");
       hnd.delaySendMsg("GO TO SLEEP.", data, 0);
-      hnd.changeNick(hnd.nick);
+      setTimeout(() => hnd.changeNick(hnd.nick), 200);
     }
     ;
     import_consts.uDB.updateOne(

@@ -498,4 +498,5 @@ const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/log
                     '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest',
                     "/timer", "/newpaste", "/pastesearch", '/clickit'];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
-                   'roomRequest', 'sendMsg', 'clickIt', 'leaderboard'];
+                   'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',
+                  'paste', 'findPaste'];

@@ -1,17 +1,15 @@
 import { CourierClient } from "@trycourier/courier";
-
 const courier = CourierClient({ authorizationToken: process.env['authToken'] }); // get from the Courier UI
-
-// Example: send a basic message to an email recipient
-export async function mail() {
+// Example: send a password reset email to a user's email address
+export async function mail(email: string, token: string) {
   const { requestId } = await courier.send({
     message: {
       to: {
-        email: "betatester1025@protonmail.com",
+        email: email,
       },
       content: {
-        title: "This is a test ",
-        body: "Self-test one oh one",
+        title: "Password Reset Request",
+        body: "Click the following link to reset your password: https://www.example.com/reset-password?token=" + token,
       },
       routing: {
         method: "single",
@@ -21,3 +19,7 @@ export async function mail() {
   });
   console.log(requestId);
 }
+
+// requestResetPassword() is the function that handles the password reset request
+const token = generateTokenForUser(); // generate token for password reset
+mail(userEmail, token); // send email to user requesting password reset using the token

@@ -31,6 +31,7 @@ var import_EEHandler = require("./EEHandler");
 var import_paste = require("./paste");
 var import_tasks = require("./tasks");
 var import_logging = require("./logging");
+var import_button = require("./button");
 var import_messageHandle = require("./betautilities/messageHandle");
 var import_supportRooms = require("./supportRooms");
 const express = require("express");
@@ -111,6 +112,10 @@ async function initServer() {
   });
   app.get("*/favicon.ico", (req, res) => {
     res.sendFile(import_consts.rootDir + "/favicon.ico");
+    (0, import_logging.incrRequests)();
+  });
+  app.get("*/icon.png", (req, res) => {
+    res.sendFile(import_consts.rootDir + "/temp.png");
     (0, import_logging.incrRequests)();
   });
   app.get("/support.js", (req, res) => {
@@ -469,6 +474,16 @@ function makeRequest(action, token, data, callback) {
           callback(obj.status, obj.data, obj.token);
         });
         break;
+      case "clickIt":
+        (0, import_button.clickIt)(token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "leaderboard":
+        (0, import_button.getLeaderboard)(token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
       default:
         callback("ERROR", { error: "Unknown command string!" }, token);
     }
@@ -533,9 +548,22 @@ const validPages = [
   "/mailertest",
   "/timer",
   "/newpaste",
-  "/pastesearch"
+  "/pastesearch",
+  "/clickit"
 ];
-const ignoreLog = ["getEE", "userRequest", "getLogs", "loadLogs", "visits", "roomRequest", "sendMsg"];
+const ignoreLog = [
+  "getEE",
+  "userRequest",
+  "getLogs",
+  "loadLogs",
+  "visits",
+  "roomRequest",
+  "sendMsg",
+  "clickIt",
+  "leaderboard",
+  "paste",
+  "findPaste"
+];
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   initServer

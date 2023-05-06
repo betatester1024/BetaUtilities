@@ -16,6 +16,7 @@ export class WebH
   connection:pseudoConnection;
   static CALLTIMEOUT = 30000;
   nick:string;
+  displayNick:string;
   pausedQ=false;
   roomName:string;
   hiddenQ: boolean;
@@ -97,6 +98,7 @@ export class WebH
   }
 
   sendMsg(msg:string, user:string) {
+    if (msg.length==0) return;
     sendMsg_B(msg, this.roomName);
     this.incrRunCt();
   }
@@ -112,6 +114,8 @@ export class WebH
   }
 
   changeNick(nick:string) {
+    this.displayNick=nick;
+    console.log("nick changed to",nick)
     // this.socket.send(`{"type": "nick", "data": {"name": "${nick}"},"id": "1"}`);
   }
 
@@ -121,7 +125,7 @@ export class WebH
       msg = msg.toLowerCase().replaceAll(/(\s|^)((@betaos)|(@betautilities)|(@system))(\s|$)/gimu, " @"+this.nick.toLowerCase()+" ").trim()
       // Required methods
       // !kill
-      console.log/("received" +msg);
+      // console.log("received" +msg);
       if (msg == "!kill @" + this.nick.toLowerCase()) {
         this.sendMsg("/me crashes", data);
         this.delaySendMsg("/me restarts", data, 200);
@@ -176,22 +180,22 @@ export class WebH
         let outStr = this.replyMessage(msg.trim(), snd, data);
         if (this.failedQ && outStr != "") outStr = "/me is rebooting."
         if (outStr == "") return;
-        // if (!this.bypass) {
-        //   this.callTimes.push(Date.now());
-        //   setTimeout(() => {this.callTimes.shift();}, 60*5*1000) // five minutes.
-        // }
-        // if (!this.bypass && this.callTimes.length >= 5) {
-        //   // if (i == 2)
-        //     if (this.callTimes.length < 10) {
-        //       outStr = this.transferOutQ?outStr+"\\n[ANTISPAM] Consider moving to &bots or &test for large-scale testing. Thank you for your understanding."
-        //         : outStr+" [ANTISPAM WARNING]";
-        //     } else {
-        //       outStr = outStr+"\\n[ANTISPAM] Automatically paused @"+this.nick;
-        //       this.pausedQ = true;
-        //       this.pauser = "BetaOS_ANTISPAM";
-        //       this.resetCall(data);
-        //     }
-        // }
+        if (!this.bypass) {
+          this.callTimes.push(Date.now());
+          setTimeout(() => {this.callTimes.shift();}, 60*5*1000) // five minutes.
+        }
+        if (!this.bypass && this.callTimes.length >= 5) {
+          // if (i == 2)
+            if (this.callTimes.length < 10) {
+              outStr = this.transferOutQ?outStr+"\\n[ANTISPAM] Consider moving to &bots or &test for large-scale testing. Thank you for your understanding."
+                : outStr+" [ANTISPAM WARNING]";
+            } else {
+              outStr = outStr+"\\n[ANTISPAM] Automatically paused @"+this.nick;
+              this.pausedQ = true;
+              this.pauser = "BetaOS_ANTISPAM";
+              this.resetCall(data);
+            }
+        }
         this.sendMsg(outStr, data);
       }
   }
@@ -219,6 +223,7 @@ export class WebH
   
   constructor(roomName: string, hiddenQ = false) {
     this.nick = "BetaOS_System";
+    this.displayNick="BetaOS_System";
     this.replyMessage = (msg:string, sender:string, data:any) => {
       return replyMessage(this, msg, sender, data)
     };

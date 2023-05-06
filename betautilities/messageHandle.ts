@@ -1,6 +1,7 @@
 import {WS} from './wsHandler';
 import {WebH} from './webHandler'
 import {systemLog} from '../logging';
+import {cueBot} from './cuebot'
 const fs = require('fs');
 //import {rooms} from './initialiser'
 // import {getUptimeStr, systemLog} from './misc';
@@ -31,6 +32,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
   if (msg.match ("@"+hnd.nick.toLowerCase())) {
     hnd.incrPingCt();
   }
+  cueBot(hnd, msg, sender, data);
   if (msg == "!debugwordle") {
     systemLog(validWords[todayWordID]+" "+todayLeetCODE.join(""));
     return "> See console <"
@@ -49,7 +51,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
   if (imgMatch) {
     return "https://external-content.duckduckgo.com/iu/?u="+encodeURIComponent(imgMatch[1]);
   }
-  if (msg.match(/!testfeature/gimu)) return "@" + sender;
+  if (msg.match(/!pasteit!?/gimu)) return "https://betatester1024.repl.co/paste";
   if (msg.match("^!uptime @" + hnd.nick.toLowerCase() + "$")) {
     hnd.clearCallReset();
     
@@ -74,7 +76,11 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     hnd.delaySendMsg("arsehole*", data, 0);
   }
 
-  if (msg.match(/(\W|^)dumbass(s?)(\W|$)/)&& Math.random() < 0.2) {
+  if (msg.match(/(\W|^)dumbass(es?)(\W|$)/)&& Math.random() < 0.2) {
+    hnd.delaySendMsg("fucking imbecile*", data, 0);
+  }
+
+  if (msg.match(/(\W|^)asshat(s?)(\W|$)/)&& Math.random() < 0.2) {
     hnd.delaySendMsg("fucking imbecile*", data, 0);
   }
 
@@ -95,7 +101,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
       else if (workingUsers.indexOf(norm(sender.toLowerCase()))<0) {
         workingUsers.push(norm(sender.toLowerCase()));
         hnd.changeNick("WorkBot V2");
-        setTimeout(()=>hnd.changeNick(hnd.nick), 10);
+        setTimeout(()=>hnd.changeNick(hnd.nick), 200);
       }
       else {
         hnd.delaySendMsg("Wait, you're already in the work- GET TO WORK.", data, 0);
@@ -123,7 +129,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     if (workingUsers.indexOf(norm(sender.toLowerCase()))>=0) {
       hnd.changeNick("WorkBot V2");
       hnd.delaySendMsg("GET TO WORK.", data, 0);
-      hnd.changeNick(hnd.nick);
+      setTimeout(()=>hnd.changeNick(hnd.nick), 200);
     };
     // systemLog(workingUsers);
     uDB.updateOne({fieldName:"WORKINGUSERS"},
@@ -150,7 +156,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     else if (sleepingUsers.indexOf(norm(sender.toLowerCase()))<0) {
       sleepingUsers.push(norm(sender.toLowerCase()));
       hnd.changeNick("SleepBot V2");
-      setTimeout(()=>hnd.changeNick(hnd.nick), 10);
+      setTimeout(()=>hnd.changeNick(hnd.nick), 200);
     }
     else {
       hnd.delaySendMsg("Wait, you're already in the- GO TO SLEEP", data, 0);
@@ -178,7 +184,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
   if (sleepingUsers.indexOf(norm(sender.toLowerCase()))>=0) {
     hnd.changeNick("SleepBot V2");
     hnd.delaySendMsg("GO TO SLEEP.", data, 0);
-    hnd.changeNick(hnd.nick);
+    setTimeout(()=>hnd.changeNick(hnd.nick), 200);
   };
   // systemLog(workingUsers);
   uDB.updateOne({fieldName:"SLEEPINGUSERS"},

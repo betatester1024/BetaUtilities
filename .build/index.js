@@ -30,6 +30,7 @@ var import_consts = require("./consts");
 var import_wsHandler = require("./betautilities/wsHandler");
 var import_webHandler = require("./betautilities/webHandler");
 var import_wordler = require("./betautilities/wordler");
+const fs = require("fs");
 let connectionSuccess = true;
 let DBConnectFailure = null;
 const localEuphRooms = [];

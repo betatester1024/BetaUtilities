@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='./utils.js'></script>
+    <title>ClickIt! | BetaOS Systems</title></title>
+    <script>
+      function clickIt() {
+        send(JSON.stringify({action:"clickIt"}), (res)=>{
+          document.getElementById("thebutton").blur();
+          send(JSON.stringify({action:"leaderboard"}), (res2)=>{
+            alert(res2.data);
+          })
+        })  
+      }
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      .btn:active {
+        scale: 1.2;
+      }
+    </style>
+  </head>
+  <body onload = "globalOnload(()=>{})">
+    <div class="main_content">
+      <header>
+        <h2 class="fsmed">Click<sup>it!</sup></h2>
+        <hr class="rounded">
+      </header>
+      <button id="thebutton" class="btn szFull grn" onclick="clickIt()">
+        <span class="material-symbols-outlined">arrow_selector_tool</span>
+        Clickit!<div class="anim"></div>
+      </button>
+      <a class="btn override" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+    </div>
+    <div class="overlay" id="overlay">
+    </div>
+  </body>
+</html>

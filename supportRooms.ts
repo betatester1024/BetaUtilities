@@ -74,11 +74,11 @@ export class supportHandler {
       // else text += "["+(userData.alias??msgs[i].sender)+"]("+userData.permLevel+")"+msgs[i].data+">";
       ev.write("data:{"+/*(Math.random()<0.5?"-":"")+*/(msgs[i].msgID??-1)+"}["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data+">\n\n");
     }
-    text += "{99999999999}[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. "+
+    text += `{${msgCt+1}}`+"[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. "+
       "Automated response services and utilities are provided by BetaOS System. "+
       "Commands are available here: &gt;&gt;commands \n"+
       "Enter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!>"
-    ev.write("data:"+text+"\n\n")
+    ev.write("data:"+text+"\n\n");
     thiscn.readyQ = true;
   }
   static async removeConnection(ev:any, rn:string, token:string) {
@@ -212,13 +212,23 @@ export function sendMsg(msg:string, room:string, token:string, callback: (status
 export async function sendMsg_B(msg:string, room:string) {
   let roomData = await msgDB.findOne({fieldName:"RoomInfo", room:room});
   let msgCt = roomData?roomData.msgCt:0;
-  await msgDB.insertOne({fieldName:"MSG", data:msg, permLevel:3, 
-                           sender:"BetaOS_System", expiry:Date.now()+3600*1000*24*30, 
+  let betaNick="";
+  for (let i=0; i<supportHandler.allRooms.length; i++) {
+    if (supportHandler.allRooms[i].name == room) {
+      // console.log("sending"+msg);
+      betaNick=supportHandler.allRooms[i].handler.displayNick??"[BetaOS_ERROR]";
+      break;
+    }
+
+  }
+  console.log(betaNick);
+  await msgDB.insertOne({fieldName:"MSG", data:msg.replaceAll("\n\n", "\n"), permLevel:3, 
+                           sender:betaNick, expiry:Date.now()+3600*1000*24*30, 
                          room:room, msgID:msgCt});
   await msgDB.updateOne({room:room, fieldName:"RoomInfo"}, {
       $inc: {msgCt:1}
     }, {upsert: true});
-  supportHandler.sendMsgTo(room, "{"+msgCt+"}[BetaOS_System](3)"+msg);
+  supportHandler.sendMsgTo(room, "{"+msgCt+"}["+betaNick+"](3)"+msg);
 }
 
 function processAnon(token:string) {
@@ -318,15 +328,17 @@ export async function WHOIS(token:string, user:string) {
 //loadLogs(data.room, data.id, data.from token)
 export async function loadLogs(rn:string, id:string, from:number, token:string) {
   try {
+  let roomInfo = await msgDB.findOne({fieldName:"RoomInfo", room:{$eq:rn}});
   from = +from;
   console.log("LOADING LOGS FROM",from-30,"TO",from);
-  if (from<minID) return {status:"SUCCESS", data:null, token:token}
-                         // DO NOT RETURN LOADCOMPLETE.
-  
+  if (from<minID || (roomInfo && roomInfo.minCt && from < roomInfo.minCt)) {
+    supportHandler.sendMsgTo_ID(id, "LOADCOMPLETE -1");
+    return {status:"SUCCESS", data:null, token:token}
+  }
   let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: from-30, $lt: from}}).toArray();
   for (let i=msgs.length-1; i>=0; i--) {
-    // console.log(msgs[i]);
-    let dat = "{"+(-msgs[i].msgID)+"}["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data;
+    console.log(msgs[i].msgID);
+    let dat = "{-"+(msgs[i].msgID)+"}["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data;
     // console.log(dat);
     supportHandler.sendMsgTo_ID(id, dat);
   }

@@ -93,6 +93,7 @@ export class WS
   };
 
   delaySendMsg(msg:string, data:any, delay:number) {
+    if (msg.length == 0) return;
     if (delay == 0) this.sendMsg(msg, data) // instant send
     else {
       setTimeout(()=>{

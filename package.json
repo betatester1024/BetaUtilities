@@ -12,6 +12,7 @@
   "dependencies": {
     "@google-cloud/local-auth": "^2.1.1",
     "@replit/database": "^2.0.3",
+    "@trycourier/courier": "^4.2.0",
     "argon2": "^0.30.3",
     "bcrypt": "^5.1.0",
     "bcrypt-ts": "^3.0.1",

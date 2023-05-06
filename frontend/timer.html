@@ -8,21 +8,41 @@
       let TOTALTIME = 0;
       let ADDTIME = 0;
       let TIMERID = -1;
-      function closeDialog() {
-        document.getElementById("timerInp").style.top = "200vh";
-        document.getElementById("startBtn").focus();
+      function closeDialog(thing) {
+        let div = document.getElementById("dialog");
+        div.style.top = "50%";
+        div.style.opacity="0";
+        div.style.pointerEvents="none";
+        document.getElementById("overlay").style.opacity = "0";
+        thing();
+        // document.getElementById("startBtn").focus();
+      }
 
-      }
       function openDialog() {
-        document.getElementById("timerInp").style.top = "0vh";
+        let div = document.getElementById("dialog");
+        div.style.top = "0px";
+        div.style.opacity="1";
+        div.style.pointerEvents="auto";
+        document.getElementById("overlay").style.opacity = "1";
+        // document.getElementById("startBtn").focus();
+        // document.getElementById("startBtn").focus();
       }
+      // function openDialog() {
+      //   let div = document.getElementById("internal");
+      //   div.style.top = "0vh";
+        
+      //   document.getElementById("dialog").style.opacity = "1";
+      //   // div.style.opacity = "1";
+        
+      //   // setTimeout(()=>{document.getElementById("inp").focus()}, 200);
+      // }
       function updateTime() {
         let h = document.getElementById("h");
         let m = document.getElementById("m");
         let s = document.getElementById("s");
         if (!h.checkValidity()||!m.checkValidity()||!s.checkValidity()) alertDialog("Invalid input!", ()=>{})
         else {
-          closeDialog();
+          closeDialog(()=>{document.getElementById("startBtn").focus();});
           resetTimer();
           resetUI();
           TOTALTIME = h.value*3600*1000 + m.value*60*1000 + s.value*1000;
@@ -142,15 +162,20 @@
       .btn {
         transition: all 0.4s ease;
       }
-      #timerInp {
+      #dialog {
         top: 0vh; 
         /* height: unset; */
-        z-index: 0;
+        /* z-index: 0; */
+        /* position: absolute; */
+        /* opacity */
+        pointer-events: auto;
       }
-      #timerInp > .internal {
+      #dialog > .internal {
         /* position: relative; */
         /* top: 20px; */
         height: unset;
+        top: 0vh;
+        display: relative;
         margin: 10px auto;
         border-radius: 15px;
         width: 90%;
@@ -159,7 +184,7 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload(()=>{document.getElementById('h').focus()}); windowResize(); redraw(true)" onresize="windowResize()">
+  <body onload = "globalOnload(()=>{/*document.getElementById('h').focus()*/openDialog()}); windowResize(); redraw(true)" onresize="windowResize()">
     <div class="main_content">
       <header>
         <h2 class="fsmed">Timer</h2>
@@ -179,9 +204,7 @@
         <span class="material-symbols-outlined">arrow_back_ios</span>
         Return to home<div class="anim"></div></a>
     </div>
-    <div class="overlay" id="overlay">
-    </div>
-    <div class="overlay" id="timerInp">
+    <div class="overlay_dialog" id="dialog">
       <div class="internal">
         <h2 class="fsmed">Enter a time: </h2>
         <form style="text-align: center; margin: 10px auto;" action="javascript:updateTime()">
@@ -206,10 +229,12 @@
         <span class="material-symbols-outlined">check</span>
         <div class="anim"></div>
       </button>
-      <button onclick="closeDialog()" class="btn red nooutline">
+      <button onclick="closeDialog(()=>{document.getElementById('startBtn').focus();})" class="btn red nooutline">
         <span class="material-symbols-outlined">close</span>
         <div class="anim"></div>
       </button>
+    </div>
+    <div class="overlay" id="overlay">
     </div>
   </body>
 </html>

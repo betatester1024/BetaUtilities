@@ -1,5 +1,6 @@
 { pkgs }: {
     deps = [
+		pkgs.nodePackages.prettier
         # pkgs.telnet
         pkgs.iputils
         pkgs.yarn

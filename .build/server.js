@@ -549,7 +549,8 @@ const validPages = [
   "/timer",
   "/newpaste",
   "/pastesearch",
-  "/clickit"
+  "/clickit",
+  "/redirect"
 ];
 const ignoreLog = [
   "getEE",

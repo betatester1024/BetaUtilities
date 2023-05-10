@@ -54,7 +54,7 @@ export function cueBot(hnd:(WebH|WS), msg:string, sender:string, data:any) {
     hnd.delaySendMsg(`*avenge`, data, 0);
     setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
   }
-  if (msg.match(/mmmm/) && Math.random() < 0.25) {
+  if (msg.match(/\bmmmmm*\b/) && Math.random() < 0.25) {
     hnd.changeNick("CueBot");
     hnd.delaySendMsg(`mmmmmmmicrowave`, data, 0);
     setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;

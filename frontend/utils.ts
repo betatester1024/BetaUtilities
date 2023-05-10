@@ -1,8 +1,16 @@
 function globalOnload(cbk:()=>any) {
   document.onkeydown = keydown;
+  document.body.addEventListener("click", ()=>{closeAlert(false, true)});
+  document.body.addEventListener("mouseover", mouseOver);
   send(JSON.stringify({ action: "userRequest" }),
     (res) => {
       document.documentElement.className = res.data.darkQ?"dark":"";
+      console.log("Loading complete; updating class")
+      // let overlay = document.getElementById("overlayL");
+      // if (overlay) {
+      //   // overlay.style.left="0vh";
+      //   overlay.style.opacity="0";
+      // }
       let maincontent = document.getElementsByClassName("main_content").item(0) as HTMLDivElement;
       let ftr = document.createElement("footer");
       maincontent.appendChild(ftr);
@@ -24,7 +32,7 @@ function globalOnload(cbk:()=>any) {
       ftr.appendChild(ele);
       send(JSON.stringify({ action: "visits" }),
         (res) => {
-          overlay.style.backgroundColor="var(--system-grey2)";
+          
           if (res.status != "SUCCESS") {
             alertDialog("Database connection failure. Please contact BetaOS.", ()=>{});
             ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`
@@ -38,29 +46,17 @@ function globalOnload(cbk:()=>any) {
               // document.getElementById("compliance").style.top="unset";
             }
             if (cbk) cbk();
-          })
-        }
-      )
+          }, true);
+        }, true);
       
     }, true);
 
-  document.body.innerHTML += `
-  <div id="compliance">
-    <h2 class="blu nohover">BetaOS Services uses cookies to operate.</h2>
-    <p>We use only <kbd>strictly necessary cookies</kbd> to verify and persist 
-    your login session, and to confirm your acceptance of these cookies. <br>
-    By continuing to use this site, you consent to our use of these cookies.</p>
-    <button class='blu btn fsmed' onclick="acceptCookies()">
-    <span class="material-symbols-outlined">check</span>
-    I understand
-    <div class="anim"></div>
-    </button>
-  </div>`
+  
   let ele2 = document.getElementById("overlay");
   if (ele2)
   //   ele2.innerHTML = 
   document.body.innerHTML += `
-  <div class="internal" id="internal_alerts" style="opacity: 0; z-index: 3;">
+  <div class="internal" id="internal_alerts" style="opacity: 0; text-align: center !important">
         <p class="fsmed" id="alerttext_v2">Error: AlertDialog configured incorrectly. Please contact BetaOS.</p>
         <div style="text-align: center;"><button class="btn szHalf override" onclick="closeAlert()" style="display: inline-block">
           <span class="alertlbl">Continue</span>
@@ -73,17 +69,31 @@ function globalOnload(cbk:()=>any) {
           <div class="anim"></div>
         </button></div>
       </div>`;
+  
   else console.log("Alert dialogs disabled on this page");
+  document.body.innerHTML += `
+  <div id="compliance">
+    <h2 class="blu nohover">BetaOS Services uses cookies to operate.</h2>
+    <p>We use only <kbd>strictly necessary cookies</kbd> to verify and persist 
+    your login session, and to confirm your acceptance of these cookies. <br>
+    By continuing to use this site, you consent to our use of these cookies.</p>
+    <button class='blu btn fsmed' onclick="acceptCookies()">
+    <span class="material-symbols-outlined">check</span>
+    I understand
+    <div class="anim"></div>
+    </button>
+  </div>`
   // update the alert-dialogs to allow cancel buttons
   // cookie dialog also goes here
 }
 
 function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false) {
   let overlay = document.getElementById("overlayL");
+  console.log(onLoadQ)
   if (overlay && !onLoadQ) {
-    // overlay.style.left="0vh";
+    console.log("content-blocking loader overlay enabled")
     overlay.style.opacity="1";
-    
+    overlay.style.backgroundColor="var(--system-overlay)";
   }
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "/server", true);
@@ -91,9 +101,8 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
       if (overlay) {
-        // overlay.style.left="200vh";
         overlay.style.opacity="0";
-        // TIME = setTimeout(()=>{overlay.style.display="block"}, 600);
+        overlay.style.backgroundColor="var(--system-grey2)";
       }
       if (failureTimeout) clearTimeout(failureTimeout);
       else closeAlert(true);
@@ -104,25 +113,23 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
   console.log(params);
   xhr.send(params);
   if (failureTimeout) clearTimeout(failureTimeout);
-  failureTimeout = setTimeout(() => alertDialog(`This is taking longer than expected.`, () => { }, 1, params), 1000);
+  failureTimeout = setTimeout(() => alertDialog(`This is taking longer than expected.`, () => { }, 1, params), 5000);
 }
 
 function acceptCookies() {
-  send(JSON.stringify({action:"acceptCookies"}), (res)=> {
-    
-  });
+  send(JSON.stringify({action:"acceptCookies"}), (res)=> {});
   document.getElementById("compliance").style.bottom="-200vh";
 }
 
 let failureTimeout: NodeJS.Timeout | null;
-let TIME:NodeJS.Timeout|null;
+// let TIME:NodeJS.Timeout|null;
 let dialogQ = false;
 let cbk: () => any = () => { };
 let BLOCKCALLBACK = false;
 function alertDialog(str: string, callback: () => any, button: number = -1, failedReq: string = "") {
-  if (TIME) clearTimeout(TIME);
-  TIME = null;
-  console.log("Timeout cleared")
+  // if (TIME) clearTimeout(TIME);
+  // TIME = null;
+  // console.log("Timeout cleared")
   let overlay = document.getElementById("overlayL");
   if (overlay) {
     overlay.style.opacity="0";
@@ -162,14 +169,16 @@ function alertDialog(str: string, callback: () => any, button: number = -1, fail
   failureTimeout = null;
 }
 
-function closeAlert(overrideCallback: boolean = false) {
+function closeAlert(overrideCallback: boolean = false, overrideOverlay:boolean = false) {
   let ele = document.getElementById("overlay") as HTMLDivElement;
   if (!ele) {
     console.log("Alert dialogs not enabled in this page");
     return;
   }
-  ele.style.opacity=0;
-  ele.style.pointerEvents="none";
+  if (!overrideOverlay && !DIALOGOPEN) {
+    ele.style.opacity=0;
+    ele.style.pointerEvents="none";
+  }
   ele = document.getElementById("internal_alerts");
   ele.style.top = "-50vh";
   ele.style.opacity=0;
@@ -215,13 +224,42 @@ addEventListener("DOMContentLoaded", function() {
   overlay.className = "overlayLoader"
   overlay.id = "overlayL";
   // overlay.style.left="0vh";
-  overlay.style.backgroundColor="var(--system-bg)";
+  overlay.style.backgroundColor="var(--system-overlay)";
   overlay.style.opacity="1";
   overlay.innerHTML = `<span class="material-symbols-outlined loader">sync</span>
   <p class="loadp fslg grn nohover">Loading.</p>`
   // document.appendChild(document.createElement("body"));
   document.body.appendChild(overlay);
-    // Your code goes here
+  // console.log(document.body.innerHTML)
 });
 
+let DIALOGOPEN = false;
+function closeDialog(thing:()=>any, name:string="dialog") {
+  let div = document.getElementById(name);
+  div.style.top = "50%";
+  div.style.opacity="0";
+  div.style.pointerEvents="none";
+  DIALOGOPEN=false;
+  document.getElementById("overlay").style.opacity = "0";
+  thing();
+  
+  // document.getElementById("startBtn").focus();
+}
 
+function openDialog(name:string="dialog") {
+  let div = document.getElementById(name);
+  div.style.top = "0px";
+  div.style.opacity="1";
+  div.style.pointerEvents="auto";
+  // ???
+  DIALOGOPEN=true;
+  document.getElementById("overlay").style.opacity = "1";
+  // document.getElementById("startBtn").focus();
+  // document.getElementById("startBtn").focus();
+}
+
+function mouseOver(e:MouseEvent) {
+  let ele = e.target;
+  let text = ele.innerHTML.replaceAll(/<.*>.*<\/.*>/gmiu, "").replaceAll("\n", "").trim();
+  if (ele.className.match(/(\W|^)btn(\W|$)/)) console.log(text)
+}

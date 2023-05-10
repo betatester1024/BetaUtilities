@@ -19,6 +19,21 @@ html {
   font-family: 'Noto Sans Display', monospace;
 }
 
+@media (prefers-color-scheme: dark) {
+  html {
+    --system-bg: #222;
+    --system-black: #eee;
+    --system-grey: #bfbfbf;
+    --system-grey2:rgba(191, 191, 191, 0.1);
+    --system-red2: rgba(238, 0, 0, 0.25);
+    --system-blue2: rgba(12, 200, 255, 0.25);
+    --system-blue3: rgba(12, 200, 255, 0.5);
+    --system-green2: rgba(0, 255, 0, 0.25);
+    --system-yellow2:rgba(255, 204, 31, 0.25);
+    --system-overlay: rgba(52, 52, 52, 0.95);
+    --system-blue: #0cc8fe;
+  }
+}
 .dark {
   --system-bg: #222;
   --system-black: #eee;
@@ -321,6 +336,14 @@ span.material-symbols-outlined {
   font-variant-caps: normal !important;
 }
 
+kbd {
+  font-family: "Noto Sans Mono", monospace;
+  border-radius: 5px;
+  padding-left: 2px;
+  padding-right: 2px;
+  background-color: var(--system-blue2)
+}
+
 .overlay {
   position: absolute;
   height: 100vh;
@@ -331,7 +354,7 @@ span.material-symbols-outlined {
   /* top: 500vh; */
   top: 0px;
   opacity: 0;
-  z-index: 1;
+  /* z-index: 1; */
   pointer-events: none;
 }
 .overlay_dialog {
@@ -343,7 +366,7 @@ span.material-symbols-outlined {
   /* background-color: var(--system-overlay); */
   /* top: 500vh; */
   top: 0px;
-  z-index: 2;
+  /* z-index: 2; */
 }
 #alerttext_v2 {
   max-height: 50%;
@@ -356,7 +379,7 @@ span.material-symbols-outlined {
   margin-right: auto;
   padding: 10px;
   margin-top: 20px;
-  z-index: 3;
+  /* z-index: 3; */
   
 }
 #internal_alerts {
@@ -423,15 +446,15 @@ footer, #footer {
 }
 
 .overlayLoader {
-  transition: all 1s ease-out;
+  transition: all 0.3s ease-out;
   width: 100vw;
   height: 100vh;
   position: absolute;
   top: 0px;
   left: 0vh;
   opacity: 1;
-  z-index: 1;
-  background-color: var(--system-grey2);
+  /* z-index: 1; */
+  background-color: var(--system-overlay);
   pointer-events: none;
 }
 

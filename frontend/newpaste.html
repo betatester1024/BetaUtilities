@@ -25,34 +25,22 @@
       }
 
       function unlock() {
-        closeDialog();
+        closeDialog(()=>{}, "pwdInp");
         let pwd = document.getElementById("inp_pwd").value
         send(JSON.stringify({action:"findPaste", data:{pwd:pwd, name:document.URL.match(/\?edit=([0-9a-zA-Z_\-]{1,30})$/)[1]}}), (res)=>{
           if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{
             document.getElementById("inp_pwd").value="";
-            openDialog();
+            openDialog("pwdInp");
           });
           else document.getElementById("text").value=res.data;
         })
-      }
-      function closeDialog() {
-        let div = document.getElementById("pwdInp");
-        div.style.top = "50vh";
-        div.style.opacity = "0";
-        
-        // document.getElementById("startBtn").focus();
-      }
-      function openDialog() {
-        let div = document.getElementById("pwdInp");
-        div.style.top = "0vh";
-        div.style.opacity = "1";
-        // setTimeout(()=>{document.getElementById("inp").focus()}, 200);
       }
       function onLoad() {
         let match = document.URL.match("\\?edit=([0-9a-zA-Z_\\-]{1,30})$");
         if (match) {
           document.getElementById("h2").innerText= "PasteIt! Editor"
-          openDialog();
+          openDialog("pwdInp");
+          // document.getElementById("inp_pwd").focus();
           let btn = document.getElementById("pasteIt");
           btn.innerHTML = `RePasteIt!
             <span class="material-symbols-outlined">update</span>

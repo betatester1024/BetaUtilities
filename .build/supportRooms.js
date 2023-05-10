@@ -85,6 +85,7 @@ class supportHandler {
     if (internalFlag) {
       token = "[SYSINTERNAL]";
     }
+    ev.write("data:CONNECTIONRELOAD>\n\n");
     for (let i = 0; i < this.connections.length; i++) {
       if (this.connections[i].roomName == rn)
         (0, import_userRequest.userRequest)(this.connections[i].tk, this.connections[i].isPseudoConnection).then((obj) => {

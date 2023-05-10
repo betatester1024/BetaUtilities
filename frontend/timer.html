@@ -8,25 +8,7 @@
       let TOTALTIME = 0;
       let ADDTIME = 0;
       let TIMERID = -1;
-      function closeDialog(thing) {
-        let div = document.getElementById("dialog");
-        div.style.top = "50%";
-        div.style.opacity="0";
-        div.style.pointerEvents="none";
-        document.getElementById("overlay").style.opacity = "0";
-        thing();
-        // document.getElementById("startBtn").focus();
-      }
-
-      function openDialog() {
-        let div = document.getElementById("dialog");
-        div.style.top = "0px";
-        div.style.opacity="1";
-        div.style.pointerEvents="auto";
-        document.getElementById("overlay").style.opacity = "1";
-        // document.getElementById("startBtn").focus();
-        // document.getElementById("startBtn").focus();
-      }
+      
       // function openDialog() {
       //   let div = document.getElementById("internal");
       //   div.style.top = "0vh";
@@ -163,18 +145,15 @@
         transition: all 0.4s ease;
       }
       #dialog {
-        top: 0vh; 
+        top: 50vh; 
         /* height: unset; */
         /* z-index: 0; */
         /* position: absolute; */
         /* opacity */
+        opacity: 0;
         pointer-events: auto;
       }
       #dialog > .internal {
-        /* position: relative; */
-        /* top: 20px; */
-        height: unset;
-        top: 0vh;
         display: relative;
         margin: 10px auto;
         border-radius: 15px;
@@ -184,13 +163,13 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload(()=>{/*document.getElementById('h').focus()*/openDialog()}); windowResize(); redraw(true)" onresize="windowResize()">
+  <body onload = "globalOnload(()=>{document.getElementById('h').focus(); openDialog()}); windowResize(); redraw(true)" onresize="windowResize()">
     <div class="main_content">
       <header>
         <h2 class="fsmed">Timer</h2>
         <hr class="rounded">
       </header>
-      <canvas id="timer" width="500" height="500" onclick="if (TIMERID<0)openDialog()"></canvas><br>
+      <canvas id="timer" width="500" height="500" onclick="if (TIMERID<0){openDialog();}"></canvas><br>
       <button class="btn szFull grn override" id="startBtn" onclick="startTimer()">
         <span class="material-symbols-outlined">arrow_forward_ios</span>
         Start<div class="anim"></div>
@@ -204,20 +183,21 @@
         <span class="material-symbols-outlined">arrow_back_ios</span>
         Return to home<div class="anim"></div></a>
     </div>
+    <div class="overlay" id="overlay"></div>
     <div class="overlay_dialog" id="dialog">
       <div class="internal">
         <h2 class="fsmed">Enter a time: </h2>
         <form style="text-align: center; margin: 10px auto;" action="javascript:updateTime()">
           <div class="inpContainer szThird nowrap timerCtn">
-            <input class="inp szFull noMin" id="h" type="number" value="0" max="99" min="0" placeholder="Hrs">
+            <input class="inp szFull noMin" id="h" type="number" value="" max="99" min="0" placeholder="Hrs">
             <div class="anim inp"></div>
           </div>
           <div class="inpContainer szThird nowrap timerCtn">
-            <input class="inp szFull noMin" id="m" type="number" value="0" max="99" min="0" placeholder="Min">
+            <input class="inp szFull noMin" id="m" type="number" value="" max="99" min="0" placeholder="Min">
             <div class="anim inp"></div>
           </div>
           <div class="inpContainer szThird nowrap timerCtn">
-            <input class="inp szFull noMin" id="s" type="number" value="0" max="99" min="0" placeholder="Sec">
+            <input class="inp szFull noMin" id="s" type="number" value="" max="99" min="0" placeholder="Sec">
             <div class="anim inp"></div>
           </div><br>
           <button style="display: none;">
@@ -234,7 +214,6 @@
         <div class="anim"></div>
       </button>
     </div>
-    <div class="overlay" id="overlay">
-    </div>
+    
   </body>
 </html>

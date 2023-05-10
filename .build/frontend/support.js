@@ -3,7 +3,6 @@ function onLoad() {
   document.getElementById("header").innerHTML = "Support: #" + document.URL.match("\\?room=(.*)")[1];
   ROOMNAME = document.URL.match("\\?room=(.*)")[1];
 }
-let STARTID = -1;
 function sendMsg() {
   let inp = document.getElementById("msgInp");
   let match = inp.value.match("^!alias @(.+)");
@@ -17,6 +16,7 @@ function sendMsg() {
       else
         alertDialog("Updated alias!", () => {
           STARTID = -1;
+          STARTIDVALID = false;
           loadStatus = -1;
           document.getElementById("msgArea").innerHTML = `<h2 id="placeholder">
         <span class="material-symbols-outlined">update</span> 
@@ -29,7 +29,6 @@ function sendMsg() {
     }, true);
   inp.value = "";
 }
-let LOADEDQ2 = false;
 const rmvReg = /(>|^)\-(.+)\([0-9]\)>/gm;
 const addReg = /(>|^)\+(.+)\([0-9]\)>/gm;
 const classStr = ["error", "user", "admin", "superadmin"];
@@ -47,6 +46,17 @@ async function initClient() {
         CONNECTIONID = cnMatch[2];
       }
       modif = modif.replace(/(>|^)CONNECTIONID ([0-9]+)>/, "");
+      let clMatch = modif.match(/(>|^)CONNECTIONRELOAD>/);
+      if (clMatch) {
+        document.getElementById("msgArea").innerHTML = "";
+        document.getElementById("userList").innerHTML = "";
+        LOADEDQ2 = false;
+        STARTID = -1;
+        STARTIDVALID = false;
+        UNREAD = 0;
+        loadStatus = -1;
+      }
+      modif = modif.replace(/(>|^)CONNECTIONRELOAD>/, "");
       let lcMatch = modif.match(/LOADCOMPLETE (-?[0-9]+)>/);
       if (lcMatch) {
         let thing = document.getElementById("msgArea");
@@ -59,6 +69,7 @@ async function initClient() {
         } else {
           loadStatus = -1;
           STARTID = lcMatch[1];
+          alert("lcMatchId updated" + STARTID);
         }
         thing.scrollTop = thing.scrollTop + 100;
       }
@@ -87,8 +98,11 @@ async function initClient() {
         if (!matches)
           continue;
         PREPENDFLAG = false;
-        if (STARTID < 0)
+        if (STARTID < 0) {
           STARTID = Number(matches[1]);
+          STARTIDVALID = true;
+          alert(STARTID);
+        }
         if (matches[1][0] == "-") {
           PREPENDFLAG = true;
           if (loadStatus == 0)
@@ -180,7 +194,9 @@ async function initClient() {
         area.scrollTop = area.scrollHeight;
         console.log("Scrolling to bottom.");
         LOADEDQ2 = true;
-      }
+        alert("scrolled");
+      } else
+        alert("invalid");
     });
   } catch (e) {
     alert(e);
@@ -228,12 +244,17 @@ window.addEventListener("focus", () => {
 });
 let UNREAD = 0;
 let FOCUSSED = true;
+let STARTID = -1;
+let LOADEDQ2 = false;
+let STARTIDVALID = false;
 function onScroll() {
-  if (document.getElementById("msgArea").scrollTop < 30 && loadStatus < 0) {
+  if (document.getElementById("msgArea").scrollTop < 30 && STARTIDVALID && loadStatus < 0) {
     loadStatus = 0;
+    alert("loading messages from" + STARTID);
     send(JSON.stringify({ action: "loadLogs", data: { room: ROOMNAME, id: CONNECTIONID, from: STARTID } }), () => {
     });
-  }
+  } else if (document.getElementById("msgArea").scrollTop < 30)
+    alert("loadStatus" + loadStatus);
 }
 let loadStatus = -1;
 //# sourceMappingURL=support.js.map

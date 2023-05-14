@@ -13,29 +13,29 @@ function globalOnload(cbk2) {
       let maincontent = document.getElementsByClassName("main_content").item(0);
       let ftr = document.createElement("footer");
       maincontent.appendChild(ftr);
-      let ele = document.createElement("p");
-      ele.id = "footer";
+      let ele3 = document.createElement("p");
+      ele3.id = "footer";
       if (res.status != "SUCCESS")
-        ele.innerHTML = `<a href='/login'>Login</a> | 
+        ele3.innerHTML = `<a href='/login'>Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
                       BetaOS Systems V2, 2023`;
       else {
-        ele.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
+        ele3.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
                       <a href='/logout'>Logout</a> | 
                       <a href='/config'>Account</a> | 
                       <a href='/status'>Status</a> | 
                       <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
                       BetaOS Systems V2, 2023`;
       }
-      ftr.appendChild(ele);
+      ftr.appendChild(ele3);
       send(
         JSON.stringify({ action: "visits" }),
         (res2) => {
           if (res2.status != "SUCCESS") {
             alertDialog("Database connection failure. Please contact BetaOS.", () => {
             });
-            ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`;
+            ele3.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`;
           }
           document.getElementById("footer").innerHTML += " | <kbd>" + res2.data.data + "</kbd>";
           send(JSON.stringify({ action: "cookieRequest" }), (res3) => {
@@ -70,6 +70,7 @@ function globalOnload(cbk2) {
       </div>`;
   else
     console.log("Alert dialogs disabled on this page");
+  let ele = document.getElementById("");
   document.body.innerHTML += `
   <div id="compliance">
     <h2 class="blu nohover">BetaOS Services uses cookies to operate.</h2>
@@ -242,7 +243,16 @@ function openDialog(name = "dialog") {
 function mouseOver(e) {
   let ele = e.target;
   let text = ele.innerHTML.replaceAll(/<.*>.*<\/.*>/gmiu, "").replaceAll("\n", "").trim();
-  if (ele.className.match(/(\W|^)btn(\W|$)/))
+  if (ele.className.match(/(\W|^)btn(\W|$)/)) {
     console.log(text);
+    let tooltip = ele.children.namedItem("TOOLTIP");
+    if (!tooltip) {
+      tooltip = document.createElement("span");
+      tooltip.innerText = text;
+      tooltip.id = "TOOLTIP";
+      tooltip.className = "TOOLTIP override";
+      ele.appendChild(tooltip);
+    }
+  }
 }
 //# sourceMappingURL=utils.js.map

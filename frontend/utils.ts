@@ -1,3 +1,4 @@
+import dialogPolyfill from 'dialog-polyfill';
 function globalOnload(cbk:()=>any) {
   document.onkeydown = keydown;
   document.body.addEventListener("click", ()=>{closeAlert(false, true)});
@@ -71,6 +72,7 @@ function globalOnload(cbk:()=>any) {
       </div>`;
   
   else console.log("Alert dialogs disabled on this page");
+  let ele = document.getElementById("");
   document.body.innerHTML += `
   <div id="compliance">
     <h2 class="blu nohover">BetaOS Services uses cookies to operate.</h2>
@@ -261,5 +263,15 @@ function openDialog(name:string="dialog") {
 function mouseOver(e:MouseEvent) {
   let ele = e.target;
   let text = ele.innerHTML.replaceAll(/<.*>.*<\/.*>/gmiu, "").replaceAll("\n", "").trim();
-  if (ele.className.match(/(\W|^)btn(\W|$)/)) console.log(text)
+  if (ele.className.match(/(\W|^)btn(\W|$)/)) {
+    console.log(text)
+    let tooltip = ele.children.namedItem("TOOLTIP");
+    if (!tooltip) {
+      tooltip = document.createElement("span");
+      tooltip.innerText = text;
+      tooltip.id="TOOLTIP";
+      tooltip.className="TOOLTIP override"
+      ele.appendChild(tooltip);
+    }
+  }
 }

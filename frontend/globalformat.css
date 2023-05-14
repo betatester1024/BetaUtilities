@@ -510,6 +510,12 @@ footer, #footer {
     min-width: 0px;
     width: unset;
   }
+  .btn span.TOOLTIP {
+    font-size: 20px;
+    min-width: unset;
+    width: unset;
+    height: unset;
+  }
   .btn span.material-symbols-outlined:not(.override) {
     font-size: 60px !important;
   }
@@ -544,4 +550,47 @@ footer, #footer {
 #compliance p {
   text-align: left;
   margin: 0px;
+}
+
+.TOOLTIP {
+  transition: all 0.5s ease;
+  transition-delay: 0.5s;
+  visibility: hidden;
+  max-width: unset;
+  
+  /* opacity: */
+  /* width: 120px; */
+  /* paddin */
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 20px;
+  position: absolute;
+  /* z-index: 1; */
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  /* transition: opacity 0.3s; */
+}
+
+.TOOLTIP::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.btn:hover .TOOLTIP {
+  visibility: visible;
+  opacity: 1;
+}
+
+.btn {
+  position: relative;
 }

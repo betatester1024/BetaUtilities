@@ -211,7 +211,7 @@ export async function initServer() {
         log("Action performed:"+body.action+", response:"+JSON.stringify(d));
       }
       else log("Action performed, error on "+body.action+", error:"+d.error);
-      res.cookie('sessionID', token?token:"", {httpOnly: true, secure:true, sameSite:"Strict"});
+      res.cookie('sessionID', token?token:"", {httpOnly: true, secure:true, sameSite:"Strict", maxAge:9e12});
       res.end(JSON.stringify({status:s, data:d}));
     })
   });

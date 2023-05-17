@@ -32,7 +32,7 @@ try {
       console.log(obj);
       for (let i=0; i<obj.euphRooms.length; i++) {
         supportHandler.addRoom(new Room("EUPH_ROOM", obj.euphRooms[i]));
-        new WS("wss://euphoria.io/room/" + obj.euphRooms[i] +"/ws", "BetaUtilities", obj.euphRooms[i], false)
+        new WS("wss://euphoria.io/room/" + obj.euphRooms[i] +"/ws", "BetaUtilities", obj.euphRooms[i], !(obj.euphRooms[i]=="test" || obj.euphRooms[i]=="bots"))
         log("Connected euph_room")+obj.euphRooms[i];
         console.log("Connected euph_room", obj.euphRooms[i]);
       }

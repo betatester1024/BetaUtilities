@@ -2,7 +2,8 @@
 function globalOnload(cbk2) {
   document.onkeydown = keydown;
   document.body.addEventListener("click", () => {
-    closeAlert(false, true);
+    if (dialogQ)
+      closeAlert(false, true);
   });
   document.body.addEventListener("mouseover", mouseOver);
   send(
@@ -126,7 +127,8 @@ let dialogQ = false;
 let cbk = () => {
 };
 let BLOCKCALLBACK = false;
-function alertDialog(str, callback, button = -1, failedReq = "") {
+function alertDialog(str, callback = () => {
+}, button = -1, failedReq = "") {
   let overlay2 = document.getElementById("overlayL");
   if (overlay2) {
     overlay2.style.opacity = "0";

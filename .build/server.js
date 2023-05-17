@@ -188,7 +188,7 @@ async function initServer() {
         (0, import_logging.log)("Action performed:" + body.action + ", response:" + JSON.stringify(d));
       } else
         (0, import_logging.log)("Action performed, error on " + body.action + ", error:" + d.error);
-      res.cookie("sessionID", token ? token : "", { httpOnly: true, secure: true, sameSite: "Strict" });
+      res.cookie("sessionID", token ? token : "", { httpOnly: true, secure: true, sameSite: "Strict", maxAge: 9e12 });
       res.end(JSON.stringify({ status: s, data: d }));
     });
   });

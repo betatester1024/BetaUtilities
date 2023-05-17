@@ -49,6 +49,9 @@ function replyMessage(hnd, msg, sender, data) {
     (0, import_logging.systemLog)(import_wordler.validWords[import_wordler.todayWordID] + " " + import_wordler.todayLeetCODE.join(""));
     return "> See console <";
   }
+  if (msg == "!acquirecake") {
+    return ":cake:";
+  }
   if (msg == "!conjure @" + hnd.nick.toLowerCase()) {
     if (hnd.socket)
       setTimeout(() => {

@@ -38,6 +38,9 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     systemLog(validWords[todayWordID]+" "+todayLeetCODE.join(""));
     return "> See console <"
   }
+  if (msg == "!acquirecake") {
+    return ":cake:";
+  }
   if (msg == "!conjure @" + hnd.nick.toLowerCase()) {
     if (hnd.socket) setTimeout(()=>{hnd.socket.close()}, 120);
     else hnd.delaySendMsg("/me reboots", data, 200)

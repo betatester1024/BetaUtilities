@@ -1,7 +1,7 @@
 import dialogPolyfill from 'dialog-polyfill';
 function globalOnload(cbk:()=>any) {
   document.onkeydown = keydown;
-  document.body.addEventListener("click", ()=>{closeAlert(false, true)});
+  document.body.addEventListener("click", ()=>{if (dialogQ) closeAlert(false, true)});
   document.body.addEventListener("mouseover", mouseOver);
   send(JSON.stringify({ action: "userRequest" }),
     (res) => {
@@ -128,7 +128,7 @@ let failureTimeout: NodeJS.Timeout | null;
 let dialogQ = false;
 let cbk: () => any = () => { };
 let BLOCKCALLBACK = false;
-function alertDialog(str: string, callback: () => any, button: number = -1, failedReq: string = "") {
+function alertDialog(str: string, callback: () => any = ()=>{}, button: number = -1, failedReq: string = "") {
   // if (TIME) clearTimeout(TIME);
   // TIME = null;
   // console.log("Timeout cleared")

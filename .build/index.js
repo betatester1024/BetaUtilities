@@ -50,7 +50,7 @@ try {
         console.log(obj);
         for (let i = 0; i < obj.euphRooms.length; i++) {
           import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("EUPH_ROOM", obj.euphRooms[i]));
-          new import_wsHandler.WS("wss://euphoria.io/room/" + obj.euphRooms[i] + "/ws", "BetaUtilities", obj.euphRooms[i], false);
+          new import_wsHandler.WS("wss://euphoria.io/room/" + obj.euphRooms[i] + "/ws", "BetaUtilities", obj.euphRooms[i], !(obj.euphRooms[i] == "test" || obj.euphRooms[i] == "bots"));
           (0, import_logging.log)("Connected euph_room") + obj.euphRooms[i];
           console.log("Connected euph_room", obj.euphRooms[i]);
         }

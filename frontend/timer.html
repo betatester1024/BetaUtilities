@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <audio id="notif">
+      <source src="notif.wav" type="audio/wav">
+    </audio>
     <script src='./utils.js'></script>
     <title>Timer | BetaOS Systems</title></title>
     <script>
@@ -63,7 +66,11 @@
         let frac = TIMEELAPSED / TOTALTIME;
         if (frac == 0) frac = 0.0001;
         if (frac >= 1 && !noAlert) {
-          alertDialog("Timer complete!", ()=>{document.title="Timer | BetaOS Systems"; resetUI(); resetTimer();});
+          var aud = document.getElementById("notif");
+          aud.currentTime = 0;
+          aud.loop = true;
+          aud.play();
+          alertDialog("Timer complete!", ()=>{aud.pause();document.title="Timer | BetaOS Systems"; resetUI(); resetTimer();});
           document.title="(1) Timer complete";
           clearInterval(TIMERID);
           TIMERID = -1;

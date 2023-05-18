@@ -118,6 +118,10 @@ async function initServer() {
     res.sendFile(import_consts.rootDir + "/temp.png");
     (0, import_logging.incrRequests)();
   });
+  app.get("*/notif.wav", (req, res) => {
+    res.sendFile(import_consts.rootDir + "notif.wav");
+    (0, import_logging.incrRequests)();
+  });
   app.get("/support.js", (req, res) => {
     res.sendFile(import_consts.frontendDir + "support.js");
     (0, import_logging.incrRequests)();

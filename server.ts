@@ -120,6 +120,10 @@ export async function initServer() {
     incrRequests();
   })
 
+  app.get('*/notif.wav', (req:Request, res:any)=> {
+    res.sendFile(rootDir+'notif.wav')
+    incrRequests();
+  })
   
   app.get('/support.js', (req:any, res:any) => {
     res.sendFile(frontendDir+"support.js");

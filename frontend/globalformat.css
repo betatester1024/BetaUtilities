@@ -595,3 +595,15 @@ footer, #footer {
 .btn {
   position: relative;
 }
+
+a:not(.btn) {
+  padding: 3px;
+  border-radius: 4px;
+  color: var(--system-blue);
+  background: linear-gradient( to right, var(--system-yellow), var(--system-yellow) ), linear-gradient( to right, var(--system-yellow), var(--system-yellow) )
+  background-size: auto 0px;
+  transition: background-size 0.5s ease;
+}
+a:hover {
+  background-size: auto 100%;
+}

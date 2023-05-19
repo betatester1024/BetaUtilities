@@ -1,6 +1,6 @@
 import {uDB} from './consts';
 import {userRequest} from './userRequest';
-import {connectionSuccess} from './index'
+import {connectionSuccess, UPSINCESTR} from './index';
 
 export function systemLog(thing:any) {log(thing.toString())};
 export function log(thing:string) {
@@ -35,7 +35,7 @@ export async function getLogs(token:string) {
   for (let i=0; i<logs.length; i++) {
     out += logs[i].data;
   }
-  return {status:"SUCCESS", data:out, token:token};
+  return {status:"SUCCESS", data:{logs:out, upsince:UPSINCESTR}, token:token};
 }
 
 export async function purgeLogs(token:string) {

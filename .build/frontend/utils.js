@@ -244,7 +244,7 @@ function openDialog(name = "dialog") {
 }
 function mouseOver(e) {
   let ele = e.target;
-  let text = ele.innerHTML.replaceAll(/<.*>.*<\/.*>/gmiu, "").replaceAll("\n", "").trim();
+  let text = ele.innerHTML.replaceAll(/<.*((>.*<\/.*>)|(\/>))/gmiu, "").replaceAll("\n", "").trim();
   if (ele.className.match(/(\W|^)btn(\W|$)/)) {
     console.log(text);
     let tooltip = ele.children.namedItem("TOOLTIP");

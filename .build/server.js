@@ -554,7 +554,7 @@ const validPages = [
   "/newpaste",
   "/pastesearch",
   "/clickit",
-  "/redirect"
+  "/capsdle"
 ];
 const ignoreLog = [
   "getEE",

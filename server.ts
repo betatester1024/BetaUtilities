@@ -500,7 +500,7 @@ function eeFormat(data:string) {
 
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
                     '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest',
-                    "/timer", "/newpaste", "/pastesearch", '/clickit', '/redirect'];
+                    "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle'];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',
                   'paste', 'findPaste'];

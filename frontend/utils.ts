@@ -272,6 +272,9 @@ function mouseOver(e:MouseEvent) {
       tooltip.id="TOOLTIP";
       tooltip.className="TOOLTIP override"
       ele.appendChild(tooltip);
+      ele.style.animation = 'none';  
+      ele.offsetHeight; /* trigger reflow */   
+      ele.style.animation = null; 
     }
   }
 }

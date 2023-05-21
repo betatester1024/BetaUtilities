@@ -254,6 +254,9 @@ function mouseOver(e) {
       tooltip.id = "TOOLTIP";
       tooltip.className = "TOOLTIP override";
       ele.appendChild(tooltip);
+      ele.style.animation = "none";
+      ele.offsetHeight;
+      ele.style.animation = null;
     }
   }
 }

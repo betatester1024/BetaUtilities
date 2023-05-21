@@ -146,18 +146,23 @@ div.anim.inp {
 }
 
 .szThird {
+  flex-grow: 2;
   width: max(26%, 5.2em);
 }
 .szHalf{
+  flex-grow: 3;
   width: max(42%, 7em);
 }
 .szTwoThirds {
+  flex-grow: 4;
   width: max(58%, 10em);
 }
 .szFull {
+  flex-grow: 6;
   width: max(88%, 10em)
 }
 .sz100 {
+  flex-grow: 6;
   width: 96%;
 }
 .szFull.noMin {
@@ -402,24 +407,24 @@ kbd {
 } */
 
 .fssml {
-  font-size: 1em;
+  font-size: 20pt;
 }
 .fssml1 .material-symbols-outlined {
   top: 5px;
 }
 
 .fssml2 {
-  font-size: 1.5em;
+  font-size: 26pt;
 }
 
 .fssml2 .material-symbols-outlined {
   top: 7px;
 }
 .fsmed {
-  font-size: 2em;
+  font-size: 25pt;
 }
 .fslg {
-  font-size: 4em;
+  font-size: 50pt;
 }
 
 textarea {
@@ -606,4 +611,17 @@ a:not(.btn) {
 }
 a:hover {
   background-size: auto 100%;
+}
+
+dialog {
+  position: absolute;
+  top: 50%;
+  left: 0px;
+  transform: translateY(-50%);
+  margin: 20px auto;
+}
+
+.btnRow {
+  display: flex;
+  flex-wrap: wrap;
 }

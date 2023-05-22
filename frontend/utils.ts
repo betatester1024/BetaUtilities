@@ -1,7 +1,7 @@
 import dialogPolyfill from 'dialog-polyfill';
 function globalOnload(cbk:()=>any) {
   document.onkeydown = keydown;
-  document.body.addEventListener("click", ()=>{if (dialogQ) closeAlert(false, true)});
+  
   document.body.addEventListener("mouseover", mouseOver);
   send(JSON.stringify({ action: "userRequest" }),
     (res) => {
@@ -56,8 +56,9 @@ function globalOnload(cbk:()=>any) {
   let ele2 = document.getElementById("overlay");
   if (ele2)
   //   ele2.innerHTML = 
+    // document.getElementById("internal_alerts").addEventListener("click", ()=>{});
   document.body.innerHTML += `
-  <div class="internal" id="internal_alerts" style="opacity: 0; text-align: center !important">
+  <div class="internal" id="internal_alerts" onclick="if (dialogQ) closeAlert(false, false)" style="opacity: 0; text-align: center !important">
         <p class="fsmed" id="alerttext_v2">Error: AlertDialog configured incorrectly. Please contact BetaOS.</p>
         <div style="text-align: center;"><button class="btn szHalf override" onclick="closeAlert()" style="display: inline-block">
           <span class="alertlbl">Continue</span>
@@ -72,6 +73,7 @@ function globalOnload(cbk:()=>any) {
       </div>`;
   
   else console.log("Alert dialogs disabled on this page");
+  
   let ele = document.getElementById("");
   document.body.innerHTML += `
   <div id="compliance">
@@ -132,6 +134,7 @@ function alertDialog(str: string, callback: () => any = ()=>{}, button: number =
   // if (TIME) clearTimeout(TIME);
   // TIME = null;
   // console.log("Timeout cleared")
+  // e.preventDefault();
   let overlay = document.getElementById("overlayL");
   if (overlay) {
     overlay.style.opacity="0";
@@ -273,6 +276,7 @@ function mouseOver(e:MouseEvent) {
       tooltip.className="TOOLTIP override"
       ele.appendChild(tooltip);
       ele.style.animation = 'none';  
+      console.log("reflowing")
       ele.offsetHeight; /* trigger reflow */   
       ele.style.animation = null; 
     }

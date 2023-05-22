@@ -621,7 +621,7 @@ dialog {
   margin: 20px auto;
 }
 
-.btnRow {
-  display: flex;
-  flex-wrap: wrap;
-}
+/* .btnRow { */
+  /* display: flex; */
+  /* flex-wrap: wrap; */
+/* } */

@@ -152,7 +152,9 @@ async function initServer() {
       res.end();
     });
   });
-  app.get("/oauth2callback", (req, res) => {
+  app.get("/redirector", (req, res) => {
+    res.sendFile(import_consts.rootDir + "/.github/pages/index.html");
+    (0, import_logging.incrRequests)();
   });
   app.post("/oauth2callback", (req, res) => {
   });

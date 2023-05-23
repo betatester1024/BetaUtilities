@@ -266,6 +266,7 @@ function openDialog(name:string="dialog") {
 function mouseOver(e:MouseEvent) {
   let ele = e.target;
   let text = ele.innerHTML.replaceAll(/<.*((>.*<\/.*>)|(\/>))/gmiu, "").replaceAll("\n", "").trim();
+  // fuck off this is good enough, it's not even used as raw html
   if (ele.className.match(/(\W|^)btn(\W|$)/)) {
     console.log(text)
     let tooltip = ele.children.namedItem("TOOLTIP");

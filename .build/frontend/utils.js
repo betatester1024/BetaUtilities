@@ -1,10 +1,6 @@
 "use strict";
 function globalOnload(cbk2) {
   document.onkeydown = keydown;
-  document.body.addEventListener("click", () => {
-    if (dialogQ)
-      closeAlert(false, true);
-  });
   document.body.addEventListener("mouseover", mouseOver);
   send(
     JSON.stringify({ action: "userRequest" }),
@@ -56,7 +52,7 @@ function globalOnload(cbk2) {
   let ele2 = document.getElementById("overlay");
   if (ele2)
     document.body.innerHTML += `
-  <div class="internal" id="internal_alerts" style="opacity: 0; text-align: center !important">
+  <div class="internal" id="internal_alerts" onclick="if (dialogQ) closeAlert(false, false)" style="opacity: 0; text-align: center !important">
         <p class="fsmed" id="alerttext_v2">Error: AlertDialog configured incorrectly. Please contact BetaOS.</p>
         <div style="text-align: center;"><button class="btn szHalf override" onclick="closeAlert()" style="display: inline-block">
           <span class="alertlbl">Continue</span>
@@ -255,6 +251,7 @@ function mouseOver(e) {
       tooltip.className = "TOOLTIP override";
       ele.appendChild(tooltip);
       ele.style.animation = "none";
+      console.log("reflowing");
       ele.offsetHeight;
       ele.style.animation = null;
     }

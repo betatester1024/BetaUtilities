@@ -164,9 +164,9 @@ export async function initServer() {
     });
   });
 
-  app.get('/oauth2callback', (req:any, res:any)=>{
-    // console.log("??")
-    // console.log(req.url);
+  app.get('/redirector', (req:any, res:any)=>{
+    res.sendFile(rootDir+"/.github/pages/index.html");
+    incrRequests();
   });
   
   app.post('/oauth2callback', (req:any, res:any)=>{

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src='./utils.js'></script>
+    <!-- <script src='./utils.js'></script> -->
     <title>Redirecting. | BetaOS Systems</title></title>
     <script>
       function globalOnload() {
-        window.open('https://betatester1024.repl.co', '_self');
+        setTimeout(()=>{window.open('https://betatester1024.repl.co', '_self')}, 3000);;
       }
       
     </script>
@@ -544,11 +544,30 @@ footer, #footer {
       .main_content {
         animation: test;
         position: relative;
+        animation-duration: 3s;
         top: -500vh;
       }
       @keyframes test {
-        0% {top: 0vh;}
+        0% {top: 200vh;}
+        20% {top: 0vh;}
+        80% {top: 0vh}
         100% {top: -500vh;}
+      }
+      #overlay {
+        opacity: 0.5;
+        z-index: -1;
+        animation: test2;
+        position: absolute;
+        animation-duration: 3s;
+        left: 0vw;
+        top: 0vh;
+        width: 200vw;
+      }
+      @keyframes test2 {
+        0% {left: 200vw;}
+        /* 0% {left: 100vw;} */
+        70% {left: 0vw}
+        100% {left: -100vw;}
       }
     </style>
   </head>
@@ -558,17 +577,10 @@ footer, #footer {
         <h2>Redirecting.</h2>
         <hr class="rounded">
         <h1>A moment, please. Redirecting.</h1>
+        <p>BetaOS Services, 2023</p>
       </header>
     </div>
     <div class="overlay" id="overlay">
-      <div class="internal">
-        <p class="fsmed" id="alerttext">Hey, some text here</p>
-        <button class="btn szTwoThirds" onclick="closeAlert()">
-          Continue
-          <span class="material-symbols-outlined">arrow_forward_ios</span>
-          <div class="anim"></div>
-        </button>
-      </div>
     </div>
   </body>
 </html>

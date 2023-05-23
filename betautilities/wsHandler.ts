@@ -208,11 +208,14 @@ export class WS
             if (this.callTimes.length < 10) {
               outStr = this.transferOutQ?outStr+"\\n[ANTISPAM] Consider moving to &bots or &test for large-scale testing. Thank you for your understanding."
                 : outStr+" [ANTISPAM WARNING]";
-            } else {
+            } else if (this.transferOutQ) {
               outStr = outStr+"\\n[ANTISPAM] Automatically paused @"+this.nick;
               this.pausedQ = true;
               this.pauser = "BetaOS_ANTISPAM";
               this.resetCall(data);
+            }
+            else {
+              outStr = outStr+"[ANTISPAM AUTOPAUSE OVERRIDDEN]"
             }
         }
         this.sendMsg(outStr, data);
@@ -237,6 +240,7 @@ export class WS
 
   static resetTime = 1000;
   onClose(event:any) {
+    // console.log("socket closed")
     WS.sockets.splice(WS.sockets.indexOf(this), 1);
     if (WS.FAILSAFETIMEOUT) {
       clearTimeout(WS.FAILSAFETIMEOUT);
@@ -245,7 +249,7 @@ export class WS
     // systemLog(("Perished in:"+this.roomName);
     if (event != 1000 && event!=1006) {
       updateActive(this.roomName, false);
-      systemLog("!killed in &"+this.roomName);
+      console.log("!killed in &"+this.roomName);
       setTimeout(() => {
         new WS(this.url, this.nick, this.roomName, this.transferOutQ)
         updateActive(this.roomName, true);
@@ -263,9 +267,9 @@ export class WS
         updateActive(this.roomName, true);
       }, WS.resetTime);
       
-      systemLog(("Retrying in: "+Math.round(WS.resetTime/1000)+" seconds"));
+      console.log(("Retrying in: "+Math.round(WS.resetTime/1000)+" seconds"));
       let dateStr = (new Date()).toLocaleDateString("en-US", {timeZone:"EST"})+"/"+(new Date()).toLocaleTimeString("en-US", {timeZone:"EST"});
-      systemLog(("[close] Connection at "+this.url+" was killed at "+dateStr));
+      console.log(("[close] Connection at "+this.url+" was killed at "+dateStr));
     }
   }
 

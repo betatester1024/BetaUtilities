@@ -49,6 +49,9 @@ function replyMessage(hnd, msg, sender, data) {
     (0, import_logging.systemLog)(import_wordler.validWords[import_wordler.todayWordID] + " " + import_wordler.todayLeetCODE.join(""));
     return "> See console <";
   }
+  if (msg == "!acquirecake") {
+    return ":cake:";
+  }
   if (msg == "!conjure @" + hnd.nick.toLowerCase()) {
     if (hnd.socket)
       setTimeout(() => {
@@ -215,7 +218,7 @@ function replyMessage(hnd, msg, sender, data) {
     );
     return "Set information for @" + norm(sender);
   }
-  let match = msg.match("^!remind(me | +@[^ ]+ )(in)?()( )([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?(.+)");
+  let match = msg.match("^!remind(me | +@[^ ]+ )(in )?()()([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?(.+)");
   if (match) {
     console.log(match);
     let remindUser = match[1];
@@ -241,6 +244,8 @@ function replyMessage(hnd, msg, sender, data) {
       author: remindUser == "me " ? null : norm(sender)
     });
     return "Will remind " + (remindUser == "me " ? "you" : remindUser.slice(2, remindUser.length - 1)) + " in " + ((exp4 - Date.now()) / 6e4).toFixed(2) + "min";
+  } else if (msg.match(/^!remind/)) {
+    return "Syntax: !remindme 1d2h3m4s message OR !remind @user 1d2h3m4s message";
   }
   if (msg == "!renick") {
     hnd.changeNick(hnd.nick);

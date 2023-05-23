@@ -58,7 +58,7 @@ async function getLogs(token) {
   for (let i = 0; i < logs.length; i++) {
     out += logs[i].data;
   }
-  return { status: "SUCCESS", data: out, token };
+  return { status: "SUCCESS", data: { logs: out, upsince: import_index.UPSINCESTR }, token };
 }
 async function purgeLogs(token) {
   let userData = await (0, import_userRequest.userRequest)(token);

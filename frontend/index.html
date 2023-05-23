@@ -38,7 +38,7 @@
           adminBtn.style.display = res.data.perms==1?"none":"inline-block";
           configBtn.className = res.data.perms>1?"btn szThird":"btn szTwoThirds";
           console.log(signupIco.innerHTML);
-        });
+        }, true);
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -59,6 +59,8 @@
       .btnRow {
         width: 90%;
         margin: auto;
+        display: flex;
+        flex-wrap: wrap;
       }
       #welcomeHdr {
         word-wrap: break-word;

@@ -42,6 +42,7 @@ export class supportHandler {
     {
       token = "[SYSINTERNAL]";
     }
+    ev.write("data:CONNECTIONRELOAD>\n\n");
     for (let i=0; i<this.connections.length; i++) {
       if (this.connections[i].roomName == rn)
         userRequest(this.connections[i].tk, this.connections[i].isPseudoConnection).then((obj:{status:string, data:any, token:string})=>{

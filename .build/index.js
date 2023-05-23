@@ -19,6 +19,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var betatester1024_exports = {};
 __export(betatester1024_exports, {
   DBConnectFailure: () => DBConnectFailure,
+  UPSINCESTR: () => UPSINCESTR,
   connectionSuccess: () => connectionSuccess
 });
 module.exports = __toCommonJS(betatester1024_exports);
@@ -35,6 +36,7 @@ let connectionSuccess = true;
 let DBConnectFailure = null;
 const localEuphRooms = [];
 const { exec } = require("child_process");
+let UPSINCESTR = "";
 try {
   if (connectionSuccess)
     (0, import_database.connectDB)().then((thing) => {
@@ -45,12 +47,13 @@ try {
       (0, import_database.DBMaintenance)();
       (0, import_wordler.serverUpdate)();
       let now = new Date(Date.now());
-      (0, import_logging.log)("----------------------Systems restarted at " + now.toLocaleString("en-US", { timeZone: "America/New_York" }) + "-------------------");
+      UPSINCESTR = "----------------------Systems restarted at " + now.toLocaleString("en-US", { timeZone: "America/New_York" }) + "-------------------";
+      (0, import_logging.log)(UPSINCESTR);
       import_consts.uDB.findOne({ fieldName: "ROOMS" }).then((obj) => {
         console.log(obj);
         for (let i = 0; i < obj.euphRooms.length; i++) {
           import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("EUPH_ROOM", obj.euphRooms[i]));
-          new import_wsHandler.WS("wss://euphoria.io/room/" + obj.euphRooms[i] + "/ws", "BetaUtilities", obj.euphRooms[i], false);
+          new import_wsHandler.WS("wss://euphoria.io/room/" + obj.euphRooms[i] + "/ws", "BetaUtilities", obj.euphRooms[i], !(obj.euphRooms[i] == "test" || obj.euphRooms[i] == "bots"));
           (0, import_logging.log)("Connected euph_room") + obj.euphRooms[i];
           console.log("Connected euph_room", obj.euphRooms[i]);
         }
@@ -86,6 +89,7 @@ try {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   DBConnectFailure,
+  UPSINCESTR,
   connectionSuccess
 });
 //# sourceMappingURL=index.js.map

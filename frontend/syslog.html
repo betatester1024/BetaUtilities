@@ -12,9 +12,10 @@
         send(JSON.stringify({action:"getLogs"}), (res)=>{
           if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{location.href="/login?redirect=syslog"});
           else {
-            document.getElementById("txtarea").value = res.data;
+            document.getElementById("txtarea").value = res.data.logs+"\n\n"+res.data.upsince;
+            
           }    
-        }, true);
+        });
         if (!LOADEDQ2 || scrDistOKQ)
         {
           ele.scrollTop = ele.scrollHeight;

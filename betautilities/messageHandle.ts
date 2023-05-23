@@ -11,6 +11,7 @@ import {uDB, authDB} from '../consts';
 import { supportHandler, Room } from '../supportRooms';
 // const authDB = 
 const serviceResponse = process.env['serviceResponse'];
+
 // const uDB = uDB
 let DATE = new Date();
 
@@ -36,6 +37,9 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
   if (msg == "!debugwordle") {
     systemLog(validWords[todayWordID]+" "+todayLeetCODE.join(""));
     return "> See console <"
+  }
+  if (msg == "!acquirecake") {
+    return ":cake:";
   }
   if (msg == "!conjure @" + hnd.nick.toLowerCase()) {
     if (hnd.socket) setTimeout(()=>{hnd.socket.close()}, 120);
@@ -216,7 +220,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     return "Set information for @"+norm(sender);
   }
 
-  let match = msg.match("^!remind(me | +@[^ ]+ )(in)?()( )([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?(.+)")
+  let match = msg.match("^!remind(me | +@[^ ]+ )(in )?()()([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?(.+)")
   if (match) {
     console.log(match);
     let remindUser = match[1];
@@ -238,6 +242,9 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
       author:remindUser=="me "?null:norm(sender)
     });
     return "Will remind "+(remindUser=="me "?"you":remindUser.slice(2, remindUser.length-1))+" in "+((exp-Date.now())/60000).toFixed(2)+"min";
+  }
+  else if (msg.match(/^!remind/)) {
+    return "Syntax: !remindme 1d2h3m4s message OR !remind @user 1d2h3m4s message"
   }
 
   if (msg == "!renick") {

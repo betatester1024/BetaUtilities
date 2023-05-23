@@ -5,29 +5,29 @@
     <title>PasteIt | BetaOS Systems</title></title>
     <script>   
       function validate() {
-        closeDialog();
+        closeDialog(()=>{}, 'pwdInp');;
         let pwd = document.getElementById("inp").value;
         send(JSON.stringify({action:"findPaste", data:{pwd:pwd, name:document.URL.match(/\/paste\/(.*)$/)[1]}}), (res)=>{
           document.getElementById("inp").value="";
-          if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{openDialog()});
+          if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{openDialog('pwdInp');});
           else {
             document.getElementById("text").value=res.data;
           }
         })
       }
-      function closeDialog() {
-        let div = document.getElementById("pwdInp");
-        div.style.top = "50vh";
-        div.style.opacity = "0";
+      // function closeDialog('pwdInp'); {
+      //   let div = document.getElementById("pwdInp");
+      //   div.style.top = "50vh";
+      //   div.style.opacity = "0";
         
-        // document.getElementById("startBtn").focus();
-      }
-      function openDialog() {
-        let div = document.getElementById("pwdInp");
-        div.style.top = "0vh";
-        div.style.opacity = "1";
-        // setTimeout(()=>{document.getElementById("inp").focus()}, 200);
-      }
+      //   // document.getElementById("startBtn").focus();
+      // }
+      // function openDialog('pwdInp'); {
+      //   let div = document.getElementById("pwdInp");
+      //   div.style.top = "0vh";
+      //   div.style.opacity = "1";
+      //   // setTimeout(()=>{document.getElementById("inp").focus()}, 200);
+      // }
       function editthis() {
         location.href=document.URL.replaceAll("/paste/", "/paste?edit=");
       }
@@ -69,7 +69,7 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload(()=>{openDialog();});">
+  <body onload = "globalOnload(()=>{openDialog('pwdInp');;});">
     <div class="main_content">
       <header>
         <h2>PasteIt!</h2>
@@ -87,7 +87,7 @@
         Return to home<div class="anim"></div></a>
     </div>
     <div class="overlay" id="overlay"></div>
-    <div class="overlay" id="pwdInp">
+    <div class="overlay_dialog" id="pwdInp">
       <div class="internal">
         <h2 class="fsmed">Enter password for paste:</h2>
         <form style="text-align: center; margin: 10px auto;" action="javascript:validate()">

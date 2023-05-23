@@ -97,7 +97,7 @@ function cueBot(hnd, msg, sender, data) {
     }, 200);
     ;
   }
-  if (msg.match(/mmmm/) && Math.random() < 0.25) {
+  if (msg.match(/\bmmmmm*\b/) && Math.random() < 0.25) {
     hnd.changeNick("CueBot");
     hnd.delaySendMsg(`mmmmmmmicrowave`, data, 0);
     setTimeout(() => {

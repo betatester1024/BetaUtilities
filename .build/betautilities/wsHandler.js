@@ -199,11 +199,13 @@ class WS {
         if (!this.bypass && this.callTimes.length >= 5) {
           if (this.callTimes.length < 10) {
             outStr = this.transferOutQ ? outStr + "\\n[ANTISPAM] Consider moving to &bots or &test for large-scale testing. Thank you for your understanding." : outStr + " [ANTISPAM WARNING]";
-          } else {
+          } else if (this.transferOutQ) {
             outStr = outStr + "\\n[ANTISPAM] Automatically paused @" + this.nick;
             this.pausedQ = true;
             this.pauser = "BetaOS_ANTISPAM";
             this.resetCall(data);
+          } else {
+            outStr = outStr + "[ANTISPAM AUTOPAUSE OVERRIDDEN]";
           }
         }
         this.sendMsg(outStr, data);
@@ -233,7 +235,7 @@ class WS {
     }
     if (event != 1e3 && event != 1006) {
       (0, import_supportRooms.updateActive)(this.roomName, false);
-      (0, import_logging.systemLog)("!killed in &" + this.roomName);
+      console.log("!killed in &" + this.roomName);
       setTimeout(() => {
         new WS(this.url, this.nick, this.roomName, this.transferOutQ);
         (0, import_supportRooms.updateActive)(this.roomName, true);
@@ -251,9 +253,9 @@ class WS {
         new WS(this.url, this.nick, this.roomName, this.transferOutQ);
         (0, import_supportRooms.updateActive)(this.roomName, true);
       }, WS.resetTime);
-      (0, import_logging.systemLog)("Retrying in: " + Math.round(WS.resetTime / 1e3) + " seconds");
+      console.log("Retrying in: " + Math.round(WS.resetTime / 1e3) + " seconds");
       let dateStr = new Date().toLocaleDateString("en-US", { timeZone: "EST" }) + "/" + new Date().toLocaleTimeString("en-US", { timeZone: "EST" });
-      (0, import_logging.systemLog)("[close] Connection at " + this.url + " was killed at " + dateStr);
+      console.log("[close] Connection at " + this.url + " was killed at " + dateStr);
     }
   }
   static killall() {

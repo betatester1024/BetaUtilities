@@ -15,6 +15,7 @@ const localEuphRooms = [
 ]
 const { exec } = require("child_process");
 
+export let UPSINCESTR = "";
 try {
   // mail();
   // let fs = 
@@ -26,13 +27,13 @@ try {
     DBMaintenance();
     serverUpdate();
     let now = new Date(Date.now());
-    
-    log("----------------------Systems restarted at "+now.toLocaleString("en-US", {timeZone: "America/New_York"})+"-------------------");
+    UPSINCESTR = "----------------------Systems restarted at "+now.toLocaleString("en-US", {timeZone: "America/New_York"})+"-------------------";
+    log(UPSINCESTR);
     uDB.findOne({fieldName:"ROOMS"}).then((obj:{euphRooms:string[], rooms:string[], hidRooms:string[]})=>{
       console.log(obj);
       for (let i=0; i<obj.euphRooms.length; i++) {
         supportHandler.addRoom(new Room("EUPH_ROOM", obj.euphRooms[i]));
-        new WS("wss://euphoria.io/room/" + obj.euphRooms[i] +"/ws", "BetaUtilities", obj.euphRooms[i], false)
+        new WS("wss://euphoria.io/room/" + obj.euphRooms[i] +"/ws", "BetaUtilities", obj.euphRooms[i], !(obj.euphRooms[i]=="test" || obj.euphRooms[i]=="bots"))
         log("Connected euph_room")+obj.euphRooms[i];
         console.log("Connected euph_room", obj.euphRooms[i]);
       }

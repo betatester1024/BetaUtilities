@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='./utils.js'></script>
+    <title>Capsdle | BetaOS Systems</title>
+    <script>
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      .letter {
+        background-color: var(--system-bg2);
+        outline: 1px solid var(--system-black);
+        width: 60px;
+        font-size: 50px;
+        height: calc(60px * 1.5);
+        display: flex;
+      }
+    </style>
+  </head>
+  <body onload = "globalOnload();">
+    <div class="main_content">
+      <header>
+        <h2>CaPsDLe <sup style="font-size: 32px;" class="grn">BetaOS Services Exclusive!</sup></h2>
+        <hr class="rounded">
+      </header>
+      <div class="btnRow">
+        <div class="row0">
+          <div class="letter" id="row0letter0"></div>
+          <div class="letter" id="row0letter1"></div>
+          <div class="letter" id="row0letter2"></div>
+          <div class="letter" id="row0letter3"></div>
+          <div class="letter" id="row0letter4"></div>
+          <div class="overlayer" id="overlayer0"></div>
+        </div> 
+      </div>
+      <a class="btn override" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+    </div>
+    <dialog class="internal" id="dialog_v2">This thing is supposed to be a dialog box.</dialog>
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

@@ -19,6 +19,21 @@ html {
   font-family: 'Noto Sans Display', monospace;
 }
 
+@media (prefers-color-scheme: dark) {
+  html {
+    --system-bg: #222;
+    --system-black: #eee;
+    --system-grey: #bfbfbf;
+    --system-grey2:rgba(191, 191, 191, 0.1);
+    --system-red2: rgba(238, 0, 0, 0.25);
+    --system-blue2: rgba(12, 200, 255, 0.25);
+    --system-blue3: rgba(12, 200, 255, 0.5);
+    --system-green2: rgba(0, 255, 0, 0.25);
+    --system-yellow2:rgba(255, 204, 31, 0.25);
+    --system-overlay: rgba(52, 52, 52, 0.95);
+    --system-blue: #0cc8fe;
+  }
+}
 .dark {
   --system-bg: #222;
   --system-black: #eee;
@@ -131,18 +146,23 @@ div.anim.inp {
 }
 
 .szThird {
+  flex-grow: 2;
   width: max(26%, 5.2em);
 }
 .szHalf{
+  flex-grow: 3;
   width: max(42%, 7em);
 }
 .szTwoThirds {
+  flex-grow: 4;
   width: max(58%, 10em);
 }
 .szFull {
+  flex-grow: 6;
   width: max(88%, 10em)
 }
 .sz100 {
+  flex-grow: 6;
   width: 96%;
 }
 .szFull.noMin {
@@ -321,6 +341,14 @@ span.material-symbols-outlined {
   font-variant-caps: normal !important;
 }
 
+kbd {
+  font-family: "Noto Sans Mono", monospace;
+  border-radius: 5px;
+  padding-left: 2px;
+  padding-right: 2px;
+  background-color: var(--system-blue2)
+}
+
 .overlay {
   position: absolute;
   height: 100vh;
@@ -331,7 +359,7 @@ span.material-symbols-outlined {
   /* top: 500vh; */
   top: 0px;
   opacity: 0;
-  z-index: 1;
+  /* z-index: 1; */
   pointer-events: none;
 }
 .overlay_dialog {
@@ -343,7 +371,7 @@ span.material-symbols-outlined {
   /* background-color: var(--system-overlay); */
   /* top: 500vh; */
   top: 0px;
-  z-index: 2;
+  /* z-index: 2; */
 }
 #alerttext_v2 {
   max-height: 50%;
@@ -356,7 +384,7 @@ span.material-symbols-outlined {
   margin-right: auto;
   padding: 10px;
   margin-top: 20px;
-  z-index: 3;
+  /* z-index: 3; */
   
 }
 #internal_alerts {
@@ -379,24 +407,24 @@ span.material-symbols-outlined {
 } */
 
 .fssml {
-  font-size: 1em;
+  font-size: 20pt;
 }
 .fssml1 .material-symbols-outlined {
   top: 5px;
 }
 
 .fssml2 {
-  font-size: 1.5em;
+  font-size: 26pt;
 }
 
 .fssml2 .material-symbols-outlined {
   top: 7px;
 }
 .fsmed {
-  font-size: 2em;
+  font-size: 25pt;
 }
 .fslg {
-  font-size: 4em;
+  font-size: 50pt;
 }
 
 textarea {
@@ -423,15 +451,15 @@ footer, #footer {
 }
 
 .overlayLoader {
-  transition: all 1s ease-out;
+  transition: all 0.3s ease-out;
   width: 100vw;
   height: 100vh;
   position: absolute;
   top: 0px;
   left: 0vh;
   opacity: 1;
-  z-index: 1;
-  background-color: var(--system-grey2);
+  /* z-index: 1; */
+  background-color: var(--system-overlay);
   pointer-events: none;
 }
 
@@ -487,6 +515,12 @@ footer, #footer {
     min-width: 0px;
     width: unset;
   }
+  .btn span.TOOLTIP {
+    font-size: 20px;
+    min-width: unset;
+    width: unset;
+    height: unset;
+  }
   .btn span.material-symbols-outlined:not(.override) {
     font-size: 60px !important;
   }
@@ -521,4 +555,73 @@ footer, #footer {
 #compliance p {
   text-align: left;
   margin: 0px;
+}
+
+.TOOLTIP {
+  transition: all 0.5s ease;
+  transition-delay: 0.5s;
+  visibility: hidden;
+  max-width: unset;
+  
+  /* opacity: */
+  /* width: 120px; */
+  /* paddin */
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 20px;
+  font-size: 20px;
+  position: absolute;
+  /* z-index: 1; */
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  /* transition: opacity 0.3s; */
+}
+
+.TOOLTIP::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.btn:hover .TOOLTIP {
+  visibility: visible;
+  opacity: 1;
+}
+
+.btn {
+  position: relative;
+}
+
+a:not(.btn) {
+  padding: 3px;
+  border-radius: 4px;
+  color: var(--system-blue);
+  background: linear-gradient( to right, var(--system-yellow), var(--system-yellow) ), linear-gradient( to right, var(--system-yellow), var(--system-yellow) )
+  background-size: auto 0px;
+  transition: background-size 0.5s ease;
+}
+a:hover {
+  background-size: auto 100%;
+}
+
+dialog {
+  position: absolute;
+  top: 50%;
+  left: 0px;
+  transform: translateY(-50%);
+  margin: 20px auto;
+}
+
+.btnRow {
+  display: flex;
+  flex-wrap: wrap;
 }

@@ -10,7 +10,7 @@ function onLoad() {
 }
 // system refresh auto!
 
-let STARTID = -1;
+
 
 function sendMsg() {
   let inp = document.getElementById("msgInp");
@@ -23,6 +23,7 @@ function sendMsg() {
       if (res.status != "SUCCESS") alertDialog("ERROR: "+res.data.error, ()=>{});
       else alertDialog("Updated alias!", ()=>{
         STARTID = -1;
+        STARTIDVALID = false;
         loadStatus = -1;
         document.getElementById("msgArea").innerHTML = `<h2 id="placeholder">
         <span class="material-symbols-outlined">update</span> 
@@ -34,7 +35,7 @@ function sendMsg() {
   else send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME}}), ()=>{}, true);
   inp.value="";
 }
-let LOADEDQ2 = false;
+
 const rmvReg = /(>|^)\-(.+)\([0-9]\)>/gm;
 const addReg = /(>|^)\+(.+)\([0-9]\)>/gm;
 const classStr = ["error", "user", "admin", "superadmin"]
@@ -56,6 +57,19 @@ async function initClient()
       CONNECTIONID = cnMatch[2];
     }    
     modif = modif.replace(/(>|^)CONNECTIONID ([0-9]+)>/, "");
+    let clMatch = modif.match(/(>|^)CONNECTIONRELOAD>/);
+    if (clMatch) {
+      document.getElementById("msgArea").innerHTML = `<h2 id="placeholder">
+        <span class="material-symbols-outlined">update</span> 
+        Reloading your messages, a moment please...</h2>`;
+      document.getElementById("userList").innerHTML = "";
+      LOADEDQ2=false;
+      STARTID=-1;
+      STARTIDVALID = false;
+      UNREAD = 0;
+      loadStatus = -1;
+    }    
+    modif = modif.replace(/(>|^)CONNECTIONRELOAD>/, "");
     let lcMatch = modif.match(/LOADCOMPLETE (-?[0-9]+)>/);
     if (lcMatch) {
       let thing = document.getElementById("msgArea")
@@ -69,6 +83,7 @@ async function initClient()
       else {
         loadStatus = -1;
         STARTID=lcMatch[1];
+        // alert("lcMatchId updated"+ STARTID);
       }
       thing.scrollTop = thing.scrollTop + 100;
     }    
@@ -97,7 +112,11 @@ async function initClient()
       let matches = msgs[i].match(/{(-?[0-9]+)}\[(.+)\]\(([0-9])\)(.*)/)
       if (!matches) continue;
       PREPENDFLAG = false;
-      if (STARTID<0) STARTID = Number(matches[1]);
+      if (STARTID<0) {
+        STARTID = Number(matches[1]);
+        STARTIDVALID = true;
+        // alert(STARTID);
+      }
       if (matches[1][0]=="-") {
         // console.log("PREPENDING")p
         PREPENDFLAG = true;
@@ -200,13 +219,15 @@ async function initClient()
         document.title = "("+UNREAD+") | Support | BetaOS Systems"
       }
     } // 
-    
+    // alert("here")
     if (!LOADEDQ2 || scrDistOKQ)
     {
       area.scrollTop = area.scrollHeight;
       console.log("Scrolling to bottom.")
       LOADEDQ2 = true;
+      // alert("scrolled")
     }
+    // else alert("invalid")
 
     
   });
@@ -283,12 +304,16 @@ window.addEventListener("focus", () => {
 
 let UNREAD = 0;
 let FOCUSSED = true;
-
+let STARTID = -1;
+let LOADEDQ2 = false;
+let STARTIDVALID = false;
 function onScroll() {
   
-  if (document.getElementById("msgArea").scrollTop < 30 && loadStatus<0) {
+  if (document.getElementById("msgArea").scrollTop < 30 && STARTIDVALID && loadStatus<0) {
     loadStatus = 0;
+    console.log("loading messages from" + STARTID)
     send(JSON.stringify({action:"loadLogs", data:{room:ROOMNAME, id:CONNECTIONID, from:STARTID}}), ()=>{});
   }
+  else if (document.getElementById("msgArea").scrollTop < 30) console.log("loadStatus" + loadStatus)
 }
 let loadStatus = -1;

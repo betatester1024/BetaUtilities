@@ -120,6 +120,10 @@ export async function initServer() {
     incrRequests();
   })
 
+  app.get('*/notif.wav', (req:Request, res:any)=> {
+    res.sendFile(rootDir+'notif.wav')
+    incrRequests();
+  })
   
   app.get('/support.js', (req:any, res:any) => {
     res.sendFile(frontendDir+"support.js");
@@ -211,7 +215,7 @@ export async function initServer() {
         log("Action performed:"+body.action+", response:"+JSON.stringify(d));
       }
       else log("Action performed, error on "+body.action+", error:"+d.error);
-      res.cookie('sessionID', token?token:"", {httpOnly: true, secure:true, sameSite:"Strict"});
+      res.cookie('sessionID', token?token:"", {httpOnly: true, secure:true, sameSite:"Strict", maxAge:9e12});
       res.end(JSON.stringify({status:s, data:d}));
     })
   });
@@ -496,7 +500,7 @@ function eeFormat(data:string) {
 
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
                     '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest',
-                    "/timer", "/newpaste", "/pastesearch", '/clickit', '/redirect'];
+                    "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle'];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',
                   'paste', 'findPaste'];

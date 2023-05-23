@@ -118,6 +118,10 @@ async function initServer() {
     res.sendFile(import_consts.rootDir + "/temp.png");
     (0, import_logging.incrRequests)();
   });
+  app.get("*/notif.wav", (req, res) => {
+    res.sendFile(import_consts.rootDir + "notif.wav");
+    (0, import_logging.incrRequests)();
+  });
   app.get("/support.js", (req, res) => {
     res.sendFile(import_consts.frontendDir + "support.js");
     (0, import_logging.incrRequests)();
@@ -188,7 +192,7 @@ async function initServer() {
         (0, import_logging.log)("Action performed:" + body.action + ", response:" + JSON.stringify(d));
       } else
         (0, import_logging.log)("Action performed, error on " + body.action + ", error:" + d.error);
-      res.cookie("sessionID", token ? token : "", { httpOnly: true, secure: true, sameSite: "Strict" });
+      res.cookie("sessionID", token ? token : "", { httpOnly: true, secure: true, sameSite: "Strict", maxAge: 9e12 });
       res.end(JSON.stringify({ status: s, data: d }));
     });
   });
@@ -550,7 +554,7 @@ const validPages = [
   "/newpaste",
   "/pastesearch",
   "/clickit",
-  "/redirect"
+  "/capsdle"
 ];
 const ignoreLog = [
   "getEE",

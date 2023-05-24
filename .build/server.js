@@ -238,6 +238,11 @@ function makeRequest(action, token, data, callback) {
           callback(obj.status, obj.data, obj.token);
         });
         break;
+      case "extendSession":
+        (0, import_userRequest.extendSession)(token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
       case "roomRequest":
         let obj2 = (0, import_supportRooms.roomRequest)(token);
         callback(obj2.status, obj2.data, obj2.token);

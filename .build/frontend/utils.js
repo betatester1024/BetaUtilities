@@ -1,4 +1,5 @@
 "use strict";
+let SESSIONTIMEOUT, SESSIONTIMEOUT2 = null;
 function globalOnload(cbk2) {
   document.onkeydown = keydown;
   document.body.addEventListener("mouseover", mouseOver);
@@ -13,11 +14,12 @@ function globalOnload(cbk2) {
       let ele3 = document.createElement("p");
       ele3.id = "footer";
       if (res.status != "SUCCESS")
-        ele3.innerHTML = `<a href='/login'>Login</a> | 
+        ele3.innerHTML = `<a href="/login?redirect=${window.location.pathname}">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
                       BetaOS Systems V2, 2023`;
       else {
+        resetExpiry(res);
         ele3.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
                       <a href='/logout'>Logout</a> | 
                       <a href='/config'>Account</a> | 
@@ -52,7 +54,7 @@ function globalOnload(cbk2) {
   let ele2 = document.getElementById("overlay");
   if (ele2)
     document.body.innerHTML += `
-  <div class="internal" id="internal_alerts" onclick="if (dialogQ) closeAlert(false, false)" style="opacity: 0; text-align: center !important">
+  <div class="internal" id="internal_alerts" onclick="if (dialogQ && !BLOCKCALLBACK) closeAlert(false, false)" style="opacity: 0; text-align: center !important">
         <p class="fsmed" id="alerttext_v2">Error: AlertDialog configured incorrectly. Please contact BetaOS.</p>
         <div style="text-align: center;"><button class="btn szHalf override" onclick="closeAlert()" style="display: inline-block">
           <span class="alertlbl">Continue</span>
@@ -256,5 +258,26 @@ function mouseOver(e) {
       ele.style.animation = null;
     }
   }
+}
+function resetExpiry(res) {
+  if (res.data.expiry < Date.now()) {
+    return;
+  }
+  SESSIONTIMEOUT = setTimeout(() => {
+    alertDialog("Your session has expired", () => {
+      location.reload();
+    });
+  }, res.data.expiry - Date.now());
+  SESSIONTIMEOUT2 = setTimeout(() => {
+    alertDialog("Your session is expiring in one minute, extend session? ", () => {
+      send(JSON.stringify({ action: "extendSession" }), (res2) => {
+        alertDialog("Session extended, expires in " + toTime(res2.data.expiry - Date.now()), () => {
+        });
+        clearTimeout(SESSIONTIMEOUT);
+        clearTimeout(SESSIONTIMEOUT2);
+        resetExpiry(res2);
+      });
+    }, 2);
+  }, Math.max(res.data.expiry - Date.now() - 6e4, 1e3));
 }
 //# sourceMappingURL=utils.js.map

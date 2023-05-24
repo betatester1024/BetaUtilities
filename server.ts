@@ -8,7 +8,7 @@ import {port, msgDB, authDB, frontendDir, roomRegex, rootDir, jsDir, uDB} from '
 import {signup, validateLogin, logout} from './validateLogin';
 import { deleteAccount } from './delacc';
 import {updateUser, realias, toggleTheme} from './updateUser'
-import {userRequest} from './userRequest';
+import {userRequest, extendSession} from './userRequest';
 import {EE} from './EEHandler';
 import {paste, findPaste, editPaste} from './paste';
 import {addTask, getTasks, updateTask, deleteTask} from './tasks';
@@ -252,6 +252,11 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
         break;
       case 'userRequest': 
         userRequest(token)
+          .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case 'extendSession': 
+        extendSession(token)
           .then((obj:{status:string, data:any, token:string})=>
             {callback(obj.status, obj.data, obj.token)});
         break;

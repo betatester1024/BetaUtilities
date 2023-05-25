@@ -1,6 +1,12 @@
 import dialogPolyfill from 'dialog-polyfill';
 let SESSIONTIMEOUT, SESSIONTIMEOUT2 = null;
+
+function ele(name:string) {
+  return document.getElementById(name);
+}
 function globalOnload(cbk:()=>any) {
+
+  
   document.onkeydown = keydown;
   
   document.body.addEventListener("mouseover", mouseOver);
@@ -114,6 +120,9 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
       else closeAlert(true);
       failureTimeout = null;
       callback(JSON.parse(xhr.responseText));
+    }
+    else if (xhr.readyState == 4 && xhr.status != 200) {
+      alertDialog("Received status code " +xhr.status+" - resend request?", ()=>{send(params, callback, onLoadQ);}, 2);
     }
   }
   console.log(params);
@@ -238,6 +247,12 @@ addEventListener("DOMContentLoaded", function() {
   // document.appendChild(document.createElement("body"));
   document.body.appendChild(overlay);
   // console.log(document.body.innerHTML)
+  
+  // screw with the meta tags
+  let metatags = document.createElement("meta");
+  metatags.content = "width=device-width; initial-scale=1.0; min-scale=1.0";
+  metatags.name = "viewport";
+  document.head.appendChild(metatags);
 });
 
 let DIALOGOPEN = false;

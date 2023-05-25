@@ -1,5 +1,8 @@
 "use strict";
 let SESSIONTIMEOUT, SESSIONTIMEOUT2 = null;
+function ele(name) {
+  return document.getElementById(name);
+}
 function globalOnload(cbk2) {
   document.onkeydown = keydown;
   document.body.addEventListener("mouseover", mouseOver);
@@ -11,30 +14,30 @@ function globalOnload(cbk2) {
       let maincontent = document.getElementsByClassName("main_content").item(0);
       let ftr = document.createElement("footer");
       maincontent.appendChild(ftr);
-      let ele3 = document.createElement("p");
-      ele3.id = "footer";
+      let ele4 = document.createElement("p");
+      ele4.id = "footer";
       if (res.status != "SUCCESS")
-        ele3.innerHTML = `<a href="/login?redirect=${window.location.pathname}">Login</a> | 
+        ele4.innerHTML = `<a href="/login?redirect=${window.location.pathname}">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
                       BetaOS Systems V2, 2023`;
       else {
         resetExpiry(res);
-        ele3.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
+        ele4.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
                       <a href='/logout'>Logout</a> | 
                       <a href='/config'>Account</a> | 
                       <a href='/status'>Status</a> | 
                       <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
                       BetaOS Systems V2, 2023`;
       }
-      ftr.appendChild(ele3);
+      ftr.appendChild(ele4);
       send(
         JSON.stringify({ action: "visits" }),
         (res2) => {
           if (res2.status != "SUCCESS") {
             alertDialog("Database connection failure. Please contact BetaOS.", () => {
             });
-            ele3.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`;
+            ele4.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`;
           }
           document.getElementById("footer").innerHTML += " | <kbd>" + res2.data.data + "</kbd>";
           send(JSON.stringify({ action: "cookieRequest" }), (res3) => {
@@ -69,7 +72,7 @@ function globalOnload(cbk2) {
       </div>`;
   else
     console.log("Alert dialogs disabled on this page");
-  let ele = document.getElementById("");
+  let ele3 = document.getElementById("");
   document.body.innerHTML += `
   <div id="compliance">
     <h2 class="blu nohover">BetaOS Services uses cookies to operate.</h2>
@@ -106,6 +109,10 @@ function send(params, callback, onLoadQ = false) {
         closeAlert(true);
       failureTimeout = null;
       callback(JSON.parse(xhr.responseText));
+    } else if (xhr.readyState == 4 && xhr.status != 200) {
+      alertDialog("Received status code " + xhr.status + " - resend request?", () => {
+        send(params, callback, onLoadQ);
+      }, 2);
     }
   };
   console.log(params);
@@ -131,19 +138,19 @@ function alertDialog(str, callback = () => {
   if (overlay2) {
     overlay2.style.opacity = "0";
   }
-  let ele = document.getElementById("overlay");
-  ele.innerHTML = "";
+  let ele2 = document.getElementById("overlay");
+  ele2.innerHTML = "";
   let p = document.getElementById("alerttext_v2");
-  if (!ele || !p) {
+  if (!ele2 || !p) {
     console.log("ERROR: Alert dialogs not enabled in this page.");
     callback();
     return;
   }
-  ele.style.opacity = "1";
-  ele = document.getElementById("internal_alerts");
-  ele.style.opacity = "1";
-  ele.style.top = "-100vh";
-  ele.style.pointerEvents = "auto";
+  ele2.style.opacity = "1";
+  ele2 = document.getElementById("internal_alerts");
+  ele2.style.opacity = "1";
+  ele2.style.top = "-100vh";
+  ele2.style.pointerEvents = "auto";
   dialogQ = true;
   cbk = callback;
   p.innerText = str;
@@ -165,19 +172,19 @@ function alertDialog(str, callback = () => {
   failureTimeout = null;
 }
 function closeAlert(overrideCallback = false, overrideOverlay = false) {
-  let ele = document.getElementById("overlay");
-  if (!ele) {
+  let ele2 = document.getElementById("overlay");
+  if (!ele2) {
     console.log("Alert dialogs not enabled in this page");
     return;
   }
   if (!overrideOverlay && !DIALOGOPEN) {
-    ele.style.opacity = 0;
-    ele.style.pointerEvents = "none";
+    ele2.style.opacity = 0;
+    ele2.style.pointerEvents = "none";
   }
-  ele = document.getElementById("internal_alerts");
-  ele.style.top = "-50vh";
-  ele.style.opacity = 0;
-  ele.style.pointerEvents = "none";
+  ele2 = document.getElementById("internal_alerts");
+  ele2.style.top = "-50vh";
+  ele2.style.opacity = 0;
+  ele2.style.pointerEvents = "none";
   dialogQ = false;
   if (cbk && !overrideCallback) {
     console.log("calling back");
@@ -221,6 +228,10 @@ addEventListener("DOMContentLoaded", function() {
   overlay.innerHTML = `<span class="material-symbols-outlined loader">sync</span>
   <p class="loadp fslg grn nohover">Loading.</p>`;
   document.body.appendChild(overlay);
+  let metatags = document.createElement("meta");
+  metatags.content = "width=device-width; initial-scale=1.0; min-scale=1.0";
+  metatags.name = "viewport";
+  document.head.appendChild(metatags);
 });
 let DIALOGOPEN = false;
 function closeDialog(thing, name = "dialog") {
@@ -241,21 +252,21 @@ function openDialog(name = "dialog") {
   document.getElementById("overlay").style.opacity = "1";
 }
 function mouseOver(e) {
-  let ele = e.target;
-  let text = ele.innerHTML.replaceAll(/<.*((>.*<\/.*>)|(\/>))/gmiu, "").replaceAll("\n", "").trim();
-  if (ele.className.match(/(\W|^)btn(\W|$)/)) {
+  let ele2 = e.target;
+  let text = ele2.innerHTML.replaceAll(/<.*((>.*<\/.*>)|(\/>))/gmiu, "").replaceAll("\n", "").trim();
+  if (ele2.className.match(/(\W|^)btn(\W|$)/)) {
     console.log(text);
-    let tooltip = ele.children.namedItem("TOOLTIP");
+    let tooltip = ele2.children.namedItem("TOOLTIP");
     if (!tooltip) {
       tooltip = document.createElement("span");
       tooltip.innerText = text;
       tooltip.id = "TOOLTIP";
       tooltip.className = "TOOLTIP override";
-      ele.appendChild(tooltip);
-      ele.style.animation = "none";
+      ele2.appendChild(tooltip);
+      ele2.style.animation = "none";
       console.log("reflowing");
-      ele.offsetHeight;
-      ele.style.animation = null;
+      ele2.offsetHeight;
+      ele2.style.animation = null;
     }
   }
 }

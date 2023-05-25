@@ -78,6 +78,8 @@ hr.redrounded {
   text-align: center;
 /*   transition: all 0.5s ease; */
   overflow: auto;
+  /* overflow-wrap: break-word; */
+  overflow-x: clip;
 }
 
 h1, p, h2 {
@@ -89,6 +91,7 @@ h2 {
   font-variant-caps: small-caps;
   min-height: 1.2em;
   margin: 0px 10px;
+  overflow-wrap: break-word;
 }
 
 .btn {
@@ -108,14 +111,18 @@ h2 {
   margin: 5px;
   text-decoration: none;
 }
-.btn:hover, .btn:focus, .btn:active {
+.btn.disabled {
+  cursor: default !important;
+}
+
+.btn:hover:not(.disabled), .btn:focus:not(.disabled), .btn:active:not(.disabled) {
   background-color: var(--system-blue2);
 }
-.btn:hover>div.anim, .btn:focus>div.anim, .btn:active>div.anim {
+.btn:hover:not(.disabled)>div.anim, .btn:focus:not(.disabled)>div.anim, .btn:active:not(.disabled)>div.anim {
   width: 90%;
   opacity: 1;
 }
-.btn > .material-symbols-outlined {
+.btn:not(.disabled) > .material-symbols-outlined {
   cursor: pointer;
 }
 input:focus + div.anim,
@@ -291,11 +298,11 @@ input[type=checkbox]:hover + span{
   text-decoration-line: underline;
 }
 
-a:active {
+a:active:not(.disabled) {
   color: var(--system-blue3) !important;
 }
 
-.btn:active {
+.btn:active:not(.disabled) {
   transition: color 0.05s linear;
   color: var(--system-black) !important;
   /* -webkit-filter: invert(100%); */
@@ -448,6 +455,8 @@ textarea {
 footer, #footer {
   margin-top: 20px;
   margin-bottom: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 .overlayLoader {
@@ -578,6 +587,7 @@ footer, #footer {
   left: 50%;
   margin-left: -60px;
   opacity: 0;
+  pointer-events: none;
   /* transition: opacity 0.3s; */
 }
 

@@ -44,8 +44,9 @@
         let lb = document.getElementById("lb")
         let appearedQ = false;
         send(JSON.stringify({action:"leaderboard"}), (res2)=>{
-          lb.innerHTML = `<tr><th colspan=3>Leaderboard</th></tr>
-                          <tr><td>#</td><td>User</td><td><span class="material-symbols-outlined" title="Clicks">arrow_selector_tool</span></td></tr>`;
+          lb.innerHTML = `<tr><th colspan=3>Leaderboard<span class="material-symbols-outlined" style="cursor: pointer" onclick="leaderboardRefresh()">refresh</span></th></tr>
+                          <tr><td>#</td><td>User</td><td>
+                          <span class="material-symbols-outlined" title="Clicks">arrow_selector_tool</span></td></tr>`;
           if (CURRUSER == "[NONE]") lb.innerHTML += `<tr class=you>
                 <td>?</td>
                 <td>You <a href='/login?redirect=clickit'>(Log in)</a></td>

@@ -36,7 +36,7 @@
           logoutBtn.style.display="inline-block";
           configBtn.style.display=res.data.perms>=1?"inline-block":"none";
           adminBtn.style.display = res.data.perms==1?"none":"inline-block";
-          configBtn.className = res.data.perms>1?"btn szThird":"btn szTwoThirds";
+          // configBtn.className = res.data.perms>1?"btn szThird":"btn szTwoThirds";
           console.log(signupIco.innerHTML);
         }, true);
       }
@@ -74,12 +74,7 @@
         <hr class="rounded">
       </header>
       <div class="btnRow">
-        <a id="status" class="btn szHalf" href="/status">
-          <span id="statspan"class="material-symbols-outlined">published_with_changes </span>
-           Status<div class="anim"></div></a>
-        <a class="btn szHalf" href="/support">
-          <span class="material-symbols-outlined" id="loginIco">help</span>
-          Support<div class="anim"></div></a>
+        <h2 class="szFull fsmed">Account</h2> 
         <a id="signupBtn" class="btn szTwoThirds grn" href="/signup">
           <span class="material-symbols-outlined" id="signupIco">person_add</span>
           Sign-up<div class="anim"></div></a>
@@ -89,34 +84,56 @@
         <a id="logoutBtn" class="btn szThird" href="/logout" style="display:none">
           <span class="material-symbols-outlined" id="signupIco">logout</span>
           Logout<div class="anim"></div></a>
-        <a id="configBtn" class="btn szThird" href="/account" style="display:none">
+        <a id="configBtn" class="btn szTwoThirds"  href="/account" style="display:none">
           <span class="material-symbols-outlined" id="loginIco">settings</span>
           Account<div class="anim"></div></a>
-        <a id="adminBtn" class="btn szThird" href="/admin" style="display:none">
+
+        <h2 class="szFull fsmed">Info/Support</h2>
+        
+        <a id="status" class="btn szHalf" href="/status">
+          <span id="statspan"class="material-symbols-outlined">published_with_changes </span>
+           Status<div class="anim"></div></a>
+        <a class="btn szHalf" href="/support">
+          <span class="material-symbols-outlined" id="loginIco">help</span>
+          Support<div class="anim"></div></a>
+        <a class="btn szTwoThirds" href="/commands">
+          <span class="material-symbols-outlined">build</span>
+          Commands<div class="anim"></div></a>
+        <a class="btn szThird" href="/contact">
+          <span class="material-symbols-outlined">phone</span>
+          Contact<div class="anim"></div></a>
+<br><br>
+        <a id="adminBtn" class="btn szFull grn" href="/admin" style="display:none">
           <span class="material-symbols-outlined" id="loginIco">security</span>
           Admin<div class="anim"></div></a>
+
+        <h2 class="fsmed szFull">Tools</h2>
         <a class="btn szHalf" href="/todo">
           <span class="material-symbols-outlined">checklist</span>
           To do<div class="anim"></div></a>
         <a class="btn szHalf grn" href="/paste">
           <span class="material-symbols-outlined">cloud_upload</span>
           PasteIt!<div class="anim"></div></a>
+        <a class="btn szTwoThirds" href="/timer">
+          <span class="material-symbols-outlined">timer</span>
+          Timer<div class="anim"></div></a>
+        <a class="btn szThird" href="/aboutme">
+          <span class="material-symbols-outlined">search</span>
+          WHOIS?<div class="anim"></div></a>
+        
+        <h2 class="fsmed szFull">Nonsense</h2>
         <a class="btn szHalf" href="/EE">
           <span class="material-symbols-outlined">draft</span>
           Page of Edits<div class="anim"></div></a>
         <a class="btn szHalf" href="/EEdit">
           <span class="material-symbols-outlined">edit_document</span>
           Edit the page!<div class="anim"></div></a>
-        <a class="btn szThird" href="/timer">
-          <span class="material-symbols-outlined">timer</span>
-          Timer<div class="anim"></div></a>
-        <a class="btn szThird fsmed" href="/commands">
-          <span class="material-symbols-outlined">build</span>
-          Commands<div class="anim"></div></a>
-        <a class="btn szThird" href="/contact">
-          <span class="material-symbols-outlined">phone</span>
-          Contact<div class="anim"></div></a>
-        
+        <a class="btn szThird" href="/clickit">
+          <span class="material-symbols-outlined">e911_emergency</span>
+          ClickIt!<div class="anim"></div></a>
+        <a class="btn szTwoThirds" href="/capsdle">
+          <span class="material-symbols-outlined">spellcheck</span>
+          Capsdle - Coming soon!<div class="anim"></div></a>
 <!--         <a class="btn szHalf" href="/login">login4<div class="anim"></div></a>
         <a class="btn szHalf" href="/login">Login5<div class="anim"></div></a>
         <a class="btn szTwoThirds" href="/login">Login6<div class="anim"></div></a>

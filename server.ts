@@ -111,8 +111,9 @@ export async function initServer() {
   })
 
   app.get("/nodemodules/*", (req:any, res:any) => {
-    console.log(rootDir+"node_modules"+req.url.replace(/.*nodemodules/, ""))
-    res.sendFile(rootDir+"node_modules"+req.url.replace(/.*nodemodules/, ""));
+    // fuck off with your long requests
+    if (req.url.length > 500) res.sendFile(frontendDir+"/404.html");
+    else res.sendFile(rootDir+"node_modules"+req.url.replace(/.*nodemodules/, ""));
     incrRequests();
   })
     

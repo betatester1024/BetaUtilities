@@ -10,7 +10,7 @@ function globalOnload(cbk:()=>any) {
   script.onload = function () {
     
   };
-  script.src = "./nodemodules/dialog-polyfill/dist/dialog-polyfill.esm.js";
+  script.src = "./nodemodules/dialog-polyfill/dist/dialog-polyfill.js";
   
   document.head.appendChild(script); //or something of the likes
 

@@ -238,6 +238,11 @@ function makeRequest(action, token, data, callback) {
           callback(obj.status, obj.data, obj.token);
         });
         break;
+      case "extendSession":
+        (0, import_userRequest.extendSession)(token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
       case "roomRequest":
         let obj2 = (0, import_supportRooms.roomRequest)(token);
         callback(obj2.status, obj2.data, obj2.token);
@@ -522,6 +527,15 @@ function eeFormat(data) {
       <hr class="rounded">
     </header>
       ${data}
+      <br>
+      <a class="btn fssml" href="/EEdit">
+    <span class="material-symbols-outlined">edit</span>
+    Edit this page
+    <div class="anim"></div></a>
+    <a class="btn fssml" href="/">
+    <span class="material-symbols-outlined">arrow_back_ios</span>
+    
+    Return to home<div class="anim"></div></a>
     </div>
     
     <div class="overlay" id="overlay">

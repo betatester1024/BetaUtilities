@@ -4,13 +4,78 @@
     <script src='./utils.js'></script>
     <title>ClickIt! | BetaOS Systems</title></title>
     <script>
+      let localClicked = 0;
+      let CURRUSER = "[NONE]"
       function clickIt() {
         send(JSON.stringify({action:"clickIt"}), (res)=>{
           document.getElementById("thebutton").blur();
-          send(JSON.stringify({action:"leaderboard"}), (res2)=>{
-            alert(res2.data);
-          })
-        })  
+          if (res.status != "SUCCESS") {
+            if (res.data.errorCode != 0) 
+              alertDialog("Error: "+res.data.error);
+            else localClicked++;    
+          }
+          leaderboardRefresh();
+        }, true)  
+        lockButton();
+        setTimeout(unlockButton, 10000);
+      }
+      function unlockButton() {
+        let btn = ele('thebutton');
+        btn.disabled = false;
+        btn.className = "btn szFull grn"
+      }
+      
+      function lockButton() {
+        let btn = ele("thebutton");
+        btn.disabled = true;
+        // btn.style.transition = "none";
+        btn.className = "btn szFull gry disabled";
+        // btn.style.transition = "color  ease";
+        // btn.scrollHeight;
+      }
+      
+      function onLoad() {
+        send(JSON.stringify({action:"userRequest"}), (res)=>{
+          if (res.status == "SUCCESS") CURRUSER = res.data.user;
+          leaderboardRefresh();
+        })
+      }
+      function leaderboardRefresh() {
+        let lb = document.getElementById("lb")
+        let appearedQ = false;
+        send(JSON.stringify({action:"leaderboard"}), (res2)=>{
+          lb.innerHTML = `<tr><th colspan=3>Leaderboard<span class="material-symbols-outlined" style="cursor: pointer" onclick="leaderboardRefresh()">refresh</span></th></tr>
+                          <tr><td>#</td><td>User</td><td>
+                          <span class="material-symbols-outlined" title="Clicks">arrow_selector_tool</span></td></tr>`;
+          if (CURRUSER == "[NONE]") lb.innerHTML += `<tr class=you>
+                <td>?</td>
+                <td>You <a href='/login?redirect=clickit'>(Log in)</a></td>
+                <td>${localClicked}</td>
+              </tr>`;
+          for (let i=0; i<Math.min(res2.data.length, 10); i++) {
+            if (CURRUSER == res2.data[i].user) {
+              appearedQ = true;
+            }
+            lb.innerHTML += `<tr class="${CURRUSER == res2.data[i].user?"you":""}">
+            <td>${i+1}</td>
+            <td><b>${res2.data[i].user}</b></td>
+            <td>${res2.data[i].clickedCt}</td></tr>`
+          }
+          if (!appearedQ && CURRUSER != "[NONE]") {
+  
+            let idx = res2.data.findIndex(ele=>ele.user == CURRUSER)
+            console.log(idx);
+            if (idx < 0) lb.innerHTML += `<tr class="you">
+            <td><span style="position: relative; top: 5px;" class="material-symbols-outlined">all_inclusive</span></td>
+            <td><b>${CURRUSER}</b></td>
+            <td>0</td></tr>`
+            else lb.innerHTML += 
+          `<tr class="you">
+            <td>${idx+1}</td>
+            <td><b>${CURRUSER}</b></td>
+            <td>${res2.data[idx].clickedCt}</td></tr>`;
+          }
+        }, true);
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -20,12 +85,35 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
     <style>
-      .btn:active {
-        scale: 1.2;
+      .btn#thebutton:active {
+        background-color: var(--system-blue2);
+      }
+      .btn#thebutton div.anim {
+        border: 3px solid var(--max-green);
+      }
+      table {
+        margin: 10px auto;
+      }
+      tr {
+        height: 30px;
+      }
+      td, th {
+        font-size: 25px;
+        color: var(--system-blue);
+        text-align: left;
+        padding: 5px;
+        padding-right: 15px;
+      }
+      th {
+        text-align: center;
+        /* width: 100%; */
+      }
+      tr.you > td, tr.you > td > a {
+        color: var(--system-green);
       }
     </style>
   </head>
-  <body onload = "globalOnload(()=>{})">
+  <body onload = "globalOnload(()=>{onLoad()})">
     <div class="main_content">
       <header>
         <h2 class="fsmed">Click<sup>it!</sup></h2>
@@ -35,6 +123,8 @@
         <span class="material-symbols-outlined">arrow_selector_tool</span>
         Clickit!<div class="anim"></div>
       </button>
+      <table id="lb">
+      </table>
       <a class="btn override" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>
         Return to home<div class="anim"></div></a>

@@ -8,7 +8,7 @@ import {port, msgDB, authDB, frontendDir, roomRegex, rootDir, jsDir, uDB} from '
 import {signup, validateLogin, logout} from './validateLogin';
 import { deleteAccount } from './delacc';
 import {updateUser, realias, toggleTheme} from './updateUser'
-import {userRequest} from './userRequest';
+import {userRequest, extendSession} from './userRequest';
 import {EE} from './EEHandler';
 import {paste, findPaste, editPaste} from './paste';
 import {addTask, getTasks, updateTask, deleteTask} from './tasks';
@@ -255,6 +255,11 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
           .then((obj:{status:string, data:any, token:string})=>
             {callback(obj.status, obj.data, obj.token)});
         break;
+      case 'extendSession': 
+        extendSession(token)
+          .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
       case 'roomRequest':
         let obj2 = roomRequest(token); // this one is synchronous
         callback(obj2.status, obj2.data, obj2.token);
@@ -482,6 +487,15 @@ function eeFormat(data:string) {
       <hr class="rounded">
     </header>
       ${data}
+      <br>
+      <a class="btn fssml" href="/EEdit">
+    <span class="material-symbols-outlined">edit</span>
+    Edit this page
+    <div class="anim"></div></a>
+    <a class="btn fssml" href="/">
+    <span class="material-symbols-outlined">arrow_back_ios</span>
+    
+    Return to home<div class="anim"></div></a>
     </div>
     
     <div class="overlay" id="overlay">

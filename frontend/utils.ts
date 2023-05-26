@@ -1,5 +1,12 @@
 import dialogPolyfill from 'dialog-polyfill';
+let SESSIONTIMEOUT, SESSIONTIMEOUT2 = null;
+
+function ele(name:string) {
+  return document.getElementById(name);
+}
 function globalOnload(cbk:()=>any) {
+
+  
   document.onkeydown = keydown;
   
   document.body.addEventListener("mouseover", mouseOver);
@@ -15,14 +22,16 @@ function globalOnload(cbk:()=>any) {
       let maincontent = document.getElementsByClassName("main_content").item(0) as HTMLDivElement;
       let ftr = document.createElement("footer");
       maincontent.appendChild(ftr);
+      
       let ele = document.createElement("p");
       ele.id="footer";
       if (res.status != "SUCCESS")
-        ele.innerHTML = `<a href='/login'>Login</a> | 
+        ele.innerHTML = `<a href="/login?redirect=${window.location.pathname}">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
                       BetaOS Systems V2, 2023`;
       else {
+        resetExpiry(res);
         ele.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
                       <a href='/logout'>Logout</a> | 
                       <a href='/config'>Account</a> | 
@@ -58,7 +67,7 @@ function globalOnload(cbk:()=>any) {
   //   ele2.innerHTML = 
     // document.getElementById("internal_alerts").addEventListener("click", ()=>{});
   document.body.innerHTML += `
-  <div class="internal" id="internal_alerts" onclick="if (dialogQ) closeAlert(false, false)" style="opacity: 0; text-align: center !important">
+  <div class="internal" id="internal_alerts" onclick="if (dialogQ && !BLOCKCALLBACK) closeAlert(false, false)" style="opacity: 0; text-align: center !important">
         <p class="fsmed" id="alerttext_v2">Error: AlertDialog configured incorrectly. Please contact BetaOS.</p>
         <div style="text-align: center;"><button class="btn szHalf override" onclick="closeAlert()" style="display: inline-block">
           <span class="alertlbl">Continue</span>
@@ -86,9 +95,8 @@ function globalOnload(cbk:()=>any) {
     I understand
     <div class="anim"></div>
     </button>
-  </div>`
-  // update the alert-dialogs to allow cancel buttons
-  // cookie dialog also goes here
+  </div>`;
+  
 }
 
 function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false) {
@@ -112,6 +120,9 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
       else closeAlert(true);
       failureTimeout = null;
       callback(JSON.parse(xhr.responseText));
+    }
+    else if (xhr.readyState == 4 && xhr.status != 200) {
+      alertDialog("Received status code " +xhr.status+" - resend request?", ()=>{send(params, callback, onLoadQ);}, 2);
     }
   }
   console.log(params);
@@ -236,6 +247,12 @@ addEventListener("DOMContentLoaded", function() {
   // document.appendChild(document.createElement("body"));
   document.body.appendChild(overlay);
   // console.log(document.body.innerHTML)
+  
+  // screw with the meta tags
+  let metatags = document.createElement("meta");
+  metatags.content = "width=device-width; initial-scale=1.0; min-scale=1.0";
+  metatags.name = "viewport";
+  document.head.appendChild(metatags);
 });
 
 let DIALOGOPEN = false;
@@ -282,4 +299,27 @@ function mouseOver(e:MouseEvent) {
       ele.style.animation = null; 
     }
   }
+}
+
+function resetExpiry(res:any) {
+  if (res.data.expiry < Date.now()) {
+    return;
+    //alertDialog("Error: Your session has expired!", ()=>{location.href = "/login?redirect="+window.location.pathname});
+  }
+  SESSIONTIMEOUT = setTimeout(()=>{
+    alertDialog("Your session has expired", ()=>{
+      location.reload();
+    })
+  }, res.data.expiry - Date.now());
+  SESSIONTIMEOUT2 = setTimeout(()=>{
+    // document.title = ""+document.title;
+    alertDialog("Your session is expiring in one minute, extend session? ", ()=>{
+      send(JSON.stringify({action:"extendSession"}), (res:{data:{expiry:number}})=>{
+        alertDialog("Session extended, expires in "+toTime(res.data.expiry - Date.now()), ()=>{});
+        clearTimeout(SESSIONTIMEOUT);
+        clearTimeout(SESSIONTIMEOUT2);
+        resetExpiry(res);
+      });
+    }, 2)
+  }, Math.max(res.data.expiry - Date.now() - 60000, 1000))
 }

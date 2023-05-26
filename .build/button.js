@@ -29,7 +29,10 @@ async function clickIt(token) {
   if (userData.status != "SUCCESS") {
     return userData;
   }
-  await import_consts.uDB.updateOne({ fieldName: "BUTTON", user: userData.data.user }, { $inc: { clickedCt: 1 } });
+  if (userData.data.lastCl > Date.now() - 1e4)
+    return { status: "ERROR", data: { error: "Clicked too much" }, token };
+  await import_consts.uDB.updateOne({ fieldName: "BUTTON", user: userData.data.user }, { $inc: { clickedCt: 1 } }, { upsert: true });
+  await import_consts.authDB.updateOne({ fieldName: "UserData", user: userData.data.user }, { $set: { lastClicked: Date.now() } }, { upsert: true });
   return { status: "SUCCESS", data: null, token };
 }
 async function getLeaderboard(token) {

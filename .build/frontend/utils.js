@@ -4,6 +4,11 @@ function ele(name) {
   return document.getElementById(name);
 }
 function globalOnload(cbk2) {
+  var script = document.createElement("script");
+  script.onload = function() {
+  };
+  script.src = "./nodemodules/dialog-polyfill/dist/dialog-polyfill.esm.js";
+  document.head.appendChild(script);
   document.onkeydown = keydown;
   document.body.addEventListener("mouseover", mouseOver);
   send(

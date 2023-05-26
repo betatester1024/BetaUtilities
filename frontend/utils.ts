@@ -1,4 +1,4 @@
-import dialogPolyfill from 'dialog-polyfill';
+// import dialogPolyfill from './nodemodules/dialog-polyfill/dist/dialog-polyfill.esm.js';
 let SESSIONTIMEOUT, SESSIONTIMEOUT2 = null;
 
 function ele(name:string) {
@@ -6,7 +6,14 @@ function ele(name:string) {
 }
 function globalOnload(cbk:()=>any) {
 
+  var script = document.createElement('script');
+  script.onload = function () {
+    
+  };
+  script.src = "./nodemodules/dialog-polyfill/dist/dialog-polyfill.esm.js";
   
+  document.head.appendChild(script); //or something of the likes
+
   document.onkeydown = keydown;
   
   document.body.addEventListener("mouseover", mouseOver);
@@ -285,7 +292,6 @@ function mouseOver(e:MouseEvent) {
   let text = ele.innerHTML.replaceAll(/<.*((>.*<\/.*>)|(\/>))/gmiu, "").replaceAll("\n", "").trim();
   // fuck off this is good enough, it's not even used as raw html
   if (ele.className.match(/(\W|^)btn(\W|$)/)) {
-    console.log(text)
     let tooltip = ele.children.namedItem("TOOLTIP");
     if (!tooltip) {
       tooltip = document.createElement("span");
@@ -294,7 +300,6 @@ function mouseOver(e:MouseEvent) {
       tooltip.className="TOOLTIP override"
       ele.appendChild(tooltip);
       ele.style.animation = 'none';  
-      console.log("reflowing")
       ele.offsetHeight; /* trigger reflow */   
       ele.style.animation = null; 
     }

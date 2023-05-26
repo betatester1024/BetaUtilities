@@ -109,6 +109,12 @@ export async function initServer() {
     res.sendFile(frontendDir+"/paste.html");
     incrRequests();
   })
+
+  app.get("/nodemodules/*", (req:any, res:any) => {
+    console.log(rootDir+"node_modules"+req.url.replace(/.*nodemodules/, ""))
+    res.sendFile(rootDir+"node_modules"+req.url.replace(/.*nodemodules/, ""));
+    incrRequests();
+  })
     
   app.get('*/favicon.ico', (req:Request, res:any)=> {
     res.sendFile(rootDir+'/favicon.ico')

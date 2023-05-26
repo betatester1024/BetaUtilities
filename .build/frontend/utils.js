@@ -260,7 +260,6 @@ function mouseOver(e) {
   let ele2 = e.target;
   let text = ele2.innerHTML.replaceAll(/<.*((>.*<\/.*>)|(\/>))/gmiu, "").replaceAll("\n", "").trim();
   if (ele2.className.match(/(\W|^)btn(\W|$)/)) {
-    console.log(text);
     let tooltip = ele2.children.namedItem("TOOLTIP");
     if (!tooltip) {
       tooltip = document.createElement("span");
@@ -269,7 +268,6 @@ function mouseOver(e) {
       tooltip.className = "TOOLTIP override";
       ele2.appendChild(tooltip);
       ele2.style.animation = "none";
-      console.log("reflowing");
       ele2.offsetHeight;
       ele2.style.animation = null;
     }

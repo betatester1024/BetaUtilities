@@ -163,7 +163,7 @@ function alertDialog(str, callback = () => {
   newDialog.style.pointerEvents = "auto";
   dialogQ = true;
   p.innerText = str;
-  p.innerHTML += "<p style='margin: 10px auto' class='gry nohover'>(Press any key to dismiss)</p>";
+  p.innerHTML += "<p style='margin: 10px auto' class='gry nohover'>(Press ENTER or ESC)</p>";
   newDialog.querySelector("#cancelBtn").style.display = "none";
   if (button == 1) {
     p.innerHTML += `<button class='btn szThird fssml' id="refresh" onclick='location.reload()'>
@@ -191,8 +191,14 @@ function closeAlert(sel) {
   dialog.style.top = "50vh";
   dialog.style.opacity = "0";
   dialog.style.pointerEvents = "none";
-  if (!overridecallback)
-    dialog.callback();
+  if (!overridecallback) {
+    try {
+      dialog.callback();
+    } catch (e) {
+      alertDialog("Error while calling back: " + e, () => {
+      });
+    }
+  }
   dialog.remove();
   if (!byId("internal_alerts") && !DIALOGOPEN) {
     dialogQ = false;

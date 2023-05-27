@@ -417,6 +417,10 @@ kbd {
   border-radius: 10px;
 }
 
+dialog + .backdrop {
+  background-color: var(--system-blue);
+}
+
 .overlay .internal {
   margin: auto;
   height: 100%;

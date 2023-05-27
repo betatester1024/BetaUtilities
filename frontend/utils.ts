@@ -213,7 +213,7 @@ function alertDialog(str: string, callback: () => any = ()=>{}, button: number =
   newDialog.style.pointerEvents="auto";
   dialogQ = true;
   p.innerText = str;
-  p.innerHTML += "<p style='margin: 10px auto' class='gry nohover'>(Press any key to dismiss)</p>"
+  p.innerHTML += "<br><br><p style='margin: 10px auto' class='gry nohover'>(Press ENTER or ESC)</p>"
   newDialog.querySelector("#cancelBtn").style.display = "none";
   if (button == 1) {
     p.innerHTML += `<button class='btn szThird fssml' id="refresh" onclick='location.reload()'>
@@ -251,7 +251,10 @@ function closeAlert(sel:number) {
   dialog.style.opacity="0";
   dialog.style.pointerEvents="none";
   // console.log(dialog.callback)
-  if (!overridecallback) dialog.callback();
+  if (!overridecallback) {
+    try {dialog.callback(); }
+    catch (e:any) {alertDialog("Error while calling back: "+e, ()=>{});}
+  }
   dialog.remove();
 
   

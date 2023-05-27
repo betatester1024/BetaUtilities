@@ -56,6 +56,7 @@ const hashingOptions = {
   hashLength: 50
 };
 const expiry = [0, 1e3 * 60 * 60 * 24, 1e3 * 60 * 1, 1e3 * 60 * 5];
+
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   CREDENTIALS_PATH,

@@ -23,4 +23,6 @@ export const hashingOptions = {
    hashLength: 50
  }
 // account expiries for:    user accounts, admins,   super-admins
+
 export const expiry = [0, 1000*60*60*24, 1000*60*1, 1000*60*5];
+

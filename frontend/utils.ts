@@ -1,16 +1,16 @@
+
 // import dialogPolyfill from './nodemodules/dialog-polyfill/dist/dialog-polyfill.esm.js';
 let SESSIONTIMEOUT, SESSIONTIMEOUT2 = null;
 
 function byId(name:string) {
+
   return document.getElementById(name);
 }
 function globalOnload(cbk:()=>any) {
-
   var script = document.createElement('script');
   script.src = "./nodemodules/dialog-polyfill/dist/dialog-polyfill.js";
   
   document.head.appendChild(script); //or something of the likes
-
   document.onkeydown = keydown;
   
   document.body.addEventListener("mouseover", mouseOver);
@@ -83,6 +83,7 @@ function globalOnload(cbk:()=>any) {
   // if (ele2)
   //   ele2.innerHTML = 
     // document.getElementById("internal_alerts").addEventListener("click", ()=>{});
+
   // document.body.innerHTML += `
   // <div class="internal" id="internal_alerts" onclick="if (dialogQ && !BLOCKCALLBACK) closeAlert(false, false)" style="opacity: 0; text-align: center !important">
   //       <p class="fsmed" id="alerttext_v2">Error: AlertDialog configured incorrectly. Please contact BetaOS.</p>
@@ -97,6 +98,7 @@ function globalOnload(cbk:()=>any) {
   //         <div class="anim"></div>
   //       </button></div>
   //     </div>`;
+
   
   // else console.log("Alert dialogs disabled on this page");
   
@@ -141,6 +143,7 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
       if (failureTimeout) clearTimeout(failureTimeout);
       // else closeAlert(true);
       failureTimeout = null;
+
       alertDialog("Received status code " +xhr.status+" - resend request?", ()=>{send(params, callback, onLoadQ);}, 2);
     }
   }

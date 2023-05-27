@@ -272,7 +272,11 @@ function closeAlert(sel:number) {
 }
 
 function keydown(e: Event) {
-  if (dialogQ && (e.key == "Escape"||e.key == "Enter")) {
+  if (e.defaultPrevented) {
+    console.log("prevent-defaulted");
+    return;
+  }
+  if(dialogQ && (e.key == "Escape"||e.key == "Enter")) {
     e.preventDefault();
     if (e.key == "Escape") {
       console.log("RejectKey")

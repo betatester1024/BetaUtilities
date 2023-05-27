@@ -163,7 +163,7 @@ function alertDialog(str, callback = () => {
   newDialog.style.pointerEvents = "auto";
   dialogQ = true;
   p.innerText = str;
-  p.innerHTML += "<p style='margin: 10px auto' class='gry nohover'>(Press ENTER or ESC)</p>";
+  p.innerHTML += "<br><br><p style='margin: 10px auto' class='gry nohover'>(Press ENTER or ESC)</p>";
   newDialog.querySelector("#cancelBtn").style.display = "none";
   if (button == 1) {
     p.innerHTML += `<button class='btn szThird fssml' id="refresh" onclick='location.reload()'>
@@ -207,6 +207,10 @@ function closeAlert(sel) {
   }
 }
 function keydown(e) {
+  if (e.defaultPrevented) {
+    console.log("prevent-defaulted");
+    return;
+  }
   if (dialogQ && (e.key == "Escape" || e.key == "Enter")) {
     e.preventDefault();
     if (e.key == "Escape") {

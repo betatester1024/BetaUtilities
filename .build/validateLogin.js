@@ -1,7 +1,9 @@
 "use strict";
+var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -15,6 +17,10 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var validateLogin_exports = {};
 __export(validateLogin_exports, {
@@ -24,8 +30,8 @@ __export(validateLogin_exports, {
 });
 module.exports = __toCommonJS(validateLogin_exports);
 var import_consts = require("./consts");
+var import_crypto = __toESM(require("crypto"));
 const argon2 = require("argon2");
-const crypto = require("crypto");
 async function validateLogin(user, pwd, persistQ, token) {
   if (!user.match(import_consts.userRegex)) {
     return { status: "ERROR", data: { error: "Invalid user string!" }, token };
@@ -37,7 +43,7 @@ async function validateLogin(user, pwd, persistQ, token) {
   if (!usrInfo) {
     return { status: "ERROR", data: { error: "No such user!" }, token };
   } else if (await argon2.verify(usrInfo.pwd, pwd)) {
-    let uuid = crypto.randomUUID();
+    let uuid = import_crypto.default.randomUUID();
     let userData = await import_consts.authDB.findOne({ fieldName: "UserData", user });
     await import_consts.authDB.insertOne({ fieldName: "Token", associatedUser: user, token: uuid, expiry: persistQ ? 9e99 : Date.now() + import_consts.expiry[userData.permLevel] });
     return { status: "SUCCESS", data: { perms: usrInfo.permLevel }, token: uuid };

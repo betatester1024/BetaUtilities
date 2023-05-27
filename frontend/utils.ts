@@ -1,15 +1,12 @@
 // import dialogPolyfill from './nodemodules/dialog-polyfill/dist/dialog-polyfill.esm.js';
 let SESSIONTIMEOUT, SESSIONTIMEOUT2 = null;
 
-function ele(name:string) {
+function byId(name:string) {
   return document.getElementById(name);
 }
 function globalOnload(cbk:()=>any) {
 
   var script = document.createElement('script');
-  script.onload = function () {
-    
-  };
   script.src = "./nodemodules/dialog-polyfill/dist/dialog-polyfill.js";
   
   document.head.appendChild(script); //or something of the likes
@@ -17,6 +14,13 @@ function globalOnload(cbk:()=>any) {
   document.onkeydown = keydown;
   
   document.body.addEventListener("mouseover", mouseOver);
+
+  // byId("overlay").onclick=(e:Event)=>{
+  //   if (dialogQ) {
+  //     console.log("ClickOutside (Reject)")
+  //     closeAlert(-1);
+  //   }
+  // };
   send(JSON.stringify({ action: "userRequest" }),
     (res) => {
       document.documentElement.className = res.data.darkQ?"dark":"";
@@ -57,10 +61,16 @@ function globalOnload(cbk:()=>any) {
           document.getElementById("footer").innerHTML += " | <kbd>"+res.data.data+"</kbd>";
           send(JSON.stringify({action:"cookieRequest"}), (res)=>{
             if (res.data.toString() == "false") {
-              console.log("thing");
-              document.getElementById("compliance").style.bottom="0px";
-              
+              // console.log("thing");
+              let cpl = document.getElementById("compliance");
+              cpl.style.opacity="1";
+              cpl.style.pointerEvents="auto";
               // document.getElementById("compliance").style.top="unset";
+            }
+            else {
+              let cpl = document.getElementById("compliance");
+              cpl.style.opacity="0";
+              cpl.style.pointerEvents="none";
             }
             if (cbk) cbk();
           }, true);
@@ -69,31 +79,31 @@ function globalOnload(cbk:()=>any) {
     }, true);
 
   
-  let ele2 = document.getElementById("overlay");
-  if (ele2)
+  // let ele2 = document.getElementById("overlay");
+  // if (ele2)
   //   ele2.innerHTML = 
     // document.getElementById("internal_alerts").addEventListener("click", ()=>{});
-  document.body.innerHTML += `
-  <div class="internal" id="internal_alerts" onclick="if (dialogQ && !BLOCKCALLBACK) closeAlert(false, false)" style="opacity: 0; text-align: center !important">
-        <p class="fsmed" id="alerttext_v2">Error: AlertDialog configured incorrectly. Please contact BetaOS.</p>
-        <div style="text-align: center;"><button class="btn szHalf override" onclick="closeAlert()" style="display: inline-block">
-          <span class="alertlbl">Continue</span>
-          <span class="material-symbols-outlined">arrow_forward_ios</span>
-          <div class="anim"></div>
-        </button>
-        <button class="btn szHalf red override" id="cancelBtn" style="display: none" onclick="closeAlert(true)">
-          <span class="alertlbl">Cancel</span>
-          <span class="material-symbols-outlined">cancel</span>
-          <div class="anim"></div>
-        </button></div>
-      </div>`;
+  // document.body.innerHTML += `
+  // <div class="internal" id="internal_alerts" onclick="if (dialogQ && !BLOCKCALLBACK) closeAlert(false, false)" style="opacity: 0; text-align: center !important">
+  //       <p class="fsmed" id="alerttext_v2">Error: AlertDialog configured incorrectly. Please contact BetaOS.</p>
+  //       <div style="text-align: center;"><button class="btn szHalf override" onclick="closeAlert()" style="display: inline-block">
+  //         <span class="alertlbl">Continue</span>
+  //         <span class="material-symbols-outlined">arrow_forward_ios</span>
+  //         <div class="anim"></div>
+  //       </button>
+  //       <button class="btn szHalf red override" id="cancelBtn" style="display: none" onclick="closeAlert(true)">
+  //         <span class="alertlbl">Cancel</span>
+  //         <span class="material-symbols-outlined">cancel</span>
+  //         <div class="anim"></div>
+  //       </button></div>
+  //     </div>`;
   
-  else console.log("Alert dialogs disabled on this page");
+  // else console.log("Alert dialogs disabled on this page");
   
   let ele = document.getElementById("");
   document.body.innerHTML += `
   <div id="compliance">
-    <h2 class="blu nohover">BetaOS Services uses cookies to operate.</h2>
+    <h2 class="blu nohover"><span class="material-symbols-outlined">cookie </span> BetaOS Services uses cookies to operate.</h2>
     <p>We use only <kbd>strictly necessary cookies</kbd> to verify and persist 
     your login session, and to confirm your acceptance of these cookies. <br>
     By continuing to use this site, you consent to our use of these cookies.</p>
@@ -110,7 +120,7 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
   let overlay = document.getElementById("overlayL");
   console.log(onLoadQ)
   if (overlay && !onLoadQ) {
-    console.log("content-blocking loader overlay enabled")
+    console.log("overlay active")
     overlay.style.opacity="1";
     overlay.style.backgroundColor="var(--system-overlay)";
   }
@@ -124,42 +134,73 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
         overlay.style.backgroundColor="var(--system-grey2)";
       }
       if (failureTimeout) clearTimeout(failureTimeout);
-      else closeAlert(true);
       failureTimeout = null;
       callback(JSON.parse(xhr.responseText));
     }
     else if (xhr.readyState == 4 && xhr.status != 200) {
+      if (failureTimeout) clearTimeout(failureTimeout);
+      // else closeAlert(true);
+      failureTimeout = null;
       alertDialog("Received status code " +xhr.status+" - resend request?", ()=>{send(params, callback, onLoadQ);}, 2);
     }
   }
   console.log(params);
   xhr.send(params);
-  if (failureTimeout) clearTimeout(failureTimeout);
-  failureTimeout = setTimeout(() => alertDialog(`This is taking longer than expected.`, () => { }, 1, params), 5000);
+  let failureTimeout = setTimeout(() => alertDialog(`This is taking longer than expected.`, () => { }, 1, params), 5000);
 }
 
 function acceptCookies() {
   send(JSON.stringify({action:"acceptCookies"}), (res)=> {});
-  document.getElementById("compliance").style.bottom="-200vh";
+  let cpm = document.getElementById("compliance")
+  cpm.style.opacity="0";
+  cpm.style.pointerEvents="none"
 }
 
-let failureTimeout: NodeJS.Timeout | null;
 // let TIME:NodeJS.Timeout|null;
 let dialogQ = false;
-let cbk: () => any = () => { };
-let BLOCKCALLBACK = false;
+// let cbk: () => any = () => { };
+// let BLOCKCALLBACK = false;
 function alertDialog(str: string, callback: () => any = ()=>{}, button: number = -1, failedReq: string = "") {
   // if (TIME) clearTimeout(TIME);
   // TIME = null;
   // console.log("Timeout cleared")
   // e.preventDefault();
+  let newDialog = document.createElement("dialog");
+  dialogPolyfill.registerDialog(newDialog);
+  document.body.appendChild(newDialog);
+  newDialog.className = "internal ALERT";
+  newDialog.id="internal_alerts";
+  
+  newDialog.style.opacity = "0";
+  newDialog.style.textAlign="center";
+  newDialog.innerHTML = `
+    <p class="fsmed" id="alerttext_v2">Error: AlertDialog configured incorrectly. Please contact BetaOS.</p>
+    <div style="text-align: center;"><button id="confirmbtn" class="btn szHalf override" onclick="console.log('ConfirmClick'); closeAlert(1)" style="display: inline-block">
+      <span class="alertlbl">Continue</span>
+      <span class="material-symbols-outlined">arrow_forward_ios</span>
+      <div class="anim"></div>
+    </button>
+    <button class="btn szHalf red override" id="cancelBtn" style="display: none" onclick="console.log('RejectClick'); closeAlert(-1)">
+      <span class="alertlbl">Cancel</span>
+      <span class="material-symbols-outlined">cancel</span>
+      <div class="anim"></div>
+    </button></div>`;
+  
+  setTimeout(()=>{
+    newDialog.style.opacity="1";
+    newDialog.style.top = "18px";
+  }, 0);
+  newDialog.setAttribute("type", button+"")
+  // newDialog.setAttribute("callback", callback.toString())
+  newDialog.callback = callback; 
+  // console.log(newDialog.callback)
   let overlay = document.getElementById("overlayL");
   if (overlay) {
     overlay.style.opacity="0";
   }
   let ele = document.getElementById("overlay") as HTMLDivElement;
   ele.innerHTML="";
-  let p = document.getElementById("alerttext_v2") as HTMLParagraphElement;
+  let p = newDialog.querySelector("#alerttext_v2");
   if (!ele || !p) {
     console.log("ERROR: Alert dialogs not enabled in this page.")
     callback();
@@ -167,60 +208,76 @@ function alertDialog(str: string, callback: () => any = ()=>{}, button: number =
   }
   
   ele.style.opacity="1";
-  ele = document.getElementById("internal_alerts");
-  ele.style.opacity="1";
-  ele.style.top = "-100vh";
-  ele.style.pointerEvents="auto";
+  newDialog.style.opacity="1";
+  // newDialog.style.top = "0vh ";
+  newDialog.style.pointerEvents="auto";
   dialogQ = true;
-  cbk = callback;
   p.innerText = str;
   p.innerHTML += "<p style='margin: 10px auto' class='gry nohover'>(Press any key to dismiss)</p>"
-  document.getElementById("cancelBtn").style.display = "none";
+  newDialog.querySelector("#cancelBtn").style.display = "none";
   if (button == 1) {
     p.innerHTML += `<button class='btn szThird fssml' id="refresh" onclick='location.reload()'>
     <span class="material-symbols-outlined">history</span> Refresh?
     <div class="anim"></div></button>`
-    console.log("Failed request: " + failedReq);
-    BLOCKCALLBACK = true;
+    console.log("Alert-type: FAILEDREQUEST" + failedReq);
   }
   else if (button == 2) {
-    document.getElementById("cancelBtn").style.display = "inline-block";
-    console.log("Confirm speedbump");
-    BLOCKCALLBACK = true;
+    newDialog.querySelector("#cancelBtn").style.display = "inline-block";
+    console.log("Alert-type CANCELLABLE");
   }
-  if (failureTimeout) clearTimeout(failureTimeout);
-  failureTimeout = null;
+  else console.log("Alert-type: STANDARD");
+  newDialog.showModal();
+  // if (failureTimeout) clearTimeout(failureTimeout);
+  // failureTimeout = null;
 }
 
-function closeAlert(overrideCallback: boolean = false, overrideOverlay:boolean = false) {
+// three ways to close a dialog. 
+// acknowledged a callback (enter key)
+// cancelled a callback (escape key) - only for type-two
+// clicked outside (depends on alert type)
+function closeAlert(sel:number) {
   let ele = document.getElementById("overlay") as HTMLDivElement;
+  // let dialog = 
+  let coll = document.getElementsByClassName("ALERT");
+  let dialog = coll.item(coll.length-1);
+  let overridecallback=false;
+  if (dialog.getAttribute("type")==2 && sel < 0) overridecallback = true;
   if (!ele) {
     console.log("Alert dialogs not enabled in this page");
     return;
   }
-  if (!overrideOverlay && !DIALOGOPEN) {
-    ele.style.opacity=0;
+  
+  dialog.style.top = "50vh";
+  dialog.style.opacity="0";
+  dialog.style.pointerEvents="none";
+  // console.log(dialog.callback)
+  if (!overridecallback) dialog.callback();
+  dialog.remove();
+
+  
+  // eval("(()=>{"+dialog.getAttribute("callback")+"})()");
+  // dialog.
+  if (!byId("internal_alerts") && !DIALOGOPEN) {
+    dialogQ = false;
+    ele.style.opacity="0";
     ele.style.pointerEvents="none";
   }
-  ele = document.getElementById("internal_alerts");
-  ele.style.top = "-50vh";
-  ele.style.opacity=0;
-  ele.style.pointerEvents="none";
-  dialogQ = false;
-  if (cbk && !overrideCallback) {
-    console.log("calling back")
-    cbk();
-  }
-  BLOCKCALLBACK = false;
+  // if (cbk && !overrideCallback) {
+  //   console.log("calling back")
+  //   // cbk();
+  // }
 }
 
 function keydown(e: Event) {
-  if (dialogQ) {
+  if (dialogQ && (e.key == "Escape"||e.key == "Enter")) {
     e.preventDefault();
-    if (BLOCKCALLBACK) closeAlert(true);
+    if (e.key == "Escape") {
+      console.log("RejectKey")
+      closeAlert(-1);
+    }
     else {
-      console.log("KEYDOWNCLOSEDIALOG")
-      closeAlert();
+      console.log("ConfirmKey")
+      closeAlert(1);
     }
   }
 }

@@ -20,13 +20,13 @@
         setTimeout(unlockButton, 10000);
       }
       function unlockButton() {
-        let btn = ele('thebutton');
+        let btn = byId('thebutton');
         btn.disabled = false;
         btn.className = "btn szFull grn"
       }
       
       function lockButton() {
-        let btn = ele("thebutton");
+        let btn = byId("thebutton");
         btn.disabled = true;
         // btn.style.transition = "none";
         btn.className = "btn szFull gry disabled";

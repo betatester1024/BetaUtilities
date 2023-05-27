@@ -381,12 +381,14 @@ kbd {
   /* z-index: 2; */
 }
 #alerttext_v2 {
-  max-height: 50%;
+  max-height: 50vh;
   overflow-y: auto;
   border-radius: 20px 0px 0px 20px;
   background-color: var(--system-bg);
   margin-bottom: 0px;
   width: 90%;
+  /* maheight: 80%; */
+  /* overflow */
   margin-left: auto;
   margin-right: auto;
   padding: 10px;
@@ -396,10 +398,23 @@ kbd {
 }
 #internal_alerts {
   margin: auto;
-  height: 100%;
-  position: relative;
-  top: 50%;
+  /* height: 70%; */
+  /* position: relative; */
+  /* top: 500%; */
   transition: all 0.5s ease;
+}
+
+.ALERT {
+  background-color: var(--system-transp);
+  position: relative;
+  top: 200px;
+  margin: 20px auto !important;
+  border: none;
+  /* max-height: 70%; */
+  width: 90%;
+  opacity: 0;
+  overflow-wrap: normal;
+  border-radius: 10px;
 }
 
 .overlay .internal {
@@ -507,7 +522,7 @@ footer, #footer {
     display: none;
   }
   #internal_alerts .btn, .internal .btn {
-    width: 3em;
+    width: 120px;
   }
   
 /*   .btn span {
@@ -540,12 +555,13 @@ footer, #footer {
 }
 
 #compliance {
-  transition: all 0.7s ease; /*cubic-bezier( 1, 0.33, 0.3, 1.24 );/*ease;*/
-/*   transition-delay: 3s; */
+  transition: all 1s ease; /*cubic-bezier( 1, 0.33, 0.3, 1.24 );/*ease;*/
+  transition-delay: .5s;
   position: absolute;
   padding: 60px;
 /*   top: 100vh; */
-  bottom: -200vh;
+  bottom: 0vh;
+  opacity: 0;
   background-color: var(--system-overlay);
   border-radius: 30px 30px 0px 0px;
   width: calc(100% - 120px);
@@ -622,14 +638,14 @@ a:not(.btn) {
 a:hover {
   background-size: auto 100%;
 }
-
+/* 
 dialog {
   position: absolute;
   top: 50%;
   left: 0px;
   transform: translateY(-50%);
   margin: 20px auto;
-}
+} */
 
 /* .btnRow { */
   /* display: flex; */

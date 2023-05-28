@@ -1,4 +1,4 @@
-html {
+html, ::backdrop {
   --system-red: #ee0000;
   --system-red2: rgba(238, 0, 0, 0.1);
   --system-blue:#0a84ff;
@@ -9,10 +9,13 @@ html {
   --max-green: #00ef00;
   --system-yellow: #FFCC1F;
   --system-yellow2:rgba(255, 204, 31, 0.1);
+  --system-orange: #F65314;
+  --system-orange2: #F653141A;
   --system-grey: #8c8c8c;
   --system-grey2:rgba(140, 140, 140, 0.1);
   --system-bg: #eee;
   --system-overlay: rgba(200, 200, 200, 0.95);
+  --system-overlay2: rgba(200, 200, 200, 0.6);
   --system-transp: rgba(0, 0, 0, 0);
   --system-black: #222;
   transition: all 1s ease;
@@ -20,7 +23,7 @@ html {
 }
 
 @media (prefers-color-scheme: dark) {
-  html {
+  html, ::backdrop {
     --system-bg: #222;
     --system-black: #eee;
     --system-grey: #bfbfbf;
@@ -237,9 +240,23 @@ div.anim.inp {
 .blu > .anim {
   border: 2.3px solid var(--system-blue);
 }
+
+.org {
+  color: var(--system-orange);
+}
+.ylw:hover, .ylw:focus {
+  background-color: var(--system-orange2);
+/*   color: #000; */
+}
+.ylw > .anim{
+  border: 2.3px solid var(--system-yellow);
+}
+
 .nohover:hover, .nohover:focus {
   background-color: unset !important;
 }
+
+
 
 .roundhover {
   transition: all 0.2s ease;
@@ -404,7 +421,7 @@ kbd {
   transition: all 0.5s ease;
 }
 
-.ALERT {
+.ALERT, .CLOSEDALERT {
   background-color: var(--system-transp);
   position: relative;
   top: 200px;
@@ -415,10 +432,19 @@ kbd {
   opacity: 0;
   overflow-wrap: normal;
   border-radius: 10px;
+  transition: all 0.5s ease;
 }
 
-dialog + .backdrop {
-  background-color: var(--system-blue);
+.ALERT *, .CLOSEDALERT * {
+  transition: all 0.5s ease;
+}
+
+.CLOSEDALERT {
+  opacity: 0 !important;
+}
+
+dialog::backdrop {
+  background-color: var(--system-overlay2);
 }
 
 .overlay .internal {

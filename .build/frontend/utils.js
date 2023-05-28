@@ -126,7 +126,6 @@ function alertDialog(str, callback = () => {
   document.body.appendChild(newDialog);
   newDialog.className = "internal ALERT";
   newDialog.id = "internal_alerts";
-  newDialog.style.opacity = "0";
   newDialog.style.textAlign = "center";
   newDialog.innerHTML = `
     <p class="fsmed" id="alerttext_v2">Error: AlertDialog configured incorrectly. Please contact BetaOS.</p>
@@ -159,7 +158,6 @@ function alertDialog(str, callback = () => {
     return;
   }
   ele.style.opacity = "1";
-  newDialog.style.opacity = "1";
   newDialog.style.pointerEvents = "auto";
   dialogQ = true;
   p.innerText = str;
@@ -199,7 +197,11 @@ function closeAlert(sel) {
       });
     }
   }
-  dialog.remove();
+  setTimeout(() => {
+    dialog.close();
+  }, 200);
+  dialog.className = "internal CLOSEDALERT";
+  dialog.id = "CLOSEDALERT";
   if (!byId("internal_alerts") && !DIALOGOPEN) {
     dialogQ = false;
     ele.style.opacity = "0";

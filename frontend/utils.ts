@@ -171,7 +171,7 @@ function alertDialog(str: string, callback: () => any = ()=>{}, button: number =
   newDialog.className = "internal ALERT";
   newDialog.id="internal_alerts";
   
-  newDialog.style.opacity = "0";
+  // newDialog.style.opacity = "0";
   newDialog.style.textAlign="center";
   newDialog.innerHTML = `
     <p class="fsmed" id="alerttext_v2">Error: AlertDialog configured incorrectly. Please contact BetaOS.</p>
@@ -192,6 +192,8 @@ function alertDialog(str: string, callback: () => any = ()=>{}, button: number =
   }, 0);
   newDialog.setAttribute("type", button+"")
   // newDialog.setAttribute("callback", callback.toString())
+  
+  // here we add a new attribute to the element, hoping that nothing breaks
   newDialog.callback = callback; 
   // console.log(newDialog.callback)
   let overlay = document.getElementById("overlayL");
@@ -208,7 +210,7 @@ function alertDialog(str: string, callback: () => any = ()=>{}, button: number =
   }
   
   ele.style.opacity="1";
-  newDialog.style.opacity="1";
+  // newDialog.style.opacity="1";
   // newDialog.style.top = "0vh ";
   newDialog.style.pointerEvents="auto";
   dialogQ = true;
@@ -255,7 +257,12 @@ function closeAlert(sel:number) {
     try {dialog.callback(); }
     catch (e:any) {alertDialog("Error while calling back: "+e, ()=>{});}
   }
-  dialog.remove();
+  // can't remove t he damn dialog because we want it to fade out first
+  // so instead we change its class name so it does not get found again
+  setTimeout(()=>{dialog.close()}, 200);
+  dialog.className = "internal CLOSEDALERT";
+  dialog.id="CLOSEDALERT";
+  // dialog.remove();
 
   
   // eval("(()=>{"+dialog.getAttribute("callback")+"})()");

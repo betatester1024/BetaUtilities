@@ -40,11 +40,11 @@
           leaderboardRefresh();
         })
       }
-      function leaderboardRefresh() {
+      function leaderboardRefresh(loadq=true) {
         let lb = document.getElementById("lb")
         let appearedQ = false;
         send(JSON.stringify({action:"leaderboard"}), (res2)=>{
-          lb.innerHTML = `<tr><th colspan=3>Leaderboard<span class="material-symbols-outlined" style="cursor: pointer" onclick="leaderboardRefresh()">refresh</span></th></tr>
+          lb.innerHTML = `<tr><th colspan=3>Leaderboard<span class="material-symbols-outlined" style="cursor: pointer" onclick="leaderboardRefresh(false)">refresh</span></th></tr>
                           <tr><td>#</td><td>User</td><td>
                           <span class="material-symbols-outlined" title="Clicks">arrow_selector_tool</span></td></tr>`;
           if (CURRUSER == "[NONE]") lb.innerHTML += `<tr class=you>
@@ -75,7 +75,7 @@
             <td><b>${CURRUSER}</b></td>
             <td>${res2.data[idx].clickedCt}</td></tr>`;
           }
-        }, true);
+        }, loadq);
       }
     </script>
     <meta name="viewport" content="width=device-width">

@@ -161,10 +161,12 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
 }
 
 function acceptCookies() {
-  send(JSON.stringify({action:"acceptCookies"}), (res)=> {});
   let cpm = document.getElementById("compliance")
+  cpm.style.transition="all 0.5s ease";
   cpm.style.opacity="0";
-  cpm.style.pointerEvents="none"
+  cpm.style.pointerEvents="none";
+  send(JSON.stringify({action:"acceptCookies"}), (res)=> {});
+
 }
 
 // let TIME:NodeJS.Timeout|null;

@@ -118,11 +118,12 @@ function send(params, callback, onLoadQ = false) {
   }, 1, params), 5e3);
 }
 function acceptCookies() {
-  send(JSON.stringify({ action: "acceptCookies" }), (res) => {
-  });
   let cpm = document.getElementById("compliance");
+  cpm.style.transition = "all 0.5s ease";
   cpm.style.opacity = "0";
   cpm.style.pointerEvents = "none";
+  send(JSON.stringify({ action: "acceptCookies" }), (res) => {
+  });
 }
 let dialogQ = false;
 function alertDialog(str, callback = () => {

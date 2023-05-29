@@ -8,8 +8,8 @@
       let CURRCOL = 0;
       let CURRWORD = "";
       let copyText = [];
-      function addLetter(e) {
-        // nowWord = "abcDC"
+
+      function keyDown_Capsdle(e) { // i think someone else took keyDown() or summat
         let letter = "INVALID"
         
         if (e.keyCode >= 65 && e.keyCode <= 90 || e.keyCode >= 48 && e.keyCode <= 57) {
@@ -19,7 +19,13 @@
         if (e.keyCode == 8) letter= "BKSP"
         if (e.keyCode == 13) letter= "ENTER";
         if (letter == "INVALID") return;
-        else if (letter != "ENTER") e.preventDefault();
+        else
+          if (addLetter(letter)) e.preventDefault();
+      }
+      function addLetter(letter, oskQ=false) {
+        // nowWord = "abcDC"
+        let PD = false; // preventDefaultQ?
+        if (letter != "ENTER" && !oskQ) PD = true;
         if (letter == "BKSP" && CURRCOL > 0) {
           CURRCOL --;
           updateHighlight();
@@ -67,12 +73,12 @@
           }
           copyText.push(rowCopy);
           if (correctCt == 5) {
-            e.preventDefault();
+            PD = true;
             alertDialog(`Congratulations! You have won in ${CURRROW+1} move${CURRROW==0?"":"s"}! 
             Press ENTER to share your score.`, 
             ()=>{ navigator.clipboard.writeText(copyText.join("\n")+"\n"+(CURRROW+1)+" move"+(CURRROW==0?"":"s")+"\nCapsdle by BetaOS: "+location.href);}, 2);
             document.body.removeEventListener("keydown", addLetter);
-            return;
+            return PD;
           }
           CURRWORD = ""
           CURRCOL=0;
@@ -92,16 +98,16 @@
             byId("btnRow").appendChild(newRow);
             
           } else {
-            e.preventDefault();
-            document.body.removeEventListener("keydown", addLetter);
+            PD = true;
+            document.body.removeEventListener("keydown", keyDown_Capsdle);
             alertDialog("You have lost.", ()=>{})
           }
           updateHighlight();
         }
+        return PD;
       }
 
       function updateHighlight() {
-        console.log(CURRROW, CURRCOL)
         for (let i=0; i<5; i++) byId("row"+CURRROW+"letter"+i).className = "letter";
         if (CURRCOL < 5) byId("row"+CURRROW+"letter"+CURRCOL).className = "letter activeLetter";
         for (let i=0; i<CURRROW; i++) byId("row"+i).className = "";
@@ -129,7 +135,7 @@
         return 4294967296 * (2097151 & h2) + (h1 >>> 0);
       };
       let nowWord = "";
-      const letters =  "abcdefghijklmnopqrstuvwxyz0123456789";
+      const letters =  "qwertyuiopasdfghjklzxcvbnm0123456789";
       const capitals = "QWERTYUIOPASDFGHJKLZXCVBNM0123456789";
       function updateCurrWord() {
         let prevWord = nowWord;
@@ -153,6 +159,12 @@
       function onLoad() {
         document.body.addEventListener("keydown", addLetter);
         setInterval(updateCurrWord, 200);
+        let osk = byId("osk");
+        osk.innerHTML = "";
+        for(let i=0; i<letters.length; i++) {
+          osk.innerHTML += `<button class="btn oskBtn" id="btn${letters[i]}" onclick="addLetter(${letters[i]}, true)">${letters[i]}</button>`
+          if (i == 9 || i == 18 || i == 25) osk.innerHTML += "<br>";
+        }
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -214,6 +226,9 @@
         margin-top: 2px;
         /* overfl */
       }
+      .main_content {
+        height: unset;
+      }
       #osk {
         position: absolute;
         bottom: 0px;
@@ -257,16 +272,13 @@
         </div>
       </div>
     </div> -->
-      <div id="osk">
-        <button class="btn" id="btnq">q</button>
-        <button class="btn" id="btnw">w</button>
-        <button class="btn" id="btne">e</button>
-        <button class="btn" id="btnr">r</button>
-        <button class="btn" id="btnt">t</button>
-      </div>
+     
       <a class="btn override" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>
         Return to home<div class="anim"></div></a>
+    </div>
+    <div id="osk">
+      <p>Loading OnScreenKeyboard...</p>
     </div>
     <dialog class="internal" id="dialog_v2">This thing is supposed to be a dialog box.</dialog>
     <div class="overlay" id="overlay">

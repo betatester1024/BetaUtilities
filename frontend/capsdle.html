@@ -22,10 +22,11 @@
         else
           if (addLetter(letter)) e.preventDefault();
       }
-      function addLetter(letter, oskQ=false) {
+      function addLetter(letter) {
+        // console.log(letter);
         // nowWord = "abcDC"
         let PD = false; // preventDefaultQ?
-        if (letter != "ENTER" && !oskQ) PD = true;
+        if (letter != "ENTER") PD = true;
         if (letter == "BKSP" && CURRCOL > 0) {
           CURRCOL --;
           updateHighlight();
@@ -77,7 +78,7 @@
             alertDialog(`Congratulations! You have won in ${CURRROW+1} move${CURRROW==0?"":"s"}! 
             Press ENTER to share your score.`, 
             ()=>{ navigator.clipboard.writeText(copyText.join("\n")+"\n"+(CURRROW+1)+" move"+(CURRROW==0?"":"s")+"\nCapsdle by BetaOS: "+location.href);}, 2);
-            document.body.removeEventListener("keydown", addLetter);
+            document.body.removeEventListener("keydown", keyDown_Capsdle);
             return PD;
           }
           CURRWORD = ""
@@ -157,14 +158,30 @@
       }
 
       function onLoad() {
-        document.body.addEventListener("keydown", addLetter);
+        document.body.addEventListener("keydown", keyDown_Capsdle);
         setInterval(updateCurrWord, 200);
         let osk = byId("osk");
         osk.innerHTML = "";
-        for(let i=0; i<letters.length; i++) {
-          osk.innerHTML += `<button class="btn oskBtn" id="btn${letters[i]}" onclick="addLetter(${letters[i]}, true)">${letters[i]}</button>`
-          if (i == 9 || i == 18 || i == 25) osk.innerHTML += "<br>";
+        let stops = [0, 10, 19, 26, 36];
+        for (let s=1; s<stops.length; s++) {
+          let currDiv = document.createElement("div");
+          currDiv.className = "oskRow";
+          currDiv.id="row"+s;
+          for(let i=stops[s-1]; i<stops[s]; i++) {
+            currDiv.innerHTML += `<button class="btn oskBtn notooltip override" 
+                                          id="${letters[i]}"
+                                          onclick="addLetter('${letters[i]}')">${letters[i]}</button>`
+          }
+          osk.appendChild(currDiv);
         }
+        osk.innerHTML += `<div class="oskRow" id="row5">
+          <button class="btn oskBtn iconned override grn" id="btnGo" onclick="addLetter('ENTER')">
+          <span class="material-symbols-outlined">keyboard_return</span> ENTER
+          </button>
+          <button class="btn oskBtn iconned override grn" id="btnGo" onclick="addLetter('ENTER')">
+          <span class="material-symbols-outlined">keyboard_return</span> ENTER
+          </button>
+        </div>`
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -227,20 +244,52 @@
         /* overfl */
       }
       .main_content {
-        height: unset;
+        height: calc(100% - 500px)
       }
       #osk {
         position: absolute;
         bottom: 0px;
         width: 100%;
         outline: solid 1px var(--system-blue);
+        background-color: var(--system-bg);
+        height: 500px;
+        /* display: flex; */
+        /* flex-wrap: wrap; */
+      }
+      .oskBtn {
+        flex-grow: 1;
+        height: 90%;
+        margin: 2px;
+        margin-top: auto;
+        margin-bottom: auto;
+        padding: 0px;
+        border-radius: 5px;
+      }
+      .oskButton.iconned {
+        position: relative;
+        top: -10px;
+      }
+      .oskRow {
+        height: max(calc(100%/5), 70px);
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+      }
+      @media only screen and (max-height: 1000px) {
+        .main_content{
+          height: 50%;
+        }
+        #osk {
+          height: 50%;
+          overflow-y: auto;
+        }
       }
     </style>
   </head>
   <body onload = "globalOnload(()=>{ onLoad();});">
     <div class="main_content">
       <header>
-        <h2>CaPsDLe <sup style="font-size: 32px;" class="grn">BetaOS Services Exclusive!</sup></h2>
+        <h2>CaPsDLe <sup style="font-size: 32px;" class="grn nohover">BetaOS Services Exclusive!</sup></h2>
         <hr class="rounded">
       </header>
       <button onclick="openDialog()" class="btn fssml">

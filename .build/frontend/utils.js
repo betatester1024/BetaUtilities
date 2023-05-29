@@ -282,7 +282,7 @@ function openDialog(name = "dialog") {
 function mouseOver(e) {
   let ele = e.target;
   let text = ele.innerHTML.replaceAll(/<.*((>.*<\/.*>)|(\/>))/gmiu, "").replaceAll("\n", "").trim();
-  if (ele.className.match(/(\W|^)btn(\W|$)/)) {
+  if (ele.className.match(/(\W|^)btn(\W|$)/) && !ele.className.match(/(\W|^)notooltip(\W|$)/)) {
     let tooltip = ele.children.namedItem("TOOLTIP");
     if (!tooltip) {
       tooltip = document.createElement("span");

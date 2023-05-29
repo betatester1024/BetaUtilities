@@ -375,7 +375,7 @@ function mouseOver(e:MouseEvent) {
   let ele = e.target;
   let text = ele.innerHTML.replaceAll(/<.*((>.*<\/.*>)|(\/>))/gmiu, "").replaceAll("\n", "").trim();
   // fuck off this is good enough, it's not even used as raw html
-  if (ele.className.match(/(\W|^)btn(\W|$)/)) {
+  if (ele.className.match(/(\W|^)btn(\W|$)/) && !ele.className.match(/(\W|^)notooltip(\W|$)/)) {
     let tooltip = ele.children.namedItem("TOOLTIP");
     if (!tooltip) {
       tooltip = document.createElement("span");

@@ -20,8 +20,10 @@ async function globalOnload(cbk) {
       maincontent.appendChild(ftr);
       let ele3 = document.createElement("p");
       ele3.id = "footer";
+      let urlEle = new URL(location.href);
+      let redirector = urlEle.pathname + "?" + urlEle.searchParams.toString();
       if (res.status != "SUCCESS")
-        ele3.innerHTML = `<a href="/login?redirect=${window.location.pathname}">Login</a> | 
+        ele3.innerHTML = `<a href="/login?redirect=${redirector}">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
                       BetaOS Systems V2, 2023`;

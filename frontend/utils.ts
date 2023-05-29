@@ -45,8 +45,10 @@ async function globalOnload(cbk:()=>any) {
       
       let ele = document.createElement("p");
       ele.id="footer";
+      let urlEle = new URL(location.href);
+      let redirector = urlEle.pathname + "?"+urlEle.searchParams.toString();
       if (res.status != "SUCCESS")
-        ele.innerHTML = `<a href="/login?redirect=${window.location.pathname}">Login</a> | 
+        ele.innerHTML = `<a href="/login?redirect=${redirector}">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
                       BetaOS Systems V2, 2023`;

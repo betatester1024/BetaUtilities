@@ -7,18 +7,19 @@
       let CURRROW = 0;
       let CURRCOL = 0;
       let CURRWORD = "";
+      let copyText = [];
       function addLetter(e) {
         // nowWord = "abcDC"
         let letter = "INVALID"
         
-        if (e.keyCode >= 65 && e.keyCode <= 90) {
+        if (e.keyCode >= 65 && e.keyCode <= 90 || e.keyCode >= 48 && e.keyCode <= 57) {
           letter = e.key;
           if (e.shiftKey) letter = letter.toUpperCase();
         }
         if (e.keyCode == 8) letter= "BKSP"
         if (e.keyCode == 13) letter= "ENTER";
         if (letter == "INVALID") return;
-        else e.preventDefault();
+        else if (letter != "ENTER") e.preventDefault();
         if (letter == "BKSP" && CURRCOL > 0) {
           CURRCOL --;
           updateHighlight();
@@ -34,33 +35,42 @@
         else if (CURRCOL >= 5 && letter == "ENTER") {
           // verify letter
           let correctCt = 0;
+          let rowCopy = "";
           for (let i=0; i<5; i++) {
             // correct case, correct place
+            
             if (CURRWORD [i] == nowWord[i]) {
               correctCt ++;
               byId("row"+CURRROW+"letter"+i).style.backgroundColor = "var(--system-green)";
+              rowCopy += "🟩"
             }
               // wrong case, correct place
             else if (CURRWORD[i] == swapCase(nowWord[i])) {
               byId("row"+CURRROW+"letter"+i).style.backgroundColor = "var(--system-blue)";
+              rowCopy += "🟦";
             }
               // correct case, wrong place
             else if (nowWord.indexOf(CURRWORD[i]) >= 0) {
               byId("row"+CURRROW+"letter"+i).style.backgroundColor = "var(--system-yellow)";
+              rowCopy += "🟨"
             }
               // wrong case, wrong place
             else if (nowWord.indexOf(swapCase(CURRWORD[i])) >= 0) {
-              byId("row"+CURRROW+"letter"+i).style.backgroundColor = "var(--system-red)";
+              byId("row"+CURRROW+"letter"+i).style.backgroundColor = "var(--system-orange)";
+              rowCopy += "🟧";
             }
             // does not exist in word
             else {
               byId("row"+CURRROW+"letter"+i).style.backgroundColor = "var(--system-overlay)";
+              rowCopy += "⬜";
             }
           }
+          copyText.push(rowCopy);
           if (correctCt == 5) {
-            alertDialog(`Congratulations! You have won in ${CURRROW+1} moves! 
+            e.preventDefault();
+            alertDialog(`Congratulations! You have won in ${CURRROW+1} move${CURRROW==0?"":"s"}! 
             Press ENTER to share your score.`, 
-            ()=>{ navigator.clipboard.writeText("Look, mother, I won in "+(CURRROW+1)+" moves!");}, 2);
+            ()=>{ navigator.clipboard.writeText(copyText.join("\n")+"\n"+(CURRROW+1)+" move"+(CURRROW==0?"":"s")+"\nCapsdle by BetaOS: "+location.href);}, 2);
             document.body.removeEventListener("keydown", addLetter);
             return;
           }
@@ -71,7 +81,9 @@
           if (CURRROW < 12) {
             let newRow = document.createElement("div");
             newRow.id = "row"+CURRROW;
-            newRow.innerHTML = `<div class="letter" id="row${CURRROW}letter0"></div>
+            newRow.innerHTML = `
+            <div class="letter ct" id="row${CURRROW}Ct">${CURRROW+1}</div>
+            <div class="letter" id="row${CURRROW}letter0"></div>
               <div class="letter" id="row${CURRROW}letter1"></div>
               <div class="letter" id="row${CURRROW}letter2"></div>
               <div class="letter" id="row${CURRROW}letter3"></div>
@@ -80,6 +92,7 @@
             byId("btnRow").appendChild(newRow);
             
           } else {
+            e.preventDefault();
             document.body.removeEventListener("keydown", addLetter);
             alertDialog("You have lost.", ()=>{})
           }
@@ -115,10 +128,11 @@
       
         return 4294967296 * (2097151 & h2) + (h1 >>> 0);
       };
-      let nowWord = "ErRoR";
-      const letters =  "abcdefghijklmnopqrstuvwxyz";
-      const capitals = "QWERTYUIOPASDFGHJKLZXCVBNM";
+      let nowWord = "";
+      const letters =  "abcdefghijklmnopqrstuvwxyz0123456789";
+      const capitals = "QWERTYUIOPASDFGHJKLZXCVBNM0123456789";
       function updateCurrWord() {
+        let prevWord = nowWord;
         nowWord = "";
         let now = new Date(Date.now());
         let nowMins = Math.floor(now.getMinutes() / 5)*5; // floors to interval of 5 minutes.
@@ -127,10 +141,13 @@
         let nowHash = hashIt(nowDay+"/"+nowHrs+"/"+nowMins);
         let nextExpiry = 5*60*1000 - (Date.now())%(5*60*1000)
         for (let i=0; i<5; i++) {
-          let currLetterIdx =Math.floor((nowHash%Math.pow(52, 5)) / Math.pow(52, i)) % 52;
+          let currLetterIdx =Math.floor((nowHash%Math.pow(62, 5)) / Math.pow(62, i)) % 62;
           if (currLetterIdx < 26) nowWord += letters[currLetterIdx % 26];
-          else nowWord += capitals[currLetterIdx % 26];
+          else if (currLetterIdx < 52) nowWord += capitals[currLetterIdx % 26];
+          else nowWord += capitals[currLetterIdx - 26];
         }
+        byId("updates").innerHTML = "Current word updates in: <kbd>"+toTime(nextExpiry)+"</kbd>";
+        if (nowWord!=prevWord && prevWord != "") alertDialog("Current word has been updated!", ()=>{location.reload();})
       }
 
       function onLoad() {
@@ -139,6 +156,7 @@
       }
     </script>
     <meta name="viewport" content="width=device-width">
+     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -155,6 +173,7 @@
         display: inline-block;
         vertical-align: top;
         transition: all 0.5s ease;
+        font-family: "Noto Sans Mono", monospace;
       }
       .activeRow > .letter {
         background-color: var(--system-bg);
@@ -162,42 +181,45 @@
       .activeLetter {
         background-color: var(--system-yellow2) !important;
       }
-      .flip-card {
-        background-color: transparent;
-        width: 400px;
-        height: 400px;
-        border: 2px solid #f1f1f1;
-        perspective: 1000px;
-      }
-      
-      .flip-card-inner {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        text-align: center;
-        transition: transform 0.8s;
-        transform-style: preserve-3d;
-        -webkit-backface-visibility: hidden; /* Safari */
-        backface-visibility: hidden;
-      }
-      
-      .flip-card:hover .flip-card-inner {
-        transform: rotateX(180deg);
-      }
-      
-      .flip-card-front, .flip-card-back {
-        /* position: absolute; */
-        width: 100%;
-        height: 100%;
-        -webkit-backface-visibility: hidden; /* Safari */
-        backface-visibility: hidden;
-      }
-      
-      
-      .flip-card-back {
-        transform: rotateX(180deg);
-      }
+      .ct {
+        color: var(--system-blue);
+        font-size: 40px;
 
+        background-color: var(--system-green2) !important;
+      }
+      #dialog {
+        top: 50vh; 
+        /* height: unset; */
+        /* z-index: 0; */
+        /* position: absolute; */
+        /* opacity */
+        opacity: 0;
+        pointer-events: none;
+      }
+      #dialog > .internal {
+        display: relative;
+        margin: 10px auto;
+        border-radius: 15px;
+        width: 90%;
+        background-color: var(--system-bg);
+        padding: 15px;
+      }
+      .democtn {
+        display: inline-block;
+        width: 60px;
+      }
+      .democtn > p {
+        width: 100%;
+        text-align: left;
+        margin-top: 2px;
+        /* overfl */
+      }
+      #osk {
+        position: absolute;
+        bottom: 0px;
+        width: 100%;
+        outline: solid 1px var(--system-blue);
+      }
     </style>
   </head>
   <body onload = "globalOnload(()=>{ onLoad();});">
@@ -206,8 +228,15 @@
         <h2>CaPsDLe <sup style="font-size: 32px;" class="grn">BetaOS Services Exclusive!</sup></h2>
         <hr class="rounded">
       </header>
+      <button onclick="openDialog()" class="btn fssml">
+        <span class="material-symbols-outlined">help</span>
+        What's this?
+        <div class="anim"></div>
+      </button>
+      <p id="updates">Word resetting in: [Loading]</p>
       <div class="btnRow" id="btnRow">
         <div id="row0" class="activeRow">
+          <div class="letter ct" id="row0Ct">1</div>
           <div class="letter activeLetter" id="row0letter0"></div>
           <div class="letter" id="row0letter1"></div>
           <div class="letter" id="row0letter2"></div>
@@ -228,6 +257,13 @@
         </div>
       </div>
     </div> -->
+      <div id="osk">
+        <button class="btn" id="btnq">q</button>
+        <button class="btn" id="btnw">w</button>
+        <button class="btn" id="btne">e</button>
+        <button class="btn" id="btnr">r</button>
+        <button class="btn" id="btnt">t</button>
+      </div>
       <a class="btn override" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>
         Return to home<div class="anim"></div></a>
@@ -242,6 +278,36 @@
           <div class="anim"></div>
         </button>
       </div>
+    </div>
+    <div class="overlay_dialog" id="dialog">
+      <div class="internal">
+        <h2 class="fsmed">How to play Capsdle</h2>
+        <p>Enter 5 alphanumeric letters (case-sensitive!) and press <kbd>ENTER</kbd>. <br>
+        You have 12 tries.</p>
+        <div class="democtn">
+          <div class="letter" id="row0letter0" style="background-color: var(--system-green)">
+          </div><p class="grn nohover"> Right place right case!</p>
+        </div> <div class="democtn">
+          <div class="letter" id="row0letter1" style="background-color: var(--system-blue)">
+          </div><p class="blu nohover"> Right place wrong case!</p>
+        </div> <div class="democtn">
+          <div class="letter" id="row0letter2" style="background-color: var(--system-yellow)">
+          </div><p class="ylw nohover"> Right case wrong place!</p>
+        </div> <div class="democtn">
+          <div class="letter" id="row0letter3" style="background-color: var(--system-orange)">
+          </div><p class="org nohover"> Wrong place wrong case!</p>
+        </div> <div class="democtn">
+          <div class="letter" id="row0letter4" style="background-color: var(--system-grey)">
+          </div><p class="gry nohover"> Letter not found in word</p>
+        </div>
+        <p>Word updates every five minutes.</p>
+      </div>
+      <button onclick="closeDialog(()=>{})" class="btn grn">
+        <span class="material-symbols-outlined">check</span>
+        Close
+        <div class="anim"></div>
+      </button>
+
     </div>
   </body>
 </html>

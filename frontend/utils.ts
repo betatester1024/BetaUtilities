@@ -4,13 +4,22 @@ let SESSIONTIMEOUT, SESSIONTIMEOUT2 = null;
 function byId(name:string) {
   return document.getElementById(name);
 }
-function globalOnload(cbk:()=>any) {
+async function globalOnload(cbk:()=>any) {
 
   var script = document.createElement('script');
   script.src = "./nodemodules/dialog-polyfill/dist/dialog-polyfill.js";
+  document.head.appendChild(script);
+  // load NotoSansMono
+  // const NSM = new FontFace('Noto Sans Mono', 'url(https://fonts.googleapis.com/css2?family=Noto+Sans+Mono&display=swap)');
+  // await NSM.load();
+  // document.fonts.add(NSM);
+  // WebFont.load({
+  //   google: {
+  //     families: ['Noto Sans Mono']
+  //   }
+  // });
+  console.log("Font loaded!")
   
-  document.head.appendChild(script); //or something of the likes
-
   document.onkeydown = keydown;
   
   document.body.addEventListener("mouseover", mouseOver);
@@ -79,9 +88,9 @@ function globalOnload(cbk:()=>any) {
     }, true);
 
   
-  // let ele2 = document.getElementById("overlay");
-  // if (ele2)
-  //   ele2.innerHTML = 
+  let ele2 = document.getElementById("overlay");
+  if (ele2)
+    ele2.innerHTML = `<div class="internal" style="opacity: 0; text-align: center !important"> </div>`
     // document.getElementById("internal_alerts").addEventListener("click", ()=>{});
   // document.body.innerHTML += `
   // <div class="internal" id="internal_alerts" onclick="if (dialogQ && !BLOCKCALLBACK) closeAlert(false, false)" style="opacity: 0; text-align: center !important">

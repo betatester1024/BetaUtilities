@@ -3,10 +3,11 @@ let SESSIONTIMEOUT, SESSIONTIMEOUT2 = null;
 function byId(name) {
   return document.getElementById(name);
 }
-function globalOnload(cbk) {
+async function globalOnload(cbk) {
   var script = document.createElement("script");
   script.src = "./nodemodules/dialog-polyfill/dist/dialog-polyfill.js";
   document.head.appendChild(script);
+  console.log("Font loaded!");
   document.onkeydown = keydown;
   document.body.addEventListener("mouseover", mouseOver);
   send(
@@ -17,30 +18,30 @@ function globalOnload(cbk) {
       let maincontent = document.getElementsByClassName("main_content").item(0);
       let ftr = document.createElement("footer");
       maincontent.appendChild(ftr);
-      let ele2 = document.createElement("p");
-      ele2.id = "footer";
+      let ele3 = document.createElement("p");
+      ele3.id = "footer";
       if (res.status != "SUCCESS")
-        ele2.innerHTML = `<a href="/login?redirect=${window.location.pathname}">Login</a> | 
+        ele3.innerHTML = `<a href="/login?redirect=${window.location.pathname}">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
                       BetaOS Systems V2, 2023`;
       else {
         resetExpiry(res);
-        ele2.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
+        ele3.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
                       <a href='/logout'>Logout</a> | 
                       <a href='/config'>Account</a> | 
                       <a href='/status'>Status</a> | 
                       <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
                       BetaOS Systems V2, 2023`;
       }
-      ftr.appendChild(ele2);
+      ftr.appendChild(ele3);
       send(
         JSON.stringify({ action: "visits" }),
         (res2) => {
           if (res2.status != "SUCCESS") {
             alertDialog("Database connection failure. Please contact BetaOS.", () => {
             });
-            ele2.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`;
+            ele3.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`;
           }
           document.getElementById("footer").innerHTML += " | <kbd>" + res2.data.data + "</kbd>";
           send(JSON.stringify({ action: "cookieRequest" }), (res3) => {
@@ -62,6 +63,9 @@ function globalOnload(cbk) {
     },
     true
   );
+  let ele2 = document.getElementById("overlay");
+  if (ele2)
+    ele2.innerHTML = `<div class="internal" style="opacity: 0; text-align: center !important"> </div>`;
   let ele = document.getElementById("");
   document.body.innerHTML += `
   <div id="compliance">

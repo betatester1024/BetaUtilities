@@ -8,6 +8,7 @@ html, ::backdrop {
   --system-green2: rgba(0, 255, 0, 0.1);
   --max-green: #00ef00;
   --system-yellow: #FFCC1F;
+  --system-yellowtext: #ea8600;
   --system-yellow2:rgba(255, 204, 31, 0.1);
   --system-orange: #F65314;
   --system-orange2: #F653141A;
@@ -201,7 +202,7 @@ div.anim.inp {
   border: 2.3px solid var(--system-green);
 }
 .ylw {
-  color: var(--system-yellow);
+  color: var(--system-yellowtext);
 }
 .ylw:hover, .ylw:focus {
   background-color: var(--system-yellow2);

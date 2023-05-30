@@ -8,10 +8,10 @@ html, ::backdrop {
   --system-green2: rgba(0, 255, 0, 0.1);
   --max-green: #00ef00;
   --system-yellow: #FFCC1F;
-  --system-yellowtext: #ea8600;
+  --system-yellowtext: #e99201;
   --system-yellow2:rgba(255, 204, 31, 0.1);
-  --system-orange: #F65314;
-  --system-orange2: #F653141A;
+  --system-orange: #f85c12;
+  --system-orange2: #F85c121A;
   --system-grey: #8c8c8c;
   --system-grey2:rgba(140, 140, 140, 0.1);
   --system-bg: #eee;
@@ -35,10 +35,11 @@ html, ::backdrop {
     --system-green2: rgba(0, 255, 0, 0.25);
     --system-yellow2:rgba(255, 204, 31, 0.25);
     --system-overlay: rgba(52, 52, 52, 0.95);
+    --system-overlay2: rgba(52, 52, 52, 0.6);
     --system-blue: #0cc8fe;
   }
 }
-.dark {
+.dark, .dark > body > ::backdrop {
   --system-bg: #222;
   --system-black: #eee;
   --system-grey: #bfbfbf;
@@ -49,6 +50,7 @@ html, ::backdrop {
   --system-green2: rgba(0, 255, 0, 0.25);
   --system-yellow2:rgba(255, 204, 31, 0.25);
   --system-overlay: rgba(52, 52, 52, 0.95);
+  --system-overlay2: rgba(52, 52, 52, 0.6);
   --system-blue: #0cc8fe;
 }
 
@@ -445,6 +447,13 @@ kbd {
 }
 
 dialog::backdrop {
+  background-color: var(--system-overlay2);
+}
+
+/* 
+
+  l., lk;ji'ppoiooiuiioo*/
+dialog + .backdrop { /* polyfill */
   background-color: var(--system-overlay2);
 }
 

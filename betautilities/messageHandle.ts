@@ -578,13 +578,13 @@ export function wordleUpdate() {
 }
 
 export async function uptime(token:string) {
-  let time = Number(fs.readFileSync('./betautilities/runtime.txt'));
-  return {status:"SUCCESS", data:{up:Date.now() - STARTTIME, total:time}, token:token};
+  let time = await uDB.findOne({fieldName:"UPTIME"});
+  return {status:"SUCCESS", data:{up:Date.now() - STARTTIME, total:time.uptime}, token:token};
 }
-function getUptimeStr(STARTTIME:number=-1) {
+async function getUptimeStr(STARTTIME:number=-1) {
   if (STARTTIME < 0) {
-    let time = Number(fs.readFileSync('./betautilities/runtime.txt'));
-    return formatTime(time);
+    let time = await uDB.findOne({fieldName:"UPTIME"});//  Number(fs.readFileSync('./betautilities/runtime.txt'));
+    return formatTime(time.uptime);
   }
   let timeElapsed = Date.now() - STARTTIME;
   let date = new Date(STARTTIME);

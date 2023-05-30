@@ -5,6 +5,7 @@ export let todayLeetCODE:string[] = [];
 let charSet = "0123456789abcdefghijklmnopqrstuvwxyz";
 export let allWords:string[] = [];
 export let validWords:string[] = [];
+import {uDB} from '../consts';
 
 fs.readFile('betautilities/wordfile.txt', (err:ErrorEvent, data:any) => {
   if (err) throw err;
@@ -49,10 +50,10 @@ function hashCode(str:string) {
 }
 
 let STARTTIME = Date.now();
-export function serverUpdate() {
+export async function serverUpdate() {
   setTimeout(serverUpdate, 1000);
   if (FILEDATA) refreshCodes()
   let offsetTime = Date.now()-STARTTIME;
   STARTTIME = Date.now();
-  fs.writeFileSync('betautilities/runtime.txt', (Number(fs.readFileSync('betautilities/runtime.txt')) + offsetTime).toString());
+  await uDB.updateOne({fieldName:"UPTIME"}, {$inc:{uptime:offsetTime}}, {upsert:true});
 }

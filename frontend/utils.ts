@@ -4,11 +4,16 @@ let SESSIONTIMEOUT, SESSIONTIMEOUT2 = null;
 function byId(name:string) {
   return document.getElementById(name);
 }
-async function globalOnload(cbk:()=>any) {
+let HASNETWORK = false;
+async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
 
-  var script = document.createElement('script');
-  script.src = "./nodemodules/dialog-polyfill/dist/dialog-polyfill.js";
-  document.head.appendChild(script);
+  if (!networkLess) {
+    var script = document.createElement('script');
+    script.src = "./nodemodules/dialog-polyfill/dist/dialog-polyfill.js";
+    document.head.appendChild(script);
+  }
+  else byId("overlayL").remove();
+  HASNETWORK = !networkLess;
   // load NotoSansMono
   // const NSM = new FontFace('Noto Sans Mono', 'url(https://fonts.googleapis.com/css2?family=Noto+Sans+Mono&display=swap)');
   // await NSM.load();
@@ -18,7 +23,7 @@ async function globalOnload(cbk:()=>any) {
   //     families: ['Noto Sans Mono']
   //   }
   // });
-  console.log("Font loaded!")
+  // console.log("Font loaded!")
   
   document.onkeydown = keydown;
   
@@ -30,6 +35,7 @@ async function globalOnload(cbk:()=>any) {
   //     closeAlert(-1);
   //   }
   // };
+  if (!networkLess) {
   send(JSON.stringify({ action: "userRequest" }),
     (res) => {
       document.documentElement.className = res.data.darkQ?"dark":"";
@@ -88,30 +94,11 @@ async function globalOnload(cbk:()=>any) {
         }, true);
       
     }, true);
-
+  }
   
   let ele2 = document.getElementById("overlay");
   if (ele2)
     ele2.innerHTML = `<div class="internal" style="opacity: 0; text-align: center !important"> </div>`
-    // document.getElementById("internal_alerts").addEventListener("click", ()=>{});
-  // document.body.innerHTML += `
-  // <div class="internal" id="internal_alerts" onclick="if (dialogQ && !BLOCKCALLBACK) closeAlert(false, false)" style="opacity: 0; text-align: center !important">
-  //       <p class="fsmed" id="alerttext_v2">Error: AlertDialog configured incorrectly. Please contact BetaOS.</p>
-  //       <div style="text-align: center;"><button class="btn szHalf override" onclick="closeAlert()" style="display: inline-block">
-  //         <span class="alertlbl">Continue</span>
-  //         <span class="material-symbols-outlined">arrow_forward_ios</span>
-  //         <div class="anim"></div>
-  //       </button>
-  //       <button class="btn szHalf red override" id="cancelBtn" style="display: none" onclick="closeAlert(true)">
-  //         <span class="alertlbl">Cancel</span>
-  //         <span class="material-symbols-outlined">cancel</span>
-  //         <div class="anim"></div>
-  //       </button></div>
-  //     </div>`;
-  
-  // else console.log("Alert dialogs disabled on this page");
-  
-  let ele = document.getElementById("");
   document.body.innerHTML += `
   <div id="compliance">
     <h2 class="blu nohover"><span class="material-symbols-outlined">cookie </span> BetaOS Services uses cookies to operate.</h2>
@@ -124,7 +111,9 @@ async function globalOnload(cbk:()=>any) {
     <div class="anim"></div>
     </button>
   </div>`;
-  
+  if (networkLess) {let cpl = document.getElementById("compliance");
+  cpl.style.opacity="1"; }
+              // cpl.style.pointerEvents="none";
 }
 
 function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false) {
@@ -179,7 +168,8 @@ function alertDialog(str: string, callback: () => any = ()=>{}, button: number =
   // console.log("Timeout cleared")
   // e.preventDefault();
   let newDialog = document.createElement("dialog");
-  dialogPolyfill.registerDialog(newDialog);
+  try {dialogPolyfill.registerDialog(newDialog);}
+  catch (e:Exception) {str += "\n\nAdditionally, an error occurred while loading dialogs: "+e}
   document.body.appendChild(newDialog);
   newDialog.className = "internal ALERT";
   newDialog.id="internal_alerts";

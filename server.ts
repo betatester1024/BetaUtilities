@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const crypto = require("crypto");
 const parse = require("co-body");
+const fs = require('fs');
  // for generating secure random #'s
 import {connectionSuccess} from './index';
 import {port, msgDB, authDB, frontendDir, roomRegex, rootDir, jsDir, uDB} from './consts';
@@ -28,7 +29,7 @@ export async function initServer() {
   var limiter = RateLimit({
     windowMs: 10*1000, // 10 seconds
     max: 50,
-    message: "Too many requests, please try again later.",
+    message: tooManyRequests(),
     statusCode: 429, // 429 status = Too Many Requests (RFC 6585)
   });
   app.use(limiter);
@@ -503,6 +504,49 @@ function eeFormat(data:string) {
     <span class="material-symbols-outlined">arrow_back_ios</span>
     
     Return to home<div class="anim"></div></a>
+    </div>
+    
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>`;
+}
+
+function tooManyRequests() {
+  return `<!DOCTYPE html>
+<html>
+  <head>
+    <title>Error 429 | BetaOS Systems</title>
+    <script>
+    ${fs.readFileSync(jsDir+"/utils.js")}
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <style>
+      ${fs.readFileSync(frontendDir+"/globalformat.css")}
+    </style>
+  </head>
+  <body onload="globalOnload(()=>{}, true)">
+    <div class="main_content">
+    <header>
+      <h2>Error: Too many requests</h2>
+      <hr class="redrounded">
+    </header>
+    <p class="fsmed"><span class="material-symbols-outlined red nohover nooutline">error</span>
+    Try <button class="btn fssml" onclick="location.reload()">
+    <span class="material-symbols-outlined">refresh</span>
+    refreshing.<div class="anim"></div></button></p>
     </div>
     
     <div class="overlay" id="overlay">

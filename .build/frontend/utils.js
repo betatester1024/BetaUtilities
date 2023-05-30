@@ -3,72 +3,77 @@ let SESSIONTIMEOUT, SESSIONTIMEOUT2 = null;
 function byId(name) {
   return document.getElementById(name);
 }
-async function globalOnload(cbk) {
-  var script = document.createElement("script");
-  script.src = "./nodemodules/dialog-polyfill/dist/dialog-polyfill.js";
-  document.head.appendChild(script);
-  console.log("Font loaded!");
+let HASNETWORK = false;
+async function globalOnload(cbk, networkLess = false) {
+  if (!networkLess) {
+    var script = document.createElement("script");
+    script.src = "./nodemodules/dialog-polyfill/dist/dialog-polyfill.js";
+    document.head.appendChild(script);
+  } else
+    byId("overlayL").remove();
+  HASNETWORK = !networkLess;
   document.onkeydown = keydown;
   document.body.addEventListener("mouseover", mouseOver);
-  send(
-    JSON.stringify({ action: "userRequest" }),
-    (res) => {
-      document.documentElement.className = res.data.darkQ ? "dark" : "";
-      console.log("Loading complete; updating class");
-      let maincontent = document.getElementsByClassName("main_content").item(0);
-      let ftr = document.createElement("footer");
-      maincontent.appendChild(ftr);
-      let ele3 = document.createElement("p");
-      ele3.id = "footer";
-      let urlEle = new URL(location.href);
-      let redirector = urlEle.pathname + "?" + urlEle.searchParams.toString();
-      if (res.status != "SUCCESS")
-        ele3.innerHTML = `<a href="/login?redirect=${redirector}">Login</a> | 
+  if (!networkLess) {
+    send(
+      JSON.stringify({ action: "userRequest" }),
+      (res) => {
+        document.documentElement.className = res.data.darkQ ? "dark" : "";
+        console.log("Loading complete; updating class");
+        let maincontent = document.getElementsByClassName("main_content").item(0);
+        let ftr = document.createElement("footer");
+        maincontent.appendChild(ftr);
+        let ele = document.createElement("p");
+        ele.id = "footer";
+        let urlEle = new URL(location.href);
+        let redirector = urlEle.pathname + "?" + urlEle.searchParams.toString();
+        if (res.status != "SUCCESS")
+          ele.innerHTML = `<a href="/login?redirect=${redirector}">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
                       BetaOS Systems V2, 2023`;
-      else {
-        resetExpiry(res);
-        ele3.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
+        else {
+          resetExpiry(res);
+          ele.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
                       <a href='/logout'>Logout</a> | 
                       <a href='/config'>Account</a> | 
                       <a href='/status'>Status</a> | 
                       <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
                       BetaOS Systems V2, 2023`;
-      }
-      ftr.appendChild(ele3);
-      send(
-        JSON.stringify({ action: "visits" }),
-        (res2) => {
-          if (res2.status != "SUCCESS") {
-            alertDialog("Database connection failure. Please contact BetaOS.", () => {
-            });
-            ele3.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`;
-          }
-          document.getElementById("footer").innerHTML += " | <kbd>" + res2.data.data + "</kbd>";
-          send(JSON.stringify({ action: "cookieRequest" }), (res3) => {
-            if (res3.data.toString() == "false") {
-              let cpl = document.getElementById("compliance");
-              cpl.style.opacity = "1";
-              cpl.style.pointerEvents = "auto";
-            } else {
-              let cpl = document.getElementById("compliance");
-              cpl.style.opacity = "0";
-              cpl.style.pointerEvents = "none";
+        }
+        ftr.appendChild(ele);
+        send(
+          JSON.stringify({ action: "visits" }),
+          (res2) => {
+            if (res2.status != "SUCCESS") {
+              alertDialog("Database connection failure. Please contact BetaOS.", () => {
+              });
+              ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`;
             }
-            if (cbk)
-              cbk();
-          }, true);
-        },
-        true
-      );
-    },
-    true
-  );
+            document.getElementById("footer").innerHTML += " | <kbd>" + res2.data.data + "</kbd>";
+            send(JSON.stringify({ action: "cookieRequest" }), (res3) => {
+              if (res3.data.toString() == "false") {
+                let cpl = document.getElementById("compliance");
+                cpl.style.opacity = "1";
+                cpl.style.pointerEvents = "auto";
+              } else {
+                let cpl = document.getElementById("compliance");
+                cpl.style.opacity = "0";
+                cpl.style.pointerEvents = "none";
+              }
+              if (cbk)
+                cbk();
+            }, true);
+          },
+          true
+        );
+      },
+      true
+    );
+  }
   let ele2 = document.getElementById("overlay");
   if (ele2)
     ele2.innerHTML = `<div class="internal" style="opacity: 0; text-align: center !important"> </div>`;
-  let ele = document.getElementById("");
   document.body.innerHTML += `
   <div id="compliance">
     <h2 class="blu nohover"><span class="material-symbols-outlined">cookie </span> BetaOS Services uses cookies to operate.</h2>
@@ -81,6 +86,10 @@ async function globalOnload(cbk) {
     <div class="anim"></div>
     </button>
   </div>`;
+  if (networkLess) {
+    let cpl = document.getElementById("compliance");
+    cpl.style.opacity = "1";
+  }
 }
 function send(params, callback, onLoadQ = false) {
   let overlay2 = document.getElementById("overlayL");
@@ -129,7 +138,11 @@ let dialogQ = false;
 function alertDialog(str, callback = () => {
 }, button = -1, failedReq = "") {
   let newDialog = document.createElement("dialog");
-  dialogPolyfill.registerDialog(newDialog);
+  try {
+    dialogPolyfill.registerDialog(newDialog);
+  } catch (e) {
+    str += "\n\nAdditionally, an error occurred while loading dialogs: " + e;
+  }
   document.body.appendChild(newDialog);
   newDialog.className = "internal ALERT";
   newDialog.id = "internal_alerts";

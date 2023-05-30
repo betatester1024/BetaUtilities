@@ -25,6 +25,7 @@ __export(wordler_exports, {
   validWords: () => validWords
 });
 module.exports = __toCommonJS(wordler_exports);
+var import_consts = require("../consts");
 const fs = require("fs");
 let todayWordID = 0;
 let FILEDATA;
@@ -67,13 +68,13 @@ function hashCode(str) {
   return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 }
 let STARTTIME = Date.now();
-function serverUpdate() {
+async function serverUpdate() {
   setTimeout(serverUpdate, 1e3);
   if (FILEDATA)
     refreshCodes();
   let offsetTime = Date.now() - STARTTIME;
   STARTTIME = Date.now();
-  fs.writeFileSync("betautilities/runtime.txt", (Number(fs.readFileSync("betautilities/runtime.txt")) + offsetTime).toString());
+  await import_consts.uDB.updateOne({ fieldName: "UPTIME" }, { $inc: { uptime: offsetTime } }, { upsert: true });
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

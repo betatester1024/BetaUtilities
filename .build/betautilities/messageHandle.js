@@ -592,13 +592,13 @@ function norm(str) {
 function wordleUpdate() {
 }
 async function uptime(token) {
-  let time = Number(fs.readFileSync("./betautilities/runtime.txt"));
-  return { status: "SUCCESS", data: { up: Date.now() - STARTTIME, total: time }, token };
+  let time = await import_consts.uDB.findOne({ fieldName: "UPTIME" });
+  return { status: "SUCCESS", data: { up: Date.now() - STARTTIME, total: time.uptime }, token };
 }
-function getUptimeStr(STARTTIME2 = -1) {
+async function getUptimeStr(STARTTIME2 = -1) {
   if (STARTTIME2 < 0) {
-    let time = Number(fs.readFileSync("./betautilities/runtime.txt"));
-    return formatTime(time);
+    let time = await import_consts.uDB.findOne({ fieldName: "UPTIME" });
+    return formatTime(time.uptime);
   }
   let timeElapsed = Date.now() - STARTTIME2;
   let date = new Date(STARTTIME2);

@@ -10,6 +10,7 @@
   white-space: normal;
   border-radius: 10px;
 }
+
 #userList {
   border-radius: 10px;
   width: calc(12% - 20px);

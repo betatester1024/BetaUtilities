@@ -103,19 +103,19 @@ async function initServer() {
     });
     (0, import_logging.incrRequests)();
   });
+  app.get("*/nodemodules/*", (req, res) => {
+    if (req.url.length > 500)
+      res.sendFile(import_consts.frontendDir + "/404.html");
+    else
+      res.sendFile(import_consts.rootDir + "node_modules" + req.url.replace(/.*nodemodules/, ""));
+    (0, import_logging.incrRequests)();
+  });
   app.get("/paste", (req, res) => {
     res.sendFile(import_consts.frontendDir + "/newpaste.html");
     (0, import_logging.incrRequests)();
   });
   app.get("/paste/*", (req, res) => {
     res.sendFile(import_consts.frontendDir + "/paste.html");
-    (0, import_logging.incrRequests)();
-  });
-  app.get("/nodemodules/*", (req, res) => {
-    if (req.url.length > 500)
-      res.sendFile(import_consts.frontendDir + "/404.html");
-    else
-      res.sendFile(import_consts.rootDir + "node_modules" + req.url.replace(/.*nodemodules/, ""));
     (0, import_logging.incrRequests)();
   });
   app.get("*/favicon.ico", (req, res) => {

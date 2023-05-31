@@ -37,7 +37,9 @@ hr.rounded {
 }
 form {
   width: 95%;
+  display: flex;
   margin: 0 auto;
+  text-align: left;
 }
 .anim.inp, #inpContainment, input {
   display: inline-block;
@@ -48,9 +50,13 @@ input {
 #inpContainment {
    width: calc(100% - 6.5em);
 }
+#inpContainment > input {
+  width: 99%;
+  margin: 0px 20px 0px 0px;
+}
 button#sendBtn {
-  position: relative;
-  top: -34px;
+  /* position: relative; */
+  /* top: -34px; */
   padding-top: 0px !important;
 }
 

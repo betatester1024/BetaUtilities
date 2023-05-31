@@ -95,6 +95,14 @@ export async function initServer() {
     incrRequests();
   })
 
+  app.get("*/nodemodules/*", (req:any, res:any) => {
+    // fuck off with your long requests
+    if (req.url.length > 500) res.sendFile(frontendDir+"/404.html");
+    else res.sendFile(rootDir+"node_modules"+req.url.replace(/.*nodemodules/, ""));
+    incrRequests();
+  })
+    
+
 
   app.get("/paste", (req:any, res:any) => {
     res.sendFile(frontendDir+"/newpaste.html");
@@ -111,13 +119,7 @@ export async function initServer() {
     incrRequests();
   })
 
-  app.get("/nodemodules/*", (req:any, res:any) => {
-    // fuck off with your long requests
-    if (req.url.length > 500) res.sendFile(frontendDir+"/404.html");
-    else res.sendFile(rootDir+"node_modules"+req.url.replace(/.*nodemodules/, ""));
-    incrRequests();
-  })
-    
+  
   app.get('*/favicon.ico', (req:Request, res:any)=> {
     res.sendFile(rootDir+'/favicon.ico')
     incrRequests();

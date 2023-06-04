@@ -35,6 +35,7 @@ var import_button = require("./button");
 var import_messageHandle = require("./betautilities/messageHandle");
 var import_supportRooms = require("./supportRooms");
 const express = require("express");
+const enableWs = require("express-ws");
 const app = express();
 const crypto = require("crypto");
 const parse = require("co-body");
@@ -44,6 +45,7 @@ const cookieParser = require("cookie-parser");
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 var RateLimit = require("express-rate-limit");
 async function initServer() {
+  enableWs(app);
   var limiter = RateLimit({
     windowMs: 10 * 1e3,
     max: 50,
@@ -70,6 +72,14 @@ async function initServer() {
       res.send(Buffer.from(eeFormat(data.data)));
     }, "", "");
     (0, import_logging.incrRequests)();
+  });
+  app.ws("/ws", (ws, req) => {
+    ws.on("message", (msg) => {
+      ws.send("reply:" + msg);
+    });
+    ws.on("close", () => {
+      console.log("WebSocket was closed");
+    });
   });
   app.get("/support", (req, res) => {
     let match = req.url.match("\\?room=(" + import_consts.roomRegex + ")");

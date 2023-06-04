@@ -80,6 +80,7 @@ b {
   padding-bottom: 2px;
   margin-bottom: 10px;
   vertical-align: top;
+  margin-right: 4px;
 }
 
 p {
@@ -91,6 +92,11 @@ p {
 h2 > span, .supportMsg {
   top: 5px;
   color: var(--system-blue);
+}
+
+
+div.msgContainer > div.msgContainer {
+  margin-left: 10px;  
 }
 
 p.slashMe {

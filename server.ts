@@ -1,4 +1,5 @@
 const express = require('express')
+const enableWs = require('express-ws');
 const app = express()
 const crypto = require("crypto");
 const parse = require("co-body");
@@ -17,6 +18,7 @@ import {getLogs, log, purgeLogs, visitCt, incrRequests} from './logging';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
 import {clickIt, getLeaderboard} from './button';
+import { WebSocketServer } from 'ws';
 import {uptime} from './betautilities/messageHandle'
 import {supportHandler, roomRequest, sendMsg, 
         createRoom, deleteRoom, WHOIS, loadLogs, 
@@ -26,6 +28,19 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false })
 var RateLimit = require('express-rate-limit');
 
 export async function initServer() {
+
+
+  // const wss = new WebSocketServer({server:app, path: "/ws"});
+  
+  // wss.on('connection', (ws:any)=>{
+  //   ws.on('error', console.log);
+  //   ws.on('message', (data:any)=>{
+  //     console.log('received: %s', data);
+  //   });
+  //   console.log("connected!");
+  //   ws.send('something');
+  // });
+  enableWs(app);
   var limiter = RateLimit({
     windowMs: 10*1000, // 10 seconds
     max: 50,
@@ -60,7 +75,15 @@ export async function initServer() {
     incrRequests();
   });
 
-  
+  app.ws('/ws', (ws, req) => {
+    ws.on('message', msg => {
+        ws.send("reply:"+msg)
+    })
+
+    ws.on('close', () => {
+        console.log('WebSocket was closed')
+    })
+  })
 
   app.get('/support', (req:any, res:any) => {
     let match = req.url.match('\\?room=('+roomRegex+")");

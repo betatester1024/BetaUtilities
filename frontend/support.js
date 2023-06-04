@@ -127,7 +127,10 @@ async function initClient()
       // parse things
       newMsgSender.innerText = matches[2];
       newMsgSender.className = classStr[matches[3]];
-      if (!PREPENDFLAG) area.appendChild(newMsgSender);
+      let ctn = document.createElement("div");
+      ctn.id=matches[1];
+      ctn.className='msgContainer'
+      if (!PREPENDFLAG) ctn.appendChild(newMsgSender);
       // newMsgBody.className = classStr[matches[3]];
       let msg = " "+matches[4].replaceAll("&gt;", ";gt;");
       for (let i=0; i<replacements.length; i++) {
@@ -204,14 +207,16 @@ async function initClient()
       }
       if (!PREPENDFLAG) {
         // console.log("NOT")
-        area.appendChild(ele);
-        area.appendChild(document.createElement("br"));
+        ctn.appendChild(ele);
+        ctn.appendChild(document.createElement("br"));
+        area.appendChild(ctn);
       }
       else {
         // console.log("PREPEND")
-        area.prepend(document.createElement("br"));
-        area.prepend(ele);
-        area.prepend(newMsgSender);
+        ctn.prepend(document.createElement("br"));
+        ctn.prepend(ele);
+        ctn.prepend(newMsgSender);
+        area.prepend(ctn);
       }
       document.getElementById("placeholder").style.display="none";
       if (!FOCUSSED) {

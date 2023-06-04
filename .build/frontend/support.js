@@ -111,8 +111,11 @@ async function initClient() {
         let newMsgSender = document.createElement("b");
         newMsgSender.innerText = matches[2];
         newMsgSender.className = classStr[matches[3]];
+        let ctn = document.createElement("div");
+        ctn.id = matches[1];
+        ctn.className = "msgContainer";
         if (!PREPENDFLAG)
-          area.appendChild(newMsgSender);
+          ctn.appendChild(newMsgSender);
         let msg = " " + matches[4].replaceAll("&gt;", ";gt;");
         for (let i2 = 0; i2 < replacements.length; i2++) {
           msg = msg.replaceAll(`:${replacements[i2].from}:`, ">EMOJI" + replacements[i2].to + ">");
@@ -177,12 +180,14 @@ async function initClient() {
           }
         }
         if (!PREPENDFLAG) {
-          area.appendChild(ele);
-          area.appendChild(document.createElement("br"));
+          ctn.appendChild(ele);
+          ctn.appendChild(document.createElement("br"));
+          area.appendChild(ctn);
         } else {
-          area.prepend(document.createElement("br"));
-          area.prepend(ele);
-          area.prepend(newMsgSender);
+          ctn.prepend(document.createElement("br"));
+          ctn.prepend(ele);
+          ctn.prepend(newMsgSender);
+          area.prepend(ctn);
         }
         document.getElementById("placeholder").style.display = "none";
         if (!FOCUSSED) {

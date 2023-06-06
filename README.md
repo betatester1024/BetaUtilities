@@ -11,9 +11,9 @@ BetaUtilities for euphoria.io using WebSocket.
 - Currently hosted on [repl.it](https://repl.it). 
 # BetaOS Services ONLINE
 - See [here!](https://betatester1024.repl.co)
-- Additional functionality on the site:
 
-# BetaOS Services
+Additional functionality on the site:
+## BetaOS Services
 - To do lists
 - Support forum with admin-created rooms
 - PasteIt! Secure paste service (Encryption coming soon)

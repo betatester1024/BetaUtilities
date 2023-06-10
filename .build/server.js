@@ -630,7 +630,8 @@ const validPages = [
   "/newpaste",
   "/pastesearch",
   "/clickit",
-  "/capsdle"
+  "/capsdle",
+  "/sweepthatmine"
 ];
 const ignoreLog = [
   "getEE",

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='./utils.js'></script>
+    <title>Administrative panel | BetaOS Systems</title>
+    <script>
+      const accessLevels = ["Error-level", "User", "Admin", "Super-admin"];
+      let grid = [];
+      let revealed = [];
+      let w = 20;
+      let h = 16;
+      let mineCt = 50;
+      function onLoad() {
+         // do stuff i guess
+        for (let y=0; y<h; y++) {
+          grid.push([]);
+          revealed.push([]);
+          grid[y].length = w;
+          revealed[y].length = w;
+          grid[y].fill(false);
+          revealed[y].fill(-1);
+          let swp = byId("sweep");
+          let div = document.createElement("div");
+          div.id="row"+y;
+          div.className="row";
+          for (let x=0; x<w; x++) {
+            div.innerHTML += `<button class="btn gry" onclick="reveal(${y},${x})" id="${y}-${x}">
+              <span class="material-symbols-outlined">question_mark</span> 
+            </button>`
+            
+          }
+          swp.appendChild(div);
+        }
+        console.log(grid);
+        initMines(6,5)
+      }
+      function initMines(x, y) {
+        // avoid area around x, y
+        for (let i=0; i<mineCt; i++) {
+          let newX = -1;
+          let newY = -1;
+          do {
+            newX = Math.floor(Math.random()*w);
+            newY = Math.floor(Math.random()*h);
+          }
+          while (grid[newY][newX]);
+          let dx = newX-x;
+          let dy = newY-y;
+          let dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist > 5 || Math.random()*dist/2 > 1) {
+            if (dist <= 5) console.log("dist "+dist)
+            grid[newY][newX] = true;
+          }
+          
+        } // i
+
+        prt();
+      }
+
+      function reveal(y, x) {
+        // console.log(y, x);
+        if (y >= h || x >= w || x<0 || y<0 || revealed[y][x] >= 0) return;
+        if (grid[y][x]) {
+          revealed[y][x]=9;
+          throw "error";
+          return;
+        }//alertDialog("you lost", ()=>{});
+        let surrounding = 0;
+        if (y<h-1 && grid[y+1][x]) surrounding++;
+        if (x<w-1 && grid[y][x+1]) surrounding++;
+        if (y>0 && grid[y-1][x]) surrounding++;
+        if (x>0 && grid[y][x-1]) surrounding++;
+        if (y<h-1 && x<w-1 && grid[y+1][x+1]) surrounding++;
+        if (y<h-1 && x>0 && grid[y+1][x-1]) surrounding++;
+        if (y>0 && x<w-1 && grid[y-1][x+1]) surrounding++;
+        if (y>0 && x>0 && grid[y-1][x-1]) surrounding++;
+        if (surrounding > 0) {
+          // console.log(surrounding)
+          revealed[y][x] = surrounding;
+          return;
+        }
+        else {
+          revealed[y][x] = 0;
+          // console.log("none")
+          reveal(y+1,x)   
+          reveal(y,x+1)   
+          reveal(y-1,x)   
+          reveal(y,x-1)   
+          reveal(y+1,x+1) 
+          reveal(y+1,x-1) 
+          reveal(y-1,x+1) 
+          reveal(y-1,x-1)
+        }
+      }
+      
+      function prt() {
+        let line = "";
+        for (let y=0; y<h; y++) {
+          for (let x=0; x<w; x++) {
+            let char = revealed[y][x];
+            if (char == -1) char = "?"
+            if (char == -1) char = "*"
+            line += char;
+          }
+          line += "\n"
+        }
+        console.log(line);
+        return line;
+      }
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      #superadmin {
+        border-radius:50px;
+        width: 90%;
+        margin: 0 auto;
+        transition: all 1s ease;
+      }
+      .inpContainer {
+        text-align: center !important;
+      }
+      .row {
+        display: flex;
+        /* flex-grow */
+      }
+    </style>
+  </head>
+  <body onload = "globalOnload(onLoad)">
+    <div class="main_content">
+      <header>
+        <h2>SweepThatMine</h2>
+        <hr class="rounded">
+      </header>
+      <div id="sweep"></div>
+      <a class="btn szFull override" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+    
+      </div>
+    </div>
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

@@ -14,6 +14,7 @@ html, ::backdrop {
   --system-orange2: #F85c121A;
   --system-grey: #8c8c8c;
   --system-grey2:rgba(140, 140, 140, 0.1);
+  --system-grey3:rgba(230, 230, 230, 0.4);
   --system-bg: #eee;
   --system-overlay: rgba(200, 200, 200, 0.95);
   --system-overlay2: rgba(200, 200, 200, 0.6);
@@ -29,9 +30,10 @@ html, ::backdrop {
     --system-black: #eee;
     --system-grey: #bfbfbf;
     --system-grey2:rgba(191, 191, 191, 0.1);
+    --system-grey3:rgba(119, 119, 119, 0.5);
     --system-red2: rgba(238, 0, 0, 0.25);
     --system-blue2: rgba(12, 200, 255, 0.25);
-    --system-blue3: rgba(12, 200, 255, 0.5);
+    --system-blue3: rgba(12, 200, 255, 0.4);
     --system-green2: rgba(0, 255, 0, 0.25);
     --system-yellow2:rgba(255, 204, 31, 0.25);
     --system-overlay: rgba(52, 52, 52, 0.95);
@@ -44,6 +46,7 @@ html, ::backdrop {
   --system-black: #eee;
   --system-grey: #bfbfbf;
   --system-grey2:rgba(191, 191, 191, 0.1);
+  --system-grey3:rgba(119, 119, 119, 0.5);
   --system-red2: rgba(238, 0, 0, 0.25);
   --system-blue2: rgba(12, 200, 255, 0.25);
   --system-blue3: rgba(12, 200, 255, 0.5);

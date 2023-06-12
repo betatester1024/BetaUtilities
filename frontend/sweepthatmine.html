@@ -8,12 +8,16 @@
       let grid = [];
       let initQ = false;
       let revealed = [];
-      let w = 10;
-      let h = 10;
-      let mineCt = 10;
+      let w = 20;
+      let h = 20;
+      let mineCt = 50;
       let revealedOK = 0;
       function onLoad() {
          // do stuff i guess
+        grid = [];
+        initQ = false;
+        revealed = [];
+        revealedOK = 0;
         for (let y=0; y<h; y++) {
           grid.push([]);
           revealed.push([]);
@@ -26,19 +30,43 @@
           div.id="row"+y;
           div.className="row";
           for (let x=0; x<w; x++) {
-            div.innerHTML += `<button class="btn gry cell notooltip override" onclick="this.blur(); reveal(${y},${x})" id="${y}-${x}">
-              <span class="material-symbols-outlined override">question_mark</span> 
-            </button>`
             
+            let btn = document.createElement("button");
+            btn.className = "btn gry cell notooltip override";
+            btn.id=y+"-"+x;
+            btn.innerHTML = `
+              <span class="material-symbols-outlined override">question_mark</span> `;
+            btn.onclick=(ev)=>{onClick(ev, y, x)};
+            btn.oncontextmenu=(ev)=>{onClick(ev, y, x)};
+            div.appendChild(btn);
           }
           swp.appendChild(div);
         }
         console.log(grid);
         // initMines(6,5)
       }
+      function onClick(thing, y, x) {
+        if (thing.ctrlKey || thing.shiftKey  || thing.button != 0) {
+          thing.preventDefault();
+          console.log('here');
+          flag(y, x);
+        }
+        else reveal(y, x);
+      }
+      function flag(y, x) {
+        if (revealed[y][x] == -1) {
+          revealed[y][x] = -2;
+          byId(y+'-'+x).innerHTML = `<span class="material-symbols-outlined override">flag</span>`;
+        }
+        else if (revealed[y][x] == -2) {
+          revealed[y][x] = -1; 
+          byId(y+'-'+x).innerHTML = `<span class="material-symbols-outlined override">question_mark</span>` ;
+        }
+      }
       function initMines(x, y) {
         // avoid area around x, y
         let i = 0;
+        
         while (i < mineCt) {
           let newX = -1;
           let newY = -1;
@@ -50,7 +78,7 @@
           let dx = newX-x;
           let dy = newY-y;
           let dist = Math.sqrt(dx*dx + dy*dy);
-          if (dist > 5 || Math.random()*dist > 1) {
+          if (dist > 2 && (dist > 5 || Math.random()*dist > 1)) {
             if (dist <= 5) console.log("dist "+dist)
             grid[newY][newX] = true;
             i++;
@@ -63,15 +91,16 @@
       }
       const word = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'error'];
       function reveal(y, x) {
+        // console.log(y, x);
+        if (y >= h || x >= w || x<0 || y<0 || revealed[y][x] >= 0) return;
+        if (revealed[y][x] == -2) return;
         if (!initQ) {
           initMines(x, y);
           initQ = true;
         }
-        // console.log(y, x);
-        if (y >= h || x >= w || x<0 || y<0 || revealed[y][x] >= 0) return;
         if (grid[y][x]) {
           revealed[y][x]=9;
-          alertDialog("you lost", ()=>{});
+          alertDialog("You lost!", ()=>{resetGrid();}, 2);
           let cell = byId(y+"-"+x);
           cell.innerHTML = `<span class="material-symbols-outlined override red nohover nooutline">explosion</span> `
           cell.className += " revealed nohover"
@@ -136,6 +165,11 @@
         console.log(line);
         return line;
       }
+      function resetGrid() {
+        byId("sweep").innerHTML = "";
+        onLoad();
+        
+      }
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -186,7 +220,7 @@
       /* .gry {} */
     </style>
   </head>
-  <body onload = "globalOnload(onLoad)">
+  <body onload = "globalOnload(onLoad)" oncontextmenu='return false;'>
     <div class="main_content">
       <header>
         <h2>SweepThatMine</h2>

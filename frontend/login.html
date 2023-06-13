@@ -9,12 +9,13 @@
         let usr = document.getElementById("userInp");
         let pwd = document.getElementById("pwdInp");
         let ck = document.getElementById("ckInp");
-        let redirect = document.URL.match("redirect=(.*)$")
+        let redirect = document.URL.match("redirect=(.*)$");
+        console.log(redirect);
         send(JSON.stringify({action:"login", data:{user:usr.value, pass:pwd.value, persistQ:ck.checked}}), (res)=>{
           if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{});
           else {
             alertDialog("Welcome, "+usr.value +" ("+accessLevels[res.data.perms]+")", ()=>{
-              if (redirect) window.open(redirect[1], '_self');
+              if (redirect) window.open(decodeURIComponent(redirect[1]), '_self');
               else window.open("/", '_self');
             });
           }

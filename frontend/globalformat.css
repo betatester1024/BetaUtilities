@@ -14,7 +14,7 @@ html, ::backdrop {
   --system-orange2: #F85c121A;
   --system-grey: #8c8c8c;
   --system-grey2:rgba(140, 140, 140, 0.1);
-  --system-grey3:rgba(230, 230, 230, 0.4);
+  --system-grey3:rgba(173, 173, 173, 0.4);
   --system-bg: #eee;
   --system-overlay: rgba(200, 200, 200, 0.95);
   --system-overlay2: rgba(200, 200, 200, 0.6);

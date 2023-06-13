@@ -245,6 +245,7 @@ function closeAlert(sel:number) {
   // let dialog = 
   let coll = document.getElementsByClassName("ALERT");
   let dialog = coll.item(coll.length-1);
+  if (!dialog) return;
   let overridecallback=false;
   if (dialog.getAttribute("type")==2 && sel < 0) overridecallback = true;
   if (!ele) {
@@ -262,7 +263,7 @@ function closeAlert(sel:number) {
   }
   // can't remove t he damn dialog because we want it to fade out first
   // so instead we change its class name so it does not get found again
-  setTimeout(()=>{dialog.close()}, 200);
+  setTimeout(()=>{dialog.close()}, 500);
   dialog.className = "internal CLOSEDALERT";
   dialog.id="CLOSEDALERT";
   // dialog.remove();
@@ -270,7 +271,7 @@ function closeAlert(sel:number) {
   
   // eval("(()=>{"+dialog.getAttribute("callback")+"})()");
   // dialog.
-  if (!byId("internal_alerts") && !DIALOGOPEN) {
+  if (!dialogsActive()) { // if no alerts are open AND form-dialog is not open
     dialogQ = false;
     ele.style.opacity="0";
     ele.style.pointerEvents="none";
@@ -343,10 +344,19 @@ function closeDialog(thing:()=>any, name:string="dialog") {
   div.style.opacity="0";
   div.style.pointerEvents="none";
   DIALOGOPEN=false;
-  document.getElementById("overlay").style.opacity = "0";
+  let ele = byId("overlay");
+  if (!dialogsActive()) { // if no alerts are open AND form-dialog is not open
+    dialogQ = false;
+    ele.style.opacity="0";
+    ele.style.pointerEvents="none";
+  }
   thing();
   
   // document.getElementById("startBtn").focus();
+}
+
+function dialogsActive() {
+  return document.getElementsByClassName("ALERT").length>0 || DIALOGOPEN;
 }
 
 function openDialog(name:string="dialog") {

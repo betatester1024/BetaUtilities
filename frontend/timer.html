@@ -121,6 +121,28 @@
         ADDTIME = Date.now() - STARTTIME + ADDTIME;
         console.log("+"+ADDTIME);
       }
+      function keyDown(ev) {
+        if (dialogsActive()) return;
+        if (ev.target.nodeName == "INPUT") {
+          if (ev.key == "Escape") closeDialog(()=>{byId("startBtn").focus();});
+          return;
+        }
+        switch(ev.key) {
+          case 'r': 
+            byId("resetBtn").click();
+            ev.preventDefault();
+            break;
+          case ' ':
+            byId("startBtn").click();
+            ev.preventDefault();
+            break;
+          case 'e':
+            byId("timer").click();
+            ev.preventDefault();
+            break;
+          
+        }
+      }
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -166,13 +188,21 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload(()=>{document.getElementById('h').focus(); openDialog()}); windowResize(); redraw(true)" onresize="windowResize()">
+  <body onload = "
+      globalOnload(()=>{
+        document.getElementById('h').focus(); 
+        openDialog(); 
+        document.addEventListener('keydown', keyDown);
+      }); 
+      windowResize(); 
+      redraw(true)" 
+    onresize="windowResize()">
     <div class="main_content">
       <header>
         <h2 class="fsmed">Timer</h2>
         <hr class="rounded">
       </header>
-      <canvas id="timer" width="500" height="500" onclick="if (TIMERID<0){openDialog();}"></canvas><br>
+      <canvas id="timer" width="500" height="500" onclick="if (TIMERID<0){byId('h').focus(); openDialog();}"></canvas><br>
       <button class="btn szFull grn override" id="startBtn" onclick="startTimer()">
         <span class="material-symbols-outlined">arrow_forward_ios</span>
         Start<div class="anim"></div>

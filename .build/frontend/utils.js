@@ -199,6 +199,8 @@ function closeAlert(sel) {
   let ele = document.getElementById("overlay");
   let coll = document.getElementsByClassName("ALERT");
   let dialog = coll.item(coll.length - 1);
+  if (!dialog)
+    return;
   let overridecallback = false;
   if (dialog.getAttribute("type") == 2 && sel < 0)
     overridecallback = true;
@@ -219,10 +221,10 @@ function closeAlert(sel) {
   }
   setTimeout(() => {
     dialog.close();
-  }, 200);
+  }, 500);
   dialog.className = "internal CLOSEDALERT";
   dialog.id = "CLOSEDALERT";
-  if (!byId("internal_alerts") && !DIALOGOPEN) {
+  if (!dialogsActive()) {
     dialogQ = false;
     ele.style.opacity = "0";
     ele.style.pointerEvents = "none";
@@ -281,8 +283,16 @@ function closeDialog(thing, name = "dialog") {
   div.style.opacity = "0";
   div.style.pointerEvents = "none";
   DIALOGOPEN = false;
-  document.getElementById("overlay").style.opacity = "0";
+  let ele = byId("overlay");
+  if (!dialogsActive()) {
+    dialogQ = false;
+    ele.style.opacity = "0";
+    ele.style.pointerEvents = "none";
+  }
   thing();
+}
+function dialogsActive() {
+  return document.getElementsByClassName("ALERT").length > 0 || DIALOGOPEN;
 }
 function openDialog(name = "dialog") {
   let div = document.getElementById(name);

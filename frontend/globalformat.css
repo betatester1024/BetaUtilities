@@ -80,10 +80,7 @@ hr.redrounded {
   border-radius: 5px;
 }
 
-*:focus {
-  outline: 3px solid var(--system-blue);
-  /* transition:  */
-}
+
 .main_content {
   height: 100vh;
   width: 100vw;
@@ -127,7 +124,9 @@ h2 {
 .btn.disabled {
   cursor: default !important;
 }
-
+.nobreak {
+  display: inline-block;
+}
 .btn:hover:not(.disabled), .btn:focus:not(.disabled), .btn:active:not(.disabled) {
   background-color: var(--system-blue2);
 }
@@ -356,12 +355,14 @@ option {
 }
 
 input:focus, select:focus {
-  border: 3px solid var(--system-blue);
+  outline: 3px solid var(--system-blue);
+  transition: all 0.5s ease, outline 1ms ease;
 /*   cursor: text; */
 }
 
 input:focus:invalid{
-  border: 3px solid var(--system-red);
+  outline: 3px solid var(--system-red);
+  transition: all 0.5s ease;
 /*   cursor: text; */
 }
 
@@ -455,6 +456,10 @@ kbd {
 
 dialog::backdrop {
   background-color: var(--system-overlay2);
+  transition: all 0.5s ease;
+}
+dialog.CLOSEDALERT::backdrop {
+  background-color: var(--system-transp);
 }
 
 /* 
@@ -694,6 +699,10 @@ dialog {
   margin: 20px auto;
 } */
 
+*:focus {
+  outline: 3px solid var(--system-blue);
+  transition: all 0.5s ease, outline 1ms ease;
+}
 /* .btnRow { */
   /* display: flex; */
   /* flex-wrap: wrap; */

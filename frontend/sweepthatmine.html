@@ -183,9 +183,8 @@
         width: 60%;
         /* over */
         /* flex-grow: 1; */
-      }
-      #sweep {
         /* overflow-y: auto; */
+        margin: 0 auto;
       }
       .cell {
         margin: 0px;
@@ -226,6 +225,11 @@
         <h2>SweepThatMine</h2>
         <hr class="rounded">
       </header>
+      <p class="nobreak fssml">Select a difficulty: </p><select id="difficulty" class="szHalf fssml">
+        <option>Easy</option>
+        <option>Medium</option>
+        <option>Hard</option>
+      </select>
       <div id="sweep"></div>
       <a class="btn szFull override" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>

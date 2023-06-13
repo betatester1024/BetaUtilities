@@ -2,7 +2,7 @@
 <html>
   <head>
     <script src='./utils.js'></script>
-    <title>Administrative panel | BetaOS Systems</title>
+    <title>SweepThatMine! | BetaOS Systems</title>
     <script>
       const accessLevels = ["Error-level", "User", "Admin", "Super-admin"];
       let grid = [];
@@ -11,10 +11,15 @@
       let w = 20;
       let h = 20;
       let mineCt = 50;
+      let widths = [10, 20, 30];
+      let heights = [10, 17, 24];
+      let mineCts = [10, 50, 99];
       let revealedOK = 0;
+      let since = -1;
       function onLoad() {
          // do stuff i guess
         grid = [];
+        since = Date.now();
         initQ = false;
         revealed = [];
         revealedOK = 0;
@@ -34,8 +39,12 @@
             let btn = document.createElement("button");
             btn.className = "btn gry cell notooltip override";
             btn.id=y+"-"+x;
-            btn.innerHTML = `
-              <span class="material-symbols-outlined override">question_mark</span> `;
+            // btn.appendChild(byId("quest").cloneNode(false));
+            btn.innerHTML =`
+            <svg version="2.0">
+              <use href="#quest" />
+            </svg>
+`
             btn.onclick=(ev)=>{onClick(ev, y, x)};
             btn.oncontextmenu=(ev)=>{onClick(ev, y, x)};
             div.appendChild(btn);
@@ -150,6 +159,18 @@
         }
         
       }
+
+      function updateDifficulty() {
+        let diff = byId("difficulty").value;
+        w = widths[diff];
+        h = heights[diff];
+        mineCt = mineCts[diff];
+        resetGrid();
+      }
+
+      function updateTimer() {
+        byId("timer").innerText = toTime(Date.now() - since);
+      }
       
       function prt() {
         let line = "";
@@ -197,13 +218,18 @@
         border: solid 1px var(--system-grey3);
         /* bor */
       }
-      .cell > span {
-        font-size: calc(100% - 20px) !important;
+      .cell > object {
+        /* font-size: calc(100% - 20px) !important;
         font-weight: 500;
         top: 50%;
         left: 50%;
         transform: translateY(-50%) translateX(-50%);
+        position: absolute; */
+        width: 100%;
+        height: 100%;
         position: absolute;
+        top: 0px;
+        left: 0px;
       }
       .cell:active, .cell:focus, .cell *:active, .cell *:focus {
         outline: none;
@@ -219,16 +245,24 @@
       /* .gry {} */
     </style>
   </head>
-  <body onload = "globalOnload(onLoad)" oncontextmenu='return false;'>
+  <body onload = "globalOnload(()=>{onLoad(); setInterval(updateTimer, 100);})" oncontextmenu='return false;'>
     <div class="main_content">
       <header>
         <h2>SweepThatMine</h2>
         <hr class="rounded">
       </header>
-      <p class="nobreak fssml">Select a difficulty: </p><select id="difficulty" class="szHalf fssml">
-        <option>Easy</option>
-        <option>Medium</option>
-        <option>Hard</option>
+      <div style="display:none">
+        <svg src="/quest.svg" id="quest" version="2.0">
+          <use href="#quest"/>
+        </svg>
+        <object data="/quest.svg" id="flag" type="image/svg+xml"></object>
+      </div>
+      <h2 id="timer" class="fsmed centred">> LOADING TIMER <</h2>
+      <p class="nobreak fssml">Select a difficulty: </p>
+      <select id="difficulty" onchange="updateDifficulty()" class="szHalf fssml">
+        <option value = "0">Easy</option>
+        <option value = "1" selected>Medium</option>
+        <option value = "2">Hard</option>
       </select>
       <div id="sweep"></div>
       <a class="btn szFull override" href="/">

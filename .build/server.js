@@ -144,6 +144,10 @@ async function initServer() {
     res.sendFile(import_consts.frontendDir + "support.js");
     (0, import_logging.incrRequests)();
   });
+  app.get("*.svg", (req, res) => {
+    res.sendFile(import_consts.frontendDir + req.url);
+    (0, import_logging.incrRequests)();
+  });
   app.get("/*.js*", (req, res) => {
     res.sendFile(import_consts.jsDir + req.url);
     (0, import_logging.incrRequests)();

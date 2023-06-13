@@ -28,7 +28,7 @@ async function globalOnload(cbk, networkLess = false) {
         let urlEle = new URL(location.href);
         let redirector = urlEle.pathname + "?" + urlEle.searchParams.toString();
         if (res.status != "SUCCESS")
-          ele.innerHTML = `<a href="/login?redirect=${decodeURIComponent(redirector)}">Login</a> | 
+          ele.innerHTML = `<a href="/login?redirect=${redirector}">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
                       BetaOS Systems V2, 2023`;
@@ -305,6 +305,8 @@ function openDialog(name = "dialog") {
 function mouseOver(e) {
   let ele = e.target;
   let text = ele.innerHTML.replaceAll(/<.*((>.*<\/.*>)|(\/>))/gmiu, "").replaceAll("\n", "").trim();
+  if (typeof ele.className != "string")
+    return;
   if (ele.className.match(/(\W|^)btn(\W|$)/) && !ele.className.match(/(\W|^)notooltip(\W|$)/)) {
     let tooltip = ele.children.namedItem("TOOLTIP");
     if (!tooltip) {

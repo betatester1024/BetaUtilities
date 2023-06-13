@@ -162,6 +162,11 @@ export async function initServer() {
     res.sendFile(frontendDir+"support.js");
     incrRequests();
   })
+
+  app.get('*.svg', (req:any, res:any) => {
+    res.sendFile(frontendDir+req.url);
+    incrRequests();
+  })
   
   app.get('/*.js*', (req:any, res:any) => {
     res.sendFile(jsDir+req.url);

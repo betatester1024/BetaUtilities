@@ -3,6 +3,9 @@ let SESSIONTIMEOUT, SESSIONTIMEOUT2 = null;
 function byId(name) {
   return document.getElementById(name);
 }
+function byClass(name, ct = 0) {
+  return document.getElementsByClassName(name).item(ct);
+}
 let HASNETWORK = false;
 async function globalOnload(cbk, networkLess = false) {
   if (!networkLess) {
@@ -21,8 +24,9 @@ async function globalOnload(cbk, networkLess = false) {
         document.documentElement.className = res.data.darkQ ? "dark" : "";
         console.log("Loading complete; updating class");
         let maincontent = document.getElementsByClassName("main_content").item(0);
-        let ftr = document.createElement("footer");
-        maincontent.appendChild(ftr);
+        let ftr = byId("ftrOverride") ?? document.createElement("footer");
+        if (!byId("ftrOverride"))
+          maincontent.appendChild(ftr);
         let ele = document.createElement("p");
         ele.id = "footer";
         let urlEle = new URL(location.href);
@@ -184,7 +188,7 @@ function alertDialog(str, callback = () => {
   p.innerHTML += "<br><br><p style='margin: 10px auto' class='gry nohover'>(Press ENTER or ESC)</p>";
   newDialog.querySelector("#cancelBtn").style.display = "none";
   if (button == 1) {
-    p.innerHTML += `<button class='btn szThird fssml' id="refresh" onclick='location.reload()'>
+    p.innerHTML += `<button class='btn szThird fssml' id="resend" onclick='send(${failedReq})'>
     <span class="material-symbols-outlined">history</span> Refresh?
     <div class="anim"></div></button>`;
     console.log("Alert-type: FAILEDREQUEST" + failedReq);
@@ -322,7 +326,7 @@ function mouseOver(e) {
   }
 }
 function resetExpiry(res) {
-  if (res.data.expiry < Date.now()) {
+  if (res.data.expiry < Date.now() || res.data.expiry - Date.now() > 9e60) {
     return;
   }
   SESSIONTIMEOUT = setTimeout(() => {

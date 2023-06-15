@@ -18,7 +18,9 @@
       let since = -1;
       function onLoad() {
          // do stuff i guess
+        byId("sweep").style.height="";
         grid = [];
+        lostCt = 0;
         since = Date.now();
         initQ = false;
         revealed = [];
@@ -39,19 +41,19 @@
             let btn = document.createElement("button");
             btn.className = "btn gry cell notooltip override";
             btn.id=y+"-"+x;
-            // btn.appendChild(byId("quest").cloneNode(false));
-            btn.innerHTML =`
-            <svg version="2.0">
-              <use href="#quest" />
-            </svg>
-`
+            btn.innerHTML = `
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                <path fill="var(--system-black)" d="M431-330q1-72 16.5-105t58.5-72q42-38 64.5-70.5T593-647q0-45-30-75t-84-30q-52 0-80 29.5T358-661l-84-37q22-59 74.5-100.5T479-840q100 0 154 55.5T687-651q0 48-20.5 87T601-482q-49 47-59 72t-11 80H431Zm48 250q-29 0-49.5-20.5T409-150q0-29 20.5-49.5T479-220q29 0 49.5 20.5T549-150q0 29-20.5 49.5T479-80Z"/>
+              </svg>`;
             btn.onclick=(ev)=>{onClick(ev, y, x)};
             btn.oncontextmenu=(ev)=>{onClick(ev, y, x)};
-            div.appendChild(btn);
+            swp.appendChild(btn);
           }
-          swp.appendChild(div);
+          // swp.appendChild(div);
+          swp.appendChild(document.createElement("br"));
         }
-        console.log(grid);
+        byId("sweep").style.height="unset";
+        location.href="#bottom";
         // initMines(6,5)
       }
       function onClick(thing, y, x) {
@@ -65,13 +67,19 @@
       function flag(y, x) {
         if (revealed[y][x] == -1) {
           revealed[y][x] = -2;
-          byId(y+'-'+x).innerHTML = `<span class="material-symbols-outlined override">flag</span>`;
+          byId(y+'-'+x).innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48">
+                <path fill="var(--system-red)" d="M200-120v-680h343l19 86h238v370H544l-18.933-85H260v309h-60Zm300-452Zm95 168h145v-250H511l-19-86H260v251h316l19 85Z"/>
+              </svg>`;
         }
         else if (revealed[y][x] == -2) {
           revealed[y][x] = -1; 
-          byId(y+'-'+x).innerHTML = `<span class="material-symbols-outlined override">question_mark</span>` ;
+          byId(y+'-'+x).innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                <path fill="var(--system-black)" d="M431-330q1-72 16.5-105t58.5-72q42-38 64.5-70.5T593-647q0-45-30-75t-84-30q-52 0-80 29.5T358-661l-84-37q22-59 74.5-100.5T479-840q100 0 154 55.5T687-651q0 48-20.5 87T601-482q-49 47-59 72t-11 80H431Zm48 250q-29 0-49.5-20.5T409-150q0-29 20.5-49.5T479-220q29 0 49.5 20.5T549-150q0 29-20.5 49.5T479-80Z"/>
+              </svg>` ;
         }
       }
+
+      let lostCt = 0;
       function initMines(x, y) {
         // avoid area around x, y
         let i = 0;
@@ -109,9 +117,13 @@
         }
         if (grid[y][x]) {
           revealed[y][x]=9;
-          alertDialog("You lost!", ()=>{resetGrid();}, 2);
+          lostCt++;
+          alertDialog(`You lost! 
+          Press [CONTINUE] to restart.
+          Press [CANCEL] to continue your game.`, ()=>{clearT(); resetGrid(); }, 2);
           let cell = byId(y+"-"+x);
-          cell.innerHTML = `<span class="material-symbols-outlined override red nohover nooutline">explosion</span> `
+          cell.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48">
+          <path fill="var(--system-red)" d="M481-29 346-160H160v-186L26-480l134-134v-186h186l135-134 133 134h186v186l134 134-134 134v186H614L481-29Zm0-191q107.917 0 183.458-76.125Q740-372.25 740-481q0-107.917-75.542-183.458Q588.917-740 481-740q-108.75 0-184.875 75.542Q220-588.917 220-481q0 108.75 76.125 184.875T481-220Zm-.5-60q-83.5 0-142-58.5t-58.5-142q0-83.5 58.5-141.5t142-58q83.5 0 141.5 58t58 141.5q0 83.5-58 142T480.5-280Zm.5 167 107.917-107H740v-151l109-109-109-109v-151H589L481-849 371-740H220v151L111-480l109 109v151h150l111 107Zm-1-368Zm1 121q-50.82 0-85.91-35.09Q360-430.18 360-481q0-49.98 35.09-84.49T481-600q49.98 0 84.49 34.51T600-481q0 50.82-34.51 85.91Q530.98-360 481-360Z"/></svg>`
           cell.className += " revealed nohover"
           return;
         }
@@ -132,7 +144,9 @@
           cell.innerHTML = `<span class="override ${word[surrounding]}">${surrounding}</span>`;
           cell.className += " revealed nohover"
           if (revealedOK == w*h - mineCt) {
-            alertDialog("You won!");
+            alertDialog("You won in "+toTime(Date.now() - since)+"!" + 
+                        (lostCt>0?" (Having already died "+lostCt+" time"+(lostCt==1?")":"s)"):""), 
+                        ()=>{location.href="#top"; clearT();});
           }
           return;
         }
@@ -144,18 +158,20 @@
           cell.innerHTML = `<span class="override zero">0</span>`;
           cell.className += " revealed nohover";
           if (revealedOK == w*h - mineCt) {
-            alertDialog("You won!");
+            alertDialog("You won in "+toTime(Date.now() - since)+"!" + 
+                        (lostCt>0?" (Having already died "+lostCt+" time"+(lostCt==1?")":"s)"):""), 
+                        ()=>{location.href="#top"; clearT();});
             return;
           }
           // console.log("none")
-          reveal(y+1,x)   
-          reveal(y,x+1)   
-          reveal(y-1,x)   
-          reveal(y,x-1)   
-          reveal(y+1,x+1) 
-          reveal(y+1,x-1) 
-          reveal(y-1,x+1) 
-          reveal(y-1,x-1)
+          setTimeout(()=>{reveal(y+1,x)}, 20);
+          setTimeout(()=>{reveal(y,x+1)}, 40);
+          setTimeout(()=>{reveal(y-1,x)}, 60);
+          setTimeout(()=>{reveal(y,x-1)}, 80);
+          setTimeout(()=>{reveal(y+1,x+1)}, 100);
+          setTimeout(()=>{reveal(y+1,x-1)}, 120);
+          setTimeout(()=>{reveal(y-1,x+1)}, 140);
+          setTimeout(()=>{reveal(y-1,x-1)}, 180);
         }
         
       }
@@ -165,6 +181,7 @@
         w = widths[diff];
         h = heights[diff];
         mineCt = mineCts[diff];
+        document.documentElement.style.setProperty("--width", w);
         resetGrid();
       }
 
@@ -186,10 +203,12 @@
         console.log(line);
         return line;
       }
+      function clearT(){
+        clearInterval()
+      }
       function resetGrid() {
         byId("sweep").innerHTML = "";
         onLoad();
-        
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -199,12 +218,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
     <style>
+      :root {
+        --width: 20;
+      }
+      #sweep {
+        margin: 10px;
+        width: unset;
+        height: 90vh;
+        line-height: 0px;
+       } /*
+      #sweep br {
+        line-height: 0px;
+      } */
       .row {
-        display: flex;
+        /* display: flex; */
         width: 60%;
-        /* over */
-        /* flex-grow: 1; */
-        /* overflow-y: auto; */
         margin: 0 auto;
       }
       .cell {
@@ -212,13 +240,20 @@
         padding: 0px;
         border-radius: 2px;
         min-height: unset;
-        flex-grow: 1;
+        width: calc(min(100%, 80vh) / var(--width));
+        /* height: calc(100%); */
+        /* fontis-ze: calc100% / EE) */
+        /* flex-grow: 1; */
         transition: all 0.3s ease;
         aspect-ratio: 1 / 1;
-        border: solid 1px var(--system-grey3);
+        border: solid 1px var(--system-grey2);
+        vertical-align: middle;
+        /* display: inline-block; */
+        font-size: 100% !important;
+        font-weight: 600;
         /* bor */
       }
-      .cell > object {
+      .cell > svg {
         /* font-size: calc(100% - 20px) !important;
         font-weight: 500;
         top: 50%;
@@ -234,41 +269,52 @@
       .cell:active, .cell:focus, .cell *:active, .cell *:focus {
         outline: none;
       }
-      .zero {}
+      .zero {color: var(--system-grey)}
       .one {color: #00bb00;}
       .two {color: var(--system-yellowtext);}
       .three {color: var(--system-red);}
       .four {color: #8b00ff;}
-      .five {color: var(--system-blue);}
+      .five, .seven, .eight{color: var(--system-blue);}
       .six {color: var(--system-black);}
-      .cell.revealed, .cell.revealed:hover {background-color: #e8c09c !important;}
+      .gry {color: #8c8c8c;}
+      .cell.revealed, .cell.revealed:hover {background-color: var(--system-grey4) !important;}
       /* .gry {} */
+      @media screen and (max-width: 1200px) {
+        .row {
+          width: max(90%, 800px);
+          /* margin: ; */
+        }
+      }
+      @media screen and (max-width: 850px) {
+        .main_content {
+          overflow-x: auto !important;
+        }
+      }
     </style>
   </head>
   <body onload = "globalOnload(()=>{onLoad(); setInterval(updateTimer, 100);})" oncontextmenu='return false;'>
     <div class="main_content">
+      <div id="top"><!--href anchor--></div>
       <header>
         <h2>SweepThatMine</h2>
         <hr class="rounded">
       </header>
-      <div style="display:none">
-        <svg src="/quest.svg" id="quest" version="2.0">
-          <use href="#quest"/>
-        </svg>
-        <object data="/quest.svg" id="flag" type="image/svg+xml"></object>
-      </div>
-      <h2 id="timer" class="fsmed centred">> LOADING TIMER <</h2>
       <p class="nobreak fssml">Select a difficulty: </p>
       <select id="difficulty" onchange="updateDifficulty()" class="szHalf fssml">
         <option value = "0">Easy</option>
         <option value = "1" selected>Medium</option>
         <option value = "2">Hard</option>
       </select>
+      <h2 id="timer" class="fsmed centred">> LOADING TIMER <</h2>
       <div id="sweep"></div>
-      <a class="btn szFull override" href="/">
+      <details>
+        <summary><p class="nobreak" style="margin-top: 2px; margin-bottom:2px;">Show footers</p></summary>
+        <a class="btn szFull override" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>
         Return to home<div class="anim"></div></a>
-    
+        <footer id="ftrOverride"></footer>
+      </details>
+      <div id="bottom"><!--href anchor--></div>
       </div>
     </div>
     <div class="overlay" id="overlay">

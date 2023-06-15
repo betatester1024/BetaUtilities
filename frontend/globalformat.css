@@ -8,6 +8,7 @@ html, ::backdrop {
   --system-green2: rgba(0, 255, 0, 0.1);
   --max-green: #00ef00;
   --system-yellow: #FFCC1F;
+  scroll-behavior:smooth;
   --system-yellowtext: #e99201;
   --system-yellow2:rgba(255, 204, 31, 0.1);
   --system-orange: #f85c12;
@@ -15,6 +16,7 @@ html, ::backdrop {
   --system-grey: #8c8c8c;
   --system-grey2:rgba(140, 140, 140, 0.1);
   --system-grey3:rgba(173, 173, 173, 0.4);
+  --system-grey4:#9a99963b;
   --system-bg: #eee;
   --system-overlay: rgba(200, 200, 200, 0.95);
   --system-overlay2: rgba(200, 200, 200, 0.6);
@@ -47,6 +49,7 @@ html, ::backdrop {
   --system-grey: #bfbfbf;
   --system-grey2:rgba(191, 191, 191, 0.1);
   --system-grey3:rgba(119, 119, 119, 0.5);
+  --system-grey4: #ffffff40;
   --system-red2: rgba(238, 0, 0, 0.25);
   --system-blue2: rgba(12, 200, 255, 0.25);
   --system-blue3: rgba(12, 200, 255, 0.5);
@@ -86,6 +89,7 @@ hr.redrounded {
   width: 100vw;
   margin: 0 auto;
   text-align: center;
+  scroll-behavior: smooth;
 /*   transition: all 0.5s ease; */
   overflow: auto;
   /* overflow-wrap: break-word; */
@@ -200,65 +204,65 @@ div.anim.inp {
   width: 0px;
 }
 
-.grn {
+.btn.grn {
   color: var(--system-green);
 }
-.grn:hover, .grn:focus {
+.btn.grn:hover, .btn.grn:focus {
   background-color: var(--system-green2);
 }
-.grn > .anim {
+.btn.grn > .anim {
   border: 2.3px solid var(--system-green);
 }
-.ylw {
+.btn.ylw {
   color: var(--system-yellowtext);
 }
-.ylw:hover, .ylw:focus {
+.btn.ylw:hover, .btn.ylw:focus {
   background-color: var(--system-yellow2);
 /*   color: #000; */
 }
-.ylw > .anim{
+.btn.ylw > .anim{
   border: 2.3px solid var(--system-yellow);
 }
-.red, input:invalid {
+.btn.red, input:invalid {
   color: var(--system-red);
-  border: 3px solid var(--system-red);
+  outline: 3px solid var(--system-red);
 }
-.red:hover, .red:focus, input:invalid {
+.btn.red:hover, .btn.red:focus, input:invalid {
   background-color: var(--system-red2);
 }
-.red > .anim {
+.btn.red > .anim {
   border: 2.3px solid var(--system-red);
 }
 
-.gry {
+.btn.gry {
   color: var(--system-grey);
 }
-.gry:hover, .gry:focus {
+.btn.gry:hover, .btn.gry:focus {
   background-color: var(--system-grey2);
 }
-.gry > .anim {
+.btn.gry > .anim {
   border: 2.3px solid var(--system-grey);
 }
 
-.blu {
+.btn.blu {
   color: var(--system-blue);
 }
-.blu:hover, .blu:focus{
+.btn.blu:hover, .btn.blu:focus{
   background-color: var(--system-blue2);
 }
 .blu > .anim {
   border: 2.3px solid var(--system-blue);
 }
 
-.org {
+.btn.org {
   color: var(--system-orange);
 }
-.ylw:hover, .ylw:focus {
+.btn.org:hover, .btn.org:focus {
   background-color: var(--system-orange2);
 /*   color: #000; */
 }
-.ylw > .anim{
-  border: 2.3px solid var(--system-yellow);
+.btn.org > .anim{
+  border: 2.3px solid var(--system-orange);
 }
 
 .nohover:hover, .nohover:focus {
@@ -277,6 +281,7 @@ div.anim.inp {
 
 .nooutline {
   border: none;
+  outline: none;
 }
 
 .material-symbols-outlined {
@@ -292,10 +297,11 @@ div.anim.inp {
 }
 
 input, select {
-  border: 3px solid var(--system-bg);
+  outline: 2.3px solid var(--system-bg);
   background-color: var(--system-bg);
   height: 1.6em;
   outline: none;
+  border: none;
   font-size: 2.5em;
   font-weight: 500;
   color: var(--system-blue);
@@ -506,7 +512,7 @@ textarea {
   height: 50vh;
   color: var(--system-blue);
   font-family:"Noto Sans Mono";
-  border: 2px solid var(--system-blue);
+  outline: 2px solid var(--system-blue);
   border-radius: 10px;
   resize: vertical;
   background-color: var(--system-grey2);
@@ -707,3 +713,28 @@ dialog {
   /* display: flex; */
   /* flex-wrap: wrap; */
 /* } */
+
+details {
+  width: 90%;
+  border-radius: 5px;
+  background-color: var(--system-grey2);
+  margin: 10px auto;
+  padding: 10px;
+  
+}
+details summary {
+  text-align: left;
+  padding: 0px 10px;
+  border-radius: 5px;
+  transition: background-color 0.5s ease;
+}
+details:hover > summary {
+  outline: 2px solid var(--system-blue);
+}
+details summary:hover {
+  cursor: pointer;
+  background-color: var(--system-blue2); 
+}
+summary::marker {
+  color: var(--system-blue);
+}

@@ -4,6 +4,10 @@ let SESSIONTIMEOUT, SESSIONTIMEOUT2 = null;
 function byId(name:string) {
   return document.getElementById(name);
 }
+function byClass(name:string, ct:number=0) {
+  return document.getElementsByClassName(name).item(ct);
+}
+
 let HASNETWORK = false;
 async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
 
@@ -46,8 +50,8 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
       //   overlay.style.opacity="0";
       // }
       let maincontent = document.getElementsByClassName("main_content").item(0) as HTMLDivElement;
-      let ftr = document.createElement("footer");
-      maincontent.appendChild(ftr);
+      let ftr = byId("ftrOverride")??document.createElement("footer");
+      if (!byId("ftrOverride")) maincontent.appendChild(ftr);
       
       let ele = document.createElement("p");
       ele.id="footer";
@@ -221,7 +225,7 @@ function alertDialog(str: string, callback: () => any = ()=>{}, button: number =
   p.innerHTML += "<br><br><p style='margin: 10px auto' class='gry nohover'>(Press ENTER or ESC)</p>"
   newDialog.querySelector("#cancelBtn").style.display = "none";
   if (button == 1) {
-    p.innerHTML += `<button class='btn szThird fssml' id="refresh" onclick='location.reload()'>
+    p.innerHTML += `<button class='btn szThird fssml' id="resend" onclick='send(${failedReq})'>
     <span class="material-symbols-outlined">history</span> Refresh?
     <div class="anim"></div></button>`
     console.log("Alert-type: FAILEDREQUEST" + failedReq);
@@ -392,7 +396,7 @@ function mouseOver(e:MouseEvent) {
 }
 
 function resetExpiry(res:any) {
-  if (res.data.expiry < Date.now()) {
+  if (res.data.expiry < Date.now() || res.data.expiry - Date.now() > 9e60) {
     return;
     //alertDialog("Error: Your session has expired!", ()=>{location.href = "/login?redirect="+window.location.pathname});
   }

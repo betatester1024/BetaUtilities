@@ -164,6 +164,10 @@ export async function initServer() {
   })
 
   app.get('*.svg', (req:any, res:any) => {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() + 1);
+    res.setHeader("expires", date.toUTCString());
+    res.setHeader("cache-control", "public, max-age=31536000, immutable");
     res.sendFile(frontendDir+req.url);
     incrRequests();
   })

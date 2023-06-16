@@ -8,7 +8,7 @@ html, ::backdrop {
   --system-green2: rgba(0, 255, 0, 0.1);
   --max-green: #00ef00;
   --system-yellow: #FFCC1F;
-  scroll-behavior:smooth;
+  scroll-behavior: smooth;
   --system-yellowtext: #e99201;
   --system-yellow2:rgba(255, 204, 31, 0.1);
   --system-orange: #f85c12;
@@ -131,7 +131,7 @@ h2 {
 .nobreak {
   display: inline-block;
 }
-.btn:hover:not(.disabled), .btn:focus:not(.disabled), .btn:active:not(.disabled) {
+.btn:hover, .btn:focus, .btn:active {
   background-color: var(--system-blue2);
 }
 .btn:hover:not(.disabled)>div.anim, .btn:focus:not(.disabled)>div.anim, .btn:active:not(.disabled)>div.anim {
@@ -140,6 +140,10 @@ h2 {
 }
 .btn:not(.disabled) > .material-symbols-outlined {
   cursor: pointer;
+}
+.disabled {
+  color: var(--system-grey) !important;
+  background-color: var(--system-grey2) !important;
 }
 input:focus + div.anim,
 input:hover + div.anim,
@@ -204,64 +208,63 @@ div.anim.inp {
   width: 0px;
 }
 
-.btn.grn {
+.grn {
   color: var(--system-green);
 }
-.btn.grn:hover, .btn.grn:focus {
+.grn:hover, .grn:focus {
   background-color: var(--system-green2);
 }
-.btn.grn > .anim {
+.grn > .anim {
   border: 2.3px solid var(--system-green);
 }
-.btn.ylw {
+.ylw {
   color: var(--system-yellowtext);
 }
-.btn.ylw:hover, .btn.ylw:focus {
+.ylw:hover, .ylw:focus {
   background-color: var(--system-yellow2);
 /*   color: #000; */
 }
-.btn.ylw > .anim{
+.ylw > .anim{
   border: 2.3px solid var(--system-yellow);
 }
-.btn.red, input:invalid {
+.red, input:invalid {
   color: var(--system-red);
   outline: 3px solid var(--system-red);
 }
-.btn.red:hover, .btn.red:focus, input:invalid {
+.red:hover, .red:focus, input:invalid {
   background-color: var(--system-red2);
 }
-.btn.red > .anim {
+.red > .anim {
   border: 2.3px solid var(--system-red);
 }
 
-.btn.gry {
+.gry {
   color: var(--system-grey);
 }
-.btn.gry:hover, .btn.gry:focus {
+.gry:hover, .gry:focus {
   background-color: var(--system-grey2);
 }
-.btn.gry > .anim {
+.gry > .anim {
   border: 2.3px solid var(--system-grey);
 }
 
-.btn.blu {
+.blu {
   color: var(--system-blue);
 }
-.btn.blu:hover, .btn.blu:focus{
+.blu:hover, .blu:focus{
   background-color: var(--system-blue2);
 }
 .blu > .anim {
   border: 2.3px solid var(--system-blue);
 }
-
-.btn.org {
+.org {
   color: var(--system-orange);
 }
-.btn.org:hover, .btn.org:focus {
+.org:hover, .org:focus {
   background-color: var(--system-orange2);
 /*   color: #000; */
 }
-.btn.org > .anim{
+.org > .anim{
   border: 2.3px solid var(--system-orange);
 }
 

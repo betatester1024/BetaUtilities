@@ -225,7 +225,7 @@ function alertDialog(str: string, callback: () => any = ()=>{}, button: number =
   p.innerHTML += "<br><br><p style='margin: 10px auto' class='gry nohover'>(Press ENTER or ESC)</p>"
   newDialog.querySelector("#cancelBtn").style.display = "none";
   if (button == 1) {
-    p.innerHTML += `<button class='btn szThird fssml' id="resend" onclick='send(${failedReq})'>
+    p.innerHTML += `<button class='btn szThird fssml' id="resend" onclick='send(decodeURIComponent(${encodeURIComponent(failedReq)})'>
     <span class="material-symbols-outlined">history</span> Refresh?
     <div class="anim"></div></button>`
     console.log("Alert-type: FAILEDREQUEST" + failedReq);

@@ -251,7 +251,7 @@ async function sendMsg_B(msg, room) {
   console.log(betaNick);
   await import_consts.msgDB.insertOne({
     fieldName: "MSG",
-    data: msg.replaceAll("\n\n", "\n"),
+    data: msg.replaceAll("\n\n", "\n").replaceAll(">", "&gt;"),
     permLevel: 3,
     sender: betaNick,
     expiry: Date.now() + 3600 * 1e3 * 24 * 30,

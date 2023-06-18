@@ -223,7 +223,7 @@ export async function sendMsg_B(msg:string, room:string) {
 
   }
   console.log(betaNick);
-  await msgDB.insertOne({fieldName:"MSG", data:msg.replaceAll("\n\n", "\n"), permLevel:3, 
+  await msgDB.insertOne({fieldName:"MSG", data:msg.replaceAll("\n\n", "\n").replaceAll(">", "&gt;"), permLevel:3, 
                            sender:betaNick, expiry:Date.now()+3600*1000*24*30, 
                          room:room, msgID:msgCt});
   await msgDB.updateOne({room:room, fieldName:"RoomInfo"}, {

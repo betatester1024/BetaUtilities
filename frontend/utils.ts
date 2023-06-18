@@ -58,7 +58,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
       let urlEle = new URL(location.href);
       let redirector = urlEle.pathname + "?"+urlEle.searchParams.toString();
       if (res.status != "SUCCESS")
-        ele.innerHTML = `<a href="/login?redirect=${redirector}">Login</a> | 
+        ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
                       BetaOS Systems V2, 2023`;

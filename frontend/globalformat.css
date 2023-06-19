@@ -741,3 +741,10 @@ details summary:hover {
 summary::marker {
   color: var(--system-blue);
 }
+
+.ftrInput
+{
+  height: 20px !important;
+  border-radius: 3px;
+  font-size: 18px;
+}

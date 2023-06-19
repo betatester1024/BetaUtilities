@@ -36,7 +36,7 @@ let source = null;
 async function initClient() {
   try {
     console.log("Starting client.");
-    source = new EventSource("/stream?room=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1]);
+    source = new EventSource("/stream?room=" + new URL(document.URL).searchParams.get("room"));
     source.addEventListener("message", (message) => {
       console.log("Got", message);
       ele = document.getElementById("userList");

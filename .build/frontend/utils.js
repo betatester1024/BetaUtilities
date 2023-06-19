@@ -35,6 +35,10 @@ async function globalOnload(cbk, networkLess = false) {
           ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
+                      <form class="inpContainer szThird nobreak" action="javascript:location.href=byId('ftrNav').value" style="margin: 2px;">
+                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate...">
+                        <div class="anim"></div>
+                      </form> |
                       BetaOS Systems V2, 2023`;
         else {
           resetExpiry(res);
@@ -138,6 +142,13 @@ function acceptCookies() {
   send(JSON.stringify({ action: "acceptCookies" }), (res) => {
   });
 }
+function nonBlockingDialog(str, callback = () => {
+}) {
+  let div = document.createElement("div");
+  div.className = "ALERT_NONBLOCK";
+  div.innerHTML = str;
+  document.body.appendChild(div);
+}
 let dialogQ = false;
 function alertDialog(str, callback = () => {
 }, button = -1, failedReq = "") {
@@ -237,6 +248,12 @@ function closeAlert(sel) {
 function keydown(e) {
   if (e.defaultPrevented) {
     console.log("prevent-defaulted");
+    return;
+  }
+  if (byId("ftrNav") && e.key == "/" && (e.target.nodeName != "INPUT" || e.target.type != "text" && e.target.type != "password")) {
+    location.href = "#ftrNav";
+    byId("ftrNav").focus();
+    e.preventDefault();
     return;
   }
   if (dialogQ && (e.key == "Escape" || e.key == "Enter")) {

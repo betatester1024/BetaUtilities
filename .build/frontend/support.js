@@ -82,10 +82,10 @@ async function initClient() {
       ele = document.createElement("p");
       let scrDistOKQ = area.scrollTop >= area.scrollHeight - area.offsetHeight - 100;
       let msgs = modif.split(">");
-      for (let i = 0; i < msgs.length; i++) {
-        let matches = msgs[i].match(/{(-?[0-9]+)}\[(.+)\]\(([0-9])\)(.*)/);
+      if (message.action == "msg") {
+        matches = ["ERROR", message.data.id, message.data.sender, message.data.perms, message.data.content];
         if (!matches)
-          continue;
+          return;
         PREPENDFLAG = false;
         if (STARTID < 0) {
           STARTID = Number(matches[1]);
@@ -104,9 +104,9 @@ async function initClient() {
         ctn.className = "msgContainer";
         if (!PREPENDFLAG)
           ctn.appendChild(newMsgSender);
-        let msg = " " + matches[4].replaceAll("&gt;", ";gt;");
-        for (let i2 = 0; i2 < replacements.length; i2++) {
-          msg = msg.replaceAll(`:${replacements[i2].from}:`, ">EMOJI" + replacements[i2].to + ">");
+        let msg = " " + matches[4].replaceAll("&gt;", ";gt;").replaceAll(">", ";gt;");
+        for (let i = 0; i < replacements.length; i++) {
+          msg = msg.replaceAll(`:${replacements[i].from}:`, ">EMOJI" + replacements[i].to + ">");
         }
         let slashMe = false;
         msg = msg.replaceAll(/(&[a-zA-Z0-9]{1,20})([^;]|$)/gm, ">ROOM$1>$2");
@@ -123,14 +123,14 @@ async function initClient() {
           ele.className = classStr[matches[3]];
         let split = msg.split(">");
         let out = "";
-        for (let i2 = 0; i2 < split.length; i2++) {
-          if (i2 % 2 == 0) {
-            let fragment = document.createTextNode(split[i2].replaceAll(";gt;", ">"));
+        for (let i = 0; i < split.length; i++) {
+          if (i % 2 == 0) {
+            let fragment = document.createTextNode(split[i].replaceAll(";gt;", ">"));
             fragment.className = classStr[matches[3]];
             ele.appendChild(fragment);
           } else {
-            let pref = split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)")[1];
-            let post = pref != "BR" ? split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)(.+)")[2] : "";
+            let pref = split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)")[1];
+            let post = pref != "BR" ? split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)(.+)")[2] : "";
             if (pref == "EMOJI") {
               let replaced = document.createElement("span");
               replaced.title = ":" + findReplacement(post) + ":";
@@ -140,8 +140,8 @@ async function initClient() {
             } else if (pref == "LINK") {
               let replaced = document.createElement("a");
               replaced.className = "supportMsg " + classStr[matches[3]];
-              replaced.href = "https://" + post;
-              replaced.innerText = post;
+              replaced.href = "https://" + post.replaceAll(";gt;", ">");
+              replaced.innerText = post.replaceAll(";gt;", ">");
               replaced.setAttribute("target", "_blank");
               ele.appendChild(replaced);
             } else if (pref == "ROOM") {
@@ -159,8 +159,8 @@ async function initClient() {
             } else if (pref == "INTERNALLINK") {
               let replaced = document.createElement("a");
               replaced.className = "supportMsg " + classStr[matches[3]];
-              replaced.href = post.slice(8);
-              replaced.innerText = ">>" + post.slice(8);
+              replaced.href = post.slice(8).replaceAll(";gt;", ">");
+              replaced.innerText = ">>" + post.slice(8).replaceAll(";gt;", ">");
               ele.appendChild(replaced);
             } else if (pref == "BR") {
               ele.appendChild(document.createElement("br"));

@@ -112,7 +112,7 @@ class supportHandler {
     for (let i = 0; i < msgs.length; i++) {
       ev.send(JSON.stringify({ action: "msg", data: { id: msgs[i].msgID ?? -1, sender: msgs[i].sender, perms: msgs[i].permLevel, content: msgs[i].data } }));
     }
-    text += "Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. Commands are available here: &gt;&gt;commands \nEnter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!>";
+    text += "Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. Commands are available here: &gt;&gt;commands \nEnter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!";
     ev.send(JSON.stringify({ action: "msg", data: { id: +msgCt + 1, sender: "[SYSTEM]", perms: 3, content: text } }));
     thiscn.readyQ = true;
   }
@@ -225,9 +225,9 @@ function sendMsg(msg, room, token, callback) {
       $inc: { msgCt: 1 }
     }, { upsert: true });
     if (obj.status == "SUCCESS") {
-      supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, user: obj.data.alias, perms: obj.data.perms, content: msg } }));
+      supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: obj.data.alias, perms: obj.data.perms, content: msg } }));
     } else {
-      supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, user: processAnon(token), perms: 1, content: msg } }));
+      supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, content: msg } }));
     }
     for (let i = 0; i < supportHandler.allRooms.length; i++) {
       if (supportHandler.allRooms[i].name == room) {
@@ -260,7 +260,7 @@ async function sendMsg_B(msg, room) {
   await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
     $inc: { msgCt: 1 }
   }, { upsert: true });
-  supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, user: betaNick, perms: 3, content: msg } }));
+  supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: betaNick, perms: 3, content: msg.replaceAll("\n\n", "\n") } }));
 }
 function processAnon(token) {
   return "Anonymous user";

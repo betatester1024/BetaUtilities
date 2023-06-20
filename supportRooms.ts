@@ -78,7 +78,7 @@ export class supportHandler {
     text += "Welcome to BetaOS Services support! Enter any message in the box below. "+
       "Automated response services and utilities are provided by BetaOS System. "+
       "Commands are available here: &gt;&gt;commands \n"+
-      "Enter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!>"
+      "Enter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!"
     ev.send(JSON.stringify({action:"msg", data:{id:+msgCt+1, sender:"[SYSTEM]", perms: 3, content:text}}));
     thiscn.readyQ = true;
   }
@@ -192,11 +192,11 @@ export function sendMsg(msg:string, room:string, token:string, callback: (status
       $inc: {msgCt:1}
     }, {upsert: true});
     if (obj.status == "SUCCESS") {
-      supportHandler.sendMsgTo(room, JSON.stringify({action:"msg", data:{id:msgCt, user:obj.data.alias, perms:obj.data.perms, content:msg}}));
+      supportHandler.sendMsgTo(room, JSON.stringify({action:"msg", data:{id:msgCt, sender:obj.data.alias, perms:obj.data.perms, content:msg}}));
     }
     else {
       //console.log("sending")
-      supportHandler.sendMsgTo(room, JSON.stringify({action:"msg", data:{id:msgCt, user:processAnon(token), perms:1, content:msg}}));
+      supportHandler.sendMsgTo(room, JSON.stringify({action:"msg", data:{id:msgCt, sender:processAnon(token), perms:1, content:msg}}));
     }
     //console.log(supportHandler.allRooms);
     for (let i=0; i<supportHandler.allRooms.length; i++) {
@@ -229,7 +229,7 @@ export async function sendMsg_B(msg:string, room:string) {
   await msgDB.updateOne({room:room, fieldName:"RoomInfo"}, {
       $inc: {msgCt:1}
     }, {upsert: true});
-  supportHandler.sendMsgTo(room, JSON.stringify({action:"msg", data:{id:msgCt, user:betaNick, perms:3, content:msg}}));
+  supportHandler.sendMsgTo(room, JSON.stringify({action:"msg", data:{id:msgCt, sender:betaNick, perms:3, content:msg.replaceAll("\n\n", "\n")}}));
 }
 
 function processAnon(token:string) {

@@ -73,6 +73,10 @@ async function globalOnload(cbk, networkLess = false) {
                 cpl.style.opacity = "0";
                 cpl.style.pointerEvents = "none";
               }
+              setTimeout(() => {
+                byId("overlayLContainer").style.opacity = 0;
+                byId("overlayLContainer").style.pointerEvents = "none";
+              }, 500);
               if (cbk)
                 cbk();
             }, true);
@@ -254,7 +258,7 @@ function keydown(e) {
     console.log("prevent-defaulted");
     return;
   }
-  if (byId("ftrNav") && e.key == "/" && (e.target.nodeName != "INPUT" || e.target.type != "text" && e.target.type != "password")) {
+  if (byId("ftrNav") && e.key == "/" && e.target.nodeName != "TEXTAREA" && (e.target.nodeName != "INPUT" || e.target.type != "text" && e.target.type != "password")) {
     location.href = "#ftrNav";
     byId("ftrNav").focus();
     e.preventDefault();
@@ -294,18 +298,26 @@ function padWithZero(n) {
   return n < 10 ? "0" + n : n;
 }
 let overlay;
-const tips = ["Press <kbd>/</kbd> to access the navigation menu."];
+const tips = [
+  "Press <kbd>/</kbd> to access the navigation menu.",
+  "\u{1F9C0}",
+  "Have you tried turning it off and on again?",
+  "Use <kbd>space</kbd> to start/stop timer/stopwatch.",
+  "Press <kbd>E</kbd> to edit the timer.",
+  "Press <kbd>R</kbd> to reset the timer/stopwatch.",
+  "Try <a href='/clickit'>ClickIt</a> today!"
+];
 addEventListener("DOMContentLoaded", function() {
   overlay = document.createElement("div");
   overlay.className = "overlayLoader";
   overlay.id = "overlayL";
   overlay.style.backgroundColor = "var(--system-overlay)";
   overlay.style.opacity = "1";
-  overlay.innerHTML = `<div id="overlayLContainer">
+  overlay.innerHTML = `<div id="overlayLContainer" style='pointer-events:auto;'>
   <p class="fslg grn nohover">Loading.</p>
   <span class="material-symbols-outlined loader">sync</span>
   <hr class="rounded">
-  <p class="fsmed gry nohover"><b>Did you know?</b> ${tips[Math.floor(Math.random() * tips.length)]}</p>
+  <p class="fsmed gry nohover"><b>DailyWisdom:</b> ${tips[Math.floor(Math.random() * tips.length)]}</p>
   </div>`;
   document.body.appendChild(overlay);
   let metatags = document.createElement("meta");

@@ -97,9 +97,10 @@ async function initClient()
     
     let scrDistOKQ =  (area.scrollTop) >= (area.scrollHeight-area.offsetHeight - 100)
     let msgs = modif.split(">");
-    for (let i=0; i<msgs.length; i++) {
-      let matches = msgs[i].match(/{(-?[0-9]+)}\[(.+)\]\(([0-9])\)(.*)/)
-      if (!matches) continue;
+    if (message.action == "msg") {
+      matches = ["ERROR", message.data.id, message.data.sender, message.data.perms, message.data.content];
+      // let matches = msgs[i].match(/{(-?[0-9]+)}\[(.+)\]\(([0-9])\)(.*)/)
+      if (!matches) return;
       PREPENDFLAG = false;
       if (STARTID<0) {
         STARTID = Number(matches[1]);
@@ -121,7 +122,7 @@ async function initClient()
       ctn.className='msgContainer'
       if (!PREPENDFLAG) ctn.appendChild(newMsgSender);
       // newMsgBody.className = classStr[matches[3]];
-      let msg = " "+matches[4].replaceAll("&gt;", ";gt;");
+      let msg = " "+matches[4].replaceAll("&gt;", ";gt;").replaceAll(">", ";gt;");
       for (let i=0; i<replacements.length; i++) {
         msg = msg.replaceAll(`:${replacements[i].from}:`, ">EMOJI"+replacements[i].to+">");
       }
@@ -151,7 +152,7 @@ async function initClient()
         }
         else {
           let pref = split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)")[1];
-          let post = pref!="BR"?split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)(.+)")[2]:"";
+          let post = pref!="BR"?(split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)(.+)")[2]):"";
           if (pref == "EMOJI") {
             let replaced = document.createElement("span");
             replaced.title = ":"+findReplacement(post)+":";
@@ -162,8 +163,8 @@ async function initClient()
           else if (pref == "LINK") {
             let replaced = document.createElement("a");
             replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
-            replaced.href = "https://"+post;
-            replaced.innerText = post;
+            replaced.href = "https://"+post.replaceAll(";gt;", ">");
+            replaced.innerText = post.replaceAll(";gt;", ">");
             replaced.setAttribute("target", "_blank");
             ele.appendChild(replaced);
           }
@@ -184,9 +185,9 @@ async function initClient()
           else if (pref == "INTERNALLINK") {
             let replaced = document.createElement("a");
             replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
-            replaced.href = post.slice(8);
+            replaced.href = post.slice(8).replaceAll(";gt;", ">");
             // replaced.setAttribute("target", "_blank");
-            replaced.innerText = ">>"+post.slice(8);
+            replaced.innerText = ">>"+post.slice(8).replaceAll(";gt;", ">");
             ele.appendChild(replaced);
           }
           else if (pref == "BR") {

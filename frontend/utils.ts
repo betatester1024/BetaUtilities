@@ -101,6 +101,10 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
               cpl.style.opacity="0";
               cpl.style.pointerEvents="none";
             }
+            setTimeout(()=>{
+              byId("overlayLContainer").style.opacity=0;
+              byId("overlayLContainer").style.pointerEvents="none";
+            }, 500);
             if (cbk) cbk();
           }, true);
         }, true);
@@ -307,7 +311,7 @@ function keydown(e: Event) {
     console.log("prevent-defaulted");
     return;
   }
-  if (byId("ftrNav") && e.key == "/" && (e.target.nodeName != "INPUT" || 
+  if (byId("ftrNav") && e.key == "/" && e.target.nodeName != "TEXTAREA" && (e.target.nodeName != "INPUT" || 
                        (e.target.type!="text" && e.target.type!="password"))) {
     location.href="#ftrNav";
     byId("ftrNav").focus();
@@ -349,7 +353,10 @@ function padWithZero(n: number) {
 }
 
 let overlay:HTMLDivElement;
-const tips = ["Press <kbd>/</kbd> to access the navigation menu."]
+const tips = ["Press <kbd>/</kbd> to access the navigation menu.", "🧀", 
+              "Have you tried turning it off and on again?", "Use <kbd>space</kbd> to start/stop timer/stopwatch.",
+              "Press <kbd>E</kbd> to edit the timer.", "Press <kbd>R</kbd> to reset the timer/stopwatch.",
+              "Try <a href='/clickit'>ClickIt</a> today!"]
 addEventListener("DOMContentLoaded", function() {
   overlay = document.createElement("div");
   overlay.className = "overlayLoader"
@@ -357,11 +364,11 @@ addEventListener("DOMContentLoaded", function() {
   // overlay.style.left="0vh";
   overlay.style.backgroundColor="var(--system-overlay)";
   overlay.style.opacity="1";
-  overlay.innerHTML = `<div id="overlayLContainer">
+  overlay.innerHTML = `<div id="overlayLContainer" style='pointer-events:auto;'>
   <p class="fslg grn nohover">Loading.</p>
   <span class="material-symbols-outlined loader">sync</span>
   <hr class="rounded">
-  <p class="fsmed gry nohover"><b>Did you know?</b> ${tips[Math.floor(Math.random()*tips.length)]}</p>
+  <p class="fsmed gry nohover"><b>DailyWisdom:</b> ${tips[Math.floor(Math.random()*tips.length)]}</p>
   </div>`
   // document.appendChild(document.createElement("body"));
   document.body.appendChild(overlay);

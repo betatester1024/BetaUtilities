@@ -39,7 +39,7 @@ hr.rounded {
 form {
   width: 95%;
   display: flex;
-  margin: 0 auto;
+  margin: 20px auto;
   text-align: left;
 }
 .anim.inp, #inpContainment, input {
@@ -80,7 +80,12 @@ b {
   padding-bottom: 2px;
   margin-bottom: 10px;
   vertical-align: top;
-  margin-right: 4px;
+}
+p {
+  margin-left: 5px;
+}
+.slashMe {
+  margin-left: 0px;
 }
 
 p {

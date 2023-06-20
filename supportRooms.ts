@@ -16,7 +16,7 @@ export class Room {
 }
 
 export class pseudoConnection {
-  write(thing:any) {}
+  send(thing:any) {}
   close () {}
 };
 
@@ -42,15 +42,15 @@ export class supportHandler {
     {
       token = "[SYSINTERNAL]";
     }
-    ev.write("data:CONNECTIONRELOAD>\n\n");
+    ev.send(JSON.stringify({action:"RELOAD"}));
     for (let i=0; i<this.connections.length; i++) {
       if (this.connections[i].roomName == rn)
         userRequest(this.connections[i].tk, this.connections[i].isPseudoConnection).then((obj:{status:string, data:any, token:string})=>{
           if (obj.status == "SUCCESS") {
-            ev.write("data:+"+obj.data.alias+"("+obj.data.perms+")>\n\n");
+            ev.send(JSON.stringify({action:"addUser", data:{user:obj.data.alias, perms:obj.data.perms}}));
           }
           else {
-            ev.write("data:+"+processAnon(this.connections[i].tk)+"(1)>\n\n");
+            ev.send(JSON.stringify({action:"addUser", data:{user:processAnon(this.connections[i].tk), perms:1}}));
           }
         });
     }
@@ -59,27 +59,27 @@ export class supportHandler {
     this.connections.push(thiscn);
     // TELL EVERYONE ELSE ABOUT THE NEW CONNECTION
     userRequest(token, internalFlag).then((obj:{status:string, data:any, token:string})=>{
-      if (obj.status == "SUCCESS") this.sendMsgTo(rn, "+"+obj.data.alias+"("+obj.data.perms+")");
-      else this.sendMsgTo(rn, "+"+processAnon(obj.token)+"(1)");
+      if (obj.status == "SUCCESS") this.sendMsgTo(rn, JSON.stringify({action:"addUser", data:{user:obj.data.alias, perms:obj.data.perms}}));
+      else this.sendMsgTo(rn, JSON.stringify({action:"addUser", data:{user:processAnon(obj.token), perms:1}}));
     });
     // console.log("added connection in "+rn);
     let roomData = await msgDB.findOne({fieldName:"RoomInfo", room:{$eq:rn}});
     let msgCt = roomData?roomData.msgCt:0;
     let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: msgCt-30}}).toArray();
     let text = "";
-    ev.write("data:CONNECTIONID "+this.connectionCt+">\n\n");
+    ev.send(JSON.stringify({action:"CONNECTIONID", data:{id:this.connectionCt}}));
     for (let i=0; i<msgs.length; i++) {
       // let userData = await authDB.findOne({fieldName:"UserData", user:msgs[i].sender})
       // if (!userData) text+= "["+msgs[i].sender+"](1)"+msgs[i].data+">";
       // if (!userData) ev.write("data:["+msgs[i].sender+"](1)"+msgs[i].data+">\n\n");
       // else text += "["+(userData.alias??msgs[i].sender)+"]("+userData.permLevel+")"+msgs[i].data+">";
-      ev.write("data:{"+/*(Math.random()<0.5?"-":"")+*/(msgs[i].msgID??-1)+"}["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data+">\n\n");
+      ev.send(JSON.stringify({action:"msg", data:{id:msgs[i].msgID??-1, sender:msgs[i].sender, perms: msgs[i].permLevel, content:msgs[i].data}}));
     }
-    text += `{${msgCt+1}}`+"[SYSTEM](3)Welcome to BetaOS Services support! Enter any message in the box below. "+
+    text += "Welcome to BetaOS Services support! Enter any message in the box below. "+
       "Automated response services and utilities are provided by BetaOS System. "+
       "Commands are available here: &gt;&gt;commands \n"+
       "Enter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!>"
-    ev.write("data:"+text+"\n\n");
+    ev.send(JSON.stringify({action:"msg", data:{id:+msgCt+1, sender:"[SYSTEM]", perms: 3, content:text}}));
     thiscn.readyQ = true;
   }
   static async removeConnection(ev:any, rn:string, token:string) {
@@ -87,8 +87,8 @@ export class supportHandler {
     if (idx >= 0) this.connections.splice(idx, 1);
     
     userRequest(token).then((obj:{status:string, data:any, token:string})=>{
-      if (obj.status == "SUCCESS") this.sendMsgTo(rn, "-"+obj.data.alias+"("+obj.data.perms+")");
-      else this.sendMsgTo(rn, "-"+processAnon(obj.token)+"(1)");
+      if (obj.status == "SUCCESS") this.sendMsgTo(rn, JSON.stringify({action:"removeUser", data:{user:obj.data.alias, perms:obj.data.perms}}));
+      else this.sendMsgTo(rn, JSON.stringify({action:"removeUser", data:{user:processAnon(obj.token), perms:1}}));
       // console.log("removed connection in "+rn); 
     });
   }
@@ -162,7 +162,7 @@ export class supportHandler {
       if (this.connections[i].roomName == roomName) {
         // encode '>' -- used for message-breaks (yes, it is stupid.)
         data = data.replaceAll(">", "&gt;");
-        this.connections[i].event.write("data:"+data+">\n\n")
+        this.connections[i].event.send(data);
       }
     }
     
@@ -174,7 +174,7 @@ export class supportHandler {
         // encode '>' -- used for message-breaks (yes, it is stupid.)
         data = data.replaceAll(">", "&gt;");
         
-        this.connections[i].event.write("data:"+data+">\n\n")
+        this.connections[i].event.send(data);
         
       }
     }
@@ -192,11 +192,11 @@ export function sendMsg(msg:string, room:string, token:string, callback: (status
       $inc: {msgCt:1}
     }, {upsert: true});
     if (obj.status == "SUCCESS") {
-      supportHandler.sendMsgTo(room, "{"+msgCt+"}["+obj.data.alias+"]("+obj.data.perms+")"+msg);
+      supportHandler.sendMsgTo(room, JSON.stringify({action:"msg", data:{id:msgCt, user:obj.data.alias, perms:obj.data.perms, content:msg}}));
     }
     else {
       //console.log("sending")
-      supportHandler.sendMsgTo(room, "{"+msgCt+"}["+processAnon(token)+"](1)"+msg);
+      supportHandler.sendMsgTo(room, JSON.stringify({action:"msg", data:{id:msgCt, user:processAnon(token), perms:1, content:msg}}));
     }
     //console.log(supportHandler.allRooms);
     for (let i=0; i<supportHandler.allRooms.length; i++) {
@@ -229,7 +229,7 @@ export async function sendMsg_B(msg:string, room:string) {
   await msgDB.updateOne({room:room, fieldName:"RoomInfo"}, {
       $inc: {msgCt:1}
     }, {upsert: true});
-  supportHandler.sendMsgTo(room, "{"+msgCt+"}["+betaNick+"](3)"+msg);
+  supportHandler.sendMsgTo(room, JSON.stringify({action:"msg", data:{id:msgCt, user:betaNick, perms:3, content:msg}}));
 }
 
 function processAnon(token:string) {
@@ -333,18 +333,18 @@ export async function loadLogs(rn:string, id:string, from:number, token:string) 
   from = +from;
   console.log("LOADING LOGS FROM",from-30,"TO",from);
   if (from<minID || (roomInfo && roomInfo.minCt && from < roomInfo.minCt)) {
-    supportHandler.sendMsgTo_ID(id, "LOADCOMPLETE -1");
+    supportHandler.sendMsgTo_ID(id, JSON.stringify({action:"LOADCOMPLETE", data:{id:-1}}));
     return {status:"SUCCESS", data:null, token:token}
   }
   let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: from-30, $lt: from}}).toArray();
   for (let i=msgs.length-1; i>=0; i--) {
     console.log(msgs[i].msgID);
-    let dat = "{-"+(msgs[i].msgID)+"}["+(msgs[i].sender)+"]("+msgs[i].permLevel+")"+msgs[i].data;
+    let dat = JSON.stringify({action:"msg", data:{id:-msgs[i].msgID, sender:msgs[i].sender, perms:msgs[i].permLevel, content:+msgs[i].data}});
     // console.log(dat);
     supportHandler.sendMsgTo_ID(id, dat);
   }
   console.log("LOADING COMPLETE, LOADED"+msgs.length,"MESSAGES");
-  supportHandler.sendMsgTo_ID(id, "LOADCOMPLETE "+(from-30));
+  supportHandler.sendMsgTo_ID(id, JSON.stringify({action:"LOADCOMPLETE", data:{id:from-30}}));
   return {status:"SUCCESS", data:null, token:token};
   } catch (e:any) {
     console.log("Error:",e);

@@ -73,6 +73,10 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
                       <a href='/config'>Account</a> | 
                       <a href='/status'>Status</a> | 
                       <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
+                      <form class="inpContainer szThird nobreak" action="javascript:location.href=byId('ftrNav').value" style="margin: 2px;">
+                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate...">
+                        <div class="anim"></div>
+                      </form> |
                       BetaOS Systems V2, 2023`;
       }
       ftr.appendChild(ele);
@@ -323,7 +327,7 @@ function keydown(e: Event) {
   }
 }
 
-function toTime(ms: number) {
+function toTime(ms: number, inclMs) {
   let day = Math.floor(ms / 1000 / 60 / 60 / 24);
   ms = ms % (1000 * 60 * 60 * 24);
   let hr = Math.floor(ms / 1000 / 60 / 60);
@@ -332,9 +336,14 @@ function toTime(ms: number) {
   ms = ms % (1000 * 60);
   let sec = Math.floor(ms / 1000);
   if (ms < 0) return "00:00:00";
-  return (day > 0 ? day + "d " : "") + padWithZero(hr) + ":" + padWithZero(min) + ":" + padWithZero(sec);
+  return (day > 0 ? day + "d " : "") + padWithZero(hr) + ":" + padWithZero(min) + ":" + padWithZero(sec)+(inclMs?"."+padWithThreeZeroes(ms%1000):"");
 }
 
+function padWithThreeZeroes(n:number) {
+  if (n < 10) return "00"+n;
+  if (n < 100) return "0"+n;
+  return n;
+}
 function padWithZero(n: number) {
   return n < 10 ? "0" + n : n;
 }

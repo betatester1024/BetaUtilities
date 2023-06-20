@@ -4,8 +4,8 @@ function onLoad() {
   // send(JSON.stringify({action:"refresh_users"}), (res)=>{
   // });
   document.getElementById("header").innerHTML = "Support: #"+
-    document.URL.match("\\?room=(.*)")[1];
-  ROOMNAME = document.URL.match("\\?room=(.*)")[1];
+    new URL(document.URL).searchParams.get("room");
+  ROOMNAME = new URL(document.URL).searchParams.get("room");
   
 }
 // system refresh auto!
@@ -45,20 +45,19 @@ async function initClient()
   
   try {
   console.log("Starting client.")
-  source = new EventSource('/stream?room='+
+  source = new WebSocket('wss://'+new URL(document.URL).host+'?room='+
                                  new URL(document.URL).searchParams.get("room"));
-  source.addEventListener('message', message => {
+  source.onmessage = (message) => {
     console.log('Got', message);
+    message = JSON.parse(message.data);
     ele = document.getElementById("userList");
-    let modif = message.data;
-    let cnMatch = modif.match(/(>|^)CONNECTIONID ([0-9]+)>/);
-    if (cnMatch) {
+    // let modif = message.data;
+    let action = message.action;
+    if (message.action == "CONNECTIONID") {
       
-      CONNECTIONID = cnMatch[2];
+      CONNECTIONID = message.data.id;
     }    
-    modif = modif.replace(/(>|^)CONNECTIONID ([0-9]+)>/, "");
-    let clMatch = modif.match(/(>|^)CONNECTIONRELOAD>/);
-    if (clMatch) {
+    if (message.action == "RELOAD") {
       document.getElementById("msgArea").innerHTML = `<h2 id="placeholder">
         <span class="material-symbols-outlined">update</span> 
         Reloading your messages, a moment please...</h2>`;
@@ -69,11 +68,9 @@ async function initClient()
       UNREAD = 0;
       loadStatus = -1;
     }    
-    modif = modif.replace(/(>|^)CONNECTIONRELOAD>/, "");
-    let lcMatch = modif.match(/LOADCOMPLETE (-?[0-9]+)>/);
-    if (lcMatch) {
+    if (message.action == "LOADCOMPLETE") {
       let thing = document.getElementById("msgArea")
-      if (lcMatch[1]<0) {
+      if (message.data.id<0) {
         let errorEle = document.createElement("b");
         errorEle.className = "red";
         errorEle.innerText = "No more messages to load";
@@ -82,26 +79,18 @@ async function initClient()
       }
       else {
         loadStatus = -1;
-        STARTID=lcMatch[1];
+        STARTID=message.data.id;
         // alert("lcMatchId updated"+ STARTID);
       }
       thing.scrollTop = thing.scrollTop + 100;
     }    
-    modif = modif.replace(/LOADCOMPLETE (-?[0-9]+)>/, "");
-    let removed = rmvReg.exec(modif);
-    let added = addReg.exec(modif)
-    while (removed || added) {
-      if (removed) {
-        ele.innerHTML= ele.innerHTML.replace(removed[2]+"<br>", "");
+    if (message.action == "removeUser") {
+        ele.innerHTML= ele.innerHTML.replace(message.data.user+"<br>", "");
       }
-      if (added) {
-        ele.innerHTML+= added[2]+"<br>";
-      }
-      modif = modif.replaceAll(rmvReg, "");
-      modif = modif.replaceAll(addReg, "");
-      removed = modif.match(rmvReg);
-      added = modif.match(addReg);
+    if (message.action=="addUser") {
+        ele.innerHTML+= message.data.user+"<br>";
     }
+    let modif = "";
     console.log(modif);
     let area = document.getElementById("msgArea");
     ele = document.createElement("p");
@@ -235,7 +224,7 @@ async function initClient()
     // else alert("invalid")
 
     
-  });
+  };
   } catch (e) {
     alert(e);
     console.log("Restartng client ("+e+")")

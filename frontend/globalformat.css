@@ -272,7 +272,14 @@ div.anim.inp {
   background-color: unset !important;
 }
 
+.flex {
+  display: flex;
+  flex-wrap: wrap;
+}
 
+.addMargin {
+  margin: 8px;
+}
 
 .roundhover {
   transition: all 0.2s ease;

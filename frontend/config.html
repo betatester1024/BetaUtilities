@@ -74,30 +74,32 @@
             <input id="pwdInp2" type="password" placeholder="Password confirmation">
             <div class="anim inp"></div>
           </div>
-          <button type=submit class="btn szFull grn">
-            <span class="material-symbols-outlined">update</span>
-            Update your information<div class="anim"></div></button>
-          <a class="btn szHalf override" href="/admin">
-            <span class="material-symbols-outlined">arrow_forward_ios</span>
-            Access admin panel<div class="anim"></div></a>
-          <button type="button" class="btn szHalf" onclick="updateTheme()">
-            <span class="material-symbols-outlined">light_mode</span>
-            Swap colour scheme<div class="anim"></div></button>
-          <a class="btn szThird ylw override" href="/logout">
-            <span class="material-symbols-outlined">logout</span>
-            Logout: <br>This session<div class="anim"></div></a>
-          <button type="button" class="btn szThird ylw override" onclick="alertDialog('Confirm logout from all accounts?', ()=>{window.open('/logout?options=all', '_self')}, 2)">
-            <span class="material-symbols-outlined">logout</span>
-            Logout: <br>All accounts<div class="anim"></div></button>
-          <a class="btn szThird red override" href="/accountDel">
-            <span class="material-symbols-outlined">warning</span>
-            Delete your account<div class="anim"></div></a>
-<!--           <button type=button class="btn szFull" onclick="alertDialog('TEST')">
-            <span class="material-symbols-outlined">looks_one</span>
-            Test alert dialog<div class="anim"></div></button> -->
-          <a class="btn szFull override" href="/">
-            <span class="material-symbols-outlined">arrow_back_ios</span>
-            Return to home<div class="anim"></div></a>
+          <div class="flex" style="margin: 8px;">
+            <button type=submit class="btn szFull grn">
+              <span class="material-symbols-outlined">update</span>
+              Update your information<div class="anim"></div></button>
+            <a class="btn szHalf override" href="/admin">
+              <span class="material-symbols-outlined">arrow_forward_ios</span>
+              Access admin panel<div class="anim"></div></a>
+            <button type="button" class="btn szHalf" onclick="updateTheme()">
+              <span class="material-symbols-outlined">light_mode</span>
+              Swap colour scheme<div class="anim"></div></button>
+            <a class="btn szThird ylw override" href="/logout">
+              <span class="material-symbols-outlined">logout</span>
+              Logout: <br>This session<div class="anim"></div></a>
+            <button type="button" class="btn szThird ylw override" onclick="alertDialog('Confirm logout from all accounts?', ()=>{window.open('/logout?options=all', '_self')}, 2)">
+              <span class="material-symbols-outlined">logout</span>
+              Logout: <br>All accounts<div class="anim"></div></button>
+            <a class="btn szThird red override" href="/accountDel">
+              <span class="material-symbols-outlined">warning</span>
+              Delete your account<div class="anim"></div></a>
+  <!--           <button type=button class="btn szFull" onclick="alertDialog('TEST')">
+              <span class="material-symbols-outlined">looks_one</span>
+              Test alert dialog<div class="anim"></div></button> -->
+            <a class="btn szFull override" href="/">
+              <span class="material-symbols-outlined">arrow_back_ios</span>
+              Return to home<div class="anim"></div></a>
+          </div>
         </form>
       </div>
     </div>

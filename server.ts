@@ -42,7 +42,7 @@ export async function initServer() {
   // });
   enableWs(app);
   var limiter = RateLimit({
-    windowMs: 10*1000, // 10 seconds
+    windowMs: 10*1000, // 10 second
     max: 50,
     message: tooManyRequests(),
     statusCode: 429, // 429 status = Too Many Requests (RFC 6585)
@@ -75,15 +75,19 @@ export async function initServer() {
     incrRequests();
   });
 
-  app.ws('/ws', (ws, req) => {
-    ws.on('message', msg => {
-        ws.send("reply:"+msg)
-    })
-
-    ws.on('close', () => {
-        console.log('WebSocket was closed')
-    })
-  })
+  app.ws('/', (ws:any, req:any) => {
+    ws.on('message', (msg:any) => {
+      ws.send("reply:"+msg);
+    });
+    console.log("WebSocket was opened")
+    ws.send(JSON.stringify({action:"OPEN", data:null}));
+    supportHandler.addConnection(ws, req.query.room, req.cookies.sessionID);
+    ws.on("close", () => {
+      // clear the connection
+      supportHandler.removeConnection(ws, req.query.room, req.cookies.sessionID);
+      console.log("Removed stream");
+    });
+  });
 
   app.get('/support', (req:any, res:any) => {
     let match = req.url.match('\\?room=('+roomRegex+")");
@@ -599,7 +603,8 @@ function tooManyRequests() {
 
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
                     '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest',
-                    "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle', '/sweepthatmine'];
+                    "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle', '/sweepthatmine',
+                   "/stopwatch"];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',
                   'paste', 'findPaste'];

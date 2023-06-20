@@ -125,20 +125,23 @@
             </select>
             <div class="anim inp"></div>
           </div>
+          <div class="flex addMargin">
           <button type=submit class="btn szHalf grn">
             <span class="material-symbols-outlined">update</span>
             Create or update this account<div class="anim"></div></button>
           <button type="button" class="btn szHalf red" onclick="alertDialog('Confirm account deletion?', del, 2)">
             <span class="material-symbols-outlined">delete_forever</span>
             Delete this account<div class="anim"></div></button>
+          </div>
         </form>
-          
+        <div class="flex addMargin"> 
           <a class="btn szTwoThirds override" href="/account">
             <span class="material-symbols-outlined">arrow_back_ios</span>
             Return to your account<div class="anim"></div></a>
           <a class="btn szThird ylw" href="/syslog">
           <span class="material-symbols-outlined">inventory</span>
           SysLog<div class="anim"></div></a>
+        </flex>
           <div class="red" id="superadmin">
             <h2 class="fsmed">Super-administrative command area</h2>
             <form action="javascript:runCmd()">

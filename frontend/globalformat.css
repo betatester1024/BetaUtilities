@@ -541,7 +541,13 @@ footer, #footer {
   padding-left: 10px;
   padding-right: 10px;
 }
-
+#overlayLContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  text-align: center;
+}
 .overlayLoader {
   transition: all 0.3s ease-out;
   width: 100vw;
@@ -559,9 +565,6 @@ footer, #footer {
   pointer-events: none;
   font-size: 10em !important;
   color: var(--system-blue);
-  position: relative;
-  top: 50%;
-  left: calc(50% - 0.5em);
   animation: rotating 1s linear infinite;
 }
 

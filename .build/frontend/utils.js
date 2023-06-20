@@ -294,14 +294,19 @@ function padWithZero(n) {
   return n < 10 ? "0" + n : n;
 }
 let overlay;
+const tips = ["Press <kbd>/</kbd> to access the navigation menu."];
 addEventListener("DOMContentLoaded", function() {
   overlay = document.createElement("div");
   overlay.className = "overlayLoader";
   overlay.id = "overlayL";
   overlay.style.backgroundColor = "var(--system-overlay)";
   overlay.style.opacity = "1";
-  overlay.innerHTML = `<span class="material-symbols-outlined loader">sync</span>
-  <p class="loadp fslg grn nohover">Loading.</p>`;
+  overlay.innerHTML = `<div id="overlayLContainer">
+  <p class="fslg grn nohover">Loading.</p>
+  <span class="material-symbols-outlined loader">sync</span>
+  <hr class="rounded">
+  <p class="fsmed gry nohover"><b>Did you know?</b> ${tips[Math.floor(Math.random() * tips.length)]}</p>
+  </div>`;
   document.body.appendChild(overlay);
   let metatags = document.createElement("meta");
   metatags.content = "width=device-width; initial-scale=1.0; min-scale=1.0";

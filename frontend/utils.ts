@@ -349,6 +349,7 @@ function padWithZero(n: number) {
 }
 
 let overlay:HTMLDivElement;
+const tips = ["Press <kbd>/</kbd> to access the navigation menu."]
 addEventListener("DOMContentLoaded", function() {
   overlay = document.createElement("div");
   overlay.className = "overlayLoader"
@@ -356,8 +357,12 @@ addEventListener("DOMContentLoaded", function() {
   // overlay.style.left="0vh";
   overlay.style.backgroundColor="var(--system-overlay)";
   overlay.style.opacity="1";
-  overlay.innerHTML = `<span class="material-symbols-outlined loader">sync</span>
-  <p class="loadp fslg grn nohover">Loading.</p>`
+  overlay.innerHTML = `<div id="overlayLContainer">
+  <p class="fslg grn nohover">Loading.</p>
+  <span class="material-symbols-outlined loader">sync</span>
+  <hr class="rounded">
+  <p class="fsmed gry nohover"><b>Did you know?</b> ${tips[Math.floor(Math.random()*tips.length)]}</p>
+  </div>`
   // document.appendChild(document.createElement("body"));
   document.body.appendChild(overlay);
   // console.log(document.body.innerHTML)

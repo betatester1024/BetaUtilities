@@ -91,8 +91,9 @@ async function initClient() {
           STARTID = Number(matches[1]);
           STARTIDVALID = true;
         }
-        if (matches[1][0] == "-") {
+        if (matches[1] <= 0) {
           PREPENDFLAG = true;
+          matches[1] = -matches[1];
           if (loadStatus == 0)
             loadStatus = 1;
         }

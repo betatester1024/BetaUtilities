@@ -195,6 +195,7 @@ class supportHandler {
     for (let i = 0; i < this.connections.length; i++) {
       if (this.connections[i].roomName == roomName) {
         data = data.replaceAll(">", "&gt;");
+        console.log(data);
         this.connections[i].event.send(data);
       }
     }
@@ -203,6 +204,7 @@ class supportHandler {
     for (let i = 0; i < this.connections.length; i++) {
       if (this.connections[i].id == connectionID) {
         data = data.replaceAll(">", "&gt;");
+        console.log(data);
         this.connections[i].event.send(data);
       }
     }
@@ -212,6 +214,7 @@ function sendMsg(msg, room, token, callback) {
   (0, import_userRequest.userRequest)(token).then(async (obj) => {
     let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room });
     let msgCt = roomData ? roomData.msgCt : 0;
+    msg = msg.replaceAll("\\n", "\n");
     await import_consts.msgDB.insertOne({
       fieldName: "MSG",
       data: msg.replaceAll(">", "&gt;"),
@@ -247,10 +250,10 @@ async function sendMsg_B(msg, room) {
       break;
     }
   }
-  console.log(betaNick);
+  console.log(msg);
   await import_consts.msgDB.insertOne({
     fieldName: "MSG",
-    data: msg.replaceAll("\n\n", "\n").replaceAll(">", "&gt;"),
+    data: msg.replaceAll("\\n\\n", "\n").replaceAll(">", "&gt;"),
     permLevel: 3,
     sender: betaNick,
     expiry: Date.now() + 3600 * 1e3 * 24 * 30,
@@ -260,7 +263,7 @@ async function sendMsg_B(msg, room) {
   await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
     $inc: { msgCt: 1 }
   }, { upsert: true });
-  supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: betaNick, perms: 3, content: msg.replaceAll("\n\n", "\n") } }));
+  supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: betaNick, perms: 3, content: msg.replaceAll("\\n\\n", "\n") } }));
 }
 function processAnon(token) {
   return "Anonymous user";
@@ -360,7 +363,7 @@ async function loadLogs(rn, id, from, token) {
   try {
     let roomInfo = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
     from = +from;
-    console.log("LOADING LOGS FROM", from - 30, "TO", from);
+    console.log("LOADING LOGS FROM", from - 30, "TO", from, roomInfo.minCt);
     if (from < import_database.minID || roomInfo && roomInfo.minCt && from < roomInfo.minCt) {
       supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: -1 } }));
       return { status: "SUCCESS", data: null, token };
@@ -368,7 +371,7 @@ async function loadLogs(rn, id, from, token) {
     let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, msgID: { $gt: from - 30, $lt: from } }).toArray();
     for (let i = msgs.length - 1; i >= 0; i--) {
       console.log(msgs[i].msgID);
-      let dat = JSON.stringify({ action: "msg", data: { id: -msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, content: +msgs[i].data } });
+      let dat = JSON.stringify({ action: "msg", data: { id: -msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, content: msgs[i].data } });
       supportHandler.sendMsgTo_ID(id, dat);
     }
     console.log("LOADING COMPLETE, LOADED" + msgs.length, "MESSAGES");
@@ -450,7 +453,8 @@ async function purge(name2, token) {
       return { status: "ERROR", data: { error: "Insufficient permissions!" }, token };
     await import_consts.msgDB.deleteMany({ fieldName: "MSG", room: name2 });
     await import_consts.msgDB.updateOne({ fieldName: "RoomInfo", room: name2 }, { $set: {
-      msgCt: 0
+      msgCt: 0,
+      minCt: 0
     } });
     return { status: "SUCCESS", data: null, token };
   } catch (e) {

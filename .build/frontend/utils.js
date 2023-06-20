@@ -73,10 +73,6 @@ async function globalOnload(cbk, networkLess = false) {
                 cpl.style.opacity = "0";
                 cpl.style.pointerEvents = "none";
               }
-              setTimeout(() => {
-                byId("overlayLContainer").style.opacity = 0;
-                byId("overlayLContainer").style.pointerEvents = "none";
-              }, 500);
               if (cbk)
                 cbk();
             }, true);
@@ -114,6 +110,8 @@ function send(params, callback, onLoadQ = false) {
     console.log("overlay active");
     overlay2.style.opacity = "1";
     overlay2.style.backgroundColor = "var(--system-overlay)";
+    byId("overlayLContainer").style.opacity = 1;
+    byId("overlayLContainer").style.pointerEvents = "auto";
   }
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "/server", true);
@@ -123,6 +121,8 @@ function send(params, callback, onLoadQ = false) {
       if (overlay2) {
         overlay2.style.opacity = "0";
         overlay2.style.backgroundColor = "var(--system-grey2)";
+        byId("overlayLContainer").style.opacity = 0;
+        byId("overlayLContainer").style.pointerEvents = "none";
       }
       if (failureTimeout)
         clearTimeout(failureTimeout);
@@ -207,7 +207,7 @@ function alertDialog(str, callback = () => {
   p.innerHTML += "<br><br><p style='margin: 10px auto' class='gry nohover'>(Press ENTER or ESC)</p>";
   newDialog.querySelector("#cancelBtn").style.display = "none";
   if (button == 1) {
-    p.innerHTML += `<button class='btn szThird fssml' id="resend" onclick='send(decodeURIComponent(${encodeURIComponent(failedReq)})'>
+    p.innerHTML += `<button class='btn szThird fssml' id="resend" onclick='send(decodeURIComponent("${encodeURIComponent(failedReq)}")'>
     <span class="material-symbols-outlined">history</span> Refresh?
     <div class="anim"></div></button>`;
     console.log("Alert-type: FAILEDREQUEST" + failedReq);

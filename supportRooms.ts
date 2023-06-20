@@ -162,6 +162,7 @@ export class supportHandler {
       if (this.connections[i].roomName == roomName) {
         // encode '>' -- used for message-breaks (yes, it is stupid.)
         data = data.replaceAll(">", "&gt;");
+        console.log(data);
         this.connections[i].event.send(data);
       }
     }
@@ -173,7 +174,7 @@ export class supportHandler {
       if (this.connections[i].id == connectionID) {
         // encode '>' -- used for message-breaks (yes, it is stupid.)
         data = data.replaceAll(">", "&gt;");
-        
+        console.log(data);
         this.connections[i].event.send(data);
         
       }
@@ -185,6 +186,7 @@ export function sendMsg(msg:string, room:string, token:string, callback: (status
   userRequest(token).then(async (obj:{status:string, data:any, token:string})=>{
     let roomData = await msgDB.findOne({fieldName:"RoomInfo", room:room});
     let msgCt = roomData?roomData.msgCt:0;
+    msg = msg.replaceAll("\\n", "\n");
     await msgDB.insertOne({fieldName:"MSG", data:msg.replaceAll(">", "&gt;"), permLevel:obj.data.perms??1, 
                              sender:obj.data.alias??""+processAnon(token), expiry:Date.now()+3600*1000*24*30, 
                            room:room, msgID:msgCt});
@@ -222,14 +224,14 @@ export async function sendMsg_B(msg:string, room:string) {
     }
 
   }
-  console.log(betaNick);
-  await msgDB.insertOne({fieldName:"MSG", data:msg.replaceAll("\n\n", "\n").replaceAll(">", "&gt;"), permLevel:3, 
+  console.log(msg);
+  await msgDB.insertOne({fieldName:"MSG", data:msg.replaceAll("\\n\\n", "\n").replaceAll(">", "&gt;"), permLevel:3, 
                            sender:betaNick, expiry:Date.now()+3600*1000*24*30, 
                          room:room, msgID:msgCt});
   await msgDB.updateOne({room:room, fieldName:"RoomInfo"}, {
       $inc: {msgCt:1}
     }, {upsert: true});
-  supportHandler.sendMsgTo(room, JSON.stringify({action:"msg", data:{id:msgCt, sender:betaNick, perms:3, content:msg.replaceAll("\n\n", "\n")}}));
+  supportHandler.sendMsgTo(room, JSON.stringify({action:"msg", data:{id:msgCt, sender:betaNick, perms:3, content:msg.replaceAll("\\n\\n", "\n")}}));
 }
 
 function processAnon(token:string) {
@@ -331,7 +333,7 @@ export async function loadLogs(rn:string, id:string, from:number, token:string) 
   try {
   let roomInfo = await msgDB.findOne({fieldName:"RoomInfo", room:{$eq:rn}});
   from = +from;
-  console.log("LOADING LOGS FROM",from-30,"TO",from);
+  console.log("LOADING LOGS FROM",from-30,"TO",from, roomInfo.minCt);
   if (from<minID || (roomInfo && roomInfo.minCt && from < roomInfo.minCt)) {
     supportHandler.sendMsgTo_ID(id, JSON.stringify({action:"LOADCOMPLETE", data:{id:-1}}));
     return {status:"SUCCESS", data:null, token:token}
@@ -339,7 +341,7 @@ export async function loadLogs(rn:string, id:string, from:number, token:string) 
   let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: from-30, $lt: from}}).toArray();
   for (let i=msgs.length-1; i>=0; i--) {
     console.log(msgs[i].msgID);
-    let dat = JSON.stringify({action:"msg", data:{id:-msgs[i].msgID, sender:msgs[i].sender, perms:msgs[i].permLevel, content:+msgs[i].data}});
+    let dat = JSON.stringify({action:"msg", data:{id:-msgs[i].msgID, sender:msgs[i].sender, perms:msgs[i].permLevel, content:msgs[i].data}});
     // console.log(dat);
     supportHandler.sendMsgTo_ID(id, dat);
   }
@@ -421,7 +423,8 @@ export async function purge(name:string, token:string) {
 
   await msgDB.deleteMany({fieldName:"MSG", room:name});
   await msgDB.updateOne({fieldName:"RoomInfo", room:name}, {$set:{
-    msgCt:0
+    msgCt:0,
+    minCt:0
   }})
   return {status:"SUCCESS", data:null, token:token};
   } catch (e:any) {

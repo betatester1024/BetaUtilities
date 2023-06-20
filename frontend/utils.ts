@@ -101,10 +101,6 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
               cpl.style.opacity="0";
               cpl.style.pointerEvents="none";
             }
-            setTimeout(()=>{
-              byId("overlayLContainer").style.opacity=0;
-              byId("overlayLContainer").style.pointerEvents="none";
-            }, 500);
             if (cbk) cbk();
           }, true);
         }, true);
@@ -139,6 +135,8 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
     console.log("overlay active")
     overlay.style.opacity="1";
     overlay.style.backgroundColor="var(--system-overlay)";
+    byId("overlayLContainer").style.opacity=1;
+              byId("overlayLContainer").style.pointerEvents="auto";
   }
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "/server", true);
@@ -148,6 +146,8 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
       if (overlay) {
         overlay.style.opacity="0";
         overlay.style.backgroundColor="var(--system-grey2)";
+        byId("overlayLContainer").style.opacity=0;
+        byId("overlayLContainer").style.pointerEvents="none";
       }
       if (failureTimeout) clearTimeout(failureTimeout);
       failureTimeout = null;
@@ -245,7 +245,7 @@ function alertDialog(str: string, callback: () => any = ()=>{}, button: number =
   p.innerHTML += "<br><br><p style='margin: 10px auto' class='gry nohover'>(Press ENTER or ESC)</p>"
   newDialog.querySelector("#cancelBtn").style.display = "none";
   if (button == 1) {
-    p.innerHTML += `<button class='btn szThird fssml' id="resend" onclick='send(decodeURIComponent(${encodeURIComponent(failedReq)})'>
+    p.innerHTML += `<button class='btn szThird fssml' id="resend" onclick='send(decodeURIComponent("${encodeURIComponent(failedReq)}")'>
     <span class="material-symbols-outlined">history</span> Refresh?
     <div class="anim"></div></button>`
     console.log("Alert-type: FAILEDREQUEST" + failedReq);

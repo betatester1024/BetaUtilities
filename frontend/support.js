@@ -3,7 +3,7 @@ function onLoad() {
   // });
   // send(JSON.stringify({action:"refresh_users"}), (res)=>{
   // });
-  document.getElementById("header").innerHTML = "Support: #"+
+  document.getElementById("header").innerText = "Support: #"+
     new URL(document.URL).searchParams.get("room");
   ROOMNAME = new URL(document.URL).searchParams.get("room");
   

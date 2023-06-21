@@ -19,7 +19,7 @@ html, ::backdrop {
   --system-grey4:#9a99963b;
   --system-bg: #eee;
   --system-overlay: rgba(200, 200, 200, 0.95);
-  --system-overlay2: rgba(200, 200, 200, 0.6);
+  --system-overlay2: rgba(200, 200, 200, 0.5);
   --system-transp: rgba(0, 0, 0, 0);
   --system-black: #222;
   transition: all 1s ease;
@@ -39,7 +39,7 @@ html, ::backdrop {
     --system-green2: rgba(0, 255, 0, 0.25);
     --system-yellow2:rgba(255, 204, 31, 0.25);
     --system-overlay: rgba(52, 52, 52, 0.95);
-    --system-overlay2: rgba(52, 52, 52, 0.6);
+    --system-overlay2: rgba(52, 52, 52, 0.5);
     --system-blue: #0cc8fe;
   }
 }
@@ -56,7 +56,7 @@ html, ::backdrop {
   --system-green2: rgba(0, 255, 0, 0.25);
   --system-yellow2:rgba(255, 204, 31, 0.25);
   --system-overlay: rgba(52, 52, 52, 0.95);
-  --system-overlay2: rgba(52, 52, 52, 0.6);
+  --system-overlay2: rgba(52, 52, 52, 0.5);
   --system-blue: #0cc8fe;
 }
 
@@ -549,7 +549,7 @@ footer, #footer {
   text-align: center;
 }
 .overlayLoader {
-  transition: all 0.3s ease-out;
+  transition: all 0.5s ease;
   width: 100vw;
   height: 100vh;
   position: absolute;
@@ -763,4 +763,46 @@ summary::marker {
   position: absolute;
   left: 15px;
   top: 15px;
+  background-color: var(--system-overlay);
+  padding: 15px;
+  border-radius: 10px;
+  min-height: 100px;
+  min-width: 250px;
+  touch-action: pan-x pan-y;
+  opacity: 0;
+  pointer-events: none;
+  padding-top: 0px;
+  transition: all 0.5s ease, left 0s ease, top 0s ease;
+}
+
+.ALERT_DRAGGER {
+  /* height: px; */
+  font-size: 30px;
+  border-radius: 10px 10px 0px 0px;
+  background-color: var(--system-grey3);
+  color: var(--system-blue);
+  font-weight: 600;
+  width: calc(100% - 10px);
+  left: -15px;
+  top: 0px;
+  position: relative;
+  cursor: move;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 2px;
+  font-family: "Noto Sans Display";
+  text-align: center;
+}
+
+.ALERT_NONBLOCK > .closeBtn {
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 5px 0px;
+}
+.ALERT_NONBLOCK > .content {
+  background-color: var(--system-bg);
+  padding: 10px;
+  border-radius: 7px;
+  min-width: 500px;
+  min-height: 300px;
 }

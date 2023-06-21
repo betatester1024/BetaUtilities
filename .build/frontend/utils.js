@@ -16,6 +16,8 @@ async function globalOnload(cbk, networkLess = false) {
     byId("overlayL").remove();
   HASNETWORK = !networkLess;
   document.onkeydown = keydown;
+  document.onpointerup = pointerUp;
+  document.onpointermove = pointerMove;
   document.body.addEventListener("mouseover", mouseOver);
   if (!networkLess) {
     send(
@@ -103,6 +105,35 @@ async function globalOnload(cbk, networkLess = false) {
     cpl.style.opacity = "1";
   }
 }
+let DRAGGING = null;
+let origLeft = -1;
+let origTop = -1;
+let origX = -1;
+let origY = -1;
+function pointerUp() {
+  DRAGGING = null;
+  origLeft = -1;
+  origTop = -1;
+}
+function pointerMove(ev) {
+  if (DRAGGING) {
+    DRAGGING.parentElement.style.left = origLeft + ev.screenX - origX + "px";
+    DRAGGING.parentElement.style.top = origTop + ev.screenY - origY + "px";
+    ev.preventDefault();
+    ev.stopPropagation();
+  }
+}
+function pointerDown(ev) {
+  console.log("something is happening");
+  DRAGGING = ev.currentTarget;
+  origX = ev.screenX;
+  origY = ev.screenY;
+  origLeft = toIntPx(window.getComputedStyle(DRAGGING.parentElement).left);
+  origTop = toIntPx(window.getComputedStyle(DRAGGING.parentElement).top);
+}
+function toIntPx(val) {
+  return Number(val.replace("px", ""));
+}
 function send(params, callback, onLoadQ = false) {
   let overlay2 = document.getElementById("overlayL");
   console.log(onLoadQ);
@@ -160,8 +191,31 @@ function nonBlockingDialog(str, callback = () => {
 }) {
   let div = document.createElement("div");
   div.className = "ALERT_NONBLOCK";
-  div.innerHTML = str;
+  div.innerHTML = `<div class="content">${str}</div>`;
+  let draggable = document.createElement("div");
+  draggable.className = "ALERT_DRAGGER";
+  draggable.innerText = "ServiceAlert";
+  div.prepend(draggable);
+  div.callback = callback;
   document.body.appendChild(div);
+  setTimeout(() => {
+    div.style.opacity = "1";
+    div.style.pointerEvents = "auto";
+    draggable.onpointerdown = pointerDown;
+  }, 20);
+  let button = document.createElement("button");
+  div.appendChild(document.createElement("br"));
+  div.appendChild(button);
+  button.outerHTML = `
+  <button class="grn btn fsmed closeBtn" onclick="closeNBD(this.parentElement)">
+  <span class='material-symbols-outlined'>arrow_forward</span>
+  Continue<div class="anim"></div>
+  </button>`;
+}
+function closeNBD(ele) {
+  ele.style.opacity = "0";
+  ele.style.pointerEvents = "none";
+  ele.callback();
 }
 let dialogQ = false;
 function alertDialog(str, callback = () => {

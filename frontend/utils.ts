@@ -30,7 +30,8 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
   // console.log("Font loaded!")
   
   document.onkeydown = keydown;
-  
+  document.onpointerup=pointerUp;
+  document.onpointermove = pointerMove;
   document.body.addEventListener("mouseover", mouseOver);
 
   // byId("overlay").onclick=(e:Event)=>{
@@ -127,7 +128,39 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
   cpl.style.opacity="1"; }
               // cpl.style.pointerEvents="none";
 }
+let DRAGGING = null;
+let origLeft = -1;
+let origTop = -1;
+let origX = -1;
+let origY = -1;
+function pointerUp() 
+{
+  DRAGGING = null;
+  origLeft = -1;
+  origTop = -1;
+}
+function pointerMove(ev:PointerEvent) 
+{
+  if (DRAGGING) {
+    DRAGGING.parentElement.style.left = origLeft+ev.screenX - origX+"px";
+    DRAGGING.parentElement.style.top = origTop+ev.screenY-origY+"px";
+    ev.preventDefault();
+    ev.stopPropagation();
+  }
+}
+function pointerDown(ev:PointerEvent) {
+  console.log("something is happening")
+  DRAGGING = ev.currentTarget;
+  origX = ev.screenX;
+  origY = ev.screenY;
+  origLeft = toIntPx(window.getComputedStyle(DRAGGING.parentElement).left);
+  origTop = toIntPx(window.getComputedStyle(DRAGGING.parentElement).top);
+  
+}
 
+function toIntPx(val:string) {
+  return Number(val.replace("px", ""));
+}
 function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false) {
   let overlay = document.getElementById("overlayL");
   console.log(onLoadQ)
@@ -183,8 +216,34 @@ function nonBlockingDialog(str:string, callback:()=>any = ()=>{})
 {
   let div = document.createElement("div");
   div.className="ALERT_NONBLOCK";
-  div.innerHTML = str; // yes, it can be html'd
+  div.innerHTML = `<div class="content">${str}</div>`; // yes, it can be html'd
+  let draggable = document.createElement("div");
+  
+  draggable.className = "ALERT_DRAGGER";
+  draggable.innerText = "ServiceAlert"
+  div.prepend(draggable);
+  div.callback=callback;
   document.body.appendChild(div);
+  setTimeout(()=>{
+    div.style.opacity="1";
+    div.style.pointerEvents="auto";  
+    draggable.onpointerdown = pointerDown;
+  }, 20);
+  let button = document.createElement("button");
+  div.appendChild(document.createElement("br"));
+  div.appendChild(button);
+  button.outerHTML = `
+  <button class="grn btn fsmed closeBtn" onclick="closeNBD(this.parentElement)">
+  <span class='material-symbols-outlined'>arrow_forward</span>
+  Continue<div class="anim"></div>
+  </button>`;
+  
+}
+
+function closeNBD(ele:HTMLElement) {
+  ele.style.opacity="0";
+  ele.style.pointerEvents = "none";
+  ele.callback();
 }
 
 // let TIME:NodeJS.Timeout|null;

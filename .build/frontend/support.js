@@ -1,7 +1,20 @@
 "use strict";
 function onLoad() {
-  document.getElementById("header").innerHTML = "Support: #" + new URL(document.URL).searchParams.get("room");
+  document.getElementById("header").innerText = "Support: #" + new URL(document.URL).searchParams.get("room");
   ROOMNAME = new URL(document.URL).searchParams.get("room");
+}
+let ACTIVEREPLY = -1;
+let awaitingParent = [];
+function toggleActiveReply(id) {
+  if (ACTIVEREPLY == id) {
+    byId(id).className = byId(id).className.replace("activeReply", "");
+    ACTIVEREPLY = -1;
+  } else {
+    if (ACTIVEREPLY >= 0)
+      toggleActiveReply(ACTIVEREPLY);
+    byId(id).className += " activeReply ";
+    ACTIVEREPLY = id;
+  }
 }
 function sendMsg() {
   let inp = document.getElementById("msgInp");
@@ -25,7 +38,7 @@ function sendMsg() {
         });
     }, true);
   } else
-    send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME } }), () => {
+    send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME, parent: ACTIVEREPLY } }), () => {
     }, true);
   inp.value = "";
 }
@@ -37,6 +50,14 @@ async function initClient() {
   try {
     console.log("Starting client.");
     source = new WebSocket("wss://" + new URL(document.URL).host + "?room=" + new URL(document.URL).searchParams.get("room"));
+    source.onclose = () => {
+      console.log("connection failed");
+      setTimeout(initClient, 500);
+    };
+    source.onerror = () => {
+      console.log("connection failed");
+      setTimeout(initClient, 500);
+    };
     source.onmessage = (message) => {
       console.log("Got", message);
       message = JSON.parse(message.data);
@@ -45,16 +66,25 @@ async function initClient() {
       if (message.action == "CONNECTIONID") {
         CONNECTIONID = message.data.id;
       }
-      if (message.action == "RELOAD") {
+      if (message.action == "RELOAD" || message.action == "RESTART") {
         document.getElementById("msgArea").innerHTML = `<h2 id="placeholder">
         <span class="material-symbols-outlined">update</span> 
         Reloading your messages, a moment please...</h2>`;
         document.getElementById("userList").innerHTML = "";
         LOADEDQ2 = false;
         STARTID = -1;
+        ACTIVEREPLY = -1;
         STARTIDVALID = false;
         UNREAD = 0;
         loadStatus = -1;
+        awaitingParent = [];
+        if (message.action == "RESTART")
+          source.close();
+      }
+      if (message.action == "delMsg") {
+        let ele2 = byId(message.data.id);
+        if (ele2)
+          ele2.remove();
       }
       if (message.action == "LOADCOMPLETE") {
         let thing = document.getElementById("msgArea");
@@ -87,17 +117,21 @@ async function initClient() {
         if (!matches)
           return;
         PREPENDFLAG = false;
-        if (STARTID < 0) {
+        if (STARTID < 0 || matches[1] == 0) {
           STARTID = Number(matches[1]);
           STARTIDVALID = true;
         }
-        if (matches[1] <= 0) {
+        if (matches[1][0] == "-") {
           PREPENDFLAG = true;
           matches[1] = -matches[1];
           if (loadStatus == 0)
             loadStatus = 1;
         }
         let newMsgSender = document.createElement("b");
+        newMsgSender.onclick = (ev) => {
+          ;
+          toggleActiveReply(ctn.id);
+        };
         newMsgSender.innerText = matches[2];
         newMsgSender.className = classStr[matches[3]];
         let ctn = document.createElement("div");
@@ -114,7 +148,7 @@ async function initClient() {
         msg = msg.replaceAll(/(#[a-zA-Z0-9_\-]{1,20})([^;]|$)/gm, ">SUPPORT$1>$2");
         msg = msg.replaceAll(/(;gt;;gt;[^ ]{0,90})/gm, ">INTERNALLINK$1>");
         msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu, ">LINK$<test>>");
-        msg = msg.replaceAll(/\\n/gmiu, ">BR>");
+        msg = msg.replaceAll(/\n/gmiu, ">BR>");
         console.log(msg);
         if (msg.match("^[ \n]*/me(.*)")) {
           msg = msg.match("^[ \n]*/me(.*)")[1];
@@ -168,15 +202,40 @@ async function initClient() {
             }
           }
         }
+        ele.onclick = (ev) => {
+          ;
+          toggleActiveReply(ctn.id);
+        };
         if (!PREPENDFLAG) {
           ctn.appendChild(ele);
           ctn.appendChild(document.createElement("br"));
-          area.appendChild(ctn);
+          if (message.data.parent >= 0) {
+            if (byId(message.data.parent)) {
+              console.log("awaiting parent");
+              byId(message.data.parent).appendChild(ctn);
+            } else
+              awaitingParent.push({ parent: message.data.parent, ele: ctn });
+          } else
+            area.appendChild(ctn);
         } else {
           ctn.prepend(document.createElement("br"));
           ctn.prepend(ele);
           ctn.prepend(newMsgSender);
-          area.prepend(ctn);
+          if (message.data.parent >= 0) {
+            if (byId(message.data.parent)) {
+              console.log("Awaiting parent");
+              byId(message.data.parent).appendChild(ctn);
+            } else
+              awaitingParent.push({ parent: message.data.parent, ele: ctn });
+          } else
+            area.prepend(ctn);
+        }
+        for (let i = 0; i < awaitingParent.length; i++) {
+          if (awaitingParent[i].parent == message.data.id) {
+            ele.appendChild(awaitingParent[i].ele);
+            console.log("added");
+            awaitingParent.splice(i, 1);
+          }
         }
         document.getElementById("placeholder").style.display = "none";
         if (!FOCUSSED) {

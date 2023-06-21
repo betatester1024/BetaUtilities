@@ -225,7 +225,7 @@ export class WebH
     this.nick = "BetaOS_System";
     this.displayNick="BetaOS_System";
     this.replyMessage = (msg:string, sender:string, data:any) => {
-      if (filter.clean(msg)!= msg) return "Stop that. "
+      // if (filter.clean(msg)!= msg) return "Stop that. "
       return replyMessage(this, msg, sender, data)
     };
     this.hiddenQ = hiddenQ;
@@ -236,4 +236,4 @@ export class WebH
   }
 }
 
-var Filter = require('bad-words'),filter = new Filter();
+// var Filter = require('bad-words'),filter = new Filter();

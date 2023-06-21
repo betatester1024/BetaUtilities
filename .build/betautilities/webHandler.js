@@ -205,8 +205,6 @@ class WebH {
     this.nick = "BetaOS_System";
     this.displayNick = "BetaOS_System";
     this.replyMessage = (msg, sender, data) => {
-      if (filter.clean(msg) != msg)
-        return "Stop that. ";
       return (0, import_messageHandle.replyMessage)(this, msg, sender, data);
     };
     this.hiddenQ = hiddenQ;
@@ -217,7 +215,6 @@ class WebH {
     import_supportRooms.supportHandler.addConnection(new import_supportRooms.pseudoConnection(), roomName, "[SYSINTERNAL]", true);
   }
 }
-var Filter = require("bad-words"), filter = new Filter();
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   WebH

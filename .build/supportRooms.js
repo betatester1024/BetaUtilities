@@ -4,8 +4,8 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
-  for (var name2 in all)
-    __defProp(target, name2, { get: all[name2], enumerable: true });
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
 };
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
@@ -45,9 +45,9 @@ class Room {
   type;
   name;
   handler;
-  constructor(type, name2, responder = null, handler = null) {
+  constructor(type, name, responder = null, handler = null) {
     this.type = type;
-    this.name = name2;
+    this.name = name;
     this.handler = handler;
   }
 }
@@ -107,10 +107,14 @@ class supportHandler {
     let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
     let msgCt = roomData ? roomData.msgCt : 0;
     let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, msgID: { $gt: msgCt - 30 } }).toArray();
+    let threads = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, $or: [{ parent: -1 }, { parent: { $exists: false } }] }).limit(20).toArray();
     let text = "";
     ev.send(JSON.stringify({ action: "CONNECTIONID", data: { id: this.connectionCt } }));
+    for (let i = 0; i < threads.length; i++) {
+      ev.send(JSON.stringify({ action: "msg", data: { id: threads[i].msgID ?? -1, sender: threads[i].sender, perms: threads[i].permLevel, parent: threads[i].parent ?? -1, content: threads[i].data } }));
+    }
     for (let i = 0; i < msgs.length; i++) {
-      ev.send(JSON.stringify({ action: "msg", data: { id: msgs[i].msgID ?? -1, sender: msgs[i].sender, perms: msgs[i].permLevel, content: msgs[i].data } }));
+      ev.send(JSON.stringify({ action: "msg", data: { id: msgs[i].msgID ?? -1, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } }));
     }
     text += "Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. Commands are available here: &gt;&gt;commands \nEnter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!";
     ev.send(JSON.stringify({ action: "msg", data: { id: +msgCt + 1, sender: "[SYSTEM]", perms: 3, content: text } }));
@@ -210,7 +214,7 @@ class supportHandler {
     }
   }
 }
-function sendMsg(msg, room, token, callback) {
+function sendMsg(msg, room, parent, token, callback) {
   (0, import_userRequest.userRequest)(token).then(async (obj) => {
     let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room });
     let msgCt = roomData ? roomData.msgCt : 0;
@@ -222,15 +226,16 @@ function sendMsg(msg, room, token, callback) {
       sender: obj.data.alias ?? "" + processAnon(token),
       expiry: Date.now() + 3600 * 1e3 * 24 * 30,
       room,
-      msgID: msgCt
+      msgID: msgCt,
+      parent
     });
     await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
       $inc: { msgCt: 1 }
     }, { upsert: true });
     if (obj.status == "SUCCESS") {
-      supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: obj.data.alias, perms: obj.data.perms, content: msg } }));
+      supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: obj.data.alias, perms: obj.data.perms, parent, content: msg } }));
     } else {
-      supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, content: msg } }));
+      supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, parent, content: msg } }));
     }
     for (let i = 0; i < supportHandler.allRooms.length; i++) {
       if (supportHandler.allRooms[i].name == room) {
@@ -274,17 +279,17 @@ function roomRequest(token, all = false) {
   else
     return { status: "SUCCESS", data: supportHandler.listOnlineRooms(), token };
 }
-async function createRoom(name2, token) {
-  if (supportHandler.checkFoundQ(name2))
+async function createRoom(name, token) {
+  if (supportHandler.checkFoundQ(name))
     return { status: "ERROR", data: { error: "Room already exists" }, token };
   let usrData = await (0, import_userRequest.userRequest)(token);
-  if (!name2.match("^" + import_consts.roomRegex + "$"))
+  if (!name.match("^" + import_consts.roomRegex + "$"))
     return { status: "ERROR", data: { error: "Invalid roomname!" }, token };
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
-      new import_webHandler.WebH(name2, false);
+      new import_webHandler.WebH(name, false);
       let obj = await import_consts.uDB.findOne({ fieldName: "ROOMS" });
-      obj.rooms.push(name2);
+      obj.rooms.push(name);
       await import_consts.uDB.updateOne({ fieldName: "ROOMS" }, {
         $set: {
           rooms: obj.rooms
@@ -296,18 +301,18 @@ async function createRoom(name2, token) {
   } else
     return usrData;
 }
-async function deleteRoom(name2, token) {
-  if (!supportHandler.checkFoundQ(name2))
+async function deleteRoom(name, token) {
+  if (!supportHandler.checkFoundQ(name))
     return { status: "ERROR", data: { error: "Room does not exist" }, token };
   let usrData = await (0, import_userRequest.userRequest)(token);
-  if (!name2.match("^" + import_consts.roomRegex + "$"))
+  if (!name.match("^" + import_consts.roomRegex + "$"))
     return { status: "ERROR", data: { error: "Invalid roomname!" }, token };
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
       let obj = await import_consts.uDB.findOne({ fieldName: "ROOMS" });
-      let idx = obj.rooms.indexOf(name2);
+      let idx = obj.rooms.indexOf(name);
       if (idx >= 0) {
-        supportHandler.deleteRoom("ONLINE_SUPPORT", name2);
+        supportHandler.deleteRoom("ONLINE_SUPPORT", name);
         obj.rooms.splice(idx, 1);
         await import_consts.uDB.updateOne({ fieldName: "ROOMS" }, {
           $set: {
@@ -316,9 +321,9 @@ async function deleteRoom(name2, token) {
         }, { upsert: true });
         return { status: "SUCCESS", data: null, token };
       } else {
-        let idx2 = obj.hidRooms.indexOf(name2);
+        let idx2 = obj.hidRooms.indexOf(name);
         if (idx2 >= 0) {
-          supportHandler.deleteRoom("HIDDEN_SUPPORT", name2);
+          supportHandler.deleteRoom("HIDDEN_SUPPORT", name);
           obj.hidRooms.splice(idx2, 1);
         } else
           return { status: "ERROR", data: { error: "Database inconsistency detected" }, token };
@@ -334,11 +339,11 @@ async function deleteRoom(name2, token) {
   } else
     return usrData;
 }
-function updateActive(name2, activeQ) {
+function updateActive(name, activeQ) {
   if (activeQ)
-    supportHandler.addRoom(new Room("EUPH_ROOM", name2));
+    supportHandler.addRoom(new Room("EUPH_ROOM", name));
   else
-    supportHandler.deleteRoom("EUPH_ROOM", name2);
+    supportHandler.deleteRoom("EUPH_ROOM", name);
 }
 async function WHOIS(token, user) {
   let userData = await import_consts.authDB.findOne({ fieldName: "UserData", user });
@@ -371,7 +376,7 @@ async function loadLogs(rn, id, from, token) {
     let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, msgID: { $gt: from - 30, $lt: from } }).toArray();
     for (let i = msgs.length - 1; i >= 0; i--) {
       console.log(msgs[i].msgID);
-      let dat = JSON.stringify({ action: "msg", data: { id: -msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, content: msgs[i].data } });
+      let dat = JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } });
       supportHandler.sendMsgTo_ID(id, dat);
     }
     console.log("LOADING COMPLETE, LOADED" + msgs.length, "MESSAGES");
@@ -383,7 +388,7 @@ async function loadLogs(rn, id, from, token) {
 }
 async function delMsg(id, room, token) {
   try {
-    if (!supportHandler.checkFoundQ(name))
+    if (!supportHandler.checkFoundQ(room))
       return { status: "ERROR", data: { error: "Room does not exist" }, token };
     let usrData = await (0, import_userRequest.userRequest)(token);
     if (usrData.status != "SUCCESS")
@@ -391,43 +396,44 @@ async function delMsg(id, room, token) {
     if (usrData.perms < 2)
       return { status: "ERROR", data: { error: "Insufficient permissions!" }, token };
     await import_consts.msgDB.deleteOne({ fieldName: "MSG", msgID: Number(id), room });
+    supportHandler.sendMsgTo(room, JSON.stringify({ action: "delMsg", data: { id: Number(id) } }));
     return { status: "SUCCESS", data: null, token };
   } catch (e) {
     console.log("Error:", e);
   }
 }
-async function updateDefaultLoad(name2, token) {
+async function updateDefaultLoad(name, token) {
   try {
     let usrData = await (0, import_userRequest.userRequest)(token);
     if (usrData.status != "SUCCESS")
       return usrData;
     if (usrData.data.perms < 3)
       return { status: "ERROR", data: { error: "Insufficient permissions!" }, token };
-    for (let i = 0; i < name2.length; i++) {
-      if (!name2[i].match("^" + import_consts.roomRegex + "$"))
+    for (let i = 0; i < name.length; i++) {
+      if (!name[i].match("^" + import_consts.roomRegex + "$"))
         return { status: "ERROR", data: { error: "Invalid room-name(s)" }, token };
     }
     await import_consts.uDB.updateOne({ fieldName: "ROOMS" }, { $set: {
-      euphRooms: name2
+      euphRooms: name
     } });
     return { status: "SUCCESS", data: null, token };
   } catch (e) {
     console.log("Error:", e);
   }
 }
-async function hidRoom(name2, token) {
+async function hidRoom(name, token) {
   try {
-    console.log(name2);
-    if (supportHandler.checkFoundQ(name2))
+    console.log(name);
+    if (supportHandler.checkFoundQ(name))
       return { status: "ERROR", data: { error: "Room already exists" }, token };
     let usrData = await (0, import_userRequest.userRequest)(token);
-    if (!name2.match("^" + import_consts.roomRegex + "$"))
+    if (!name.match("^" + import_consts.roomRegex + "$"))
       return { status: "ERROR", data: { error: "Invalid roomname!" }, token };
     if (usrData.status == "SUCCESS") {
       if (usrData.data.perms >= 2) {
-        new import_webHandler.WebH(name2, false);
+        new import_webHandler.WebH(name, false);
         let obj = await import_consts.uDB.findOne({ fieldName: "ROOMS" });
-        obj.hidRooms.push(name2);
+        obj.hidRooms.push(name);
         await import_consts.uDB.updateOne({ fieldName: "ROOMS" }, {
           $set: {
             hidRooms: obj.hidRooms
@@ -442,20 +448,21 @@ async function hidRoom(name2, token) {
     console.log("Error:", e);
   }
 }
-async function purge(name2, token) {
+async function purge(name, token) {
   try {
-    if (!supportHandler.checkFoundQ(name2))
+    if (!supportHandler.checkFoundQ(name))
       return { status: "ERROR", data: { error: "Room does not exist" }, token };
     let usrData = await (0, import_userRequest.userRequest)(token);
     if (usrData.status != "SUCCESS")
       return usrData;
     if (usrData.data.perms < 3)
       return { status: "ERROR", data: { error: "Insufficient permissions!" }, token };
-    await import_consts.msgDB.deleteMany({ fieldName: "MSG", room: name2 });
-    await import_consts.msgDB.updateOne({ fieldName: "RoomInfo", room: name2 }, { $set: {
+    await import_consts.msgDB.deleteMany({ fieldName: "MSG", room: name });
+    await import_consts.msgDB.updateOne({ fieldName: "RoomInfo", room: name }, { $set: {
       msgCt: 0,
       minCt: 0
     } });
+    supportHandler.sendMsgTo(name, JSON.stringify({ action: "RESTART" }));
     return { status: "SUCCESS", data: null, token };
   } catch (e) {
     console.log("Error:", e);

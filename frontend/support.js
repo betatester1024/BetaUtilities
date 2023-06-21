@@ -9,8 +9,20 @@ function onLoad() {
   
 }
 // system refresh auto!
-
-
+let ACTIVEREPLY = -1;
+let awaitingParent = [];
+function toggleActiveReply(id) 
+{
+  if (ACTIVEREPLY == id) {
+    byId(id).className=byId(id).className.replace("activeReply", "");
+    ACTIVEREPLY = -1;
+  }
+  else {
+    if (ACTIVEREPLY>=0) toggleActiveReply(ACTIVEREPLY);
+    byId(id).className += " activeReply ";
+    ACTIVEREPLY = id;
+  }
+}
 
 function sendMsg() {
   let inp = document.getElementById("msgInp");
@@ -32,7 +44,7 @@ function sendMsg() {
       });
     }, true);
   }
-  else send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME}}), ()=>{}, true);
+  else send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME, parent:ACTIVEREPLY}}), ()=>{}, true);
   inp.value="";
 }
 
@@ -47,6 +59,8 @@ async function initClient()
   console.log("Starting client.")
   source = new WebSocket('wss://'+new URL(document.URL).host+'?room='+
                                  new URL(document.URL).searchParams.get("room"));
+  source.onclose = ()=>{console.log("connection failed"); setTimeout(initClient, 500)};
+  source.onerror = ()=>{console.log("connection failed"); setTimeout(initClient, 500)};
   source.onmessage = (message) => {
     console.log('Got', message);
     message = JSON.parse(message.data);
@@ -57,17 +71,24 @@ async function initClient()
       
       CONNECTIONID = message.data.id;
     }    
-    if (message.action == "RELOAD") {
+    if (message.action == "RELOAD" || message.action == "RESTART") {
       document.getElementById("msgArea").innerHTML = `<h2 id="placeholder">
         <span class="material-symbols-outlined">update</span> 
         Reloading your messages, a moment please...</h2>`;
       document.getElementById("userList").innerHTML = "";
       LOADEDQ2=false;
       STARTID=-1;
+      ACTIVEREPLY = -1;
       STARTIDVALID = false;
       UNREAD = 0;
       loadStatus = -1;
+      awaitingParent = [];
+      if (message.action == "RESTART") source.close();
     }    
+    if (message.action == "delMsg") {
+      let ele = byId(message.data.id);
+      if (ele) ele.remove();
+    }
     if (message.action == "LOADCOMPLETE") {
       let thing = document.getElementById("msgArea")
       if (message.data.id<0) {
@@ -102,12 +123,12 @@ async function initClient()
       // let matches = msgs[i].match(/{(-?[0-9]+)}\[(.+)\]\(([0-9])\)(.*)/)
       if (!matches) return;
       PREPENDFLAG = false;
-      if (STARTID<0) {
+      if (STARTID<0 || matches[1] == 0) {
         STARTID = Number(matches[1]);
         STARTIDVALID = true;
         // alert(STARTID);
       }
-      if (matches[1]<=0) {
+      if (matches[1][0] == "-") {
         // console.log("PREPENDING")p
         PREPENDFLAG = true;
         matches[1] = -matches[1];
@@ -115,12 +136,15 @@ async function initClient()
       }
       // let newMsgBody = document.createTextNode();
       let newMsgSender = document.createElement("b");
+      newMsgSender.onclick=(ev)=>{; 
+                       toggleActiveReply(ctn.id)};
       // parse things
       newMsgSender.innerText = matches[2];
       newMsgSender.className = classStr[matches[3]];
       let ctn = document.createElement("div");
       ctn.id=matches[1];
-      ctn.className='msgContainer'
+      
+      ctn.className='msgContainer';
       if (!PREPENDFLAG) ctn.appendChild(newMsgSender);
       // newMsgBody.className = classStr[matches[3]];
       let msg = " "+matches[4].replaceAll("&gt;", ";gt;").replaceAll(">", ";gt;");
@@ -196,18 +220,41 @@ async function initClient()
           }
         }
       }
+      ele.onclick=(ev)=>{; 
+                       toggleActiveReply(ctn.id)};
       if (!PREPENDFLAG) {
         // console.log("NOT")
         ctn.appendChild(ele);
         ctn.appendChild(document.createElement("br"));
-        area.appendChild(ctn);
+        if (message.data.parent >= 0) {
+          if (byId(message.data.parent)) {
+            console.log("awaiting parent");
+            byId(message.data.parent).appendChild(ctn);
+          }
+          else awaitingParent.push({parent:message.data.parent, ele:ctn});
+        }
+        else area.appendChild(ctn);
       }
       else {
         // console.log("PREPEND")
         ctn.prepend(document.createElement("br"));
         ctn.prepend(ele);
         ctn.prepend(newMsgSender);
-        area.prepend(ctn);
+        if (message.data.parent >= 0) {
+          if (byId(message.data.parent)) {
+            console.log("Awaiting parent")
+            byId(message.data.parent).appendChild(ctn);
+          }
+          else awaitingParent.push({parent:message.data.parent, ele:ctn});
+        }
+        else area.prepend(ctn);
+      }
+      for (let i=0; i<awaitingParent.length; i++) {
+        if (awaitingParent[i].parent == message.data.id) {
+          ele.appendChild(awaitingParent[i].ele);
+          console.log("added");
+          awaitingParent.splice(i, 1);
+        }
       }
       document.getElementById("placeholder").style.display="none";
       if (!FOCUSSED) {

@@ -758,3 +758,9 @@ summary::marker {
   border-radius: 3px;
   font-size: 18px;
 }
+
+.ALERT_NONBLOCK {
+  position: absolute;
+  left: 15px;
+  top: 15px;
+}

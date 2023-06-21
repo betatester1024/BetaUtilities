@@ -352,7 +352,7 @@ function makeRequest(action, token, data, callback) {
           callback("SUCCESS", null, token);
           break;
         }
-        (0, import_supportRooms.sendMsg)(data.msg.slice(0, 1024), data.room, token, callback);
+        (0, import_supportRooms.sendMsg)(data.msg.slice(0, 1024), data.room, data.parent, token, callback);
         break;
       case "lookup":
         if (!data) {

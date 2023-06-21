@@ -66,14 +66,15 @@ export class supportHandler {
     let roomData = await msgDB.findOne({fieldName:"RoomInfo", room:{$eq:rn}});
     let msgCt = roomData?roomData.msgCt:0;
     let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: msgCt-30}}).toArray();
+    let threads = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, $or:[{parent:-1}, {parent:{$exists:false}}]}).limit(20).toArray();
     let text = "";
     ev.send(JSON.stringify({action:"CONNECTIONID", data:{id:this.connectionCt}}));
+    // load 3 threads and all their children
+    for (let i=0; i<threads.length; i++) {
+      ev.send(JSON.stringify({action:"msg", data:{id:threads[i].msgID??-1, sender:threads[i].sender, perms: threads[i].permLevel, parent: threads[i].parent??-1, content:threads[i].data}}));
+    }
     for (let i=0; i<msgs.length; i++) {
-      // let userData = await authDB.findOne({fieldName:"UserData", user:msgs[i].sender})
-      // if (!userData) text+= "["+msgs[i].sender+"](1)"+msgs[i].data+">";
-      // if (!userData) ev.write("data:["+msgs[i].sender+"](1)"+msgs[i].data+">\n\n");
-      // else text += "["+(userData.alias??msgs[i].sender)+"]("+userData.permLevel+")"+msgs[i].data+">";
-      ev.send(JSON.stringify({action:"msg", data:{id:msgs[i].msgID??-1, sender:msgs[i].sender, perms: msgs[i].permLevel, content:msgs[i].data}}));
+      ev.send(JSON.stringify({action:"msg", data:{id:msgs[i].msgID??-1, sender:msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent??-1, content:msgs[i].data}}));
     }
     text += "Welcome to BetaOS Services support! Enter any message in the box below. "+
       "Automated response services and utilities are provided by BetaOS System. "+
@@ -182,23 +183,23 @@ export class supportHandler {
   }  
 }
 
-export function sendMsg(msg:string, room:string, token:string, callback: (status:string, data:any, token:string)=>any) {
+export function sendMsg(msg:string, room:string, parent:number, token:string, callback: (status:string, data:any, token:string)=>any) {
   userRequest(token).then(async (obj:{status:string, data:any, token:string})=>{
     let roomData = await msgDB.findOne({fieldName:"RoomInfo", room:room});
     let msgCt = roomData?roomData.msgCt:0;
     msg = msg.replaceAll("\\n", "\n");
     await msgDB.insertOne({fieldName:"MSG", data:msg.replaceAll(">", "&gt;"), permLevel:obj.data.perms??1, 
                              sender:obj.data.alias??""+processAnon(token), expiry:Date.now()+3600*1000*24*30, 
-                           room:room, msgID:msgCt});
+                           room:room, msgID:msgCt, parent:parent});
     await msgDB.updateOne({room:room, fieldName:"RoomInfo"}, {
       $inc: {msgCt:1}
     }, {upsert: true});
     if (obj.status == "SUCCESS") {
-      supportHandler.sendMsgTo(room, JSON.stringify({action:"msg", data:{id:msgCt, sender:obj.data.alias, perms:obj.data.perms, content:msg}}));
+      supportHandler.sendMsgTo(room, JSON.stringify({action:"msg", data:{id:msgCt, sender:obj.data.alias, perms:obj.data.perms, parent: parent, content:msg}}));
     }
     else {
       //console.log("sending")
-      supportHandler.sendMsgTo(room, JSON.stringify({action:"msg", data:{id:msgCt, sender:processAnon(token), perms:1, content:msg}}));
+      supportHandler.sendMsgTo(room, JSON.stringify({action:"msg", data:{id:msgCt, sender:processAnon(token), perms:1, parent: parent, content:msg}}));
     }
     //console.log(supportHandler.allRooms);
     for (let i=0; i<supportHandler.allRooms.length; i++) {
@@ -341,7 +342,7 @@ export async function loadLogs(rn:string, id:string, from:number, token:string) 
   let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: from-30, $lt: from}}).toArray();
   for (let i=msgs.length-1; i>=0; i--) {
     console.log(msgs[i].msgID);
-    let dat = JSON.stringify({action:"msg", data:{id:-msgs[i].msgID, sender:msgs[i].sender, perms:msgs[i].permLevel, content:msgs[i].data}});
+    let dat = JSON.stringify({action:"msg", data:{id:"-"+msgs[i].msgID, sender:msgs[i].sender, perms:msgs[i].permLevel, parent: msgs[i].parent??-1, content:msgs[i].data}});
     // console.log(dat);
     supportHandler.sendMsgTo_ID(id, dat);
   }
@@ -356,11 +357,12 @@ export async function loadLogs(rn:string, id:string, from:number, token:string) 
 export async function delMsg(id:string, room:string, token:string) {
   try {
   // console.log({fieldName:"MSG", msgID:id, room:room});
-  if (!supportHandler.checkFoundQ(name)) return {status:"ERROR", data:{error:"Room does not exist"}, token:token};
+  if (!supportHandler.checkFoundQ(room)) return {status:"ERROR", data:{error:"Room does not exist"}, token:token};
   let usrData = await userRequest(token) as {status:string, data:{perms:number}};
   if (usrData.status != "SUCCESS") return usrData;
   if (usrData.perms < 2) return {status:"ERROR", data:{error:"Insufficient permissions!"}, token:token};
   await msgDB.deleteOne({fieldName:"MSG", msgID:Number(id), room:room});
+  supportHandler.sendMsgTo(room, JSON.stringify({action:"delMsg", data:{id:Number(id)}}));
   return {status:"SUCCESS", data:null, token:token};
   } catch (e:any) {
     console.log("Error:",e);
@@ -426,6 +428,7 @@ export async function purge(name:string, token:string) {
     msgCt:0,
     minCt:0
   }})
+  supportHandler.sendMsgTo(name, JSON.stringify({action:"RESTART"}));
   return {status:"SUCCESS", data:null, token:token};
   } catch (e:any) {
     console.log("Error:",e);

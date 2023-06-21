@@ -103,6 +103,9 @@ h2 > span, .supportMsg {
 div.msgContainer > div.msgContainer {
   margin-left: 10px;  
 }
+.activeReply {
+  background-color: var(--system-blue2);
+}
 .msgContainer {
   margin-top: 5px;
   margin-bottom: 5px;
@@ -120,7 +123,7 @@ p.slashMe {
 
 .slashMe > .material-symbols-outlined {
   top: 2px;
-  background-color: none;
+  background-color: var(--system-transp);
 }
 
 .slashMe:not(p) {

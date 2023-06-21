@@ -126,6 +126,8 @@ function send(params, callback, onLoadQ = false) {
       }
       if (failureTimeout)
         clearTimeout(failureTimeout);
+      else
+        closeAlert(-1);
       failureTimeout = null;
       callback(JSON.parse(xhr.responseText));
     } else if (xhr.readyState == 4 && xhr.status != 200) {
@@ -139,8 +141,12 @@ function send(params, callback, onLoadQ = false) {
   };
   console.log(params);
   xhr.send(params);
-  let failureTimeout = setTimeout(() => alertDialog(`This is taking longer than expected.`, () => {
-  }, 1, params), 5e3);
+  let failureTimeout = setTimeout(() => {
+    failureTimeout = null;
+    alertDialog(`This is taking longer than expected.`, (res) => {
+      callback(res);
+    }, 1, params);
+  }, 5e3);
 }
 function acceptCookies() {
   let cpm = document.getElementById("compliance");
@@ -207,9 +213,12 @@ function alertDialog(str, callback = () => {
   p.innerHTML += "<br><br><p style='margin: 10px auto' class='gry nohover'>(Press ENTER or ESC)</p>";
   newDialog.querySelector("#cancelBtn").style.display = "none";
   if (button == 1) {
-    p.innerHTML += `<button class='btn szThird fssml' id="resend" onclick='send(decodeURIComponent("${encodeURIComponent(failedReq)}")'>
-    <span class="material-symbols-outlined">history</span> Refresh?
+    p.innerHTML += `<button class='btn szThird fssml' id="resend" onclick='closeAlert(-1); send(decodeURIComponent("${encodeURIComponent(failedReq)}"), (res)=>{this.parentElement.parentElement.callback(res);})'>
+    <span class="material-symbols-outlined">history</span> Retry?
     <div class="anim"></div></button>`;
+    newDialog.querySelector("#cancelBtn").style.display = "inline-block";
+    newDialog.querySelector("#confirmbtn").style.display = "none";
+    newDialog.querySelector("#cancelBtn").querySelector(".alertlbl").innerText = "Close";
     console.log("Alert-type: FAILEDREQUEST" + failedReq);
   } else if (button == 2) {
     newDialog.querySelector("#cancelBtn").style.display = "inline-block";
@@ -225,7 +234,7 @@ function closeAlert(sel) {
   if (!dialog)
     return;
   let overridecallback = false;
-  if (dialog.getAttribute("type") == 2 && sel < 0)
+  if ((dialog.getAttribute("type") == 2 || dialog.getAttribute("type") == 1) && sel < 0)
     overridecallback = true;
   if (!ele) {
     console.log("Alert dialogs not enabled in this page");

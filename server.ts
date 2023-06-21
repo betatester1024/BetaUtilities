@@ -362,11 +362,11 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
         break;
       case 'sendMsg':
         if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        data = data as {msg:string, room:string};
+        data = data as {msg:string, room:string, parent:string};
         if (data.msg.length == 0) {
           callback("SUCCESS", null, token); break;
         }
-        sendMsg(data.msg.slice(0, 1024), data.room, token, callback);
+        sendMsg(data.msg.slice(0, 1024), data.room, data.parent, token, callback);
         break;
       case 'lookup':
         if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}

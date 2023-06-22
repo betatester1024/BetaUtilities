@@ -128,17 +128,11 @@ async function initClient() {
             loadStatus = 1;
         }
         let newMsgSender = document.createElement("b");
-        newMsgSender.onclick = (ev) => {
-          ;
-          toggleActiveReply(ctn.id);
-        };
         newMsgSender.innerText = matches[2];
         newMsgSender.className = classStr[matches[3]];
         let ctn = document.createElement("div");
         ctn.id = matches[1];
         ctn.className = "msgContainer";
-        if (!PREPENDFLAG)
-          ctn.appendChild(newMsgSender);
         let msg = " " + matches[4].replaceAll("&gt;", ";gt;").replaceAll(">", ";gt;");
         for (let i = 0; i < replacements.length; i++) {
           msg = msg.replaceAll(`:${replacements[i].from}:`, ">EMOJI" + replacements[i].to + ">");
@@ -202,13 +196,22 @@ async function initClient() {
             }
           }
         }
-        ele.onclick = (ev) => {
-          ;
+        let ctn_inner = document.createElement("div");
+        ctn_inner.className = "msgContents";
+        ctn_inner.appendChild(newMsgSender);
+        ctn_inner.appendChild(ele);
+        let optn = document.createElement("div");
+        optn.className = "options";
+        optn.innerHTML = `
+      <button class="btn">
+        <span class="material-symbols-outlined">reply</span>
+      </button>`;
+        ctn_inner.appendChild(optn);
+        ctn.appendChild(ctn_inner);
+        ctn_inner.onclick = (ev) => {
           toggleActiveReply(ctn.id);
         };
         if (!PREPENDFLAG) {
-          ctn.appendChild(ele);
-          ctn.appendChild(document.createElement("br"));
           if (message.data.parent >= 0) {
             if (byId(message.data.parent)) {
               console.log("awaiting parent");
@@ -218,9 +221,6 @@ async function initClient() {
           } else
             area.appendChild(ctn);
         } else {
-          ctn.prepend(document.createElement("br"));
-          ctn.prepend(ele);
-          ctn.prepend(newMsgSender);
           if (message.data.parent >= 0) {
             if (byId(message.data.parent)) {
               console.log("Awaiting parent");

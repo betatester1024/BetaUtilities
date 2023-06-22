@@ -790,7 +790,7 @@ summary::marker {
   padding-left: 20px;
   padding-right: 20px;
   padding-top: 2px;
-  font-family: "Noto Sans Display";
+  font-family: "Noto Sans Display", monospace;
   text-align: center;
 }
 
@@ -801,6 +801,8 @@ summary::marker {
 }
 .ALERT_NONBLOCK > .content {
   background-color: var(--system-bg);
+  color: var(--system-blue);
+  font-family: 'Noto Sans Mono', monospace;
   padding: 10px;
   border-radius: 7px;
   min-width: 500px;

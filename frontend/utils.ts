@@ -13,6 +13,17 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
 
   if (!networkLess) {
     var script = document.createElement('script');
+    script.src = "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js";
+    document.head.appendChild(script);
+    script.onload=()=>{
+      WebFont.load({
+        google: {
+          families: ['Noto Sans Mono']
+        }
+      });
+      console.log("Font loaded!")
+    }
+    script = document.createElement('script');
     script.src = "./nodemodules/dialog-polyfill/dist/dialog-polyfill.js";
     document.head.appendChild(script);
   }
@@ -22,12 +33,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
   // const NSM = new FontFace('Noto Sans Mono', 'url(https://fonts.googleapis.com/css2?family=Noto+Sans+Mono&display=swap)');
   // await NSM.load();
   // document.fonts.add(NSM);
-  // WebFont.load({
-  //   google: {
-  //     families: ['Noto Sans Mono']
-  //   }
-  // });
-  // console.log("Font loaded!")
+  
   
   document.onkeydown = keydown;
   document.onpointerup=pointerUp;
@@ -44,7 +50,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
   send(JSON.stringify({ action: "userRequest" }),
     (res) => {
       document.documentElement.className = res.data.darkQ?"dark":"";
-      console.log("Loading complete; updating class")
+      console.log("Dark mode toggle:",res.data.darkQ);
       // let overlay = document.getElementById("overlayL");
       // if (overlay) {
       //   // overlay.style.left="0vh";
@@ -103,10 +109,10 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
               cpl.style.pointerEvents="none";
             }
             if (cbk) cbk();
-          }, true);
-        }, true);
+          });
+        });
       
-    }, true);
+    });
   }
   
   let ele2 = document.getElementById("overlay");
@@ -149,8 +155,10 @@ function pointerMove(ev:PointerEvent)
   }
 }
 function pointerDown(ev:PointerEvent) {
-  console.log("something is happening")
   DRAGGING = ev.currentTarget;
+  document.body.appendChild(DRAGGING.parentElement);
+  ev.preventDefault();
+  ev.stopPropagation();
   origX = ev.screenX;
   origY = ev.screenY;
   origLeft = toIntPx(window.getComputedStyle(DRAGGING.parentElement).left);
@@ -163,7 +171,6 @@ function toIntPx(val:string) {
 }
 function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false) {
   let overlay = document.getElementById("overlayL");
-  console.log(onLoadQ)
   if (overlay && !onLoadQ) {
     console.log("overlay active")
     overlay.style.opacity="1";

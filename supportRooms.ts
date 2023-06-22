@@ -443,3 +443,15 @@ export async function updateAbout(about:string, token:string) {
   }})
   return {status:"SUCCESS", data:null, token:token}
 }
+
+async function loadThread(room:string, parentID:number) {
+  let thisMsg;
+  if (parentID < 0) {
+    thisMsg = await msgDB.findOne({$or:[{parent:-1}, {parent:{$exists:false}}], room:room})
+  }
+  children = await msgDB.find({parent:parentID<0?thisMsg.id:parentID, room:room}).toArray();
+  for (let i=0; i<children.length; i++) {
+    children.push(await loadThread() 
+  }
+  return children;
+}

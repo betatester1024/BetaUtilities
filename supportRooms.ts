@@ -68,6 +68,7 @@ export class supportHandler {
     let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: msgCt-30}}).toArray();
     let threads = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, $or:[{parent:-1}, {parent:{$exists:false}}]}).limit(20).toArray();
     let text = "";
+    console.log(await loadThread(rn, -1));
     ev.send(JSON.stringify({action:"CONNECTIONID", data:{id:this.connectionCt}}));
     // load 3 threads and all their children
     for (let i=0; i<threads.length; i++) {
@@ -447,11 +448,15 @@ export async function updateAbout(about:string, token:string) {
 async function loadThread(room:string, parentID:number) {
   let thisMsg;
   if (parentID < 0) {
-    thisMsg = await msgDB.findOne({$or:[{parent:-1}, {parent:{$exists:false}}], room:room})
+    thisMsg = await msgDB.findOne({fieldName:"MSG", $or:[{parent:-1}, {parent:{$exists:false}}], room:room})
+    console.log(thisMsg);
+    if (!thisMsg) return [];
   }
-  children = await msgDB.find({parent:parentID<0?thisMsg.id:parentID, room:room}).toArray();
+  let children = await msgDB.find({fieldName:"MSG", parent:parentID<0?thisMsg.msgID:parentID, room:room}).toArray();
   for (let i=0; i<children.length; i++) {
-    children.push(await loadThread() 
+    let newChildren = await loadThread(room, children[i].msgID);
+    for (c in newChildren) 
+      children.push(c);
   }
   return children;
 }

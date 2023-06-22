@@ -103,12 +103,34 @@ h2 > span, .supportMsg {
 div.msgContainer > div.msgContainer {
   margin-left: 10px;  
 }
-.activeReply {
+.activeReply > div.msgContents{
   background-color: var(--system-blue2);
 }
 .msgContainer {
   margin-top: 5px;
   margin-bottom: 5px;
+  cursor: pointer;
+}
+.msgContents:hover > .options {
+  opacity: 1;
+}
+
+.msgContents > .options {
+  position: relative;
+  top: 0px;
+  opacity: 0;
+  transition: all 0.5s ease;
+}
+.options > .btn {
+  padding: 2px;
+  height: 30px;
+  width: 30px;
+  border-radius: 5px;
+}
+.options > .btn > span.material-symbols-outlined:not(.override) 
+{
+  top: 0px;
+  font-size: 18px !important;
 }
 
 p.slashMe {

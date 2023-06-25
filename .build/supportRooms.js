@@ -106,17 +106,21 @@ class supportHandler {
     });
     let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
     let msgCt = roomData ? roomData.msgCt : 0;
-    let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, msgID: { $gt: msgCt - 30 } }).toArray();
-    let threads = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, $or: [{ parent: -1 }, { parent: { $exists: false } }] }).limit(20).toArray();
     let text = "";
-    console.log(await loadThread(rn, -1));
+    let loadedCt = 0, j = 0;
+    while (loadedCt < 30) {
+      let dat = await loadThread(rn, j, true);
+      j = dat.parentID + 1;
+      let msgs = dat.ch;
+      if (msgs.length != 0) {
+        loadedCt++;
+        console.log("loaded", msgs.length, "in room", rn);
+      }
+      for (let i = 0; i < msgs.length; i++) {
+        ev.send(JSON.stringify({ action: "msg", data: { id: msgs[i].msgID ?? -1, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } }));
+      }
+    }
     ev.send(JSON.stringify({ action: "CONNECTIONID", data: { id: this.connectionCt } }));
-    for (let i = 0; i < threads.length; i++) {
-      ev.send(JSON.stringify({ action: "msg", data: { id: threads[i].msgID ?? -1, sender: threads[i].sender, perms: threads[i].permLevel, parent: threads[i].parent ?? -1, content: threads[i].data } }));
-    }
-    for (let i = 0; i < msgs.length; i++) {
-      ev.send(JSON.stringify({ action: "msg", data: { id: msgs[i].msgID ?? -1, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } }));
-    }
     text += "Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. Commands are available here: &gt;&gt;commands \nEnter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!";
     ev.send(JSON.stringify({ action: "msg", data: { id: +msgCt + 1, sender: "[SYSTEM]", perms: 3, content: text } }));
     thiscn.readyQ = true;
@@ -228,7 +232,7 @@ function sendMsg(msg, room, parent, token, callback) {
       expiry: Date.now() + 3600 * 1e3 * 24 * 30,
       room,
       msgID: msgCt,
-      parent
+      parent: Number(parent)
     });
     await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
       $inc: { msgCt: 1 }
@@ -311,6 +315,8 @@ async function deleteRoom(name, token) {
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
       let obj = await import_consts.uDB.findOne({ fieldName: "ROOMS" });
+      await import_consts.msgDB.deleteOne({ fieldName: "RoomInfo", room: name });
+      await purge(name, token);
       let idx = obj.rooms.indexOf(name);
       if (idx >= 0) {
         supportHandler.deleteRoom("ONLINE_SUPPORT", name);
@@ -478,21 +484,22 @@ async function updateAbout(about, token) {
   } });
   return { status: "SUCCESS", data: null, token };
 }
-async function loadThread(room, parentID) {
+async function loadThread(room, parentID, noParent = false) {
   let thisMsg;
-  if (parentID < 0) {
-    thisMsg = await import_consts.msgDB.findOne({ fieldName: "MSG", $or: [{ parent: -1 }, { parent: { $exists: false } }], room });
-    console.log(thisMsg);
+  if (noParent) {
+    thisMsg = await import_consts.msgDB.findOne({ fieldName: "MSG", $or: [{ parent: -1 }, { parent: { $exists: false } }], msgID: { $gte: parentID }, room });
     if (!thisMsg)
-      return [];
+      return { ch: [], parentID };
   }
   let children = await import_consts.msgDB.find({ fieldName: "MSG", parent: parentID < 0 ? thisMsg.msgID : parentID, room }).toArray();
   for (let i = 0; i < children.length; i++) {
-    let newChildren = await loadThread(room, children[i].msgID);
-    for (c in newChildren)
+    let newChildren = (await loadThread(room, children[i].msgID)).ch;
+    for (const c of newChildren)
       children.push(c);
   }
-  return children;
+  if (thisMsg)
+    children.push(thisMsg);
+  return { ch: children, parentID: thisMsg ? thisMsg.msgID : -1 };
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

@@ -125,19 +125,19 @@ async function initServer() {
     (0, import_logging.incrRequests)();
   });
   app.get("/paste", (req, res) => {
-    res.sendFile(import_consts.frontendDir + "/newpaste.html");
+    res.sendFile(import_consts.frontendDir + "newpaste.html");
     (0, import_logging.incrRequests)();
   });
   app.get("/paste/*", (req, res) => {
-    res.sendFile(import_consts.frontendDir + "/paste.html");
+    res.sendFile(import_consts.frontendDir + "paste.html");
     (0, import_logging.incrRequests)();
   });
   app.get("*/favicon.ico", (req, res) => {
-    res.sendFile(import_consts.rootDir + "/favicon.ico");
+    res.sendFile(import_consts.rootDir + "favicon.ico");
     (0, import_logging.incrRequests)();
   });
   app.get("*/icon.png", (req, res) => {
-    res.sendFile(import_consts.rootDir + "/temp.png");
+    res.sendFile(import_consts.rootDir + "temp.png");
     (0, import_logging.incrRequests)();
   });
   app.get("*/notif.wav", (req, res) => {
@@ -587,7 +587,7 @@ function tooManyRequests() {
   <head>
     <title>Error 429 | BetaOS Systems</title>
     <script>
-    ${fs.readFileSync(import_consts.jsDir + "/utils.js")}
+    ${fs.readFileSync(import_consts.jsDir + "utils.js")}
     <\/script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />

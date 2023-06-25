@@ -132,7 +132,7 @@ export async function initServer() {
 
 
   app.get("/paste", (req:any, res:any) => {
-    res.sendFile(frontendDir+"/newpaste.html");
+    res.sendFile(frontendDir+"newpaste.html");
     incrRequests();
   })
   
@@ -142,18 +142,18 @@ export async function initServer() {
   // })
   
   app.get("/paste/*", (req:any, res:any) => {
-    res.sendFile(frontendDir+"/paste.html");
+    res.sendFile(frontendDir+"paste.html");
     incrRequests();
   })
 
   
   app.get('*/favicon.ico', (req:Request, res:any)=> {
-    res.sendFile(rootDir+'/favicon.ico')
+    res.sendFile(rootDir+'favicon.ico')
     incrRequests();
   })
 
   app.get('*/icon.png', (req:Request, res:any)=> {
-    res.sendFile(rootDir+'/temp.png')
+    res.sendFile(rootDir+'temp.png')
     incrRequests();
   })
 
@@ -564,7 +564,7 @@ function tooManyRequests() {
   <head>
     <title>Error 429 | BetaOS Systems</title>
     <script>
-    ${fs.readFileSync(jsDir+"/utils.js")}
+    ${fs.readFileSync(jsDir+"utils.js")}
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />

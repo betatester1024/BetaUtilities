@@ -231,10 +231,13 @@ async function initClient() {
             area.prepend(ctn);
         }
         for (let i = 0; i < awaitingParent.length; i++) {
-          if (awaitingParent[i].parent == message.data.id) {
-            ele.appendChild(awaitingParent[i].ele);
+          if (byId(awaitingParent[i].parent)) {
+            let ctner = byId(awaitingParent[i].parent);
+            ctner.appendChild(awaitingParent[i].ele);
             console.log("added");
             awaitingParent.splice(i, 1);
+            console.log(awaitingParent);
+            i = 0;
           }
         }
         document.getElementById("placeholder").style.display = "none";

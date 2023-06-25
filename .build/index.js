@@ -16,13 +16,13 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var betatester1024_exports = {};
-__export(betatester1024_exports, {
+var BetaOS_exports = {};
+__export(BetaOS_exports, {
   DBConnectFailure: () => DBConnectFailure,
   UPSINCESTR: () => UPSINCESTR,
   connectionSuccess: () => connectionSuccess
 });
-module.exports = __toCommonJS(betatester1024_exports);
+module.exports = __toCommonJS(BetaOS_exports);
 var import_server = require("./server");
 var import_database = require("./database");
 var import_supportRooms = require("./supportRooms");

@@ -446,17 +446,18 @@ export async function updateAbout(about:string, token:string) {
 }
 
 async function loadThread(room:string, parentID:number) {
-  let thisMsg;
-  if (parentID < 0) {
-    thisMsg = await msgDB.findOne({fieldName:"MSG", $or:[{parent:-1}, {parent:{$exists:false}}], room:room})
-    console.log(thisMsg);
-    if (!thisMsg) return [];
-  }
-  let children = await msgDB.find({fieldName:"MSG", parent:parentID<0?thisMsg.msgID:parentID, room:room}).toArray();
-  for (let i=0; i<children.length; i++) {
-    let newChildren = await loadThread(room, children[i].msgID);
-    for (c in newChildren) 
-      children.push(c);
-  }
-  return children;
+  // let thisMsg;
+  // if (parentID < 0) {
+  //   thisMsg = await msgDB.findOne({fieldName:"MSG", $or:[{parent:-1}, {parent:{$exists:false}}], room:room})
+  //   console.log(thisMsg);
+  //   if (!thisMsg) return [];
+  // }
+  // let children = await msgDB.find({fieldName:"MSG", parent:parentID<0?thisMsg.msgID:parentID, room:room}).toArray();
+  // for (let i=0; i<children.length; i++) {
+  //   let newChildren = await loadThread(room, children[i].msgID);
+  //   for (c in newChildren) 
+  //     children.push(c);
+  // }
+  // return children;
+  return [];
 }

@@ -479,20 +479,7 @@ async function updateAbout(about, token) {
   return { status: "SUCCESS", data: null, token };
 }
 async function loadThread(room, parentID) {
-  let thisMsg;
-  if (parentID < 0) {
-    thisMsg = await import_consts.msgDB.findOne({ fieldName: "MSG", $or: [{ parent: -1 }, { parent: { $exists: false } }], room });
-    console.log(thisMsg);
-    if (!thisMsg)
-      return [];
-  }
-  let children = await import_consts.msgDB.find({ fieldName: "MSG", parent: parentID < 0 ? thisMsg.msgID : parentID, room }).toArray();
-  for (let i = 0; i < children.length; i++) {
-    let newChildren = await loadThread(room, children[i].msgID);
-    for (c in newChildren)
-      children.push(c);
-  }
-  return children;
+  return [];
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

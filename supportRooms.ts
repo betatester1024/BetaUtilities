@@ -65,18 +65,32 @@ export class supportHandler {
     // console.log("added connection in "+rn);
     let roomData = await msgDB.findOne({fieldName:"RoomInfo", room:{$eq:rn}});
     let msgCt = roomData?roomData.msgCt:0;
-    let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: msgCt-30}}).toArray();
-    let threads = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, $or:[{parent:-1}, {parent:{$exists:false}}]}).limit(20).toArray();
+    // let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: msgCt-30}}).toArray();
+    // let threads = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, $or:[{parent:-1}, {parent:{$exists:false}}]}).limit(20).toArray();
     let text = "";
-    console.log(await loadThread(rn, -1));
+    // let lastLoadedThread = 
+    let loadedCt = 0, j=0;
+    while (loadedCt < 30) {
+      let dat = await loadThread(rn, j, true);
+      j = dat.parentID+1;
+      // console.log(dat)
+      let msgs = dat.ch;
+      if (msgs.length != 0) {
+        loadedCt++;
+        console.log("loaded", msgs.length, "in room", rn);
+      }
+      for (let i=0; i<msgs.length; i++) {
+        ev.send(JSON.stringify({action:"msg", data:{id:msgs[i].msgID??-1, sender:msgs[i].sender, perms: msgs[i].permLevel, parent:msgs[i].parent??-1, content:msgs[i].data}}));
+      }
+    }
     ev.send(JSON.stringify({action:"CONNECTIONID", data:{id:this.connectionCt}}));
     // load 3 threads and all their children
-    for (let i=0; i<threads.length; i++) {
-      ev.send(JSON.stringify({action:"msg", data:{id:threads[i].msgID??-1, sender:threads[i].sender, perms: threads[i].permLevel, parent: threads[i].parent??-1, content:threads[i].data}}));
-    }
-    for (let i=0; i<msgs.length; i++) {
-      ev.send(JSON.stringify({action:"msg", data:{id:msgs[i].msgID??-1, sender:msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent??-1, content:msgs[i].data}}));
-    }
+    // for (let i=0; i<threads.length; i++) {
+    //   ev.send(JSON.stringify({action:"msg", data:{id:threads[i].msgID??-1, sender:threads[i].sender, perms: threads[i].permLevel, parent: threads[i].parent??-1, content:threads[i].data}}));
+    // }
+    // for (let i=0; i<msgs.length; i++) {
+    //   ev.send(JSON.stringify({action:"msg", data:{id:msgs[i].msgID??-1, sender:msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent??-1, content:msgs[i].data}}));
+    // }
     text += "Welcome to BetaOS Services support! Enter any message in the box below. "+
       "Automated response services and utilities are provided by BetaOS System. "+
       "Commands are available here: &gt;&gt;commands \n"+
@@ -191,7 +205,7 @@ export function sendMsg(msg:string, room:string, parent:number, token:string, ca
     msg = msg.replaceAll("\\n", "\n");
     await msgDB.insertOne({fieldName:"MSG", data:msg.replaceAll(">", "&gt;"), permLevel:obj.data.perms??1, 
                              sender:obj.data.alias??""+processAnon(token), expiry:Date.now()+3600*1000*24*30, 
-                           room:room, msgID:msgCt, parent:parent});
+                           room:room, msgID:msgCt, parent:Number(parent)});
     await msgDB.updateOne({room:room, fieldName:"RoomInfo"}, {
       $inc: {msgCt:1}
     }, {upsert: true});
@@ -276,6 +290,8 @@ export async function deleteRoom(name:string, token:string) {
     if (usrData.data.perms >= 2) {
 
       let obj = await uDB.findOne({fieldName:"ROOMS"})
+      await msgDB.deleteOne({fieldName:"RoomInfo", room:name});
+      await purge(name, token)
       let idx = obj.rooms.indexOf(name); 
       if (idx>=0) {
         supportHandler.deleteRoom("ONLINE_SUPPORT", name);
@@ -460,4 +476,3 @@ async function loadThread(room:string, parentID:number) {
   // }
   // return children;
   return [];
-}

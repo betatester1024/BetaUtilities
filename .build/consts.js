@@ -36,9 +36,10 @@ __export(consts_exports, {
 module.exports = __toCommonJS(consts_exports);
 var import_database = require("./database");
 const argon2 = require("argon2");
-const rootDir = "/home/runner/betatester1024/";
-const frontendDir = "/home/runner/betatester1024/frontend/";
-const jsDir = "/home/runner/betatester1024/.build/frontend/";
+const path = require("path");
+const rootDir = path.resolve(__dirname + "/../") + "/";
+const frontendDir = path.resolve(__dirname + "/../frontend/") + "/";
+const jsDir = path.resolve(__dirname + "/../.build/frontend/") + "/";
 const port = 3e3;
 const userRegex = /^[0-9a-zA-Z_\\-]{1,20}$/;
 const roomRegex = "[0-9a-zA-Z_\\-]{1,20}";
@@ -46,8 +47,8 @@ const authDB = import_database.database.collection("SystemAUTH_V2");
 const msgDB = import_database.database.collection("SupportMessaging");
 const uDB = import_database.database.collection("BetaUtilities");
 const pasteDB = import_database.database.collection("PasteIt");
-const TOKEN_PATH = "/home/runner/betatester1024/TOKEN.json";
-const CREDENTIALS_PATH = "/home/runner/betatester1024/CREDENTIALS.json";
+const TOKEN_PATH = path.resolve(__dirname + "/../TOKEN.json");
+const CREDENTIALS_PATH = path.resolve(__dirname + "/../CREDENTIALS.json");
 const hashingOptions = {
   type: argon2.argon2d,
   memoryCost: 12288,

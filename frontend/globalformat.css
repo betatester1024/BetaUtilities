@@ -799,6 +799,7 @@ summary::marker {
   transform: translateX(-50%);
   margin: 5px 0px;
 }
+
 .ALERT_NONBLOCK > .content {
   background-color: var(--system-bg);
   color: var(--system-blue);

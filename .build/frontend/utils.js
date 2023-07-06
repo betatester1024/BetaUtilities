@@ -227,7 +227,7 @@ function closeNBD(ele) {
   ele.style.pointerEvents = "none";
   ele.callback();
 }
-let dialogQ = false;
+let ALERTOPEN = false;
 function alertDialog(str, callback = () => {
 }, button = -1, failedReq = "") {
   let newDialog = document.createElement("dialog");
@@ -272,7 +272,7 @@ function alertDialog(str, callback = () => {
   }
   ele.style.opacity = "1";
   newDialog.style.pointerEvents = "auto";
-  dialogQ = true;
+  ALERTOPEN = true;
   p.innerText = str;
   p.innerHTML += "<br><br><p style='margin: 10px auto' class='gry nohover'>(Press ENTER or ESC)</p>";
   newDialog.querySelector("#cancelBtn").style.display = "none";
@@ -321,7 +321,7 @@ function closeAlert(sel) {
   dialog.className = "internal CLOSEDALERT";
   dialog.id = "CLOSEDALERT";
   if (!dialogsActive()) {
-    dialogQ = false;
+    ALERTOPEN = false;
     ele.style.opacity = "0";
     ele.style.pointerEvents = "none";
   }
@@ -337,7 +337,7 @@ function keydown(e) {
     e.preventDefault();
     return;
   }
-  if (dialogQ && (e.key == "Escape" || e.key == "Enter")) {
+  if (ALERTOPEN && !DIALOGOPEN && (e.key == "Escape" || e.key == "Enter")) {
     e.preventDefault();
     if (e.key == "Escape") {
       console.log("RejectKey");
@@ -346,6 +346,9 @@ function keydown(e) {
       console.log("ConfirmKey");
       closeAlert(1);
     }
+  }
+  if (!ALERTOPEN && !DIALOGOPEN && (e.target.nodeName == "INPUT" || e.target.nodeName == "TEXTAREA") && e.key == "Escape") {
+    e.target.blur();
   }
 }
 function toTime(ms, inclMs) {
@@ -407,7 +410,7 @@ function closeDialog(thing, name = "dialog") {
   DIALOGOPEN = false;
   let ele = byId("overlay");
   if (!dialogsActive()) {
-    dialogQ = false;
+    ALERTOPEN = false;
     ele.style.opacity = "0";
     ele.style.pointerEvents = "none";
   }
@@ -463,5 +466,20 @@ function resetExpiry(res) {
       });
     }, 2);
   }, Math.max(res.data.expiry - Date.now() - 6e4, 1e3));
+}
+function whichTransitionEvent() {
+  var t;
+  var el = document.createElement("fakeelement");
+  var transitions = {
+    "transition": "transitionend",
+    "OTransition": "oTransitionEnd",
+    "MozTransition": "transitionend",
+    "WebkitTransition": "webkitTransitionEnd"
+  };
+  for (let t2 in transitions) {
+    if (el.style[t2] !== void 0) {
+      return transitions[t2];
+    }
+  }
 }
 //# sourceMappingURL=utils.js.map

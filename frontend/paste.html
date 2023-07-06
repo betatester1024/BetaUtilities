@@ -69,7 +69,16 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload(()=>{openDialog('pwdInp');;});">
+  <body onload = "globalOnload(()=>{
+    openDialog('pwdInp');
+    var transitionEnd = whichTransitionEvent();
+    byId('pwdInp').addEventListener(transitionEnd, theFunctionToInvoke, false);
+    
+    function theFunctionToInvoke(ev){
+      let target = ev.target.querySelector('.internal form .inpContainer #inp.noMin');
+      if (target) target.focus();
+    }
+  });">
     <div class="main_content">
       <header>
         <h2>PasteIt!</h2>

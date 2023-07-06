@@ -41,7 +41,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
   document.body.addEventListener("mouseover", mouseOver);
 
   // byId("overlay").onclick=(e:Event)=>{
-  //   if (dialogQ) {
+  //   if (ALERTOPEN) {
   //     console.log("ClickOutside (Reject)")
   //     closeAlert(-1);
   //   }
@@ -254,7 +254,7 @@ function closeNBD(ele:HTMLElement) {
 }
 
 // let TIME:NodeJS.Timeout|null;
-let dialogQ = false;
+let ALERTOPEN = false;
 // let cbk: () => any = () => { };
 // let BLOCKCALLBACK = false;
 function alertDialog(str: string, callback: () => any = ()=>{}, button: number = -1, failedReq: string = "") {
@@ -311,7 +311,7 @@ function alertDialog(str: string, callback: () => any = ()=>{}, button: number =
   // newDialog.style.opacity="1";
   // newDialog.style.top = "0vh ";
   newDialog.style.pointerEvents="auto";
-  dialogQ = true;
+  ALERTOPEN = true;
   p.innerText = str;
   p.innerHTML += "<br><br><p style='margin: 10px auto' class='gry nohover'>(Press ENTER or ESC)</p>"
   newDialog.querySelector("#cancelBtn").style.display = "none";
@@ -370,7 +370,7 @@ function closeAlert(sel:number) {
   // eval("(()=>{"+dialog.getAttribute("callback")+"})()");
   // dialog.
   if (!dialogsActive()) { // if no alerts are open AND form-dialog is not open
-    dialogQ = false;
+    ALERTOPEN = false;
     ele.style.opacity="0";
     ele.style.pointerEvents="none";
   }
@@ -392,7 +392,7 @@ function keydown(e: Event) {
     e.preventDefault();
     return;
   }
-  if(dialogQ && (e.key == "Escape"||e.key == "Enter")) {
+  if(ALERTOPEN && !DIALOGOPEN && (e.key == "Escape"||e.key == "Enter")) {
     e.preventDefault();
     if (e.key == "Escape") {
       console.log("RejectKey")
@@ -402,6 +402,12 @@ function keydown(e: Event) {
       console.log("ConfirmKey")
       closeAlert(1);
     }
+  }
+  if (!ALERTOPEN && !DIALOGOPEN && 
+      (e.target.nodeName == "INPUT" || e.target.nodeName == "TEXTAREA") &&
+      e.key == "Escape") 
+  {
+    e.target.blur();
   }
 }
 
@@ -464,7 +470,7 @@ function closeDialog(thing:()=>any, name:string="dialog") {
   DIALOGOPEN=false;
   let ele = byId("overlay");
   if (!dialogsActive()) { // if no alerts are open AND form-dialog is not open
-    dialogQ = false;
+    ALERTOPEN = false;
     ele.style.opacity="0";
     ele.style.pointerEvents="none";
   }
@@ -531,3 +537,21 @@ function resetExpiry(res:any) {
     }, 2)
   }, Math.max(res.data.expiry - Date.now() - 60000, 1000))
 }
+
+function whichTransitionEvent(){
+    var t;
+    var el = document.createElement('fakeelement');
+    var transitions = {
+      'transition':'transitionend',
+      'OTransition':'oTransitionEnd',
+      'MozTransition':'transitionend',
+      'WebkitTransition':'webkitTransitionEnd'
+    }
+
+    for(let t in transitions){
+        if( el.style[t] !== undefined ){
+            return transitions[t];
+        }
+    }
+}
+

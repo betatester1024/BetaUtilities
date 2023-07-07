@@ -384,7 +384,7 @@ async function loadLogs(rn, id, from, token) {
     let roomInfo = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
     for (let i = 0; i < supportHandler.connections.length; i++)
       if (supportHandler.connections[i].id == id) {
-        j = roomInfo.msgCt - supportHandler.connections[i].minThreadID;
+        j = supportHandler.connections[i].minThreadID;
         thiscn = supportHandler.connections[i];
         break;
       }
@@ -394,7 +394,7 @@ async function loadLogs(rn, id, from, token) {
       if (msgs.length == 0) {
       } else {
         loadedCt++;
-        thiscn.minThreadID = msgs[0].msgID;
+        thiscn.minThreadID = Math.min(thiscn.minThreadID, msgs[0].msgID);
       }
       for (let i = 0; i < msgs.length; i++) {
         supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } }));
@@ -521,8 +521,6 @@ async function loadThread(room, parentID, isParentQ) {
   }).toArray();
   if (isParentQ) {
     children.push(thisMsg);
-  } else if (!isParentQ) {
-    return [];
   }
   for (let i = 0; i < children.length; i++) {
     let newChildren = await loadThread(room, children[i].msgID, false);
@@ -530,8 +528,6 @@ async function loadThread(room, parentID, isParentQ) {
       children.push(c);
     }
   }
-  if (children.length > 1)
-    console.log(children.length);
   return children;
 }
 // Annotate the CommonJS export names for ESM import in node:

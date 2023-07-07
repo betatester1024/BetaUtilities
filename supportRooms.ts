@@ -370,7 +370,7 @@ export async function loadLogs(rn: string, id: string, from: number, token: stri
     let roomInfo = await msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
     for (let i = 0; i < supportHandler.connections.length; i++) 
       if (supportHandler.connections[i].id == id) {
-        j = roomInfo.msgCt - supportHandler.connections[i].minThreadID;
+        j = supportHandler.connections[i].minThreadID;
         thiscn = supportHandler.connections[i];
         // supportHandler.connections[i].minThreadID+=5;
         break;
@@ -385,7 +385,7 @@ export async function loadLogs(rn: string, id: string, from: number, token: stri
       }
       else {
         loadedCt++;
-        thiscn.minThreadID = msgs[0].msgID; // parent message ID
+        thiscn.minThreadID = Math.min(thiscn.minThreadID, msgs[0].msgID); // parent message ID
         // console.log("loaded", msgs.length, "in room", rn);
       }
       for (let i = 0; i < msgs.length; i++) {
@@ -528,17 +528,18 @@ async function loadThread(room: string, parentID: number, isParentQ: boolean) {
   if (isParentQ) {
     children.push(thisMsg);
   }
-  else if (!isParentQ) {
-    return [];
-  }
+  // else if (!isParentQ && children.length == 0) {
+    // return [];
+  // }
   for (let i = 0; i < children.length; i++) {
+    // console.log("att2empting", children[i].msgID);
     let newChildren = await loadThread(room, children[i].msgID, false);
+    // console.log("success: ", newChildren);
     for (let c in newChildren) {
       children.push(c);
     }
-      
   }
-  if (children.length>1) console.log(children.length);
+  // if (children.length>1) console.log(children.length);
   return children;
   // return [];
 }

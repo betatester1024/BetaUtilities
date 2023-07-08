@@ -117,7 +117,8 @@ class supportHandler {
           thiscn.minThreadID = msgs[0].msgID;
         }
         for (let i = 0; i < msgs.length; i++) {
-          ev.send(JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } }));
+          if (msgs[i])
+            ev.send(JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } }));
         }
         j--;
       }
@@ -397,7 +398,8 @@ async function loadLogs(rn, id, from, token) {
         thiscn.minThreadID = Math.min(thiscn.minThreadID, msgs[0].msgID);
       }
       for (let i = 0; i < msgs.length; i++) {
-        supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } }));
+        if (msgs[i])
+          supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } }));
       }
       j--;
     }
@@ -519,14 +521,16 @@ async function loadThread(room, parentID, isParentQ) {
     parent: isParentQ ? thisMsg.msgID : parentID,
     room
   }).toArray();
-  if (isParentQ) {
-    children.push(thisMsg);
-  }
+  if (isParentQ && children.length == 0)
+    return [thisMsg];
   for (let i = 0; i < children.length; i++) {
     let newChildren = await loadThread(room, children[i].msgID, false);
-    for (let c in newChildren) {
-      children.push(c);
+    for (let j = 0; j < newChildren.length; j++) {
+      children.push(newChildren[j]);
     }
+  }
+  if (isParentQ) {
+    children.unshift(thisMsg);
   }
   return children;
 }

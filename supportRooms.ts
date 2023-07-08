@@ -83,6 +83,7 @@ export class supportHandler {
           // console.log("loaded", msgs.length, "in room", rn);
         }
         for (let i = 0; i < msgs.length; i++) {
+          if (msgs[i])
           ev.send(JSON.stringify({ action: "msg", data: { id: "-"+msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } }));
         }
         j--;
@@ -389,6 +390,7 @@ export async function loadLogs(rn: string, id: string, from: number, token: stri
         // console.log("loaded", msgs.length, "in room", rn);
       }
       for (let i = 0; i < msgs.length; i++) {
+        if (msgs[i])
         supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "msg", data: { id: "-"+msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } }));
       }
       j--;
@@ -525,21 +527,31 @@ async function loadThread(room: string, parentID: number, isParentQ: boolean) {
     parent: (isParentQ ? thisMsg.msgID : parentID),
     room: room
   }).toArray();
-  if (isParentQ) {
-    children.push(thisMsg);
-  }
+  
   // else if (!isParentQ && children.length == 0) {
     // return [];
   // }
+  // let origLength = children.length;
+  if (isParentQ && children.length == 0) return [thisMsg];
+  // let skip = [parentID];
   for (let i = 0; i < children.length; i++) {
     // console.log("att2empting", children[i].msgID);
+    // if (skip.indexOf(children[i].msgID)>=0) continue;
     let newChildren = await loadThread(room, children[i].msgID, false);
     // console.log("success: ", newChildren);
-    for (let c in newChildren) {
-      children.push(c);
+    // skip.push(newChildren[i].msgID);
+    for (let j=0; j<newChildren.length; j++) {
+      children.push(newChildren[j]);
     }
+    // if (newChildren.length>0) skip.push(newChildren[0].msgID);
   }
-  // if (children.length>1) console.log(children.length);
+  if (isParentQ) {
+    children.unshift(thisMsg);
+  }
+  // console.log("made it here");
+  // if (children.length>1) console.log(children.length)
+  // if (children.length>0 && isParentQ) console.log(children[0].parent)
+  // if (children.length == 0) console.log("%d children found with parent %d", children.length, parentID);
   return children;
   // return [];
 }

@@ -115,7 +115,7 @@ async function initClient()
     console.log(modif);
     let area = document.getElementById("msgArea");
     ele = document.createElement("p");
-    
+    if (byId(Math.abs(message.data.id))) return;
     let scrDistOKQ =  (area.scrollTop) >= (area.scrollHeight-area.offsetHeight - 100)
     let msgs = modif.split(">");
     if (message.action == "msg") {
@@ -236,6 +236,7 @@ async function initClient()
           toggleActiveReply(ctn.id);
         }
       // area.appendChild(document.createElement("br"));
+
       if (!PREPENDFLAG) {
         if (message.data.parent >= 0) {
           if (byId(message.data.parent)) {
@@ -250,7 +251,6 @@ async function initClient()
         // console.log("PREPEND")
         if (message.data.parent >= 0) {
           if (byId(message.data.parent)) {
-            console.log("Awaiting parent")
             byId(message.data.parent).appendChild(ctn);
           }
           else awaitingParent.push({parent:message.data.parent, ele:ctn});
@@ -272,7 +272,7 @@ async function initClient()
         UNREAD ++ 
         document.title = "("+UNREAD+") | Support | BetaOS Systems"
       }
-    } // 
+    } // received message element // 
     // alert("here")
     if (!LOADEDQ2 || scrDistOKQ)
     {
@@ -284,7 +284,7 @@ async function initClient()
     // else alert("invalid")
 
     
-  };
+  } // handler function;
   } catch (e) {
     alert(e);
     console.log("Restartng client ("+e+")")

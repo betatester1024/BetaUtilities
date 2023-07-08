@@ -110,6 +110,8 @@ async function initClient() {
       console.log(modif);
       let area = document.getElementById("msgArea");
       ele = document.createElement("p");
+      if (byId(Math.abs(message.data.id)))
+        return;
       let scrDistOKQ = area.scrollTop >= area.scrollHeight - area.offsetHeight - 100;
       let msgs = modif.split(">");
       if (message.action == "msg") {
@@ -223,7 +225,6 @@ async function initClient() {
         } else {
           if (message.data.parent >= 0) {
             if (byId(message.data.parent)) {
-              console.log("Awaiting parent");
               byId(message.data.parent).appendChild(ctn);
             } else
               awaitingParent.push({ parent: message.data.parent, ele: ctn });

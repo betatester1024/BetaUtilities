@@ -52,6 +52,7 @@ const rmvReg = /(>|^)\-(.+)\([0-9]\)>/gm;
 const addReg = /(>|^)\+(.+)\([0-9]\)>/gm;
 const classStr = ["error", "user", "admin", "superadmin"]
 let source = null;
+let CONNECTIONID = -1;
 async function initClient()
 {
   
@@ -82,6 +83,7 @@ async function initClient()
       STARTIDVALID = false;
       UNREAD = 0;
       loadStatus = -1;
+      CONNECTIONID = -1;
       awaitingParent = [];
       if (message.action == "RESTART") source.close();
     }    

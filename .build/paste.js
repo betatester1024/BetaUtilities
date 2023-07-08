@@ -25,6 +25,7 @@ __export(paste_exports, {
 module.exports = __toCommonJS(paste_exports);
 var import_consts = require("./consts");
 var import_userRequest = require("./userRequest");
+const crypto = require("node:crypto").webcrypto;
 const argon2 = require("argon2");
 const pasteMatch = /^[0-9a-zA-Z_\-]{1,30}$/;
 async function paste(content, loc, pwd, token) {
@@ -38,8 +39,19 @@ async function paste(content, loc, pwd, token) {
     return { status: "ERROR", data: { error: "Paste already exists! Please select another name." }, token };
   let userData = await (0, import_userRequest.userRequest)(token);
   let user = userData.status == "SUCCESS" ? userData.data.user : null;
-  import_consts.pasteDB.insertOne({ fieldName: "PASTE", data: content, pwd: hashed, name: loc, author: user });
+  import_consts.pasteDB.insertOne({ fieldName: "PASTE", data: encryptMessage(content, pwd), pwd: hashed, name: loc, author: user });
   return { status: "SUCCESS", data: null, token };
+}
+function encryptMessage(msg, key) {
+  const enc = new TextEncoder();
+  const encoded = enc.encode(msg);
+  console.log(crypto);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  return crypto.subtle.encrypt(
+    { name: "AES-GCM", iv },
+    key,
+    encoded
+  );
 }
 async function findPaste(loc, pwd, token) {
   if (!loc.match(pasteMatch))

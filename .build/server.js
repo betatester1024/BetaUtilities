@@ -645,7 +645,8 @@ const validPages = [
   "/capsdle",
   "/sweepthatmine",
   "/stopwatch",
-  "/testbed"
+  "/testbed",
+  "/credits"
 ];
 const ignoreLog = [
   "getEE",

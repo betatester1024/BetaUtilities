@@ -1,4 +1,5 @@
 import {pasteDB, hashingOptions} from './consts';
+const crypto = require('node:crypto').webcrypto;
 const argon2 = require('argon2');
 import {userRequest} from './userRequest'
 const pasteMatch = /^[0-9a-zA-Z_\-]{1,30}$/
@@ -9,10 +10,25 @@ export async function paste(content:string, loc:string, pwd:string, token:string
   let existingDoc = await pasteDB.findOne({fieldName:"PASTE", name:loc});
   if (existingDoc) return {status:"ERROR", data:{error:"Paste already exists! Please select another name."}, token:token}
   let userData = await userRequest(token);
+  
   let user = userData.status=="SUCCESS"?userData.data.user:null
-  pasteDB.insertOne({fieldName:"PASTE", data:content, pwd:hashed, name:loc, author:user});
+  pasteDB.insertOne({fieldName:"PASTE", data:encryptMessage(content, pwd), pwd:hashed, name:loc, author:user});
   return {status:"SUCCESS", data:null, token:token};
 }
+
+function encryptMessage(msg:string, key:string) {
+  const enc = new TextEncoder();
+  const encoded =  enc.encode(msg);
+  // iv will be needed for decryption
+  console.log(crypto)
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  return crypto.subtle.encrypt(
+    { name: "AES-GCM", iv: iv },
+    key,
+    encoded
+  );
+}
+
 
 export async function findPaste(loc:string, pwd:string, token:string) {
   // console.log(pwd, loc);

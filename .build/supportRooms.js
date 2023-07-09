@@ -39,6 +39,7 @@ module.exports = __toCommonJS(supportRooms_exports);
 var import_userRequest = require("./userRequest");
 var import_consts = require("./consts");
 var import_logging = require("./logging");
+var import_database = require("./database");
 var import_webHandler = require("./betautilities/webHandler");
 class Room {
   type;
@@ -105,22 +106,17 @@ class supportHandler {
     });
     let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
     let msgCt = roomData ? roomData.msgCt : 0;
-    ev.send(JSON.stringify({ action: "CONNECTIONID", data: { id: this.connectionCt } }));
+    let threadCt = roomData ? roomData.threadCt ?? 0 : 0;
+    ev.send(JSON.stringify({ action: "CONNECTIONID", data: { id: thiscn.id } }));
     if (!thiscn.isPseudoConnection) {
       let text = "";
-      let loadedCt = 0, j = msgCt;
-      while (loadedCt < 30 && j >= 0) {
-        let msgs = await loadThread(rn, j, true);
-        if (msgs.length == 0) {
-        } else {
-          loadedCt++;
-          thiscn.minThreadID = msgs[0].msgID;
-        }
-        for (let i = 0; i < msgs.length; i++) {
-          if (msgs[i])
-            ev.send(JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } }));
-        }
-        j--;
+      let from = threadCt;
+      for (let i = 0; i < 30; i++) {
+        let resp = await loadLogs(rn, thiscn.id, from, token);
+        if (resp.status == "SUCCESS" && resp.data)
+          from = resp.data.from;
+        if (from < 0)
+          break;
       }
       text += "Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by BetaOS System. Commands are available here: &gt;&gt;commands \nEnter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!";
       ev.send(JSON.stringify({ action: "msg", data: { id: +msgCt + 1, sender: "[SYSTEM]", perms: 3, content: text } }));
@@ -223,7 +219,9 @@ function sendMsg(msg, room, parent, token, callback) {
   (0, import_userRequest.userRequest)(token).then(async (obj) => {
     let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room });
     let msgCt = roomData ? roomData.msgCt : 0;
+    let threadCt = roomData ? roomData.threadCt ?? 0 : 0;
     msg = msg.replaceAll("\\n", "\n");
+    let parentDoc = await import_consts.msgDB.findOne({ fieldName: "MSG", msgID: Number(parent) });
     await import_consts.msgDB.insertOne({
       fieldName: "MSG",
       data: msg.replaceAll(">", "&gt;"),
@@ -232,10 +230,10 @@ function sendMsg(msg, room, parent, token, callback) {
       expiry: Date.now() + 3600 * 1e3 * 24 * 30,
       room,
       msgID: msgCt,
-      parent: Number(parent)
+      threadID: parentDoc ? parentDoc.threadID ?? threadCt : threadCt
     });
     await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
-      $inc: { msgCt: 1 }
+      $inc: { msgCt: 1, threadCt: parentDoc ? 0 : 1 }
     }, { upsert: true });
     if (obj.status == "SUCCESS") {
       supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: obj.data.alias, perms: obj.data.perms, parent, content: msg } }));
@@ -380,36 +378,24 @@ async function WHOIS(token, user) {
 }
 async function loadLogs(rn, id, from, token) {
   try {
-    let j = -1;
-    let thiscn;
     let roomInfo = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
-    for (let i = 0; i < supportHandler.connections.length; i++)
-      if (supportHandler.connections[i].id == id) {
-        j = supportHandler.connections[i].minThreadID;
-        thiscn = supportHandler.connections[i];
-        break;
-      }
-    let loadedCt = 0;
-    while (loadedCt < 5 && j >= roomInfo.minCt && j <= roomInfo.msgCt) {
-      let msgs = await loadThread(rn, j, true);
-      if (msgs.length == 0) {
-      } else {
-        loadedCt++;
-        thiscn.minThreadID = Math.min(thiscn.minThreadID, msgs[0].msgID);
-      }
-      for (let i = 0; i < msgs.length; i++) {
-        if (msgs[i])
-          supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } }));
-      }
-      j--;
-    }
-    if (loadedCt < 5)
+    from = +from;
+    console.log("LOADING LOGS FROM", from - 5, "TO", from, roomInfo.minCt);
+    if (from < import_database.minID || roomInfo && roomInfo.minCt && from < roomInfo.minCt) {
       supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: -1 } }));
-    else
-      supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: 1 } }));
-    return { status: "SUCCESS", data: null, token };
+      return { status: "SUCCESS", data: { from: -1 }, token };
+    }
+    let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, threadID: { $gt: from - 5, $lt: from } }).toArray();
+    for (let i = msgs.length - 1; i >= 0; i--) {
+      let dat = JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } });
+      supportHandler.sendMsgTo_ID(id, dat);
+    }
+    console.log("LOADING COMPLETE, LOADED" + msgs.length, "MESSAGES");
+    supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: from - 5 } }));
+    return { status: "SUCCESS", data: { from: from - 5 }, token };
   } catch (e) {
     console.log("Error:", e);
+    return { status: "ERROR", data: { error: e }, token };
   }
 }
 async function delMsg(id, room, token) {
@@ -489,7 +475,8 @@ async function purge(name, token) {
     await import_consts.msgDB.updateOne({ fieldName: "RoomInfo", room: name }, {
       $set: {
         msgCt: 0,
-        minCt: 0
+        minCt: 0,
+        threadCt: 0
       }
     });
     supportHandler.sendMsgTo(name, JSON.stringify({ action: "RESTART" }));

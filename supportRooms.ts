@@ -64,32 +64,40 @@ export class supportHandler {
     // console.log("added connection in "+rn);
     let roomData = await msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
     let msgCt = roomData ? roomData.msgCt : 0;
+    let threadCt = roomData ? (roomData.threadCt??0) : 0;
     // let msgs = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, msgID:{$gt: msgCt-30}}).toArray();
     // let threads = await msgDB.find({fieldName:"MSG", room:{$eq:rn}, $or:[{parent:-1}, {parent:{$exists:false}}]}).limit(20).toArray();
-    ev.send(JSON.stringify({ action: "CONNECTIONID", data: { id: this.connectionCt } }));
+    ev.send(JSON.stringify({ action: "CONNECTIONID", data: { id: thiscn.id } }));
     if (!thiscn.isPseudoConnection) {
       let text = "";
-      // let lastLoadedThread = 0;
-      let loadedCt = 0, j = msgCt;
-      while (loadedCt < 30 && j >=0) {
-        let msgs = await loadThread(rn, j, true);
-        // console.log("msgs:", msgs);
-        if (msgs.length == 0) {
-          // console.log("message %d is not a parent thread", j)
-        }
-        else {
-          loadedCt++;
-          thiscn.minThreadID = msgs[0].msgID; // parent message ID
-          // console.log("loaded", msgs.length, "in room", rn);
-        }
-        for (let i = 0; i < msgs.length; i++) {
-          if (msgs[i])
-          ev.send(JSON.stringify({ action: "msg", data: { id: "-"+msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } }));
-        }
-        j--;
+      // // let lastLoadedThread = 0;
+      // let loadedCt = 0, j = msgCt;
+      // while (loadedCt < 30 && j >=0) {
+      //   let msgs = await loadThread(rn, j, true);
+      //   // console.log("msgs:", msgs);
+      //   if (msgs.length == 0) {
+      //     // console.log("message %d is not a parent thread", j)
+      //   }
+      //   else {
+      //     loadedCt++;
+      //     thiscn.minThreadID = msgs[0].msgID; // parent message ID
+      //     // console.log("loaded", msgs.length, "in room", rn);
+      //   }
+      //   for (let i = 0; i < msgs.length; i++) {
+      //     if (msgs[i])
+      //     ev.send(JSON.stringify({ action: "msg", data: { id: "-"+msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } }));
+      //   }
+      //   j--;
+      // }
+      // load 30 threads
+      let from = threadCt;
+      for (let i=0; i<30; i++) 
+      {
+        let resp = await loadLogs(rn, thiscn.id, from, token);
+        if (resp.status == "SUCCESS" && resp.data) from = resp.data.from;
+        if (from < 0) break;
+        // console.log(resp.data.from)
       }
-      
-      // load 3 threads and all their children
       // for (let i=0; i<threads.length; i++) {
       //   ev.send(JSON.stringify({action:"msg", data:{id:threads[i].msgID??-1, sender:threads[i].sender, perms: threads[i].permLevel, parent: threads[i].parent??-1, content:threads[i].data}}));
       // }
@@ -209,14 +217,17 @@ export function sendMsg(msg: string, room: string, parent: number, token: string
   userRequest(token).then(async (obj: { status: string, data: any, token: string }) => {
     let roomData = await msgDB.findOne({ fieldName: "RoomInfo", room: room });
     let msgCt = roomData ? roomData.msgCt : 0;
+    let threadCt = roomData ? (roomData.threadCt??0) : 0;
     msg = msg.replaceAll("\\n", "\n");
+    let parentDoc = await msgDB.findOne({fieldName:"MSG", msgID:Number(parent)});
     await msgDB.insertOne({
       fieldName: "MSG", data: msg.replaceAll(">", "&gt;"), permLevel: obj.data.perms ?? 1,
       sender: obj.data.alias ?? "" + processAnon(token), expiry: Date.now() + 3600 * 1000 * 24 * 30,
-      room: room, msgID: msgCt, parent: Number(parent)
+      room: room, msgID: msgCt, threadID: parentDoc?(parentDoc.threadID??threadCt):threadCt
     });
+
     await msgDB.updateOne({ room: room, fieldName: "RoomInfo" }, {
-      $inc: { msgCt: 1 }
+      $inc: { msgCt: 1, threadCt:parentDoc?0:1}
     }, { upsert: true });
     if (obj.status == "SUCCESS") {
       supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: obj.data.alias, perms: obj.data.perms, parent: parent, content: msg } }));
@@ -247,7 +258,6 @@ export async function sendMsg_B(msg: string, room: string) {
       betaNick = supportHandler.allRooms[i].handler.displayNick ?? "[BetaOS_ERROR]";
       break;
     }
-
   }
   console.log(msg);
   await msgDB.insertOne({
@@ -366,56 +376,57 @@ export async function WHOIS(token: string, user: string) {
 //loadLogs(data.room, data.id, data.from token)
 export async function loadLogs(rn: string, id: string, from: number, token: string) {
   try {
-    let j = -1;
-    let thiscn;
+    // let j = -1;
+    // let thiscn;
     let roomInfo = await msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
-    for (let i = 0; i < supportHandler.connections.length; i++) 
-      if (supportHandler.connections[i].id == id) {
-        j = supportHandler.connections[i].minThreadID;
-        thiscn = supportHandler.connections[i];
-        // supportHandler.connections[i].minThreadID+=5;
-        break;
-      }
+    // for (let i = 0; i < supportHandler.connections.length; i++) 
+    //   if (supportHandler.connections[i].id == id) {
+    //     j = supportHandler.connections[i].minThreadID;
+    //     thiscn = supportHandler.connections[i];
+    //     // supportHandler.connections[i].minThreadID+=5;
+    //     break;
+    //   }
     
-    let loadedCt = 0;
-    while (loadedCt < 5 && j >=roomInfo.minCt && j <= roomInfo.msgCt) {
-      let msgs = await loadThread(rn, j, true);
-      // console.log("msgs:", msgs);
-      if (msgs.length == 0) {
-        // console.log("message %d is not a parent thread", j)
-      }
-      else {
-        loadedCt++;
-        thiscn.minThreadID = Math.min(thiscn.minThreadID, msgs[0].msgID); // parent message ID
-        // console.log("loaded", msgs.length, "in room", rn);
-      }
-      for (let i = 0; i < msgs.length; i++) {
-        if (msgs[i])
-        supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "msg", data: { id: "-"+msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } }));
-      }
-      j--;
+    // let loadedCt = 0;
+    // while (loadedCt < 5 && j >=roomInfo.minCt && j <= roomInfo.msgCt) {
+    //   let msgs = await loadThread(rn, j, true);
+    //   // console.log("msgs:", msgs);
+    //   if (msgs.length == 0) {
+    //     // console.log("message %d is not a parent thread", j)
+    //   }
+    //   else {
+    //     loadedCt++;
+    //     thiscn.minThreadID = Math.min(thiscn.minThreadID, msgs[0].msgID); // parent message ID
+    //     // console.log("loaded", msgs.length, "in room", rn);
+    //   }
+    //   for (let i = 0; i < msgs.length; i++) {
+    //     if (msgs[i])
+    //     supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "msg", data: { id: "-"+msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } }));
+    //   }
+    //   j--;
+    // }
+    // if (loadedCt < 5) supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: -1 } }));
+    // else supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: 1} })); // nonsense value, unused now
+    // return {status:"SUCCESS", data:null, token:token}
+    from = +from;
+    console.log("LOADING LOGS FROM", from - 5, "TO", from, roomInfo.minCt);
+    if (from < minID || (roomInfo && roomInfo.minCt && from < roomInfo.minCt)) {
+      supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: -1 } }));
+      return { status: "SUCCESS", data: {from:-1}, token: token }
     }
-    if (loadedCt < 5) supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: -1 } }));
-    else supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: 1} })); // nonsense value, unused now
-    return {status:"SUCCESS", data:null, token:token}
-    // from = +from;
-    // console.log("LOADING LOGS FROM", from - 30, "TO", from, roomInfo.minCt);
-    // if (from < minID || (roomInfo && roomInfo.minCt && from < roomInfo.minCt)) {
-    //   supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: -1 } }));
-    //   return { status: "SUCCESS", data: null, token: token }
-    // }
-    // let msgs = await msgDB.find({ fieldName: "MSG", room: { $eq: rn }, msgID: { $gt: from - 30, $lt: from } }).toArray();
-    // for (let i = msgs.length - 1; i >= 0; i--) {
-    //   console.log(msgs[i].msgID);
-    //   let dat = JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } });
-    //   // console.log(dat);
-    //   supportHandler.sendMsgTo_ID(id, dat);
-    // }
-    // console.log("LOADING COMPLETE, LOADED" + msgs.length, "MESSAGES");
-    // supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: from - 30 } }));
-    // return { status: "SUCCESS", data: null, token: token };
+    let msgs = await msgDB.find({ fieldName: "MSG", room: { $eq: rn }, threadID: { $gt: from - 5, $lt: from } }).toArray();
+    for (let i = msgs.length - 1; i >= 0; i--) {
+      // console.log(msgs[i].msgID);
+      let dat = JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } });
+      // console.log(dat);
+      supportHandler.sendMsgTo_ID(id, dat);
+    }
+    console.log("LOADING COMPLETE, LOADED" + msgs.length, "MESSAGES");
+    supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: from - 5 } }));
+    return { status: "SUCCESS", data: {from:from-5}, token: token };
   } catch (e: any) {
     console.log("Error:", e);
+    return {status:"ERROR", data:{error:e}, token:token};
   }
 } // loadLogs
 
@@ -494,7 +505,8 @@ export async function purge(name: string, token: string) {
     await msgDB.updateOne({ fieldName: "RoomInfo", room: name }, {
       $set: {
         msgCt: 0,
-        minCt: 0
+        minCt: 0,
+        threadCt:0
       }
     })
     supportHandler.sendMsgTo(name, JSON.stringify({ action: "RESTART" }));

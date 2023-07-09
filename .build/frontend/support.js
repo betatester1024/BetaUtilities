@@ -112,7 +112,7 @@ async function initClient() {
       console.log(modif);
       let area = document.getElementById("msgArea");
       ele = document.createElement("p");
-      if (byId(Math.abs(message.data.id)))
+      if (message && message.data && message.data.id && byId(Math.abs(message.data.id)))
         return;
       let scrDistOKQ = area.scrollTop >= area.scrollHeight - area.offsetHeight - 100;
       let msgs = modif.split(">");
@@ -215,6 +215,8 @@ async function initClient() {
         ctn_inner.onclick = (ev) => {
           toggleActiveReply(ctn.id);
         };
+        if (message.data.perms == 3 && message.data.sender == "[SYSTEM]")
+          ctn.id = "-1";
         if (!PREPENDFLAG) {
           if (message.data.parent >= 0) {
             if (byId(message.data.parent)) {

@@ -18,7 +18,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
     script.onload=()=>{
       WebFont.load({
         google: {
-          families: ['Noto Sans Mono']
+          families: ['Noto Sans Mono', 'Noto Sans Display']
         }
       });
       console.log("Font loaded!")
@@ -68,7 +68,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
         ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
-                      <form class="inpContainer szThird nobreak" action="javascript:location.href=byId('ftrNav').value" style="margin: 2px;">
+                      <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
                         <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate...">
                         <div class="anim"></div>
                       </form> |
@@ -80,7 +80,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
                       <a href='/config'>Account</a> | 
                       <a href='/status'>Status</a> | 
                       <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
-                      <form class="inpContainer szThird nobreak" action="javascript:location.href=byId('ftrNav').value" style="margin: 2px;">
+                      <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
                         <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate...">
                         <div class="anim"></div>
                       </form> |

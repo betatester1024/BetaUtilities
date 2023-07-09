@@ -54,10 +54,17 @@ async function DBMaintenance() {
   let items2 = await import_consts.msgDB.find({ fieldName: "MSG" }).toArray();
   for (let i = 0; i < items2.length; i++) {
     if (!items2[i].expiry || items2[i].expiry < Date.now()) {
-      console.log("Message from " + items2[i].sender + " has expired");
+      console.log("Message from " + items2[i].sender + " in room " + items2[i].room + " has expired");
       await import_consts.msgDB.deleteOne(items2[i]);
-      await import_consts.msgDB.updateOne({ fieldName: "RoomInfo", room: items2[i].room }, { $set: { minCt: items2[i].msgID } });
-      console.log("New msgMin in room", items2[i].room, ":" + items2[i].msgID);
+      await import_consts.msgDB.updateOne(
+        { fieldName: "RoomInfo", room: items2[i].room },
+        {
+          $set: {
+            minCt: items2[i].msgID,
+            minThreadID: items2[i].threadID
+          }
+        }
+      );
     }
   }
   ;

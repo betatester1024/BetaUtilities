@@ -117,7 +117,8 @@ async function initClient()
     console.log(modif);
     let area = document.getElementById("msgArea");
     ele = document.createElement("p");
-    if (byId(Math.abs(message.data.id))) return;
+    if (message && message.data && message.data.id && 
+        byId(Math.abs(message.data.id))) return;
     let scrDistOKQ =  (area.scrollTop) >= (area.scrollHeight-area.offsetHeight - 100)
     let msgs = modif.split(">");
     if (message.action == "msg") {
@@ -238,7 +239,7 @@ async function initClient()
           toggleActiveReply(ctn.id);
         }
       // area.appendChild(document.createElement("br"));
-
+      if (message.data.perms == 3 && message.data.sender == "[SYSTEM]") ctn.id="-1";
       if (!PREPENDFLAG) {
         if (message.data.parent >= 0) {
           if (byId(message.data.parent)) {

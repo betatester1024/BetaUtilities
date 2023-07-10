@@ -145,6 +145,28 @@ function pointerDown(ev) {
 function toIntPx(val) {
   return Number(val.replace("px", ""));
 }
+function decodeStatus(status) {
+  switch (status) {
+    case 0:
+      return "Network failure";
+    case 502:
+      return "Internal Server Error";
+    case 404:
+      return "Not found";
+    case 429:
+      return "Too many requests";
+    case 403:
+      return "Forbidden";
+    case 401:
+      return "Unauthorised";
+    case 400:
+      return "Invalid request";
+    case 500:
+    case 503:
+      return "Internal Server Error";
+  }
+  return "Unknown error";
+}
 function send(params, callback, onLoadQ = false) {
   let overlay2 = document.getElementById("overlayL");
   if (overlay2 && !onLoadQ) {
@@ -164,30 +186,17 @@ function send(params, callback, onLoadQ = false) {
         overlay2.style.backgroundColor = "var(--system-grey2)";
         byId("overlayLContainer").style.opacity = 0;
         byId("overlayLContainer").style.pointerEvents = "none";
-      }
-      if (failureTimeout)
-        clearTimeout(failureTimeout);
-      else
+      } else
         closeAlert(-1);
-      failureTimeout = null;
       callback(JSON.parse(xhr.responseText));
     } else if (xhr.readyState == 4 && xhr.status != 200) {
-      if (failureTimeout)
-        clearTimeout(failureTimeout);
-      failureTimeout = null;
-      alertDialog("Received status code " + xhr.status + " - resend request?", () => {
+      alertDialog("Received status code " + xhr.status + " (" + decodeStatus(xhr.status) + ") -- resend request?", () => {
         send(params, callback, onLoadQ);
-      }, 2);
+      }, true);
     }
   };
   console.log(params);
   xhr.send(params);
-  let failureTimeout = setTimeout(() => {
-    failureTimeout = null;
-    alertDialog(`This is taking longer than expected.`, (res) => {
-      callback(res);
-    }, 1, params);
-  }, 5e3);
 }
 function acceptCookies() {
   let cpm = document.getElementById("compliance");
@@ -229,7 +238,7 @@ function closeNBD(ele) {
 }
 let ALERTOPEN = false;
 function alertDialog(str, callback = () => {
-}, button = -1, failedReq = "") {
+}, requiresConfirmation = false) {
   let newDialog = document.createElement("dialog");
   try {
     dialogPolyfill.registerDialog(newDialog);
@@ -256,7 +265,7 @@ function alertDialog(str, callback = () => {
     newDialog.style.opacity = "1";
     newDialog.style.top = "18px";
   }, 0);
-  newDialog.setAttribute("type", button + "");
+  newDialog.setAttribute("type", requiresConfirmation + "");
   newDialog.callback = callback;
   let overlay2 = document.getElementById("overlayL");
   if (overlay2) {
@@ -276,15 +285,7 @@ function alertDialog(str, callback = () => {
   p.innerText = str;
   p.innerHTML += "<br><br><p style='margin: 10px auto' class='gry nohover'>(Press ENTER or ESC)</p>";
   newDialog.querySelector("#cancelBtn").style.display = "none";
-  if (button == 1) {
-    p.innerHTML += `<button class='btn szThird fssml' id="resend" onclick='closeAlert(-1); send(decodeURIComponent("${encodeURIComponent(failedReq)}"), (res)=>{this.parentElement.parentElement.callback(res);})'>
-    <span class="material-symbols-outlined">history</span> Retry?
-    <div class="anim"></div></button>`;
-    newDialog.querySelector("#cancelBtn").style.display = "inline-block";
-    newDialog.querySelector("#confirmbtn").style.display = "none";
-    newDialog.querySelector("#cancelBtn").querySelector(".alertlbl").innerText = "Close";
-    console.log("Alert-type: FAILEDREQUEST" + failedReq);
-  } else if (button == 2) {
+  if (requiresConfirmation) {
     newDialog.querySelector("#cancelBtn").style.display = "inline-block";
     console.log("Alert-type CANCELLABLE");
   } else
@@ -298,7 +299,7 @@ function closeAlert(sel) {
   if (!dialog)
     return;
   let overridecallback = false;
-  if ((dialog.getAttribute("type") == 2 || dialog.getAttribute("type") == 1) && sel < 0)
+  if (dialog.getAttribute("type") == "true" && sel < 0)
     overridecallback = true;
   if (!ele) {
     console.log("Alert dialogs not enabled in this page");
@@ -464,7 +465,7 @@ function resetExpiry(res) {
         clearTimeout(SESSIONTIMEOUT2);
         resetExpiry(res2);
       });
-    }, 2);
+    }, true);
   }, Math.max(res.data.expiry - Date.now() - 6e4, 1e3));
 }
 function whichTransitionEvent() {

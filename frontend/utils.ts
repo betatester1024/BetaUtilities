@@ -169,6 +169,24 @@ function pointerDown(ev:PointerEvent) {
 function toIntPx(val:string) {
   return Number(val.replace("px", ""));
 }
+
+function decodeStatus(status:number) {
+  switch(status) 
+  {
+    case 0: return "Network failure"
+    case 502: return "Internal Server Error"
+    case 404: return "Not found"
+    case 429: return "Too many requests"
+    case 403: return "Forbidden"
+    case 401: return "Unauthorised"
+    case 400: return "Invalid request"
+    case 500: 
+    case 503:
+      return "Internal Server Error"
+  }  
+  return "Unknown error";
+}
+
 function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false) {
   let overlay = document.getElementById("overlayL");
   if (overlay && !onLoadQ) {
@@ -189,25 +207,25 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
         byId("overlayLContainer").style.opacity=0;
         byId("overlayLContainer").style.pointerEvents="none";
       }
-      if (failureTimeout) clearTimeout(failureTimeout);
+      // if (failureTimeout) clearTimeout(failureTimeout);
       else closeAlert(-1);
-      failureTimeout = null;
+      // failureTimeout = null;
       
       callback(JSON.parse(xhr.responseText));
     }
     else if (xhr.readyState == 4 && xhr.status != 200) {
-      if (failureTimeout) clearTimeout(failureTimeout);
+      // if (failureTimeout) clearTimeout(failureTimeout);
       // else closeAlert(true);
-      failureTimeout = null;
-      alertDialog("Received status code " +xhr.status+" - resend request?", ()=>{send(params, callback, onLoadQ);}, 2);
+      // failureTimeout = null;
+      alertDialog("Received status code " +xhr.status+" ("+decodeStatus(xhr.status)+") -- resend request?", ()=>{send(params, callback, onLoadQ);}, true);
     }
   }
   console.log(params);
   xhr.send(params);
-  let failureTimeout = setTimeout(() => {
-    failureTimeout = null;
-    alertDialog(`This is taking longer than expected.`, (res) => {callback(res);}, 1, params)
-  }, 5000);
+  // let failureTimeout = setTimeout(() => {
+  //   failureTimeout = null;
+  //   alertDialog(`This is taking longer than expected.`, (res) => {callback(res);}, 1, params)
+  // }, 5000);
 }
 
 function acceptCookies() {
@@ -257,7 +275,7 @@ function closeNBD(ele:HTMLElement) {
 let ALERTOPEN = false;
 // let cbk: () => any = () => { };
 // let BLOCKCALLBACK = false;
-function alertDialog(str: string, callback: () => any = ()=>{}, button: number = -1, failedReq: string = "") {
+function alertDialog(str: string, callback: () => any = ()=>{}, requiresConfirmation = false) {
   // if (TIME) clearTimeout(TIME);
   // TIME = null;
   // console.log("Timeout cleared")
@@ -288,7 +306,7 @@ function alertDialog(str: string, callback: () => any = ()=>{}, button: number =
     newDialog.style.opacity="1";
     newDialog.style.top = "18px";
   }, 0);
-  newDialog.setAttribute("type", button+"")
+  newDialog.setAttribute("type", requiresConfirmation+"")
   // newDialog.setAttribute("callback", callback.toString())
   
   // here we add a new attribute to the element, hoping that nothing breaks
@@ -315,16 +333,16 @@ function alertDialog(str: string, callback: () => any = ()=>{}, button: number =
   p.innerText = str;
   p.innerHTML += "<br><br><p style='margin: 10px auto' class='gry nohover'>(Press ENTER or ESC)</p>"
   newDialog.querySelector("#cancelBtn").style.display = "none";
-  if (button == 1) {
-    p.innerHTML += `<button class='btn szThird fssml' id="resend" onclick='closeAlert(-1); send(decodeURIComponent("${encodeURIComponent(failedReq)}"), (res)=>{this.parentElement.parentElement.callback(res);})'>
-    <span class="material-symbols-outlined">history</span> Retry?
-    <div class="anim"></div></button>`
-    newDialog.querySelector("#cancelBtn").style.display="inline-block";
-    newDialog.querySelector("#confirmbtn").style.display="none";
-    newDialog.querySelector("#cancelBtn").querySelector(".alertlbl").innerText = "Close"
-    console.log("Alert-type: FAILEDREQUEST" + failedReq);
-  }
-  else if (button == 2) {
+  // if (button == 1) {
+  //   p.innerHTML += `<button class='btn szThird fssml' id="resend" onclick='closeAlert(-1); send(decodeURIComponent("${encodeURIComponent(failedReq)}"), (res)=>{this.parentElement.parentElement.callback(res);})'>
+  //   <span class="material-symbols-outlined">history</span> Retry?
+  //   <div class="anim"></div></button>`
+  //   newDialog.querySelector("#cancelBtn").style.display="inline-block";
+  //   newDialog.querySelector("#confirmbtn").style.display="none";
+  //   newDialog.querySelector("#cancelBtn").querySelector(".alertlbl").innerText = "Close"
+  //   console.log("Alert-type: FAILEDREQUEST" + failedReq);
+  // }
+  if (requiresConfirmation) {
     newDialog.querySelector("#cancelBtn").style.display = "inline-block";
     console.log("Alert-type CANCELLABLE");
   }
@@ -345,7 +363,7 @@ function closeAlert(sel:number) {
   let dialog = coll.item(coll.length-1);
   if (!dialog) return;
   let overridecallback=false;
-  if ((dialog.getAttribute("type")==2 || dialog.getAttribute("type") == 1) && sel < 0) overridecallback = true;
+  if (dialog.getAttribute("type")=="true" && sel < 0) overridecallback = true;
   if (!ele) {
     console.log("Alert dialogs not enabled in this page");
     return;
@@ -534,7 +552,7 @@ function resetExpiry(res:any) {
         clearTimeout(SESSIONTIMEOUT2);
         resetExpiry(res);
       });
-    }, 2)
+    }, true)
   }, Math.max(res.data.expiry - Date.now() - 60000, 1000))
 }
 

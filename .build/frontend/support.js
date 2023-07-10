@@ -100,6 +100,7 @@ async function initClient() {
             thing.prepend(errorEle);
           }
         } else {
+          fixAwaitingParent();
           loadStatus = -1;
           STARTID = message.data.id;
         }
@@ -237,18 +238,6 @@ async function initClient() {
           else
             area.appendChild(ctn);
         }
-        for (let i = 0; i < awaitingParent.length; i++) {
-          if (byId(awaitingParent[i].parent)) {
-            let ctner = byId(awaitingParent[i].parent);
-            if (!byId(awaitingParent[i].ele.id)) {
-              ctner.appendChild(awaitingParent[i].ele);
-            } else
-              console.log("didnt'actually add");
-            awaitingParent.splice(i, 1);
-            console.log(awaitingParent);
-            i = 0;
-          }
-        }
         document.getElementById("placeholder").style.display = "none";
         if (!FOCUSSED) {
           UNREAD++;
@@ -319,4 +308,18 @@ function onScroll() {
     console.log("loadStatus" + loadStatus);
 }
 let loadStatus = -1;
+function fixAwaitingParent() {
+  for (let i = 0; i < awaitingParent.length; i++) {
+    if (byId(awaitingParent[i].parent)) {
+      let ctner = byId(awaitingParent[i].parent);
+      if (!byId(awaitingParent[i].ele.id)) {
+        ctner.appendChild(awaitingParent[i].ele);
+      } else
+        console.log("didnt'actually add");
+      awaitingParent.splice(i, 1);
+      console.log(awaitingParent);
+      i = 0;
+    }
+  }
+}
 //# sourceMappingURL=support.js.map

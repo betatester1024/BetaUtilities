@@ -49,7 +49,7 @@
         alertDialog("Confirm task deletion?", ()=>{
           send(JSON.stringify({action:"deleteTODO", data:{id:n}}), (res)=>{
             alertDialog("Task deleted.", ()=>{getTodo()})});
-        }, 2)
+        }, true)
         
       }
 

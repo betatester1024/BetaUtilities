@@ -49,7 +49,7 @@
           if (res.status!='SUCCESS') alertDialog('ERROR: '+res.data.error, ()=>{})
           else alertDialog('Purge success!', ()=>{loadLogs()});
         })
-      }, 2)">
+      }, true)">
         <span class="material-symbols-outlined">delete_forever</span>
         Purge logs<div class="anim"></div></button>
       <button class="btn blu" onclick="loadLogs()">

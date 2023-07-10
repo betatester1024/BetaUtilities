@@ -77,7 +77,7 @@
             PD = true;
             alertDialog(`Congratulations! You have won in ${CURRROW+1} move${CURRROW==0?"":"s"}! 
             Press ENTER to share your score.`, 
-            ()=>{ navigator.clipboard.writeText(copyText.join("\n")+"\n"+(CURRROW+1)+" move"+(CURRROW==0?"":"s")+"\nCapsdle by BetaOS: "+location.href);}, 2);
+            ()=>{ navigator.clipboard.writeText(copyText.join("\n")+"\n"+(CURRROW+1)+" move"+(CURRROW==0?"":"s")+"\nCapsdle by BetaOS: "+location.href);}, true);
             document.body.removeEventListener("keydown", keyDown_Capsdle);
             return PD;
           }

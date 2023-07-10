@@ -104,6 +104,7 @@ async function initClient()
         }
       }
       else {
+        fixAwaitingParent();
         loadStatus = -1;
         STARTID=message.data.id;
         // alert("lcMatchId updated"+ STARTID);
@@ -117,7 +118,7 @@ async function initClient()
         ele.innerHTML+= message.data.user+"<br>";
     }
     let modif = "";
-    console.log(modif);
+    // console.log(modif);
     let area = document.getElementById("msgArea");
     ele = document.createElement("p");
     if (message && message.data && message.data.id && 
@@ -161,7 +162,7 @@ async function initClient()
       msg = msg.replaceAll(/(;gt;;gt;[^ ]{0,90})/gm,">INTERNALLINK$1>");
       msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu,">LINK$<test>>")
       msg = msg.replaceAll(/\n/gmiu,">BR>")
-      console.log(msg);
+      // console.log(msg);
       if (msg.match("^[ \n]*/me(.*)")) {
         msg = msg.match("^[ \n]*/me(.*)")[1];
         slashMe = true;
@@ -243,44 +244,26 @@ async function initClient()
         }
       // area.appendChild(document.createElement("br"));
       if (message.data.perms == 3 && message.data.sender == "[SYSTEM]") ctn.id="-1";
-      if (!PREPENDFLAG) {
-        if (message.data.parent >= 0) {
-          if (byId(message.data.parent)) {
-            console.log("awaiting parent");
-            byId(message.data.parent).appendChild(ctn);
-          }
-          else awaitingParent.push({parent:message.data.parent, ele:ctn});
+      
+      if (message.data.parent >= 0) {
+        if (byId(message.data.parent)) {
+          // if (PREPENDFLAG) byId(message.data.parent).prepend(ctn);
+          byId(message.data.parent).appendChild(ctn);
+          for (let i=0; i<awaitingParent.length; i++) {
+            if (awaitingParent[i].ele.id == ctn.id) {
+              awaitingParent.splice(i, 1);
+              break;
+            }
+          } // remove already awaiting parent
         }
-        else area.appendChild(ctn);
+        else {
+          awaitingParent.push({parent:message.data.parent, ele:ctn});
+          console.log("awaiting parent", message.data.parent, ctn);
+        }
       }
       else {
-        // console.log("PREPEND")
-        if (message.data.parent >= 0) {
-          if (byId(message.data.parent)) {
-            byId(message.data.parent).appendChild(ctn);
-          }
-          else awaitingParent.push({parent:message.data.parent, ele:ctn});
-        }
-        else area.prepend(ctn);
-      }
-      for (let i=0; i<awaitingParent.length; i++) {
-        if (byId(awaitingParent[i].parent)) {
-          let ctner = byId(awaitingParent[i].parent);
-          if (!byId(awaitingParent[i].ele.id)) {// do not add if it has already been added
-            for (let i=0; i<ctner.children.length; i++) {
-              if (ctner.children[i].id>awaitingParent[i].ele.id) {
-                ctner.children[i].before(awaitingParent[i].ele)
-                break;
-              }
-            }
-            if (ctner.children.length==0) ctner.appendChild(awaitingParent[i].ele);
-             // ctner.appendChild(awaitingParent[i].ele);
-          }
-          console.log("added");
-          awaitingParent.splice(i, 1);
-          console.log(awaitingParent);
-          i=0;
-        }
+        if (PREPENDFLAG) area.prepend(ctn);
+        else area.appendChild(ctn);
       }
       document.getElementById("placeholder").style.display="none";
       if (!FOCUSSED) {
@@ -292,7 +275,7 @@ async function initClient()
     if (!LOADEDQ2 || scrDistOKQ)
     {
       area.scrollTop = area.scrollHeight;
-      console.log("Scrolling to bottom.")
+      // console.log("Scrolling to bottom.")
       LOADEDQ2 = true;
       // alert("scrolled")
     }
@@ -386,3 +369,36 @@ function onScroll() {
   else if (document.getElementById("msgArea").scrollTop < 30) console.log("loadStatus" + loadStatus)
 }
 let loadStatus = -1;
+
+function fixAwaitingParent() 
+{
+  for (let i=0; i<awaitingParent.length; i++) {
+    if (byId(awaitingParent[i].parent)) {
+      let ctner = byId(awaitingParent[i].parent);
+      if (!byId(awaitingParent[i].ele.id)) {// do not add if it has already been added
+        // console.log(ctner.children.length)
+        // if (ctner.children.length==1) {
+        //   console.log("added", awaitingParent[i].ele)
+        //   ctner.appendChild(awaitingParent[i].ele);
+        // }
+        // else {
+        //   for (let j=1; j<ctner.children.length; j++) {
+        //     console.log("id:",ctner.children[j].id)
+        //     if (ctner.children[j].id>awaitingParent[i].ele.id) {
+        //       console.log("added", awaitingParent[i].ele.id, awaitingParent[i].ele)
+        //       ctner.insertBefore(awaitingParent[i].ele, ctner.children[j]);
+        //       break;
+        //     }
+        //   }
+        // }
+        // if (PREPENDFLAG) ctner.prepend(awaitingParent[i].ele);
+        ctner.appendChild(awaitingParent[i].ele);
+      }
+      else console.log("didnt'actually add")
+      // console.log("added");
+      awaitingParent.splice(i, 1);
+      console.log(awaitingParent);
+      i=0;
+    }
+  }
+}

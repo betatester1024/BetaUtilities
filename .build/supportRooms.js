@@ -382,17 +382,15 @@ async function loadLogs(rn, id, from, token) {
     let roomInfo = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
     let minThreadID = roomInfo.minThreadID ?? 0;
     from = +from;
-    console.log("LOADING LOGS FROM", from - 5, "TO", from, roomInfo.minThreadID);
     if (from + 1 < minThreadID) {
       supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: -1 } }));
       return { status: "SUCCESS", data: { from: -1 }, token };
     }
-    let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, threadID: { $gt: from - 5, $lte: from } }).sort({ msgID: 1 }).toArray();
-    for (let i = msgs.length - 1; i >= 0; i--) {
+    let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, threadID: { $gt: from - 5, $lte: from } }).sort({ threadID: -1, msgID: 1 }).toArray();
+    for (let i = 0; i < msgs.length; i++) {
       let dat = JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } });
       supportHandler.sendMsgTo_ID(id, dat);
     }
-    console.log("LOADING COMPLETE, LOADED" + msgs.length, "MESSAGES");
     supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: from - 5 } }));
     return { status: "SUCCESS", data: { from: from - 5 }, token };
   } catch (e) {

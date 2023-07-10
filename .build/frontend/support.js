@@ -112,7 +112,6 @@ async function initClient() {
         ele.innerHTML += message.data.user + "<br>";
       }
       let modif = "";
-      console.log(modif);
       let area = document.getElementById("msgArea");
       ele = document.createElement("p");
       if (message && message.data && message.data.id && byId(Math.abs(message.data.id)))
@@ -150,7 +149,6 @@ async function initClient() {
         msg = msg.replaceAll(/(;gt;;gt;[^ ]{0,90})/gm, ">INTERNALLINK$1>");
         msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu, ">LINK$<test>>");
         msg = msg.replaceAll(/\n/gmiu, ">BR>");
-        console.log(msg);
         if (msg.match("^[ \n]*/me(.*)")) {
           msg = msg.match("^[ \n]*/me(.*)")[1];
           slashMe = true;
@@ -220,30 +218,32 @@ async function initClient() {
         };
         if (message.data.perms == 3 && message.data.sender == "[SYSTEM]")
           ctn.id = "-1";
-        if (!PREPENDFLAG) {
-          if (message.data.parent >= 0) {
-            if (byId(message.data.parent)) {
-              console.log("awaiting parent");
-              byId(message.data.parent).appendChild(ctn);
-            } else
-              awaitingParent.push({ parent: message.data.parent, ele: ctn });
-          } else
-            area.appendChild(ctn);
+        if (message.data.parent >= 0) {
+          if (byId(message.data.parent)) {
+            byId(message.data.parent).appendChild(ctn);
+            for (let i = 0; i < awaitingParent.length; i++) {
+              if (awaitingParent[i].ele.id == ctn.id) {
+                awaitingParent.splice(i, 1);
+                break;
+              }
+            }
+          } else {
+            awaitingParent.push({ parent: message.data.parent, ele: ctn });
+            console.log("awaiting parent", message.data.parent, ctn);
+          }
         } else {
-          if (message.data.parent >= 0) {
-            if (byId(message.data.parent)) {
-              byId(message.data.parent).appendChild(ctn);
-            } else
-              awaitingParent.push({ parent: message.data.parent, ele: ctn });
-          } else
+          if (PREPENDFLAG)
             area.prepend(ctn);
+          else
+            area.appendChild(ctn);
         }
         for (let i = 0; i < awaitingParent.length; i++) {
           if (byId(awaitingParent[i].parent)) {
             let ctner = byId(awaitingParent[i].parent);
-            if (!byId(awaitingParent[i].ele.id))
+            if (!byId(awaitingParent[i].ele.id)) {
               ctner.appendChild(awaitingParent[i].ele);
-            console.log("added");
+            } else
+              console.log("didnt'actually add");
             awaitingParent.splice(i, 1);
             console.log(awaitingParent);
             i = 0;
@@ -257,7 +257,6 @@ async function initClient() {
       }
       if (!LOADEDQ2 || scrDistOKQ) {
         area.scrollTop = area.scrollHeight;
-        console.log("Scrolling to bottom.");
         LOADEDQ2 = true;
       }
     };

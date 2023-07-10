@@ -412,19 +412,19 @@ export async function loadLogs(rn: string, id: string, from: number, token: stri
     // else supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: 1} })); // nonsense value, unused now
     // return {status:"SUCCESS", data:null, token:token}
     from = +from;
-    console.log("LOADING LOGS FROM", from - 5, "TO", from, roomInfo.minThreadID);
+    // console.log("LOADING LOGS FROM", from - 5, "TO", from, roomInfo.minThreadID);
     if (from+1 < minThreadID) {
       supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: -1 } }));
       return { status: "SUCCESS", data: {from:-1}, token: token }
     }
-    let msgs = await msgDB.find({ fieldName: "MSG", room: { $eq: rn }, threadID: { $gt: from - 5, $lte: from } }).sort({msgID:1}).toArray();
-    for (let i = msgs.length - 1; i >= 0; i--) {
-      // console.log(msgs[i].msgID);
+    let msgs = await msgDB.find({ fieldName: "MSG", room: { $eq: rn }, threadID: { $gt: from - 5, $lte: from } }).sort({threadID:-1, msgID:1}).toArray();
+    for (let i = 0; i <msgs.length; i++) {
+      // console.log("thread id %d msgid %d content %s", msgs[i].threadID, msgs[i].msgID, msgs[i].data);
       let dat = JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } });
       // console.log(dat);
       supportHandler.sendMsgTo_ID(id, dat);
     }
-    console.log("LOADING COMPLETE, LOADED" + msgs.length, "MESSAGES");
+    // console.log("LOADING COMPLETE, LOADED" + msgs.length, "MESSAGES");
     supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: from - 5 } }));
     return { status: "SUCCESS", data: {from:from-5}, token: token };
   } catch (e: any) {

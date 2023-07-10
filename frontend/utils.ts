@@ -69,7 +69,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
                       <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
-                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate...">
+                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                         <div class="anim"></div>
                       </form> |
                       BetaOS Systems V2, 2023`;
@@ -81,7 +81,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
                       <a href='/status'>Status</a> | 
                       <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
                       <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
-                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate...">
+                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                         <div class="anim"></div>
                       </form> |
                       BetaOS Systems V2, 2023`;
@@ -193,22 +193,18 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
     console.log("overlay active")
     overlay.style.opacity="1";
     overlay.style.backgroundColor="var(--system-overlay)";
+    overlay.style.pointerEvents="auto";
     byId("overlayLContainer").style.opacity=1;
-              byId("overlayLContainer").style.pointerEvents="auto";
+    byId("overlayLContainer").style.pointerEvents="auto";
   }
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "/server", true);
   xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
-      if (overlay) {
-        overlay.style.opacity="0";
-        overlay.style.backgroundColor="var(--system-grey2)";
-        byId("overlayLContainer").style.opacity=0;
-        byId("overlayLContainer").style.pointerEvents="none";
-      }
+
       // if (failureTimeout) clearTimeout(failureTimeout);
-      else closeAlert(-1);
+      
       // failureTimeout = null;
       
       callback(JSON.parse(xhr.responseText));
@@ -218,7 +214,15 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
       // else closeAlert(true);
       // failureTimeout = null;
       alertDialog("Received status code " +xhr.status+" ("+decodeStatus(xhr.status)+") -- resend request?", ()=>{send(params, callback, onLoadQ);}, true);
+      
     }
+    if (overlay) {
+      overlay.style.opacity="0";
+      overlay.style.pointerEvents="none";
+      overlay.style.backgroundColor="var(--system-grey2)";
+      byId("overlayLContainer").style.opacity=0;
+      byId("overlayLContainer").style.pointerEvents="none";
+    } else closeAlert(-1);
   }
   console.log(params);
   xhr.send(params);

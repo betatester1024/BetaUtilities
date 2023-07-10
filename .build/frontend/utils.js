@@ -49,7 +49,7 @@ async function globalOnload(cbk, networkLess = false) {
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
                       <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
-                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate...">
+                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                         <div class="anim"></div>
                       </form> |
                       BetaOS Systems V2, 2023`;
@@ -61,7 +61,7 @@ async function globalOnload(cbk, networkLess = false) {
                       <a href='/status'>Status</a> | 
                       <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
                       <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
-                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate...">
+                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                         <div class="anim"></div>
                       </form> |
                       BetaOS Systems V2, 2023`;
@@ -173,6 +173,7 @@ function send(params, callback, onLoadQ = false) {
     console.log("overlay active");
     overlay2.style.opacity = "1";
     overlay2.style.backgroundColor = "var(--system-overlay)";
+    overlay2.style.pointerEvents = "auto";
     byId("overlayLContainer").style.opacity = 1;
     byId("overlayLContainer").style.pointerEvents = "auto";
   }
@@ -181,19 +182,20 @@ function send(params, callback, onLoadQ = false) {
   xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
-      if (overlay2) {
-        overlay2.style.opacity = "0";
-        overlay2.style.backgroundColor = "var(--system-grey2)";
-        byId("overlayLContainer").style.opacity = 0;
-        byId("overlayLContainer").style.pointerEvents = "none";
-      } else
-        closeAlert(-1);
       callback(JSON.parse(xhr.responseText));
     } else if (xhr.readyState == 4 && xhr.status != 200) {
       alertDialog("Received status code " + xhr.status + " (" + decodeStatus(xhr.status) + ") -- resend request?", () => {
         send(params, callback, onLoadQ);
       }, true);
     }
+    if (overlay2) {
+      overlay2.style.opacity = "0";
+      overlay2.style.pointerEvents = "none";
+      overlay2.style.backgroundColor = "var(--system-grey2)";
+      byId("overlayLContainer").style.opacity = 0;
+      byId("overlayLContainer").style.pointerEvents = "none";
+    } else
+      closeAlert(-1);
   };
   console.log(params);
   xhr.send(params);

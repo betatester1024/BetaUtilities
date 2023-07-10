@@ -91,11 +91,14 @@ async function initClient() {
       if (message.action == "LOADCOMPLETE") {
         let thing = document.getElementById("msgArea");
         if (message.data.id < 0) {
-          let errorEle = document.createElement("b");
-          errorEle.className = "red";
-          errorEle.innerText = "No more messages to load";
-          errorEle.style.display = "block";
-          thing.prepend(errorEle);
+          if (!byId("errorEle")) {
+            let errorEle = document.createElement("b");
+            errorEle.className = "red";
+            errorEle.id = "errorEle";
+            errorEle.innerText = "No more messages to load";
+            errorEle.style.display = "block";
+            thing.prepend(errorEle);
+          }
         } else {
           loadStatus = -1;
           STARTID = message.data.id;

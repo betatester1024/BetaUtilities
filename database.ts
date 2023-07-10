@@ -23,7 +23,7 @@ export async function connectDB() {
     
   }
 }
-export let minID = -1;
+// export let minID = -1;
 export const database = client.db('BetaOS-Database01');
 // export const DB = database.collection('BetaUtilities');
 

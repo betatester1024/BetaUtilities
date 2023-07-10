@@ -39,7 +39,6 @@ module.exports = __toCommonJS(supportRooms_exports);
 var import_userRequest = require("./userRequest");
 var import_consts = require("./consts");
 var import_logging = require("./logging");
-var import_database = require("./database");
 var import_webHandler = require("./betautilities/webHandler");
 class Room {
   type;
@@ -111,7 +110,7 @@ class supportHandler {
     if (!thiscn.isPseudoConnection) {
       let text = "";
       let from = threadCt;
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 5; i++) {
         let resp = await loadLogs(rn, thiscn.id, from, token);
         if (resp.status == "SUCCESS" && resp.data)
           from = resp.data.from;
@@ -230,6 +229,7 @@ function sendMsg(msg, room, parent, token, callback) {
       expiry: Date.now() + 3600 * 1e3 * 24 * 30,
       room,
       msgID: msgCt,
+      parent,
       threadID: parentDoc ? parentDoc.threadID ?? threadCt : threadCt
     });
     await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
@@ -298,6 +298,7 @@ async function createRoom(name, token) {
           rooms: obj.rooms
         }
       }, { upsert: true });
+      await purge(name, token);
       return { status: "SUCCESS", data: null, token };
     } else
       return { status: "ERROR", data: { error: "Access denied!" }, token };
@@ -379,13 +380,14 @@ async function WHOIS(token, user) {
 async function loadLogs(rn, id, from, token) {
   try {
     let roomInfo = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
+    let minThreadID = roomInfo.minThreadID ?? 0;
     from = +from;
-    console.log("LOADING LOGS FROM", from - 5, "TO", from, roomInfo.minCt);
-    if (from < import_database.minID || roomInfo && roomInfo.minCt && from < roomInfo.minCt) {
+    console.log("LOADING LOGS FROM", from - 5, "TO", from, roomInfo.minThreadID);
+    if (from + 1 < minThreadID) {
       supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: -1 } }));
       return { status: "SUCCESS", data: { from: -1 }, token };
     }
-    let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, threadID: { $gt: from - 5, $lt: from } }).toArray();
+    let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, threadID: { $gte: from - 5, $lt: from } }).toArray();
     for (let i = msgs.length - 1; i >= 0; i--) {
       let dat = JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } });
       supportHandler.sendMsgTo_ID(id, dat);
@@ -453,6 +455,7 @@ async function hidRoom(name, token) {
             hidRooms: obj.hidRooms
           }
         }, { upsert: true });
+        await purge(name, token);
         return { status: "SUCCESS", data: null, token };
       } else
         return { status: "ERROR", data: { error: "Access denied!" }, token };
@@ -476,7 +479,8 @@ async function purge(name, token) {
       $set: {
         msgCt: 0,
         minCt: 0,
-        threadCt: 0
+        threadCt: 0,
+        minThreadID: 0
       }
     });
     supportHandler.sendMsgTo(name, JSON.stringify({ action: "RESTART" }));

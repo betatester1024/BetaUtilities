@@ -93,19 +93,22 @@ async function initClient()
     }
     if (message.action == "LOADCOMPLETE") {
       let thing = document.getElementById("msgArea")
-      if (message.data.id<0) {
+      if (message.data.id<0 ) {
+        if (!byId("errorEle")) {
         let errorEle = document.createElement("b");
         errorEle.className = "red";
+        errorEle.id="errorEle";
         errorEle.innerText = "No more messages to load";
         errorEle.style.display="block";
         thing.prepend(errorEle);
+        }
       }
       else {
         loadStatus = -1;
         STARTID=message.data.id;
         // alert("lcMatchId updated"+ STARTID);
       }
-      thing.scrollTop = thing.scrollTop + 100;
+      thing.scrollTop = thing.scrollTop+1;
     }    
     if (message.action == "removeUser") {
         ele.innerHTML= ele.innerHTML.replace(message.data.user+"<br>", "");

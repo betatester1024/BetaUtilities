@@ -1,7 +1,7 @@
 import { userRequest } from './userRequest';
 import { msgDB, authDB, uDB, roomRegex } from './consts';
 import { log } from './logging'
-import { minID } from './database';
+// import { minID } from './database';
 import { WebH } from './betautilities/webHandler';
 export class Room {
   type: string;
@@ -91,7 +91,7 @@ export class supportHandler {
       // }
       // load 30 threads
       let from = threadCt;
-      for (let i=0; i<30; i++) 
+      for (let i=0; i<5; i++) 
       {
         let resp = await loadLogs(rn, thiscn.id, from, token);
         if (resp.status == "SUCCESS" && resp.data) from = resp.data.from;
@@ -220,10 +220,11 @@ export function sendMsg(msg: string, room: string, parent: number, token: string
     let threadCt = roomData ? (roomData.threadCt??0) : 0;
     msg = msg.replaceAll("\\n", "\n");
     let parentDoc = await msgDB.findOne({fieldName:"MSG", msgID:Number(parent)});
+    // if (parentDoc) console.log(threadCt);
     await msgDB.insertOne({
       fieldName: "MSG", data: msg.replaceAll(">", "&gt;"), permLevel: obj.data.perms ?? 1,
       sender: obj.data.alias ?? "" + processAnon(token), expiry: Date.now() + 3600 * 1000 * 24 * 30,
-      room: room, msgID: msgCt, threadID: parentDoc?(parentDoc.threadID??threadCt):threadCt
+      room: room, msgID: msgCt, parent:parent, threadID: parentDoc?(parentDoc.threadID??threadCt):threadCt
     });
 
     await msgDB.updateOne({ room: room, fieldName: "RoomInfo" }, {
@@ -296,6 +297,7 @@ export async function createRoom(name: string, token: string) {
           rooms: obj.rooms
         },
       }, { upsert: true });
+      await purge(name, token); // also initialises the room info
       return { status: "SUCCESS", data: null, token: token }
     }
     else return { status: "ERROR", data: { error: "Access denied!" }, token: token };
@@ -379,6 +381,7 @@ export async function loadLogs(rn: string, id: string, from: number, token: stri
     // let j = -1;
     // let thiscn;
     let roomInfo = await msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
+    let minThreadID = roomInfo.minThreadID??0;
     // for (let i = 0; i < supportHandler.connections.length; i++) 
     //   if (supportHandler.connections[i].id == id) {
     //     j = supportHandler.connections[i].minThreadID;
@@ -409,12 +412,12 @@ export async function loadLogs(rn: string, id: string, from: number, token: stri
     // else supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: 1} })); // nonsense value, unused now
     // return {status:"SUCCESS", data:null, token:token}
     from = +from;
-    console.log("LOADING LOGS FROM", from - 5, "TO", from, roomInfo.minCt);
-    if (from < minID || (roomInfo && roomInfo.minCt && from < roomInfo.minCt)) {
+    console.log("LOADING LOGS FROM", from - 5, "TO", from, roomInfo.minThreadID);
+    if (from+1 < minThreadID) {
       supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: -1 } }));
       return { status: "SUCCESS", data: {from:-1}, token: token }
     }
-    let msgs = await msgDB.find({ fieldName: "MSG", room: { $eq: rn }, threadID: { $gt: from - 5, $lt: from } }).toArray();
+    let msgs = await msgDB.find({ fieldName: "MSG", room: { $eq: rn }, threadID: { $gte: from - 5, $lt: from } }).toArray();
     for (let i = msgs.length - 1; i >= 0; i--) {
       // console.log(msgs[i].msgID);
       let dat = JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } });
@@ -483,6 +486,7 @@ export async function hidRoom(name: string, token: string) {
             hidRooms: obj.hidRooms
           },
         }, { upsert: true });
+        await purge(name, token); // also initialises the room info
         return { status: "SUCCESS", data: null, token: token }
       }
       else return { status: "ERROR", data: { error: "Access denied!" }, token: token };
@@ -506,7 +510,8 @@ export async function purge(name: string, token: string) {
       $set: {
         msgCt: 0,
         minCt: 0,
-        threadCt:0
+        threadCt:0,
+        minThreadID:0
       }
     })
     supportHandler.sendMsgTo(name, JSON.stringify({ action: "RESTART" }));

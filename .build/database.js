@@ -21,8 +21,7 @@ __export(database_exports, {
   DBMaintenance: () => DBMaintenance,
   client: () => client,
   connectDB: () => connectDB,
-  database: () => database,
-  minID: () => minID
+  database: () => database
 });
 module.exports = __toCommonJS(database_exports);
 var import_consts = require("./consts");
@@ -41,7 +40,6 @@ async function connectDB() {
     return e;
   }
 }
-let minID = -1;
 const database = client.db("BetaOS-Database01");
 async function DBMaintenance() {
   let items = await import_consts.authDB.find({ fieldName: "Token" }).toArray();
@@ -88,7 +86,6 @@ async function DBMaintenance() {
   DBMaintenance,
   client,
   connectDB,
-  database,
-  minID
+  database
 });
 //# sourceMappingURL=database.js.map

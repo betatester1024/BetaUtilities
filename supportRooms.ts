@@ -7,7 +7,8 @@ export class Room {
   type: string;
   name: string;
   handler: WebH | null;
-  constructor(type: string, name: string, responder: ((msg: string, sender: string, data: any) => any) | null = null, handler: WebH | null = null) {
+  constructor(type: string, name: string, handler: WebH | null = null) {
+    // console.log(handler);
     this.type = type;
     this.name = name;
     this.handler = handler;
@@ -238,9 +239,10 @@ export function sendMsg(msg: string, room: string, parent: number, token: string
       supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, parent: parent, content: msg } }));
     }
     //console.log(supportHandler.allRooms);
+    console.log(supportHandler.allRooms);
     for (let i = 0; i < supportHandler.allRooms.length; i++) {
-      if (supportHandler.allRooms[i].name == room) {
-        // console.log("sending"+msg);
+      if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
+        console.log(supportHandler.allRooms[i].handler)
         supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token))
       }
 
@@ -254,7 +256,7 @@ export async function sendMsg_B(msg: string, room: string) {
   let msgCt = roomData ? roomData.msgCt : 0;
   let betaNick = "";
   for (let i = 0; i < supportHandler.allRooms.length; i++) {
-    if (supportHandler.allRooms[i].name == room) {
+    if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
       // console.log("sending"+msg);
       betaNick = supportHandler.allRooms[i].handler.displayNick ?? "[BetaOS_ERROR]";
       break;

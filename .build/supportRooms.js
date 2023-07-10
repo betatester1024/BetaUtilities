@@ -44,7 +44,7 @@ class Room {
   type;
   name;
   handler;
-  constructor(type, name, responder = null, handler = null) {
+  constructor(type, name, handler = null) {
     this.type = type;
     this.name = name;
     this.handler = handler;
@@ -240,8 +240,10 @@ function sendMsg(msg, room, parent, token, callback) {
     } else {
       supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, parent, content: msg } }));
     }
+    console.log(supportHandler.allRooms);
     for (let i = 0; i < supportHandler.allRooms.length; i++) {
-      if (supportHandler.allRooms[i].name == room) {
+      if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
+        console.log(supportHandler.allRooms[i].handler);
         supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token));
       }
     }
@@ -253,7 +255,7 @@ async function sendMsg_B(msg, room) {
   let msgCt = roomData ? roomData.msgCt : 0;
   let betaNick = "";
   for (let i = 0; i < supportHandler.allRooms.length; i++) {
-    if (supportHandler.allRooms[i].name == room) {
+    if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
       betaNick = supportHandler.allRooms[i].handler.displayNick ?? "[BetaOS_ERROR]";
       break;
     }

@@ -231,7 +231,7 @@ export class WebH
     this.hiddenQ = hiddenQ;
     if (roomName.length > 21) return;
     this.roomName = roomName;
-    supportHandler.addRoom(new Room(hiddenQ?"HIDDEN_SUPPORT":"ONLINE_SUPPORT", this.roomName, this.replyMessage, this));
+    supportHandler.addRoom(new Room(hiddenQ?"HIDDEN_SUPPORT":"ONLINE_SUPPORT", this.roomName, this));
     supportHandler.addConnection(new pseudoConnection(), roomName, "[SYSINTERNAL]", true);
   }
 }

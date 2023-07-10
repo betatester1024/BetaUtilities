@@ -387,7 +387,7 @@ async function loadLogs(rn, id, from, token) {
       supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: -1 } }));
       return { status: "SUCCESS", data: { from: -1 }, token };
     }
-    let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, threadID: { $gte: from - 5, $lt: from } }).toArray();
+    let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, threadID: { $gt: from - 5, $lte: from } }).sort({ msgID: 1 }).toArray();
     for (let i = msgs.length - 1; i >= 0; i--) {
       let dat = JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } });
       supportHandler.sendMsgTo_ID(id, dat);
@@ -472,7 +472,7 @@ async function purge(name, token) {
     let usrData = await (0, import_userRequest.userRequest)(token);
     if (usrData.status != "SUCCESS")
       return usrData;
-    if (usrData.data.perms < 3)
+    if (usrData.data.perms < 2)
       return { status: "ERROR", data: { error: "Insufficient permissions!" }, token };
     await import_consts.msgDB.deleteMany({ fieldName: "MSG", room: name });
     await import_consts.msgDB.updateOne({ fieldName: "RoomInfo", room: name }, {
@@ -482,7 +482,7 @@ async function purge(name, token) {
         threadCt: 0,
         minThreadID: 0
       }
-    });
+    }, { upsert: true });
     supportHandler.sendMsgTo(name, JSON.stringify({ action: "RESTART" }));
     return { status: "SUCCESS", data: null, token };
   } catch (e) {

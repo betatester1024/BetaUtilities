@@ -103,7 +103,7 @@ async function initClient() {
           loadStatus = -1;
           STARTID = message.data.id;
         }
-        thing.scrollTop = thing.scrollTop + 100;
+        thing.scrollTop = thing.scrollTop + 1;
       }
       if (message.action == "removeUser") {
         ele.innerHTML = ele.innerHTML.replace(message.data.user + "<br>", "");
@@ -241,7 +241,8 @@ async function initClient() {
         for (let i = 0; i < awaitingParent.length; i++) {
           if (byId(awaitingParent[i].parent)) {
             let ctner = byId(awaitingParent[i].parent);
-            ctner.appendChild(awaitingParent[i].ele);
+            if (!byId(awaitingParent[i].ele.id))
+              ctner.appendChild(awaitingParent[i].ele);
             console.log("added");
             awaitingParent.splice(i, 1);
             console.log(awaitingParent);

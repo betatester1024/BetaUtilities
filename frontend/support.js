@@ -266,7 +266,16 @@ async function initClient()
       for (let i=0; i<awaitingParent.length; i++) {
         if (byId(awaitingParent[i].parent)) {
           let ctner = byId(awaitingParent[i].parent);
-          ctner.appendChild(awaitingParent[i].ele);
+          if (!byId(awaitingParent[i].ele.id)) {// do not add if it has already been added
+            for (let i=0; i<ctner.children.length; i++) {
+              if (ctner.children[i].id>awaitingParent[i].ele.id) {
+                ctner.children[i].before(awaitingParent[i].ele)
+                break;
+              }
+            }
+            if (ctner.children.length==0) ctner.appendChild(awaitingParent[i].ele);
+             // ctner.appendChild(awaitingParent[i].ele);
+          }
           console.log("added");
           awaitingParent.splice(i, 1);
           console.log(awaitingParent);

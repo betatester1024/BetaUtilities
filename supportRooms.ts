@@ -417,7 +417,7 @@ export async function loadLogs(rn: string, id: string, from: number, token: stri
       supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: -1 } }));
       return { status: "SUCCESS", data: {from:-1}, token: token }
     }
-    let msgs = await msgDB.find({ fieldName: "MSG", room: { $eq: rn }, threadID: { $gte: from - 5, $lt: from } }).toArray();
+    let msgs = await msgDB.find({ fieldName: "MSG", room: { $eq: rn }, threadID: { $gt: from - 5, $lte: from } }).sort({msgID:1}).toArray();
     for (let i = msgs.length - 1; i >= 0; i--) {
       // console.log(msgs[i].msgID);
       let dat = JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } });
@@ -503,7 +503,7 @@ export async function purge(name: string, token: string) {
     let usrData = await userRequest(token) as { status: string, data: { perms: number } };
     if (usrData.status != "SUCCESS") return usrData;
     // console.log(usrData.data.perms);
-    if (usrData.data.perms < 3) return { status: "ERROR", data: { error: "Insufficient permissions!" }, token: token };
+    if (usrData.data.perms < 2) return { status: "ERROR", data: { error: "Insufficient permissions!" }, token: token };
 
     await msgDB.deleteMany({ fieldName: "MSG", room: name });
     await msgDB.updateOne({ fieldName: "RoomInfo", room: name }, {
@@ -513,7 +513,7 @@ export async function purge(name: string, token: string) {
         threadCt:0,
         minThreadID:0
       }
-    })
+    }, {upsert:true})
     supportHandler.sendMsgTo(name, JSON.stringify({ action: "RESTART" }));
     return { status: "SUCCESS", data: null, token: token };
   } catch (e: any) {

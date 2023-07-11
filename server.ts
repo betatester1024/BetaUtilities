@@ -1,4 +1,5 @@
 const express = require('express')
+const enableWs = require('express-ws');
 const app = express()
 const crypto = require("crypto");
 const parse = require("co-body");
@@ -17,6 +18,7 @@ import {getLogs, log, purgeLogs, visitCt, incrRequests} from './logging';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
 import {clickIt, getLeaderboard} from './button';
+import { WebSocketServer } from 'ws';
 import {uptime} from './betautilities/messageHandle'
 import {supportHandler, roomRequest, sendMsg, 
         createRoom, deleteRoom, WHOIS, loadLogs, 
@@ -26,8 +28,21 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false })
 var RateLimit = require('express-rate-limit');
 
 export async function initServer() {
+
+
+  // const wss = new WebSocketServer({server:app, path: "/ws"});
+  
+  // wss.on('connection', (ws:any)=>{
+  //   ws.on('error', console.log);
+  //   ws.on('message', (data:any)=>{
+  //     console.log('received: %s', data);
+  //   });
+  //   console.log("connected!");
+  //   ws.send('something');
+  // });
+  enableWs(app);
   var limiter = RateLimit({
-    windowMs: 10*1000, // 10 seconds
+    windowMs: 10*1000, // 10 second
     max: 50,
     message: tooManyRequests(),
     statusCode: 429, // 429 status = Too Many Requests (RFC 6585)
@@ -60,7 +75,19 @@ export async function initServer() {
     incrRequests();
   });
 
-  
+  app.ws('/', (ws:any, req:any) => {
+    ws.on('message', (msg:any) => {
+      ws.send("reply:"+msg);
+    });
+    console.log("WebSocket was opened")
+    ws.send(JSON.stringify({action:"OPEN", data:null}));
+    supportHandler.addConnection(ws, req.query.room, req.cookies.sessionID);
+    ws.on("close", () => {
+      // clear the connection
+      supportHandler.removeConnection(ws, req.query.room, req.cookies.sessionID);
+      console.log("Removed stream");
+    });
+  });
 
   app.get('/support', (req:any, res:any) => {
     let match = req.url.match('\\?room=('+roomRegex+")");
@@ -105,7 +132,7 @@ export async function initServer() {
 
 
   app.get("/paste", (req:any, res:any) => {
-    res.sendFile(frontendDir+"/newpaste.html");
+    res.sendFile(frontendDir+"newpaste.html");
     incrRequests();
   })
   
@@ -115,18 +142,18 @@ export async function initServer() {
   // })
   
   app.get("/paste/*", (req:any, res:any) => {
-    res.sendFile(frontendDir+"/paste.html");
+    res.sendFile(frontendDir+"paste.html");
     incrRequests();
   })
 
   
   app.get('*/favicon.ico', (req:Request, res:any)=> {
-    res.sendFile(rootDir+'/favicon.ico')
+    res.sendFile(rootDir+'favicon.ico')
     incrRequests();
   })
 
   app.get('*/icon.png', (req:Request, res:any)=> {
-    res.sendFile(rootDir+'/temp.png')
+    res.sendFile(rootDir+'temp.png')
     incrRequests();
   })
 
@@ -137,6 +164,15 @@ export async function initServer() {
   
   app.get('/support.js', (req:any, res:any) => {
     res.sendFile(frontendDir+"support.js");
+    incrRequests();
+  })
+
+  app.get('*.svg', (req:any, res:any) => {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() + 1);
+    res.setHeader("expires", date.toUTCString());
+    res.setHeader("cache-control", "public, max-age=31536000, immutable");
+    res.sendFile(frontendDir+req.url);
     incrRequests();
   })
   
@@ -326,11 +362,11 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
         break;
       case 'sendMsg':
         if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        data = data as {msg:string, room:string};
+        data = data as {msg:string, room:string, parent:string};
         if (data.msg.length == 0) {
           callback("SUCCESS", null, token); break;
         }
-        sendMsg(data.msg.slice(0, 1024), data.room, token, callback);
+        sendMsg(data.msg.slice(0, 1024), data.room, data.parent, token, callback);
         break;
       case 'lookup':
         if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
@@ -483,7 +519,7 @@ function eeFormat(data:string) {
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
@@ -528,11 +564,11 @@ function tooManyRequests() {
   <head>
     <title>Error 429 | BetaOS Systems</title>
     <script>
-    ${fs.readFileSync(jsDir+"/utils.js")}
+    ${fs.readFileSync(jsDir+"utils.js")}
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <style>
@@ -567,7 +603,8 @@ function tooManyRequests() {
 
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
                     '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest',
-                    "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle'];
+                    "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle', '/sweepthatmine',
+                   "/stopwatch", "/testbed", '/credits'];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',
                   'paste', 'findPaste'];

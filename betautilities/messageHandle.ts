@@ -58,8 +58,12 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
   if (msg.match(/!pasteit!?/gimu)) return "https://betatester1024.repl.co/paste";
   if (msg.match("^!uptime @" + hnd.nick.toLowerCase() + "$")) {
     hnd.clearCallReset();
-    
-    return getUptimeStr(STARTTIME)+" (Total uptime: "+getUptimeStr()+")";
+    getUptimeStr(STARTTIME).then((value:string)=>{
+      getUptimeStr().then((value2:string)=>{
+        hnd.delaySendMsg(value+" (Total uptime: "+value2+")", data, 0);
+      })
+    });
+    return "";
   }
   let match_r = msg.match(/preview\.redd\.it\/(.*\.(jpg|png|jpeg|gif|bmp))/igmu);
   if (match_r) {

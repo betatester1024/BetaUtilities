@@ -225,15 +225,15 @@ export class WebH
     this.nick = "BetaOS_System";
     this.displayNick="BetaOS_System";
     this.replyMessage = (msg:string, sender:string, data:any) => {
-      if (filter.clean(msg)!= msg) return "Stop that. "
+      // if (filter.clean(msg)!= msg) return "Stop that. "
       return replyMessage(this, msg, sender, data)
     };
     this.hiddenQ = hiddenQ;
     if (roomName.length > 21) return;
     this.roomName = roomName;
-    supportHandler.addRoom(new Room(hiddenQ?"HIDDEN_SUPPORT":"ONLINE_SUPPORT", this.roomName, this.replyMessage, this));
+    supportHandler.addRoom(new Room(hiddenQ?"HIDDEN_SUPPORT":"ONLINE_SUPPORT", this.roomName, this));
     supportHandler.addConnection(new pseudoConnection(), roomName, "[SYSINTERNAL]", true);
   }
 }
 
-var Filter = require('bad-words'),filter = new Filter();
+// var Filter = require('bad-words'),filter = new Filter();

@@ -27,3 +27,7 @@ pattern = "**/{*.ts,*.js,*.tsx,*.jsx}"
 
 [languages.typescript.languageServer]
 start = "typescript-language-server --stdio"
+
+[auth]
+pageEnabled = false
+buttonEnabled = false

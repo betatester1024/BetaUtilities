@@ -12,11 +12,11 @@
   "dependencies": {
     "@google-cloud/local-auth": "^2.1.1",
     "@replit/database": "^2.0.4",
-    "@trycourier/courier": "^4.2.0",
+    "@trycourier/courier": "^4.7.0",
     "argon2": "^0.30.3",
     "bad-words": "^3.0.4",
     "bcrypt": "^5.1.0",
-    "bcrypt-ts": "^3.0.1",
+    "bcrypt-ts": "^4.0.0",
     "body-parser": "^1.20.2",
     "co-body": "^6.1.0",
     "cookie-parser": "^1.4.6",
@@ -24,17 +24,18 @@
     "dialog-polyfill": "^0.5.6",
     "escape-html": "^1.0.3",
     "express": "^4.18.2",
-    "express-rate-limit": "^6.7.0",
-    "googleapis": "^118.0.0",
+    "express-rate-limit": "^6.7.1",
+    "express-ws": "^5.0.2",
+    "googleapis": "^120.0.0",
     "handlebars": "^4.7.7",
     "linkify-html": "^4.1.1",
-    "mongodb": "^5.5.0",
+    "mongodb": "^5.7.0",
     "mongojs": "^3.1.0",
-    "nodemailer": "^6.9.2",
+    "nodemailer": "^6.9.3",
     "websocket-ts": "^1.1.1",
     "ws": "^8.13.0"
   },
   "devDependencies": {
-    "@types/ws": "^8.5.4"
+    "@types/ws": "^8.5.5"
   }
 }

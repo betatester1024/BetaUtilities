@@ -4,11 +4,26 @@ let SESSIONTIMEOUT, SESSIONTIMEOUT2 = null;
 function byId(name:string) {
   return document.getElementById(name);
 }
+function byClass(name:string, ct:number=0) {
+  return document.getElementsByClassName(name).item(ct);
+}
+
 let HASNETWORK = false;
 async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
 
   if (!networkLess) {
     var script = document.createElement('script');
+    script.src = "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js";
+    document.head.appendChild(script);
+    script.onload=()=>{
+      WebFont.load({
+        google: {
+          families: ['Noto Sans Mono', 'Noto Sans Display']
+        }
+      });
+      console.log("Font loaded!")
+    }
+    script = document.createElement('script');
     script.src = "./nodemodules/dialog-polyfill/dist/dialog-polyfill.js";
     document.head.appendChild(script);
   }
@@ -18,19 +33,15 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
   // const NSM = new FontFace('Noto Sans Mono', 'url(https://fonts.googleapis.com/css2?family=Noto+Sans+Mono&display=swap)');
   // await NSM.load();
   // document.fonts.add(NSM);
-  // WebFont.load({
-  //   google: {
-  //     families: ['Noto Sans Mono']
-  //   }
-  // });
-  // console.log("Font loaded!")
+  
   
   document.onkeydown = keydown;
-  
+  document.onpointerup=pointerUp;
+  document.onpointermove = pointerMove;
   document.body.addEventListener("mouseover", mouseOver);
 
   // byId("overlay").onclick=(e:Event)=>{
-  //   if (dialogQ) {
+  //   if (ALERTOPEN) {
   //     console.log("ClickOutside (Reject)")
   //     closeAlert(-1);
   //   }
@@ -39,24 +50,28 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
   send(JSON.stringify({ action: "userRequest" }),
     (res) => {
       document.documentElement.className = res.data.darkQ?"dark":"";
-      console.log("Loading complete; updating class")
+      console.log("Dark mode toggle:",res.data.darkQ);
       // let overlay = document.getElementById("overlayL");
       // if (overlay) {
       //   // overlay.style.left="0vh";
       //   overlay.style.opacity="0";
       // }
       let maincontent = document.getElementsByClassName("main_content").item(0) as HTMLDivElement;
-      let ftr = document.createElement("footer");
-      maincontent.appendChild(ftr);
+      let ftr = byId("ftrOverride")??document.createElement("footer");
+      if (!byId("ftrOverride")) maincontent.appendChild(ftr);
       
       let ele = document.createElement("p");
       ele.id="footer";
       let urlEle = new URL(location.href);
       let redirector = urlEle.pathname + "?"+urlEle.searchParams.toString();
       if (res.status != "SUCCESS")
-        ele.innerHTML = `<a href="/login?redirect=${redirector}">Login</a> | 
+        ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
+                      <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
+                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate...">
+                        <div class="anim"></div>
+                      </form> |
                       BetaOS Systems V2, 2023`;
       else {
         resetExpiry(res);
@@ -65,6 +80,10 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
                       <a href='/config'>Account</a> | 
                       <a href='/status'>Status</a> | 
                       <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
+                      <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
+                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate...">
+                        <div class="anim"></div>
+                      </form> |
                       BetaOS Systems V2, 2023`;
       }
       ftr.appendChild(ele);
@@ -90,10 +109,10 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
               cpl.style.pointerEvents="none";
             }
             if (cbk) cbk();
-          }, true);
-        }, true);
+          });
+        });
       
-    }, true);
+    });
   }
   
   let ele2 = document.getElementById("overlay");
@@ -115,14 +134,67 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
   cpl.style.opacity="1"; }
               // cpl.style.pointerEvents="none";
 }
+let DRAGGING = null;
+let origLeft = -1;
+let origTop = -1;
+let origX = -1;
+let origY = -1;
+function pointerUp() 
+{
+  DRAGGING = null;
+  origLeft = -1;
+  origTop = -1;
+}
+function pointerMove(ev:PointerEvent) 
+{
+  if (DRAGGING) {
+    DRAGGING.parentElement.style.left = origLeft+ev.screenX - origX+"px";
+    DRAGGING.parentElement.style.top = origTop+ev.screenY-origY+"px";
+    ev.preventDefault();
+    ev.stopPropagation();
+  }
+}
+function pointerDown(ev:PointerEvent) {
+  DRAGGING = ev.currentTarget;
+  document.body.appendChild(DRAGGING.parentElement);
+  ev.preventDefault();
+  ev.stopPropagation();
+  origX = ev.screenX;
+  origY = ev.screenY;
+  origLeft = toIntPx(window.getComputedStyle(DRAGGING.parentElement).left);
+  origTop = toIntPx(window.getComputedStyle(DRAGGING.parentElement).top);
+  
+}
+
+function toIntPx(val:string) {
+  return Number(val.replace("px", ""));
+}
+
+function decodeStatus(status:number) {
+  switch(status) 
+  {
+    case 0: return "Network failure"
+    case 502: return "Internal Server Error"
+    case 404: return "Not found"
+    case 429: return "Too many requests"
+    case 403: return "Forbidden"
+    case 401: return "Unauthorised"
+    case 400: return "Invalid request"
+    case 500: 
+    case 503:
+      return "Internal Server Error"
+  }  
+  return "Unknown error";
+}
 
 function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false) {
   let overlay = document.getElementById("overlayL");
-  console.log(onLoadQ)
   if (overlay && !onLoadQ) {
     console.log("overlay active")
     overlay.style.opacity="1";
     overlay.style.backgroundColor="var(--system-overlay)";
+    byId("overlayLContainer").style.opacity=1;
+              byId("overlayLContainer").style.pointerEvents="auto";
   }
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "/server", true);
@@ -132,21 +204,28 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
       if (overlay) {
         overlay.style.opacity="0";
         overlay.style.backgroundColor="var(--system-grey2)";
+        byId("overlayLContainer").style.opacity=0;
+        byId("overlayLContainer").style.pointerEvents="none";
       }
-      if (failureTimeout) clearTimeout(failureTimeout);
-      failureTimeout = null;
+      // if (failureTimeout) clearTimeout(failureTimeout);
+      else closeAlert(-1);
+      // failureTimeout = null;
+      
       callback(JSON.parse(xhr.responseText));
     }
     else if (xhr.readyState == 4 && xhr.status != 200) {
-      if (failureTimeout) clearTimeout(failureTimeout);
+      // if (failureTimeout) clearTimeout(failureTimeout);
       // else closeAlert(true);
-      failureTimeout = null;
-      alertDialog("Received status code " +xhr.status+" - resend request?", ()=>{send(params, callback, onLoadQ);}, 2);
+      // failureTimeout = null;
+      alertDialog("Received status code " +xhr.status+" ("+decodeStatus(xhr.status)+") -- resend request?", ()=>{send(params, callback, onLoadQ);}, true);
     }
   }
   console.log(params);
   xhr.send(params);
-  let failureTimeout = setTimeout(() => alertDialog(`This is taking longer than expected.`, () => { }, 1, params), 5000);
+  // let failureTimeout = setTimeout(() => {
+  //   failureTimeout = null;
+  //   alertDialog(`This is taking longer than expected.`, (res) => {callback(res);}, 1, params)
+  // }, 5000);
 }
 
 function acceptCookies() {
@@ -158,11 +237,45 @@ function acceptCookies() {
 
 }
 
+function nonBlockingDialog(str:string, callback:()=>any = ()=>{}) 
+{
+  let div = document.createElement("div");
+  div.className="ALERT_NONBLOCK";
+  div.innerHTML = `<div class="content">${str}</div>`; // yes, it can be html'd
+  let draggable = document.createElement("div");
+  
+  draggable.className = "ALERT_DRAGGER";
+  draggable.innerText = "ServiceAlert"
+  div.prepend(draggable);
+  div.callback=callback;
+  document.body.appendChild(div);
+  setTimeout(()=>{
+    div.style.opacity="1";
+    div.style.pointerEvents="auto";  
+    draggable.onpointerdown = pointerDown;
+  }, 20);
+  let button = document.createElement("button");
+  div.appendChild(document.createElement("br"));
+  div.appendChild(button);
+  button.outerHTML = `
+  <button class="grn btn fsmed closeBtn" onclick="closeNBD(this.parentElement)">
+  <span class='material-symbols-outlined'>arrow_forward</span>
+  Continue<div class="anim"></div>
+  </button>`;
+  
+}
+
+function closeNBD(ele:HTMLElement) {
+  ele.style.opacity="0";
+  ele.style.pointerEvents = "none";
+  ele.callback();
+}
+
 // let TIME:NodeJS.Timeout|null;
-let dialogQ = false;
+let ALERTOPEN = false;
 // let cbk: () => any = () => { };
 // let BLOCKCALLBACK = false;
-function alertDialog(str: string, callback: () => any = ()=>{}, button: number = -1, failedReq: string = "") {
+function alertDialog(str: string, callback: () => any = ()=>{}, requiresConfirmation = false) {
   // if (TIME) clearTimeout(TIME);
   // TIME = null;
   // console.log("Timeout cleared")
@@ -193,7 +306,7 @@ function alertDialog(str: string, callback: () => any = ()=>{}, button: number =
     newDialog.style.opacity="1";
     newDialog.style.top = "18px";
   }, 0);
-  newDialog.setAttribute("type", button+"")
+  newDialog.setAttribute("type", requiresConfirmation+"")
   // newDialog.setAttribute("callback", callback.toString())
   
   // here we add a new attribute to the element, hoping that nothing breaks
@@ -216,17 +329,20 @@ function alertDialog(str: string, callback: () => any = ()=>{}, button: number =
   // newDialog.style.opacity="1";
   // newDialog.style.top = "0vh ";
   newDialog.style.pointerEvents="auto";
-  dialogQ = true;
+  ALERTOPEN = true;
   p.innerText = str;
   p.innerHTML += "<br><br><p style='margin: 10px auto' class='gry nohover'>(Press ENTER or ESC)</p>"
   newDialog.querySelector("#cancelBtn").style.display = "none";
-  if (button == 1) {
-    p.innerHTML += `<button class='btn szThird fssml' id="refresh" onclick='location.reload()'>
-    <span class="material-symbols-outlined">history</span> Refresh?
-    <div class="anim"></div></button>`
-    console.log("Alert-type: FAILEDREQUEST" + failedReq);
-  }
-  else if (button == 2) {
+  // if (button == 1) {
+  //   p.innerHTML += `<button class='btn szThird fssml' id="resend" onclick='closeAlert(-1); send(decodeURIComponent("${encodeURIComponent(failedReq)}"), (res)=>{this.parentElement.parentElement.callback(res);})'>
+  //   <span class="material-symbols-outlined">history</span> Retry?
+  //   <div class="anim"></div></button>`
+  //   newDialog.querySelector("#cancelBtn").style.display="inline-block";
+  //   newDialog.querySelector("#confirmbtn").style.display="none";
+  //   newDialog.querySelector("#cancelBtn").querySelector(".alertlbl").innerText = "Close"
+  //   console.log("Alert-type: FAILEDREQUEST" + failedReq);
+  // }
+  if (requiresConfirmation) {
     newDialog.querySelector("#cancelBtn").style.display = "inline-block";
     console.log("Alert-type CANCELLABLE");
   }
@@ -245,8 +361,9 @@ function closeAlert(sel:number) {
   // let dialog = 
   let coll = document.getElementsByClassName("ALERT");
   let dialog = coll.item(coll.length-1);
+  if (!dialog) return;
   let overridecallback=false;
-  if (dialog.getAttribute("type")==2 && sel < 0) overridecallback = true;
+  if (dialog.getAttribute("type")=="true" && sel < 0) overridecallback = true;
   if (!ele) {
     console.log("Alert dialogs not enabled in this page");
     return;
@@ -262,7 +379,7 @@ function closeAlert(sel:number) {
   }
   // can't remove t he damn dialog because we want it to fade out first
   // so instead we change its class name so it does not get found again
-  setTimeout(()=>{dialog.close()}, 200);
+  setTimeout(()=>{dialog.close()}, 500);
   dialog.className = "internal CLOSEDALERT";
   dialog.id="CLOSEDALERT";
   // dialog.remove();
@@ -270,8 +387,8 @@ function closeAlert(sel:number) {
   
   // eval("(()=>{"+dialog.getAttribute("callback")+"})()");
   // dialog.
-  if (!byId("internal_alerts") && !DIALOGOPEN) {
-    dialogQ = false;
+  if (!dialogsActive()) { // if no alerts are open AND form-dialog is not open
+    ALERTOPEN = false;
     ele.style.opacity="0";
     ele.style.pointerEvents="none";
   }
@@ -286,7 +403,14 @@ function keydown(e: Event) {
     console.log("prevent-defaulted");
     return;
   }
-  if(dialogQ && (e.key == "Escape"||e.key == "Enter")) {
+  if (byId("ftrNav") && e.key == "/" && e.target.nodeName != "TEXTAREA" && (e.target.nodeName != "INPUT" || 
+                       (e.target.type!="text" && e.target.type!="password"))) {
+    location.href="#ftrNav";
+    byId("ftrNav").focus();
+    e.preventDefault();
+    return;
+  }
+  if(ALERTOPEN && !DIALOGOPEN && (e.key == "Escape"||e.key == "Enter")) {
     e.preventDefault();
     if (e.key == "Escape") {
       console.log("RejectKey")
@@ -297,9 +421,15 @@ function keydown(e: Event) {
       closeAlert(1);
     }
   }
+  if (!ALERTOPEN && !DIALOGOPEN && 
+      (e.target.nodeName == "INPUT" || e.target.nodeName == "TEXTAREA") &&
+      e.key == "Escape") 
+  {
+    e.target.blur();
+  }
 }
 
-function toTime(ms: number) {
+function toTime(ms: number, inclMs) {
   let day = Math.floor(ms / 1000 / 60 / 60 / 24);
   ms = ms % (1000 * 60 * 60 * 24);
   let hr = Math.floor(ms / 1000 / 60 / 60);
@@ -308,14 +438,23 @@ function toTime(ms: number) {
   ms = ms % (1000 * 60);
   let sec = Math.floor(ms / 1000);
   if (ms < 0) return "00:00:00";
-  return (day > 0 ? day + "d " : "") + padWithZero(hr) + ":" + padWithZero(min) + ":" + padWithZero(sec);
+  return (day > 0 ? day + "d " : "") + padWithZero(hr) + ":" + padWithZero(min) + ":" + padWithZero(sec)+(inclMs?"."+padWithThreeZeroes(ms%1000):"");
 }
 
+function padWithThreeZeroes(n:number) {
+  if (n < 10) return "00"+n;
+  if (n < 100) return "0"+n;
+  return n;
+}
 function padWithZero(n: number) {
   return n < 10 ? "0" + n : n;
 }
 
 let overlay:HTMLDivElement;
+const tips = ["Press <kbd>/</kbd> to access the navigation menu.", "🧀", 
+              "Have you tried turning it off and on again?", "Use <kbd>space</kbd> to start/stop timer/stopwatch.",
+              "Press <kbd>E</kbd> to edit the timer.", "Press <kbd>R</kbd> to reset the timer/stopwatch.",
+              "Try <a href='/clickit'>ClickIt</a> today!"]
 addEventListener("DOMContentLoaded", function() {
   overlay = document.createElement("div");
   overlay.className = "overlayLoader"
@@ -323,8 +462,12 @@ addEventListener("DOMContentLoaded", function() {
   // overlay.style.left="0vh";
   overlay.style.backgroundColor="var(--system-overlay)";
   overlay.style.opacity="1";
-  overlay.innerHTML = `<span class="material-symbols-outlined loader">sync</span>
-  <p class="loadp fslg grn nohover">Loading.</p>`
+  overlay.innerHTML = `<div id="overlayLContainer" style='pointer-events:auto;'>
+  <p class="fslg grn nohover">Loading.</p>
+  <span class="material-symbols-outlined loader">sync</span>
+  <hr class="rounded">
+  <p class="fsmed gry nohover"><b>DailyWisdom:</b> ${tips[Math.floor(Math.random()*tips.length)]}</p>
+  </div>`
   // document.appendChild(document.createElement("body"));
   document.body.appendChild(overlay);
   // console.log(document.body.innerHTML)
@@ -343,10 +486,19 @@ function closeDialog(thing:()=>any, name:string="dialog") {
   div.style.opacity="0";
   div.style.pointerEvents="none";
   DIALOGOPEN=false;
-  document.getElementById("overlay").style.opacity = "0";
+  let ele = byId("overlay");
+  if (!dialogsActive()) { // if no alerts are open AND form-dialog is not open
+    ALERTOPEN = false;
+    ele.style.opacity="0";
+    ele.style.pointerEvents="none";
+  }
   thing();
   
   // document.getElementById("startBtn").focus();
+}
+
+function dialogsActive() {
+  return document.getElementsByClassName("ALERT").length>0 || DIALOGOPEN;
 }
 
 function openDialog(name:string="dialog") {
@@ -365,6 +517,7 @@ function mouseOver(e:MouseEvent) {
   let ele = e.target;
   let text = ele.innerHTML.replaceAll(/<.*((>.*<\/.*>)|(\/>))/gmiu, "").replaceAll("\n", "").trim();
   // fuck off this is good enough, it's not even used as raw html
+  if (typeof ele.className != "string") return;
   if (ele.className.match(/(\W|^)btn(\W|$)/) && !ele.className.match(/(\W|^)notooltip(\W|$)/)) {
     let tooltip = ele.children.namedItem("TOOLTIP");
     if (!tooltip) {
@@ -381,7 +534,7 @@ function mouseOver(e:MouseEvent) {
 }
 
 function resetExpiry(res:any) {
-  if (res.data.expiry < Date.now()) {
+  if (res.data.expiry < Date.now() || res.data.expiry - Date.now() > 9e60) {
     return;
     //alertDialog("Error: Your session has expired!", ()=>{location.href = "/login?redirect="+window.location.pathname});
   }
@@ -399,6 +552,24 @@ function resetExpiry(res:any) {
         clearTimeout(SESSIONTIMEOUT2);
         resetExpiry(res);
       });
-    }, 2)
+    }, true)
   }, Math.max(res.data.expiry - Date.now() - 60000, 1000))
 }
+
+function whichTransitionEvent(){
+    var t;
+    var el = document.createElement('fakeelement');
+    var transitions = {
+      'transition':'transitionend',
+      'OTransition':'oTransitionEnd',
+      'MozTransition':'transitionend',
+      'WebkitTransition':'webkitTransitionEnd'
+    }
+
+    for(let t in transitions){
+        if( el.style[t] !== undefined ){
+            return transitions[t];
+        }
+    }
+}
+

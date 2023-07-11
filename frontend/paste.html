@@ -34,8 +34,8 @@
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100;400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
@@ -69,7 +69,16 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload(()=>{openDialog('pwdInp');;});">
+  <body onload = "globalOnload(()=>{
+    openDialog('pwdInp');
+    var transitionEnd = whichTransitionEvent();
+    byId('pwdInp').addEventListener(transitionEnd, theFunctionToInvoke, false);
+    
+    function theFunctionToInvoke(ev){
+      let target = ev.target.querySelector('.internal form .inpContainer #inp.noMin');
+      if (target) target.focus();
+    }
+  });">
     <div class="main_content">
       <header>
         <h2>PasteIt!</h2>

@@ -16,13 +16,13 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var betatester1024_exports = {};
-__export(betatester1024_exports, {
+var unstable_exports = {};
+__export(unstable_exports, {
   DBConnectFailure: () => DBConnectFailure,
   UPSINCESTR: () => UPSINCESTR,
   connectionSuccess: () => connectionSuccess
 });
-module.exports = __toCommonJS(betatester1024_exports);
+module.exports = __toCommonJS(unstable_exports);
 var import_server = require("./server");
 var import_database = require("./database");
 var import_supportRooms = require("./supportRooms");
@@ -56,12 +56,6 @@ try {
           new import_wsHandler.WS("wss://euphoria.io/room/" + obj.euphRooms[i] + "/ws", "BetaUtilities", obj.euphRooms[i], !(obj.euphRooms[i] == "test" || obj.euphRooms[i] == "bots"));
           (0, import_logging.log)("Connected euph_room") + obj.euphRooms[i];
           console.log("Connected euph_room", obj.euphRooms[i]);
-        }
-        for (let i = 0; i < localEuphRooms.length; i++) {
-          import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("EUPH_ROOM", localEuphRooms[i]));
-          new import_wsHandler.WS("wss://euphoria.io/room/" + localEuphRooms[i] + "/ws", "BetaUtilities", localEuphRooms[i], false);
-          (0, import_logging.log)("Connected euph_room") + localEuphRooms[i];
-          console.log("Connected euph_room", localEuphRooms[i]);
         }
         for (let i = 0; i < obj.rooms.length; i++) {
           new import_webHandler.WebH(obj.rooms[i], false);

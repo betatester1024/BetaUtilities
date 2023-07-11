@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='./utils.js'></script>
+    <title>SweepThatMine! | BetaOS Systems</title>
+    <script>
+      let TIMER = -1;
+      const accessLevels = ["Error-level", "User", "Admin", "Super-admin"];
+      let grid = [];
+      let initQ = false;
+      let revealed = [];
+      let w = 20;
+      let h = 20;
+      let mineCt = 50;
+      let widths = [10, 20, 30];
+      let heights = [10, 17, 24];
+      let mineCts = [10, 50, 99];
+      let revealedOK = 0;
+      let since = -1;
+      function onLoad() {
+         // do stuff i guess
+        clearT();
+        byId("sweep").style.height="";
+        grid = [];
+        lostCt = 0;
+        since = Date.now();
+        initQ = false;
+        revealed = [];
+        revealedOK = 0;
+        for (let y=0; y<h; y++) {
+          grid.push([]);
+          revealed.push([]);
+          grid[y].length = w;
+          revealed[y].length = w;
+          grid[y].fill(false);
+          revealed[y].fill(-1);
+          let swp = byId("sweep");
+          let div = document.createElement("div");
+          div.id="row"+y;
+          div.className="row";
+          for (let x=0; x<w; x++) {
+            
+            let btn = document.createElement("button");
+            btn.className = "btn gry cell notooltip override";
+            btn.id=y+"-"+x;
+            btn.innerHTML = `
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                <path fill="var(--system-black)" d="M431-330q1-72 16.5-105t58.5-72q42-38 64.5-70.5T593-647q0-45-30-75t-84-30q-52 0-80 29.5T358-661l-84-37q22-59 74.5-100.5T479-840q100 0 154 55.5T687-651q0 48-20.5 87T601-482q-49 47-59 72t-11 80H431Zm48 250q-29 0-49.5-20.5T409-150q0-29 20.5-49.5T479-220q29 0 49.5 20.5T549-150q0 29-20.5 49.5T479-80Z"/>
+              </svg>`;
+            btn.onclick=(ev)=>{onClick(ev, y, x)};
+            btn.oncontextmenu=(ev)=>{onClick(ev, y, x)};
+            swp.appendChild(btn);
+          }
+          // swp.appendChild(div);
+          swp.appendChild(document.createElement("br"));
+        }
+        byId("sweep").style.height="unset";
+        location.href="#bottom";
+        // initMines(6,5)
+      }
+      function onClick(thing, y, x) {
+        if (thing.ctrlKey || thing.shiftKey  || thing.button != 0) {
+          thing.preventDefault();
+          console.log('here');
+          flag(y, x);
+        }
+        else reveal(y, x);
+      }
+      function flag(y, x) {
+        if (revealed[y][x] == -1) {
+          revealed[y][x] = -2;
+          byId(y+'-'+x).innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48">
+                <path fill="var(--system-red)" d="M200-120v-680h343l19 86h238v370H544l-18.933-85H260v309h-60Zm300-452Zm95 168h145v-250H511l-19-86H260v251h316l19 85Z"/>
+              </svg>`;
+        }
+        else if (revealed[y][x] == -2) {
+          revealed[y][x] = -1; 
+          byId(y+'-'+x).innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                <path fill="var(--system-black)" d="M431-330q1-72 16.5-105t58.5-72q42-38 64.5-70.5T593-647q0-45-30-75t-84-30q-52 0-80 29.5T358-661l-84-37q22-59 74.5-100.5T479-840q100 0 154 55.5T687-651q0 48-20.5 87T601-482q-49 47-59 72t-11 80H431Zm48 250q-29 0-49.5-20.5T409-150q0-29 20.5-49.5T479-220q29 0 49.5 20.5T549-150q0 29-20.5 49.5T479-80Z"/>
+              </svg>` ;
+        }
+      }
+      function revealMine(callback, ct=0, x=-1, y=0) {
+        do{
+          x++;
+          if (x == w) {
+            x=0; 
+            y++;
+            if (y == h) return;
+          }
+        } while (!grid[y][x]);
+        reveal(y, x, true);
+        if (ct < mineCt-1) setTimeout(()=>{revealMine(callback, ct+1, x, y);}, 100);
+        else {
+          console.log("callingback")
+          callback();
+        }
+      }
+      let lostCt = 0;
+      function initMines(x, y) {
+        // avoid area around x, y
+        let i = 0;
+        
+        while (i < mineCt) {
+          let newX = -1;
+          let newY = -1;
+          do {
+            newX = Math.floor(Math.random()*w);
+            newY = Math.floor(Math.random()*h);
+          }
+          while (grid[newY][newX]);
+          let dx = newX-x;
+          let dy = newY-y;
+          let dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist > 2 && (dist > 5 || Math.random()*dist > 1)) {
+            if (dist <= 5) console.log("dist "+dist)
+            grid[newY][newX] = true;
+            i++;
+            console.log(i, "mines placed")
+          }
+          
+        } // i
+
+        prt();
+      }
+      const word = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'error'];
+      function reveal(y, x, surpressAlertsQ=false) {
+        // console.log(y, x);
+        if (TIMER < 0) {
+          since = Date.now();
+          TIMER = setInterval(updateTimer, 100);
+        }
+        if (y >= h || x >= w || x<0 || y<0 || revealed[y][x] >= 0) return;
+        if (revealed[y][x] == -2) return;
+        if (!initQ) {
+          initMines(x, y);
+          initQ = true;
+        }
+        if (grid[y][x]) {
+          revealed[y][x]=9;
+          if (!surpressAlertsQ) {
+            lostCt++;
+            alertDialog(`You lost! 
+            Press [CONTINUE] to restart.
+            Press [CANCEL] to continue your game.`, ()=>{revealMine(()=>{clearT(); resetGrid(); });}, true);
+          }
+          let cell = byId(y+"-"+x);
+          cell.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48">
+          <path fill="var(--system-red)" d="M481-29 346-160H160v-186L26-480l134-134v-186h186l135-134 133 134h186v186l134 134-134 134v186H614L481-29Zm0-191q107.917 0 183.458-76.125Q740-372.25 740-481q0-107.917-75.542-183.458Q588.917-740 481-740q-108.75 0-184.875 75.542Q220-588.917 220-481q0 108.75 76.125 184.875T481-220Zm-.5-60q-83.5 0-142-58.5t-58.5-142q0-83.5 58.5-141.5t142-58q83.5 0 141.5 58t58 141.5q0 83.5-58 142T480.5-280Zm.5 167 107.917-107H740v-151l109-109-109-109v-151H589L481-849 371-740H220v151L111-480l109 109v151h150l111 107Zm-1-368Zm1 121q-50.82 0-85.91-35.09Q360-430.18 360-481q0-49.98 35.09-84.49T481-600q49.98 0 84.49 34.51T600-481q0 50.82-34.51 85.91Q530.98-360 481-360Z"/></svg>`
+          cell.className += " revealed nohover"
+          return;
+        }
+        let surrounding = 0;
+        if (y<h-1 && grid[y+1][x]) surrounding++;
+        if (x<w-1 && grid[y][x+1]) surrounding++;
+        if (y>0 && grid[y-1][x]) surrounding++;
+        if (x>0 && grid[y][x-1]) surrounding++;
+        if (y<h-1 && x<w-1 && grid[y+1][x+1]) surrounding++;
+        if (y<h-1 && x>0 && grid[y+1][x-1]) surrounding++;
+        if (y>0 && x<w-1 && grid[y-1][x+1]) surrounding++;
+        if (y>0 && x>0 && grid[y-1][x-1]) surrounding++;
+        if (surrounding > 0) {
+          // console.log(surrounding)
+          revealed[y][x] = surrounding;
+          revealedOK++;
+          let cell = byId(y+"-"+x);
+          cell.innerHTML = `<span class="override ${word[surrounding]}">${surrounding}</span>`;
+          cell.className += " revealed nohover"
+          if (revealedOK == w*h - mineCt) {
+            alertDialog("You won in "+toTime(Date.now() - since)+"!" + 
+                        (lostCt>0?" (Having already died "+lostCt+" time"+(lostCt==1?")":"s)"):""), 
+                        ()=>{location.href="#top"; clearT();});
+          }
+          return;
+        }
+        else {
+          revealed[y][x] = 0;
+          let cell = byId(y+"-"+x)
+          revealedOK++;
+          
+          cell.innerHTML = `<span class="override zero">0</span>`;
+          cell.className += " revealed nohover";
+          if (revealedOK == w*h - mineCt) {
+            alertDialog("You won in "+toTime(Date.now() - since)+"!" + 
+                        (lostCt>0?" (Having already died "+lostCt+" time"+(lostCt==1?")":"s)"):""), 
+                        ()=>{location.href="#top"; clearT();});
+            return;
+          }
+          // console.log("none")
+          setTimeout(()=>{reveal(y+1,x)}, 20);
+          setTimeout(()=>{reveal(y,x+1)}, 40);
+          setTimeout(()=>{reveal(y-1,x)}, 60);
+          setTimeout(()=>{reveal(y,x-1)}, 80);
+          setTimeout(()=>{reveal(y+1,x+1)}, 100);
+          setTimeout(()=>{reveal(y+1,x-1)}, 120);
+          setTimeout(()=>{reveal(y-1,x+1)}, 140);
+          setTimeout(()=>{reveal(y-1,x-1)}, 180);
+        }
+        
+      }
+
+      function updateDifficulty() {
+        let diff = byId("difficulty").value;
+        w = widths[diff];
+        h = heights[diff];
+        mineCt = mineCts[diff];
+        document.documentElement.style.setProperty("--width", w);
+        resetGrid();
+      }
+
+      function updateTimer() {
+        byId("timer").innerText = toTime(Date.now() - since);
+      }
+      
+      function prt() {
+        let line = "";
+        for (let y=0; y<h; y++) {
+          for (let x=0; x<w; x++) {
+            let char = revealed[y][x];
+            if (char == -1) char = "?"
+            if (char == -1) char = "*"
+            line += char;
+          }
+          line += "\n"
+        }
+        console.log(line);
+        return line;
+      }
+      function clearT(){
+        clearInterval(TIMER);
+        TIMER = -1;
+        byId("timer").innerText = "00:00:00";
+      }
+      function resetGrid() {
+        byId("sweep").innerHTML = "";
+        onLoad();
+      }
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      :root {
+        --width: 20;
+      }
+      #sweep {
+        margin: 10px;
+        width: unset;
+        height: 90vh;
+        line-height: 0px;
+       } /*
+      #sweep br {
+        line-height: 0px;
+      } */
+      .row {
+        /* display: flex; */
+        width: 60%;
+        margin: 0 auto;
+      }
+      .cell {
+        margin: 0px;
+        padding: 0px;
+        border-radius: 2px;
+        min-height: unset;
+        width: calc(min(100%, 80vh) / var(--width));
+        /* height: calc(100%); */
+        /* fontis-ze: calc100% / EE) */
+        /* flex-grow: 1; */
+        transition: all 0.3s ease;
+        aspect-ratio: 1 / 1;
+        border: solid 1px var(--system-grey2);
+        vertical-align: middle;
+        /* display: inline-block; */
+        font-size: 100% !important;
+        font-weight: 600;
+        /* bor */
+      }
+      .cell > svg {
+        /* font-size: calc(100% - 20px) !important;
+        font-weight: 500;
+        top: 50%;
+        left: 50%;
+        transform: translateY(-50%) translateX(-50%);
+        position: absolute; */
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+      }
+      .cell:active, .cell:focus, .cell *:active, .cell *:focus {
+        outline: none;
+      }
+      .zero {color: var(--system-grey)}
+      .one {color: #00bb00;}
+      .two {color: var(--system-yellowtext);}
+      .three {color: var(--system-red);}
+      .four {color: #8b00ff;}
+      .five, .seven, .eight{color: var(--system-blue);}
+      .six {color: var(--system-black);}
+      .gry {color: #8c8c8c;}
+      .cell.revealed, .cell.revealed:hover {background-color: var(--system-grey4) !important;}
+      /* .gry {} */
+      @media screen and (max-width: 1200px) {
+        .row {
+          width: max(90%, 800px);
+          /* margin: ; */
+        }
+      }
+      @media screen and (max-width: 850px) {
+        .main_content {
+          overflow-x: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body onload = "globalOnload(()=>{TIMER = setInterval(updateTimer, 100); onLoad();})" oncontextmenu='return false;'>
+    <div class="main_content">
+      <div id="top"><!--href anchor--></div>
+      <header>
+        <h2>SweepThatMine</h2>
+        <hr class="rounded">
+      </header>
+      <p class="nobreak fssml">Select a difficulty: </p>
+      <select id="difficulty" onchange="updateDifficulty()" class="szHalf fssml">
+        <option value = "0">Easy</option>
+        <option value = "1" selected>Medium</option>
+        <option value = "2">Hard</option>
+      </select> <button class="btn" onclick="resetGrid();"><span class='material-symbols-outlined'>refresh</span></button>
+      <h2 id="timer" class="fsmed centred">> LOADING TIMER <</h2>
+      <div id="sweep"></div>
+      <details>
+        <summary><p class="nobreak" style="margin-top: 2px; margin-bottom:2px;">Show footers</p></summary>
+        <a class="btn szFull override" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+        <footer id="ftrOverride"></footer>
+      </details>
+      <div id="bottom"><!--href anchor--></div>
+      </div>
+    </div>
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

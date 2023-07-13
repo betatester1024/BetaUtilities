@@ -24,6 +24,7 @@ __export(consts_exports, {
   expiry: () => expiry,
   frontendDir: () => frontendDir,
   hashingOptions: () => hashingOptions,
+  issueDB: () => issueDB,
   jsDir: () => jsDir,
   msgDB: () => msgDB,
   pasteDB: () => pasteDB,
@@ -47,6 +48,7 @@ const authDB = import_database.database.collection("SystemAUTH_V2");
 const msgDB = import_database.database.collection("SupportMessaging");
 const uDB = import_database.database.collection("BetaUtilities");
 const pasteDB = import_database.database.collection("PasteIt");
+const issueDB = import_database.database.collection("IssueTracker");
 const TOKEN_PATH = path.resolve(__dirname + "/../TOKEN.json");
 const CREDENTIALS_PATH = path.resolve(__dirname + "/../CREDENTIALS.json");
 const hashingOptions = {
@@ -65,6 +67,7 @@ const expiry = [0, 1e3 * 60 * 60 * 24, 1e3 * 60 * 30, 1e3 * 60 * 5];
   expiry,
   frontendDir,
   hashingOptions,
+  issueDB,
   jsDir,
   msgDB,
   pasteDB,

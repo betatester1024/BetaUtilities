@@ -7,7 +7,7 @@
       function validate() {
         closeDialog(()=>{}, 'pwdInp');;
         let pwd = document.getElementById("inp").value;
-        send(JSON.stringify({action:"findPaste", data:{pwd:pwd, name:document.URL.match(/\/paste\/(.*)$/)[1]}}), (res)=>{
+        send(JSON.stringify({action:"findPaste", data:{pwd:pwd, name:(new URL(document.URL)).pathname.match(/\/paste\/(.*)$/)[1]}}), (res)=>{
           document.getElementById("inp").value="";
           if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{openDialog('pwdInp');});
           else {
@@ -29,7 +29,7 @@
       //   // setTimeout(()=>{document.getElementById("inp").focus()}, 200);
       // }
       function editthis() {
-        location.href=document.URL.replaceAll("/paste/", "/paste?edit=");
+        location.href=(new URL(document.URL).pathname).replaceAll("/paste/", "/paste?edit=");
       }
     </script>
     <meta name="viewport" content="width=device-width">

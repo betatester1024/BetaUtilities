@@ -19,6 +19,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
 import {clickIt, getLeaderboard} from './button';
 import { WebSocketServer } from 'ws';
+import {newIssue, loadIssues} from './issuetracker'
 import {uptime} from './betautilities/messageHandle'
 import {supportHandler, roomRequest, sendMsg, 
         createRoom, deleteRoom, WHOIS, loadLogs, 
@@ -81,10 +82,10 @@ export async function initServer() {
     });
     console.log("WebSocket was opened")
     ws.send(JSON.stringify({action:"OPEN", data:null}));
-    supportHandler.addConnection(ws, req.query.room, req.cookies.sessionID);
+    supportHandler.addConnection(ws, req.query.room, req.cookies.accountID);
     ws.on("close", () => {
       // clear the connection
-      supportHandler.removeConnection(ws, req.query.room, req.cookies.sessionID);
+      supportHandler.removeConnection(ws, req.query.room, req.cookies.accountID);
       console.log("Removed stream");
     });
   });
@@ -114,7 +115,7 @@ export async function initServer() {
   });
 
   app.get("/cmd", urlencodedParser, async (req:any, res:any) => {
-    makeRequest(req.query.action, req.cookies.sessionID, null, (s:string, d:any, token:string)=>{
+    makeRequest(req.query.action, req.cookies.accountID, null, (s:string, d:any, token:string)=>{
       console.log(d);
       if (s == "SUCCESS") res.sendFile(frontendDir+'/actionComplete.html');
       else {res.sendFile(frontendDir+'/error.html')}
@@ -201,10 +202,10 @@ export async function initServer() {
     res.flushHeaders();
     res.write("retry:500\n\n");
     // add the connection
-    supportHandler.addConnection(res, req.query.room, req.cookies.sessionID);
+    supportHandler.addConnection(res, req.query.room, req.cookies.accountID);
     res.on("close", () => {
       // clear the connection
-      supportHandler.removeConnection(res, req.query.room, req.cookies.sessionID);
+      supportHandler.removeConnection(res, req.query.room, req.cookies.accountID);
       res.end();
       // console.log("Removed stream");
     });
@@ -241,7 +242,7 @@ export async function initServer() {
     }
     var body = await parse.json(req);
     if (!body) res.end(JSON.stringify({status:"ERROR", data:{error:"No command string"}}));
-    // let cookiematch = req.cookies.match("sessionID=[0-9a-zA-Z\\-]");
+    // let cookiematch = req.cookies.match("accountID=[0-9a-zA-Z\\-]");
     // COOKIE ACCEPTANCE DIALOG 
     if (body.action == "cookieRequest") {
       res.end(JSON.stringify({data:req.cookies.acceptedQ??false}))
@@ -252,8 +253,11 @@ export async function initServer() {
       res.end(JSON.stringify(""));
       return;
     }
+
+    if (!req.cookies.sessionID) res.cookie('sessionID', crypto.randomUUID(), {httpOnly:true, secure:true, sameSite:"Strict"});
     //////////////////////////
-    makeRequest(body.action, req.cookies.sessionID, body.data, (s:string, d:any, token:string)=>{
+
+    makeRequest(body.action, req.cookies.accountID, body.data, req.cookies.sessionID, (s:string, d:any, token:string)=>{
       /*if(body.action=="login"||body.action == "logout" ||
         body.action == "delAcc" || body.action == "signup")*/
       if (ignoreLog.indexOf(body.action)>=0){}
@@ -261,7 +265,7 @@ export async function initServer() {
         log("Action performed:"+body.action+", response:"+JSON.stringify(d));
       }
       else log("Action performed, error on "+body.action+", error:"+d.error);
-      res.cookie('sessionID', token?token:"", {httpOnly: true, secure:true, sameSite:"Strict", maxAge:9e12});
+      res.cookie('accountID', token?token:"", {httpOnly: true, secure:true, sameSite:"Strict", maxAge:9e12});
       res.end(JSON.stringify({status:s, data:d}));
     })
   });
@@ -271,11 +275,12 @@ export async function initServer() {
   })
 }
 
-function makeRequest(action:string|null, token:string, data:any|null, callback: (status:string, dat:any, token:string)=>any) {
+function makeRequest(action:string|null, token:string, data:any|null, sessID:string, callback: (status:string, dat:any, token:string)=>any) {
   if (!connectionSuccess) {
     callback("ERROR", {error:"Database connection failure"}, token);
     return;
   }
+  
   try {
     switch (action) {
       case 'test':
@@ -299,7 +304,10 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       case 'userRequest': 
         userRequest(token)
           .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+            {
+              obj.data.branch = process.env['branch'];
+              callback(obj.status, obj.data, obj.token)
+            });
         break;
       case 'extendSession': 
         extendSession(token)
@@ -498,6 +506,17 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
         .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
         break;
+      case "newIssue":
+        newIssue(data.title, data.body, token, sessID)
+          .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case "loadIssues":
+        // console.log(sessID);
+        loadIssues(data.from, data.to, token)
+          .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
       default:
         callback("ERROR", {error: "Unknown command string!"}, token);
     }
@@ -604,7 +623,7 @@ function tooManyRequests() {
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
                     '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest',
                     "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle', '/sweepthatmine',
-                   "/stopwatch", "/testbed", '/credits'];
+                   "/stopwatch", "/testbed", '/credits', '/atomicmoose', '/issuetracker'];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',
                   'paste', 'findPaste'];

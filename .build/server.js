@@ -32,6 +32,7 @@ var import_paste = require("./paste");
 var import_tasks = require("./tasks");
 var import_logging = require("./logging");
 var import_button = require("./button");
+var import_issuetracker = require("./issuetracker");
 var import_messageHandle = require("./betautilities/messageHandle");
 var import_supportRooms = require("./supportRooms");
 const express = require("express");
@@ -79,9 +80,9 @@ async function initServer() {
     });
     console.log("WebSocket was opened");
     ws.send(JSON.stringify({ action: "OPEN", data: null }));
-    import_supportRooms.supportHandler.addConnection(ws, req.query.room, req.cookies.sessionID);
+    import_supportRooms.supportHandler.addConnection(ws, req.query.room, req.cookies.accountID);
     ws.on("close", () => {
-      import_supportRooms.supportHandler.removeConnection(ws, req.query.room, req.cookies.sessionID);
+      import_supportRooms.supportHandler.removeConnection(ws, req.query.room, req.cookies.accountID);
       console.log("Removed stream");
     });
   });
@@ -107,7 +108,7 @@ async function initServer() {
     (0, import_logging.incrRequests)();
   });
   app.get("/cmd", urlencodedParser, async (req, res) => {
-    makeRequest(req.query.action, req.cookies.sessionID, null, (s, d, token) => {
+    makeRequest(req.query.action, req.cookies.accountID, null, (s, d, token) => {
       console.log(d);
       if (s == "SUCCESS")
         res.sendFile(import_consts.frontendDir + "/actionComplete.html");
@@ -176,9 +177,9 @@ async function initServer() {
     });
     res.flushHeaders();
     res.write("retry:500\n\n");
-    import_supportRooms.supportHandler.addConnection(res, req.query.room, req.cookies.sessionID);
+    import_supportRooms.supportHandler.addConnection(res, req.query.room, req.cookies.accountID);
     res.on("close", () => {
-      import_supportRooms.supportHandler.removeConnection(res, req.query.room, req.cookies.sessionID);
+      import_supportRooms.supportHandler.removeConnection(res, req.query.room, req.cookies.accountID);
       res.end();
     });
   });
@@ -218,13 +219,15 @@ async function initServer() {
       res.end(JSON.stringify(""));
       return;
     }
-    makeRequest(body.action, req.cookies.sessionID, body.data, (s, d, token) => {
+    if (!req.cookies.sessionID)
+      res.cookie("sessionID", crypto.randomUUID(), { httpOnly: true, secure: true, sameSite: "Strict" });
+    makeRequest(body.action, req.cookies.accountID, body.data, req.cookies.sessionID, (s, d, token) => {
       if (ignoreLog.indexOf(body.action) >= 0) {
       } else if (s == "SUCCESS") {
         (0, import_logging.log)("Action performed:" + body.action + ", response:" + JSON.stringify(d));
       } else
         (0, import_logging.log)("Action performed, error on " + body.action + ", error:" + d.error);
-      res.cookie("sessionID", token ? token : "", { httpOnly: true, secure: true, sameSite: "Strict", maxAge: 9e12 });
+      res.cookie("accountID", token ? token : "", { httpOnly: true, secure: true, sameSite: "Strict", maxAge: 9e12 });
       res.end(JSON.stringify({ status: s, data: d }));
     });
   });
@@ -232,7 +235,7 @@ async function initServer() {
     console.log(`BetaUtilities V2 listening on port ${import_consts.port}`);
   });
 }
-function makeRequest(action, token, data, callback) {
+function makeRequest(action, token, data, sessID, callback) {
   if (!import_index.connectionSuccess) {
     callback("ERROR", { error: "Database connection failure" }, token);
     return;
@@ -265,6 +268,7 @@ function makeRequest(action, token, data, callback) {
         break;
       case "userRequest":
         (0, import_userRequest.userRequest)(token).then((obj) => {
+          obj.data.branch = process.env["branch"];
           callback(obj.status, obj.data, obj.token);
         });
         break;
@@ -525,6 +529,16 @@ function makeRequest(action, token, data, callback) {
           callback(obj.status, obj.data, obj.token);
         });
         break;
+      case "newIssue":
+        (0, import_issuetracker.newIssue)(data.title, data.body, token, sessID).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "loadIssues":
+        (0, import_issuetracker.loadIssues)(data.from, data.to, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
       default:
         callback("ERROR", { error: "Unknown command string!" }, token);
     }
@@ -646,7 +660,9 @@ const validPages = [
   "/sweepthatmine",
   "/stopwatch",
   "/testbed",
-  "/credits"
+  "/credits",
+  "/atomicmoose",
+  "/issuetracker"
 ];
 const ignoreLog = [
   "getEE",

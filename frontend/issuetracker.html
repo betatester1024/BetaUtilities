@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src='./utils.js'></script>
+    <title>IssueTracker | BetaOS Systems</title>
+    <script>
+      function newIssue() 
+      {
+        let title = byId("title").value;
+        let body = byId("body").value;
+        send(JSON.stringify({action:"newIssue", data:{title:title, body:body}}),(res)=>{
+          if (res.status != "SUCCESS") alertDialog("Failed to post: "+res.data.error, ()=>{});
+          else {
+            byId("body").value="";
+            byId("title").value="";
+            alertDialog("Successfully posted issue #"+res.data.id, ()=>{
+              location.href="?from="+(res.data.id-20)+"&to="+res.data.id
+            });
+          }
+        })
+        loadIssues();
+      }
+      let FROM=0, TO = 0;
+      function onLoad() 
+      {
+        let u = new URL(document.URL);
+        FROM = Number(u.searchParams.get("from")??1);
+        TO = Number(u.searchParams.get("to")??20);
+        if (FROM < 0) FROM = 0;
+        if (TO<0) TO = 0;
+        byId("showing").innerText = "Showing issues #"+FROM+" to #"+TO;
+        loadIssues();
+      }
+
+      function goForward() 
+      {
+        location.href="?from="+(TO+1)+"&to="+(TO+21);
+      }
+
+      function goBack() 
+      {
+        location.href="?from="+(FROM-21)+"&to="+(FROM-1);
+      }
+      
+      function loadIssues() 
+      {
+        send(JSON.stringify({action:"loadIssues", data:{from:FROM, to:TO}}), (res)=>{
+          if (res.status != "SUCCESS") alertDialog("Failed to load issues: "+res.data.error, ()=>{});
+          else {
+            byId("issueArea").innerHTML = "";
+            for (let i=0; i<res.data.length; i++) 
+            {
+              let issueCtn = document.createElement("div");
+              issueCtn.className = "issueCtn";
+              issueCtn.id=res.data[i].id;
+              byId("issueArea").appendChild(issueCtn);
+              let p = document.createElement("p");
+              p.className = "header";
+              issueCtn.appendChild(p);
+              let b = document.createElement("b");
+              b.innerText = "#"+res.data[i].id;
+              p.appendChild(b);
+              let kbd = document.createElement("kbd");
+              kbd.class="title";
+              kbd.innerText = res.data[i].title;
+              p.appendChild(kbd);
+              let node = document.createTextNode(" Submitted by ");
+              p.appendChild(node);
+              kbd = document.createElement("kbd");
+              kbd.innerText = res.data[i].author;
+              p.appendChild(kbd);
+              // p.appendChild(document.createTextNode(")"));
+              p = document.createElement("p");
+              p.className = "issueBody";
+              p.innerText = res.data[i].body;
+              issueCtn.appendChild(p);
+              // <div id=${res.data[i].id} class="issueCtn">
+              //   <p class="header"><b>#${res.data[i].id} </b> <kbd class="title"> ${res.data[i].title}</kbd> 
+              //   (Submitted by <kbd>${res.data[i].author}</kbd>)</p>
+              //   <p class="issueBody">${res.data[i].body}</p>
+              // </div>
+              // `
+            }
+            if (res.data.length ==0) {
+              byId("hr").className = "redrounded";
+              byId("issueArea").innerHTML = `<b class="red nohover nooutline fsmed">
+              <span class="material-symbols-outlined">error</span>
+              No issues found</b>`
+            }
+          }
+        })
+      }
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      .header {
+        border-radius: 5px;
+        background-color:var(--system-grey2);
+        padding: 5px;
+        margin: 2px 0px;
+        text-align: left;
+      }
+      .header b, .header kbd.title {
+        margin-right: 10px;
+      }
+      .issueBody {
+        width: calc(100% - 20px); /* fix the thing with padding */
+        min-height: 50px;
+        margin: 5px 0px;
+        padding: 0px 10px;
+        text-align: left;
+      }
+      .issueCtn {
+        width: 80%;
+        outline: 2px var(--system-grey);
+        background-color: var(--system-grey2);
+        margin: 20px auto;
+        border-radius: 7px;
+      }
+    </style>
+  </head>
+  <body onload = "globalOnload(); onLoad()">
+    <div class="main_content">
+      <header class="redrounded">
+        <h2>IssueTracker</h2>
+        <hr class="rounded">
+      </header>
+      
+      <details>
+        <summary><p class="nobreak">New issue</p></summary><br>
+        <div class="inpContainer">
+          <input id="title" class="sml" placeholder="Enter a title...">
+          <div class="inp anim"></div>
+        </div>
+        <textarea id="body" placeholder="Detailed description..."></textarea>
+        <button class="btn blu fssml sz100" onclick="newIssue()">
+          <span class="material-symbols-outlined">add_circle</span>
+          Post issue
+        <div class="anim"></div></button>
+      </details>
+      <button class="btn fssml" onclick="loadIssues()">
+         <span class="material-symbols-outlined">refresh</span>
+          Refresh listing
+        <div class="anim"></div></button><br>
+      <b id="showing" class="blu nohover fsmed">Showing issues #LOADING to #LOADING</b>
+      <hr class="rounded" id="hr">
+      <div id="issueArea">
+      </div>
+      <nav class="flex addMargin">
+        <button class="btn fssml szHalf" onclick="goBack()">
+         <span class="material-symbols-outlined">arrow_back</span>
+          Previous page
+        <div class="anim"></div></button>
+        <button class="btn fssml szHalf" onclick="goForward()">
+         <span class="material-symbols-outlined">arrow_forward</span>
+          Next page
+        <div class="anim"></div></button>
+      </nav>
+      <a class="btn szFull override" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+        
+      </div>
+    </div>
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

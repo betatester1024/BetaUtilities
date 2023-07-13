@@ -27,7 +27,7 @@
       function unlock() {
         closeDialog(()=>{}, "pwdInp");
         let pwd = document.getElementById("inp_pwd").value
-        send(JSON.stringify({action:"findPaste", data:{pwd:pwd, name:document.URL.match(/\?edit=([0-9a-zA-Z_\-]{1,30})$/)[1]}}), (res)=>{
+        send(JSON.stringify({action:"findPaste", data:{pwd:pwd, name:(new URL(document.URL)).searchParams.get("edit")}}), (res)=>{
           if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{
             document.getElementById("inp_pwd").value="";
             openDialog("pwdInp");
@@ -36,7 +36,7 @@
         })
       }
       function onLoad() {
-        let match = document.URL.match("\\?edit=([0-9a-zA-Z_\\-]{1,30})$");
+        let match = (new URL(document.URL)).searchParams.get("edit");
         if (match) {
           document.getElementById("h2").innerText= "PasteIt! Editor"
           openDialog("pwdInp");
@@ -47,7 +47,7 @@
             <div class="anim"></div>`;
           btn.onclick=update;
           let loc = document.getElementById("loc");
-          loc.value=match[1];
+          loc.value=match;
           document.getElementById("form").action="javascript:update()";
           loc.disabled=true;
           document.getElementById("inp").placeholder="(Unchanged)"

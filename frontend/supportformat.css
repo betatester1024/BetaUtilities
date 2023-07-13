@@ -108,11 +108,12 @@ div.msgContainer > div.msgContainer {
 }
 .msgContents {
   width: calc(100% - 40px);
+  cursor:pointer;
 }
 .msgContainer {
   margin-top: 5px;
   margin-bottom: 5px;
-  cursor: pointer;
+  /* cursor: pointer; */
 }
 .msgContents:hover > .options {
   opacity: 1;

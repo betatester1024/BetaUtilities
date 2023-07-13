@@ -13,6 +13,7 @@ export const authDB = database.collection("SystemAUTH_V2")
 export const msgDB = database.collection("SupportMessaging")
 export const uDB = database.collection("BetaUtilities")
 export const pasteDB = database.collection("PasteIt");
+export const issueDB = database.collection("IssueTracker");
 export const TOKEN_PATH = path.resolve(__dirname+'/../TOKEN.json')
 export const CREDENTIALS_PATH =path.resolve( __dirname+'/../CREDENTIALS.json');
 export const hashingOptions = {

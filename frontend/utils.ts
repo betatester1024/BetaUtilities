@@ -9,6 +9,7 @@ function byClass(name:string, ct:number=0) {
 }
 
 let HASNETWORK = false;
+let branch = "STABLE";
 async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
 
   if (!networkLess) {
@@ -46,9 +47,11 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
   //     closeAlert(-1);
   //   }
   // };
+  
   if (!networkLess) {
   send(JSON.stringify({ action: "userRequest" }),
     (res) => {
+      if (res.data.branch) branch = res.data.branch;
       document.documentElement.className = res.data.darkQ?"dark":"";
       console.log("Dark mode toggle:",res.data.darkQ);
       // let overlay = document.getElementById("overlayL");
@@ -68,6 +71,8 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
         ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
+                      <a href='https://${branch=="unstable"?"betatester1024.repl.co":"unstable.betatester1024.repl.co"}'>
+                      Switch to ${branch=="unstable"?"stable":"unstable"} branch</a> | 
                       <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
                         <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                         <div class="anim"></div>
@@ -79,6 +84,8 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
                       <a href='/logout'>Logout</a> | 
                       <a href='/config'>Account</a> | 
                       <a href='/status'>Status</a> | 
+                      <a href='https://${branch=="unstable"?"betatester1024.repl.co":"unstable.betatester1024.repl.co"}'>
+                      Switch to ${branch=="unstable"?"stable":"unstable"} branch</a> | 
                       <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
                       <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
                         <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
@@ -94,7 +101,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
             alertDialog("Database connection failure. Please contact BetaOS.", ()=>{});
             ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`
           }// this means the database died 
-          document.getElementById("footer").innerHTML += " | <kbd>"+res.data.data+"</kbd>";
+          document.getElementById("footer").innerHTML += " | <kbd>Total requests made: "+res.data.data+"</kbd>";
           send(JSON.stringify({action:"cookieRequest"}), (res)=>{
             if (res.data.toString() == "false") {
               // console.log("thing");
@@ -139,11 +146,19 @@ let origLeft = -1;
 let origTop = -1;
 let origX = -1;
 let origY = -1;
-function pointerUp() 
+function pointerUp(ev:PointerEvent) 
 {
   DRAGGING = null;
   origLeft = -1;
   origTop = -1;
+  // if (ev.target.className == "close red") closeNBD(ev.target.parentElement.parentElement, false)
+  
+  // this is stupid. who cares.
+  if (ev.target.nodeName == "SPAN" && ev.target.parentElement &&
+      ev.target.parentElement.parentElement &&
+      ev.target.parentElement.parentElement.parentElement &&
+      ev.target.parentElement.parentElement.parentElement.className == "ALERT_NONBLOCKING")  
+    closeNBD(ev.target.parentElement.parentElement.parentElement, false)
 }
 function pointerMove(ev:PointerEvent) 
 {
@@ -241,15 +256,20 @@ function acceptCookies() {
 
 }
 
-function nonBlockingDialog(str:string, callback:()=>any = ()=>{}) 
+function nonBlockingDialog(str:string, callback:()=>any = ()=>{}, text:string="Continue", clr:string="grn", ico:string="arrow_forward") 
 {
   let div = document.createElement("div");
   div.className="ALERT_NONBLOCK";
-  div.innerHTML = `<div class="content">${str}</div>`; // yes, it can be html'd
+  div.innerHTML = `
+  
+  <div class="content">${str}</div>`; // yes, it can be html'd
   let draggable = document.createElement("div");
   
   draggable.className = "ALERT_DRAGGER";
   draggable.innerText = "ServiceAlert"
+  draggable.innerHTML += `<div class="close" onclick="closeNBD(this.parentElement.parentElement, false)">
+  <span class="red nooutline material-symbols-outlined">close</span>
+  </div>`
   div.prepend(draggable);
   div.callback=callback;
   document.body.appendChild(div);
@@ -262,17 +282,18 @@ function nonBlockingDialog(str:string, callback:()=>any = ()=>{})
   div.appendChild(document.createElement("br"));
   div.appendChild(button);
   button.outerHTML = `
-  <button class="grn btn fsmed closeBtn" onclick="closeNBD(this.parentElement)">
-  <span class='material-symbols-outlined'>arrow_forward</span>
-  Continue<div class="anim"></div>
+  <button class="${clr} btn fsmed closeBtn" onclick="closeNBD(this.parentElement, true)">
+  <span class='material-symbols-outlined'>${ico}</span>
+  ${text}<div class="anim"></div>
   </button>`;
   
 }
 
-function closeNBD(ele:HTMLElement) {
+function closeNBD(ele:HTMLElement, confirmQ:boolean) {
+  console.log(ele);
   ele.style.opacity="0";
   ele.style.pointerEvents = "none";
-  ele.callback();
+  if (confirmQ) ele.callback();
 }
 
 // let TIME:NodeJS.Timeout|null;

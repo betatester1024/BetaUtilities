@@ -7,6 +7,7 @@ function byClass(name, ct = 0) {
   return document.getElementsByClassName(name).item(ct);
 }
 let HASNETWORK = false;
+let branch = "STABLE";
 async function globalOnload(cbk, networkLess = false) {
   if (!networkLess) {
     var script = document.createElement("script");
@@ -34,6 +35,8 @@ async function globalOnload(cbk, networkLess = false) {
     send(
       JSON.stringify({ action: "userRequest" }),
       (res) => {
+        if (res.data.branch)
+          branch = res.data.branch;
         document.documentElement.className = res.data.darkQ ? "dark" : "";
         console.log("Dark mode toggle:", res.data.darkQ);
         let maincontent = document.getElementsByClassName("main_content").item(0);
@@ -48,6 +51,8 @@ async function globalOnload(cbk, networkLess = false) {
           ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
+                      <a href='https://${branch == "unstable" ? "betatester1024.repl.co" : "unstable.betatester1024.repl.co"}'>
+                      Switch to ${branch == "unstable" ? "stable" : "unstable"} branch</a> | 
                       <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
                         <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                         <div class="anim"></div>
@@ -59,6 +64,8 @@ async function globalOnload(cbk, networkLess = false) {
                       <a href='/logout'>Logout</a> | 
                       <a href='/config'>Account</a> | 
                       <a href='/status'>Status</a> | 
+                      <a href='https://${branch == "unstable" ? "betatester1024.repl.co" : "unstable.betatester1024.repl.co"}'>
+                      Switch to ${branch == "unstable" ? "stable" : "unstable"} branch</a> | 
                       <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
                       <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
                         <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
@@ -75,7 +82,7 @@ async function globalOnload(cbk, networkLess = false) {
               });
               ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`;
             }
-            document.getElementById("footer").innerHTML += " | <kbd>" + res2.data.data + "</kbd>";
+            document.getElementById("footer").innerHTML += " | <kbd>Total requests made: " + res2.data.data + "</kbd>";
             send(JSON.stringify({ action: "cookieRequest" }), (res3) => {
               if (res3.data.toString() == "false") {
                 let cpl = document.getElementById("compliance");
@@ -119,10 +126,12 @@ let origLeft = -1;
 let origTop = -1;
 let origX = -1;
 let origY = -1;
-function pointerUp() {
+function pointerUp(ev) {
   DRAGGING = null;
   origLeft = -1;
   origTop = -1;
+  if (ev.target.nodeName == "SPAN" && ev.target.parentElement && ev.target.parentElement.parentElement && ev.target.parentElement.parentElement.parentElement && ev.target.parentElement.parentElement.parentElement.className == "ALERT_NONBLOCKING")
+    closeNBD(ev.target.parentElement.parentElement.parentElement, false);
 }
 function pointerMove(ev) {
   if (DRAGGING) {
@@ -209,13 +218,18 @@ function acceptCookies() {
   });
 }
 function nonBlockingDialog(str, callback = () => {
-}) {
+}, text = "Continue", clr = "grn", ico = "arrow_forward") {
   let div = document.createElement("div");
   div.className = "ALERT_NONBLOCK";
-  div.innerHTML = `<div class="content">${str}</div>`;
+  div.innerHTML = `
+  
+  <div class="content">${str}</div>`;
   let draggable = document.createElement("div");
   draggable.className = "ALERT_DRAGGER";
   draggable.innerText = "ServiceAlert";
+  draggable.innerHTML += `<div class="close" onclick="closeNBD(this.parentElement.parentElement, false)">
+  <span class="red nooutline material-symbols-outlined">close</span>
+  </div>`;
   div.prepend(draggable);
   div.callback = callback;
   document.body.appendChild(div);
@@ -228,15 +242,17 @@ function nonBlockingDialog(str, callback = () => {
   div.appendChild(document.createElement("br"));
   div.appendChild(button);
   button.outerHTML = `
-  <button class="grn btn fsmed closeBtn" onclick="closeNBD(this.parentElement)">
-  <span class='material-symbols-outlined'>arrow_forward</span>
-  Continue<div class="anim"></div>
+  <button class="${clr} btn fsmed closeBtn" onclick="closeNBD(this.parentElement, true)">
+  <span class='material-symbols-outlined'>${ico}</span>
+  ${text}<div class="anim"></div>
   </button>`;
 }
-function closeNBD(ele) {
+function closeNBD(ele, confirmQ) {
+  console.log(ele);
   ele.style.opacity = "0";
   ele.style.pointerEvents = "none";
-  ele.callback();
+  if (confirmQ)
+    ele.callback();
 }
 let ALERTOPEN = false;
 function alertDialog(str, callback = () => {

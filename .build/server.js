@@ -544,6 +544,11 @@ function makeRequest(action, token, data, sessID, callback) {
           callback(obj.status, obj.data, obj.token);
         });
         break;
+      case "completeissue":
+        (0, import_issuetracker.completeIssue)(data.id, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
       default:
         callback("ERROR", { error: "Unknown command string!" }, token);
     }

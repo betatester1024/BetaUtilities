@@ -104,11 +104,11 @@ async function initClient()
         }
       }
       else {
-        fixAwaitingParent();
         loadStatus = -1;
         STARTID=message.data.id;
         // alert("lcMatchId updated"+ STARTID);
       }
+      fixAwaitingParent();
       thing.scrollTop = thing.scrollTop+1;
     }    
     if (message.action == "removeUser") {

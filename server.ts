@@ -19,7 +19,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
 import {clickIt, getLeaderboard} from './button';
 import { WebSocketServer } from 'ws';
-import {newIssue, loadIssues} from './issuetracker'
+import {newIssue, loadIssues, deleteIssue, completeIssue} from './issuetracker'
 import {uptime} from './betautilities/messageHandle'
 import {supportHandler, roomRequest, sendMsg, 
         createRoom, deleteRoom, WHOIS, loadLogs, 
@@ -507,13 +507,24 @@ function makeRequest(action:string|null, token:string, data:any|null, sessID:str
           {callback(obj.status, obj.data, obj.token)});
         break;
       case "newIssue":
-        newIssue(data.title, data.body, token, sessID)
+        newIssue(data.title, data.body, data.priority, data.tags, token, sessID)
           .then((obj:{status:string, data:any, token:string})=>
             {callback(obj.status, obj.data, obj.token)});
         break;
       case "loadIssues":
         // console.log(sessID);
-        loadIssues(data.from, data.to, token)
+        loadIssues(data.from, data.ct, token)
+          .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case "deleteissue":
+        deleteIssue(data.id, token)
+          .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+     case "completeissue":
+        // console.log(sessID);
+        completeIssue(data.id, token)
           .then((obj:{status:string, data:any, token:string})=>
             {callback(obj.status, obj.data, obj.token)});
         break;

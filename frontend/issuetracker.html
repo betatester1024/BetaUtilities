@@ -8,72 +8,89 @@
       {
         let title = byId("title").value;
         let body = byId("body").value;
-        send(JSON.stringify({action:"newIssue", data:{title:title, body:body}}),(res)=>{
+        send(JSON.stringify({action:"newIssue", data:{
+          title:title, body:body, 
+          priority:byId("priority").value, 
+          tags:[] // to be implemented later.
+        }}),(res)=>{
           if (res.status != "SUCCESS") alertDialog("Failed to post: "+res.data.error, ()=>{});
           else {
             byId("body").value="";
             byId("title").value="";
+            byId("priority").value="";
             alertDialog("Successfully posted issue #"+res.data.id, ()=>{
-              location.href="?from="+(res.data.id-20)+"&to="+res.data.id
+              location.href="?from="+(res.data.id)+"&ct="+ISSUECT
             });
           }
         })
         loadIssues();
       }
-      let FROM=0, TO = 0;
+      let FROM=0, ISSUECT = 0;
+      let MINID, MAXID;
       function onLoad() 
       {
         let u = new URL(document.URL);
         FROM = Number(u.searchParams.get("from")??1);
-        TO = Number(u.searchParams.get("to")??20);
-        if (FROM < 0) FROM = 0;
-        if (TO<0) TO = 0;
-        byId("showing").innerText = "Showing issues #"+FROM+" to #"+TO;
+        ISSUECT = Number(u.searchParams.get("ct")??20);
+        if (FROM < 0) FROM = 1;
+        if (ISSUECT<0) ISSUECT = 20;
+        byId("showing").innerText = "Showing "+ISSUECT+" issues from #"+FROM;
+        if (!userData.error && userData.perms >= 2) byId("priority").disabled=false;
+        else byId("priority").className = "disabled";
         loadIssues();
       }
 
       function goForward() 
       {
-        location.href="?from="+(TO+1)+"&to="+(TO+21);
+        location.href="?from="+(MAXID+1)+"&ct="+ISSUECT
       }
 
       function goBack() 
       {
-        location.href="?from="+(FROM-21)+"&to="+(FROM-1);
+        location.href="?from="+(MINID-ISSUECT-1)+"&ct="+ISSUECT;
       }
-      
+      const colours = ["", "low", "low", "low", "med", "med", "med", "high", "high", "max", "max"];
       function loadIssues() 
       {
-        send(JSON.stringify({action:"loadIssues", data:{from:FROM, to:TO}}), (res)=>{
+        send(JSON.stringify({action:"loadIssues", data:{from:FROM, ct:ISSUECT}}), (res)=>{
           if (res.status != "SUCCESS") alertDialog("Failed to load issues: "+res.data.error, ()=>{});
           else {
             byId("issueArea").innerHTML = "";
-            for (let i=0; i<res.data.length; i++) 
+            for (let i=0; i<res.data.issues.length; i++) 
             {
               let issueCtn = document.createElement("div");
-              issueCtn.className = "issueCtn";
-              issueCtn.id=res.data[i].id;
+              issueCtn.className = "issueCtn "+colours[res.data.issues[i].prio??1];
+              issueCtn.id=res.data.issues[i].id;
               byId("issueArea").appendChild(issueCtn);
               let p = document.createElement("p");
               p.className = "header";
               issueCtn.appendChild(p);
               let b = document.createElement("b");
-              b.innerText = "#"+res.data[i].id;
+              b.innerText = "#"+res.data.issues[i].id+" (Priority "+(res.data.issues[i].prio??1)+")";
               p.appendChild(b);
               let kbd = document.createElement("kbd");
               kbd.class="title";
-              kbd.innerText = res.data[i].title;
+              kbd.innerText = res.data.issues[i].title;
               p.appendChild(kbd);
-              let node = document.createTextNode(" Submitted by ");
+              let node = document.createTextNode("| Submitted by ");
               p.appendChild(node);
               kbd = document.createElement("kbd");
-              kbd.innerText = res.data[i].author;
+              kbd.innerText = res.data.issues[i].author;
               p.appendChild(kbd);
               // p.appendChild(document.createTextNode(")"));
               p = document.createElement("p");
               p.className = "issueBody";
-              p.innerText = res.data[i].body;
+              p.innerText = res.data.issues[i].body;
               issueCtn.appendChild(p);
+              if (userData.perms >=2) {
+                issueCtn.innerHTML += `
+                  <div class="controls">
+                    <span class="material-symbols-outlined red nooutline" onclick="deleteissue(this)">delete</span>
+                    <span class="material-symbols-outlined ylw" onclick="editissue(this)">edit</span>
+                    <span class="material-symbols-outlined grn" onclick="complete(this)">check_circle</span>
+                  </div>
+                `;
+              }
               // <div id=${res.data[i].id} class="issueCtn">
               //   <p class="header"><b>#${res.data[i].id} </b> <kbd class="title"> ${res.data[i].title}</kbd> 
               //   (Submitted by <kbd>${res.data[i].author}</kbd>)</p>
@@ -81,14 +98,69 @@
               // </div>
               // `
             }
-            if (res.data.length ==0) {
+            if (res.data.issues.length ==0) {
               byId("hr").className = "redrounded";
               byId("issueArea").innerHTML = `<b class="red nohover nooutline fsmed">
               <span class="material-symbols-outlined">error</span>
-              No issues found</b>`
+              No issues found</b>`;
+              MINID = FROM;
+              MAXID = FROM+ISSUECT;
+            }
+            else {
+              MINID = res.data.issues[0].id;
+              MAXID = res.data.issues[res.data.issues.length-1].id;
+            }
+            if (res.data.issues.length < ISSUECT) {
+              byId("next").className += " disabled";
+              byId("next").disabled=true;
+            }
+            if (res.data.issues.length < ISSUECT) {
+              byId("next").className += " disabled";
+              byId("next").disabled=true;
             }
           }
         })
+      }
+      function deleteissue(ele) 
+      {
+        let issueele = ele.parentElement.parentElement;
+        send(JSON.stringify({action:"deleteissue", data:{id:issueele.id}}), (res)=>{
+          if (res.status != "SUCCESS") {alertDialog("Error: "+res.data.error, ()=>{}); return;}
+          issueele.remove();
+          alertDialog("Issue deleted!", ()=>{});
+        });
+      }
+
+      function complete(ele) 
+      {
+        let issueele = ele.parentElement.parentElement;
+        send(JSON.stringify({action:"completeissue", data:{id:issueele.id}}), (res)=>{
+          if (res.status != "SUCCESS") {alertDialog("Error: "+res.data.error, ()=>{}); return;}
+          issueele.remove();
+          alertDialog("Issue completed!", ()=>{});
+        });
+      }
+      function editissue(ele) {
+        let issueele = ele.parentElement.parentElement;
+        nonBlockingDialog(`
+        <div style="font-family:'Noto Sans Display';">
+          <p class="nobreak fsmed">Update issue #${issueele.id}</p>
+          <div class="inpContainer szFull" style="margin: 0px;">
+          <p class="nobreak fssml" style="margin: 0px;">Update title:</p>
+          <input id="title" class="sml" placeholder="Enter a title..."
+          value="${issueele.querySelector(".header").querySelector("kbd").innerHTML.replaceAll('\"', '&#34;')}">
+          <div class="inp anim"></div>
+          </div>
+          <p class="nobreak fssml" style="margin: 0px;" >Update description:</p> 
+          <textarea id="body" placeholder="Detailed description...">${issueele.querySelector(".issueBody").innerHTML}</textarea>
+          <p class="blu fsmed nohover rounded" style="margin: 0px;">Additional information</p>
+          <p class="blu fssml nohover szFull" style=" margin: 10px; text-align: left">Priority level (Administrator config)</p>
+          <div class="inpContainer" style="margin: 0px;">
+            <input id="priority" type="number" min=1 max=10 step=1 id="priority" value=1 placeholder="(1-10)"/>
+            <div class="anim inp"></div>
+          </div>
+        </div>
+        `, ()=>{});
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -105,6 +177,16 @@
         margin: 2px 0px;
         text-align: left;
       }
+      .controls {
+        text-align: right;
+        padding: 15px;
+      }
+      .controls > span.material-symbols-outlined {
+        top: 0px;
+        font-size: 35px !important;
+        border-radius: 5px;
+        cursor: pointer;
+      }
       .header b, .header kbd.title {
         margin-right: 10px;
       }
@@ -112,6 +194,7 @@
         width: calc(100% - 20px); /* fix the thing with padding */
         min-height: 50px;
         margin: 5px 0px;
+        color: var(--system-black);
         padding: 0px 10px;
         text-align: left;
       }
@@ -122,15 +205,50 @@
         margin: 20px auto;
         border-radius: 7px;
       }
+      .med > .header
+      {
+        background-color: var(--system-yellow2);
+      }
+      .med
+      {
+        background-color: var(--system-yellow2)
+      }
+      .high > .header, .high {
+        background-color: var(--system-orange2);
+        outline: 2px solid var(--system-orange);
+        color: var(--system-orange);
+      }
+      .high > .header > kbd 
+      {
+        background-color: var(--system-orange2);
+      }
+      .high > .issueBody {
+        color: var(--system-black);
+        font-weight: 500;
+      }
+      .max > .header, .max {
+        background-color: var(--system-red2);
+        outline: 2px solid var(--system-red);
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--system-red);
+      }
+      .max > .header > kbd 
+      {
+        background-color: var(--system-red2);
+      }
+      .max > .issueBody {
+        color: var(--system-red);
+        font-weight: 600;
+      }
     </style>
   </head>
-  <body onload = "globalOnload(); onLoad()">
+  <body onload = "globalOnload(()=>{onLoad()}); ">
     <div class="main_content">
       <header class="redrounded">
         <h2>IssueTracker</h2>
         <hr class="rounded">
       </header>
-      
       <details>
         <summary><p class="nobreak">New issue</p></summary><br>
         <div class="inpContainer">
@@ -138,6 +256,12 @@
           <div class="inp anim"></div>
         </div>
         <textarea id="body" placeholder="Detailed description..."></textarea>
+        <p class="blu fsmed nohover rounded">Additional information</p>
+        <p class="blu fssml nohover szFull" style=" margin: 10px; text-align: left">Priority level (Administrator config)</p>
+        <div class="inpContainer">
+          <input id="priority" disabled type="number" min=1 max=10 step=1 id="priority" value=1 placeholder="(1-10)"/>
+          <div class="anim inp"></div>
+        </div>
         <button class="btn blu fssml sz100" onclick="newIssue()">
           <span class="material-symbols-outlined">add_circle</span>
           Post issue
@@ -152,11 +276,11 @@
       <div id="issueArea">
       </div>
       <nav class="flex addMargin">
-        <button class="btn fssml szHalf" onclick="goBack()">
+        <button class="btn fssml szHalf" id="back" onclick="goBack()">
          <span class="material-symbols-outlined">arrow_back</span>
           Previous page
         <div class="anim"></div></button>
-        <button class="btn fssml szHalf" onclick="goForward()">
+        <button class="btn fssml szHalf" id="next" onclick="goForward()">
          <span class="material-symbols-outlined">arrow_forward</span>
           Next page
         <div class="anim"></div></button>

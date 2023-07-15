@@ -634,8 +634,9 @@ footer, #footer {
 }
 
 #compliance {
-  transition: all 1s ease; /*cubic-bezier( 1, 0.33, 0.3, 1.24 );/*ease;*/
-  transition-delay: .5s;
+  transition: all 0.4s ease; /*cubic-bezier( 1, 0.33, 0.3, 1.24 );/*ease;*/
+  transition-delay: .1s;
+  height: 0px;
   position: absolute;
   padding: 60px;
 /*   top: 100vh; */
@@ -835,5 +836,7 @@ summary::marker {
   padding: 10px;
   border-radius: 7px;
   min-width: 500px;
-  min-height: 300px;
+  height: 300px;
+  /* max-height: 500px; */
+  overflow-y: auto;
 }

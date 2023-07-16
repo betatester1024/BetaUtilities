@@ -530,12 +530,27 @@ function makeRequest(action, token, data, sessID, callback) {
         });
         break;
       case "newIssue":
-        (0, import_issuetracker.newIssue)(data.title, data.body, token, sessID).then((obj) => {
+        (0, import_issuetracker.newIssue)(data.title, data.body, data.priority, data.tags ?? [], token, sessID).then((obj) => {
           callback(obj.status, obj.data, obj.token);
         });
         break;
       case "loadIssues":
-        (0, import_issuetracker.loadIssues)(data.from, data.to, token).then((obj) => {
+        (0, import_issuetracker.loadIssues)(data.from, data.ct, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "deleteissue":
+        (0, import_issuetracker.deleteIssue)(data.id, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "completeissue":
+        (0, import_issuetracker.completeIssue)(data.id, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "editissue":
+        (0, import_issuetracker.editIssue)(data.id, data.newTitle, data.newBody, data.newPriority, data.tags ?? [], token).then((obj) => {
           callback(obj.status, obj.data, obj.token);
         });
         break;

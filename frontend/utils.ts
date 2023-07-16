@@ -10,6 +10,7 @@ function byClass(name:string, ct:number=0) {
 
 let HASNETWORK = false;
 let branch = "STABLE";
+let userData = null;
 async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
 
   if (!networkLess) {
@@ -51,6 +52,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
   if (!networkLess) {
   send(JSON.stringify({ action: "userRequest" }),
     (res) => {
+      userData = res.data;
       if (res.data.branch) branch = res.data.branch;
       document.documentElement.className = res.data.darkQ?"dark":"";
       console.log("Dark mode toggle:",res.data.darkQ);
@@ -107,6 +109,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
               // console.log("thing");
               let cpl = document.getElementById("compliance");
               cpl.style.opacity="1";
+              cpl.style.height="auto";
               cpl.style.pointerEvents="auto";
               // document.getElementById("compliance").style.top="unset";
             }
@@ -157,7 +160,7 @@ function pointerUp(ev:PointerEvent)
   if (ev.target.nodeName == "SPAN" && ev.target.parentElement &&
       ev.target.parentElement.parentElement &&
       ev.target.parentElement.parentElement.parentElement &&
-      ev.target.parentElement.parentElement.parentElement.className == "ALERT_NONBLOCKING")  
+      ev.target.parentElement.parentElement.parentElement.className == "ALERT_NONBLOCK")  
     closeNBD(ev.target.parentElement.parentElement.parentElement, false)
 }
 function pointerMove(ev:PointerEvent) 
@@ -290,10 +293,10 @@ function nonBlockingDialog(str:string, callback:()=>any = ()=>{}, text:string="C
 }
 
 function closeNBD(ele:HTMLElement, confirmQ:boolean) {
-  console.log(ele);
+  // console.log(ele);
   ele.style.opacity="0";
   ele.style.pointerEvents = "none";
-  if (confirmQ) ele.callback();
+  if (confirmQ) ele.callback(ele.querySelector(".content"));
 }
 
 // let TIME:NodeJS.Timeout|null;

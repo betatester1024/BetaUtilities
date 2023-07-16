@@ -8,6 +8,7 @@ function byClass(name, ct = 0) {
 }
 let HASNETWORK = false;
 let branch = "STABLE";
+let userData = null;
 async function globalOnload(cbk, networkLess = false) {
   if (!networkLess) {
     var script = document.createElement("script");
@@ -35,6 +36,7 @@ async function globalOnload(cbk, networkLess = false) {
     send(
       JSON.stringify({ action: "userRequest" }),
       (res) => {
+        userData = res.data;
         if (res.data.branch)
           branch = res.data.branch;
         document.documentElement.className = res.data.darkQ ? "dark" : "";
@@ -87,6 +89,7 @@ async function globalOnload(cbk, networkLess = false) {
               if (res3.data.toString() == "false") {
                 let cpl = document.getElementById("compliance");
                 cpl.style.opacity = "1";
+                cpl.style.height = "auto";
                 cpl.style.pointerEvents = "auto";
               } else {
                 let cpl = document.getElementById("compliance");
@@ -130,7 +133,7 @@ function pointerUp(ev) {
   DRAGGING = null;
   origLeft = -1;
   origTop = -1;
-  if (ev.target.nodeName == "SPAN" && ev.target.parentElement && ev.target.parentElement.parentElement && ev.target.parentElement.parentElement.parentElement && ev.target.parentElement.parentElement.parentElement.className == "ALERT_NONBLOCKING")
+  if (ev.target.nodeName == "SPAN" && ev.target.parentElement && ev.target.parentElement.parentElement && ev.target.parentElement.parentElement.parentElement && ev.target.parentElement.parentElement.parentElement.className == "ALERT_NONBLOCK")
     closeNBD(ev.target.parentElement.parentElement.parentElement, false);
 }
 function pointerMove(ev) {
@@ -248,11 +251,10 @@ function nonBlockingDialog(str, callback = () => {
   </button>`;
 }
 function closeNBD(ele, confirmQ) {
-  console.log(ele);
   ele.style.opacity = "0";
   ele.style.pointerEvents = "none";
   if (confirmQ)
-    ele.callback();
+    ele.callback(ele.querySelector(".content"));
 }
 let ALERTOPEN = false;
 function alertDialog(str, callback = () => {

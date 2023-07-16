@@ -239,10 +239,10 @@ export function sendMsg(msg: string, room: string, parent: number, token: string
       supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, parent: parent, content: msg } }));
     }
     //console.log(supportHandler.allRooms);
-    console.log(supportHandler.allRooms);
+    // console.log(supportHandler.allRooms);
     for (let i = 0; i < supportHandler.allRooms.length; i++) {
       if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
-        console.log(supportHandler.allRooms[i].handler)
+        // console.log(supportHandler.allRooms[i].handler)
         supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token))
       }
 

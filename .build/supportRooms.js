@@ -240,10 +240,8 @@ function sendMsg(msg, room, parent, token, callback) {
     } else {
       supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, parent, content: msg } }));
     }
-    console.log(supportHandler.allRooms);
     for (let i = 0; i < supportHandler.allRooms.length; i++) {
       if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
-        console.log(supportHandler.allRooms[i].handler);
         supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token));
       }
     }

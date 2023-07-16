@@ -108,6 +108,7 @@ async function initClient()
         STARTID=message.data.id;
         // alert("lcMatchId updated"+ STARTID);
       }
+      console.log("Fixing awaitingParent.")
       fixAwaitingParent();
       thing.scrollTop = thing.scrollTop+1;
     }    
@@ -372,33 +373,19 @@ let loadStatus = -1;
 
 function fixAwaitingParent() 
 {
+  console.log(awaitingParent);
   for (let i=0; i<awaitingParent.length; i++) {
     if (byId(awaitingParent[i].parent)) {
       let ctner = byId(awaitingParent[i].parent);
       if (!byId(awaitingParent[i].ele.id)) {// do not add if it has already been added
-        // console.log(ctner.children.length)
-        // if (ctner.children.length==1) {
-        //   console.log("added", awaitingParent[i].ele)
-        //   ctner.appendChild(awaitingParent[i].ele);
-        // }
-        // else {
-        //   for (let j=1; j<ctner.children.length; j++) {
-        //     console.log("id:",ctner.children[j].id)
-        //     if (ctner.children[j].id>awaitingParent[i].ele.id) {
-        //       console.log("added", awaitingParent[i].ele.id, awaitingParent[i].ele)
-        //       ctner.insertBefore(awaitingParent[i].ele, ctner.children[j]);
-        //       break;
-        //     }
-        //   }
-        // }
-        // if (PREPENDFLAG) ctner.prepend(awaitingParent[i].ele);
         ctner.appendChild(awaitingParent[i].ele);
+        console.log("actually added", awaitingParent[i].ele);
       }
       else console.log("didnt'actually add")
       // console.log("added");
       awaitingParent.splice(i, 1);
       console.log(awaitingParent);
-      i=0;
+      i=-1;
     }
   }
 }

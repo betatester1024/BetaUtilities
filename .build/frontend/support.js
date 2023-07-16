@@ -103,6 +103,7 @@ async function initClient() {
           loadStatus = -1;
           STARTID = message.data.id;
         }
+        console.log("Fixing awaitingParent.");
         fixAwaitingParent();
         thing.scrollTop = thing.scrollTop + 1;
       }
@@ -309,16 +310,18 @@ function onScroll() {
 }
 let loadStatus = -1;
 function fixAwaitingParent() {
+  console.log(awaitingParent);
   for (let i = 0; i < awaitingParent.length; i++) {
     if (byId(awaitingParent[i].parent)) {
       let ctner = byId(awaitingParent[i].parent);
       if (!byId(awaitingParent[i].ele.id)) {
         ctner.appendChild(awaitingParent[i].ele);
+        console.log("actually added", awaitingParent[i].ele);
       } else
         console.log("didnt'actually add");
       awaitingParent.splice(i, 1);
       console.log(awaitingParent);
-      i = 0;
+      i = -1;
     }
   }
 }

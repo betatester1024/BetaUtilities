@@ -251,6 +251,7 @@ function sendMsg(msg, room, parent, token, callback) {
 async function sendMsg_B(msg, room) {
   let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room });
   let msgCt = roomData ? roomData.msgCt : 0;
+  let threadCt = roomData ? roomData.threadCt ?? 0 : 0;
   let betaNick = "";
   for (let i = 0; i < supportHandler.allRooms.length; i++) {
     if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
@@ -258,6 +259,9 @@ async function sendMsg_B(msg, room) {
       break;
     }
   }
+  await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
+    $inc: { msgCt: 1, threadCt: 1 }
+  }, { upsert: true });
   console.log(msg);
   await import_consts.msgDB.insertOne({
     fieldName: "MSG",
@@ -266,7 +270,9 @@ async function sendMsg_B(msg, room) {
     sender: betaNick,
     expiry: Date.now() + 3600 * 1e3 * 24 * 30,
     room,
-    msgID: msgCt
+    msgID: msgCt,
+    parent: -1,
+    threadID: threadCt
   });
   await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
     $inc: { msgCt: 1 }

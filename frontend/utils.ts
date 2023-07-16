@@ -293,10 +293,10 @@ function nonBlockingDialog(str:string, callback:()=>any = ()=>{}, text:string="C
 }
 
 function closeNBD(ele:HTMLElement, confirmQ:boolean) {
-  console.log(ele);
+  // console.log(ele);
   ele.style.opacity="0";
   ele.style.pointerEvents = "none";
-  if (confirmQ) ele.callback(ele);
+  if (confirmQ) ele.callback(ele.querySelector(".content"));
 }
 
 // let TIME:NodeJS.Timeout|null;

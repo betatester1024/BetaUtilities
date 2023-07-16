@@ -27,6 +27,7 @@
       }
       let FROM=0, ISSUECT = 0;
       let MINID, MAXID;
+      let TOTALMINID = 0;
       function onLoad() 
       {
         let u = new URL(document.URL);
@@ -34,7 +35,7 @@
         ISSUECT = Number(u.searchParams.get("ct")??20);
         if (FROM < 0) FROM = 1;
         if (ISSUECT<0) ISSUECT = 20;
-        byId("showing").innerText = "Showing "+ISSUECT+" issues from #"+FROM;
+        byId("showing").innerHTML = `Showing "+ISSUECT+" issues from #"+FROM`;
         if (!userData.error && userData.perms >= 2) byId("priority").disabled=false;
         else byId("priority").className = "disabled";
         loadIssues();
@@ -114,10 +115,13 @@
               byId("next").className += " disabled";
               byId("next").disabled=true;
             }
-            if (res.data.issues.length < ISSUECT) {
-              byId("next").className += " disabled";
-              byId("next").disabled=true;
+            TOTALMINID = res.data.minID;
+            if (res.data.issues.length == 0 || 
+                res.data.issues[0].id <= res.data.minID) {
+              byId("prev").className += " disabled";
+              byId("prev").disabled=true;
             }
+            
           }
         })
       }
@@ -137,13 +141,13 @@
         send(JSON.stringify({action:"completeissue", data:{id:issueele.id}}), (res)=>{
           if (res.status != "SUCCESS") {alertDialog("Error: "+res.data.error, ()=>{}); return;}
           issueele.remove();
-          alertDialog("Issue completed!", ()=>{});
+          alertDialog("Issue completed!", ()=>{loadIssues()});
         });
       }
       function editissue(ele) {
         let issueele = ele.parentElement.parentElement;
         nonBlockingDialog(`
-        <div style="font-family:'Noto Sans Display';">
+        <div style="font-family:'Noto Sans Display';" id="E${issueele.id}">
           <p class="nobreak fsmed">Update issue #${issueele.id}</p>
           <div class="inpContainer szFull" style="margin: 0px;">
           <p class="nobreak fssml" style="margin: 0px;">Update title:</p>
@@ -160,7 +164,21 @@
             <div class="anim inp"></div>
           </div>
         </div>
-        `, ()=>{});
+        `, (ele2)=>{sendEdits(ele2, issueele.id)});
+      }
+      function sendEdits(ele, id) 
+      {
+        // console.log(ele);
+        let newTitle = ele.querySelector("div").querySelector("input#title");
+        let newContainer = ele.querySelector("div").querySelector("textarea#body");
+        let newPrio = ele.querySelector("div").querySelector("input#priority");
+        send(JSON.stringify({action:"editissue", data:{newTitle:newTitle.value, newBody:newContainer.value, newPriority:newPrio.value, id:newTitle.parentElement.id}}), (res)=>{
+          if (res.status != "SUCCESS") {alertDialog("Error: "+res.data.error, ()=>{}); return;}
+          alertDialog("Issue edited!", ()=>{
+            loadIssues();
+          })
+        })
+        console.log(newTitle.value,"|", newContainer.value, "|", newPrio.value);
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -272,11 +290,18 @@
           Refresh listing
         <div class="anim"></div></button><br>
       <b id="showing" class="blu nohover fsmed">Showing issues #LOADING to #LOADING</b>
+     <div class="inpContainer">
+        <label class="inpContainer">
+          <input id="ckInp" type="checkbox">
+          <span class="blu nohover fsmed">Only show completed issues</span>
+          <div class="anim inp"></div>
+        </label>
+      </div>
       <hr class="rounded" id="hr">
       <div id="issueArea">
       </div>
       <nav class="flex addMargin">
-        <button class="btn fssml szHalf" id="back" onclick="goBack()">
+        <button class="btn fssml szHalf" id="prev" onclick="goBack()">
          <span class="material-symbols-outlined">arrow_back</span>
           Previous page
         <div class="anim"></div></button>

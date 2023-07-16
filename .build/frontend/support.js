@@ -100,10 +100,10 @@ async function initClient() {
             thing.prepend(errorEle);
           }
         } else {
-          fixAwaitingParent();
           loadStatus = -1;
           STARTID = message.data.id;
         }
+        fixAwaitingParent();
         thing.scrollTop = thing.scrollTop + 1;
       }
       if (message.action == "removeUser") {

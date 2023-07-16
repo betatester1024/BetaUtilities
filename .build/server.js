@@ -530,7 +530,7 @@ function makeRequest(action, token, data, sessID, callback) {
         });
         break;
       case "newIssue":
-        (0, import_issuetracker.newIssue)(data.title, data.body, data.priority, data.tags, token, sessID).then((obj) => {
+        (0, import_issuetracker.newIssue)(data.title, data.body, data.priority, data.tags ?? [], token, sessID).then((obj) => {
           callback(obj.status, obj.data, obj.token);
         });
         break;
@@ -546,6 +546,11 @@ function makeRequest(action, token, data, sessID, callback) {
         break;
       case "completeissue":
         (0, import_issuetracker.completeIssue)(data.id, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
+      case "editissue":
+        (0, import_issuetracker.editIssue)(data.id, data.newTitle, data.newBody, data.newPriority, data.tags ?? [], token).then((obj) => {
           callback(obj.status, obj.data, obj.token);
         });
         break;

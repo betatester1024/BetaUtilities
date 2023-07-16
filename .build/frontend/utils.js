@@ -251,11 +251,10 @@ function nonBlockingDialog(str, callback = () => {
   </button>`;
 }
 function closeNBD(ele, confirmQ) {
-  console.log(ele);
   ele.style.opacity = "0";
   ele.style.pointerEvents = "none";
   if (confirmQ)
-    ele.callback(ele);
+    ele.callback(ele.querySelector(".content"));
 }
 let ALERTOPEN = false;
 function alertDialog(str, callback = () => {

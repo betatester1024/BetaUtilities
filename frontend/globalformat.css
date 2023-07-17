@@ -309,7 +309,7 @@ div.anim.inp {
 input, select {
   outline: 2.3px solid var(--system-bg);
   background-color: var(--system-grey2);
-  height: 50px;
+  height: 55px;
   outline: none;
   border: none;
   font-size: 40px;

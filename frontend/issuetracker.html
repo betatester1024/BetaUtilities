@@ -36,20 +36,26 @@
         if (FROM < 0) FROM = 1;
         if (ISSUECT<0) ISSUECT = 20;
         byId("showing").innerHTML = `Showing 
-        <div class="inpContainer">
-          <select onchange="updateIssueCt()" style="width: 90px;">
-          <option disabled value='${ISSUECT}'>${ISSUECT}</option>
+        <div class="inpContainer" style="width: unset; display: inline-block; margin: 5px;">
+          <select id="sel" onchange="updateIssueCt()" style="width: 90px;">
+          <option disabled selected value='${ISSUECT}'>${ISSUECT}</option>
           <option value="5">5</option>
           <option value="10">10</option>
           <option value="20">20</option>
           <option value="50">50</option>
           </select> 
+          <div class="anim inp"></div>
         </div>
         issues from #
-          <input id="fromInp" value="${FROM}" style="width: unset;" placeholder="From ID" class="szThird" size="2">`;
+          <input id="fromInp" type="number" min='0' value="${FROM}" style="width: unset;" placeholder="From ID" class="szThird" size="2">`;
         if (!userData.error && userData.perms >= 2) byId("priority").disabled=false;
         else byId("priority").className = "disabled";
         loadIssues();
+      }
+
+      function updateIssueCt() 
+      {
+        location.href="?from="+(MINID)+"&ct="+byId("sel").value;
       }
 
       function goForward() 

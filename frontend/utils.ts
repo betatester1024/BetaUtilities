@@ -201,6 +201,7 @@ function decodeStatus(status:number) {
     case 403: return "Forbidden"
     case 401: return "Unauthorised"
     case 400: return "Invalid request"
+    case 413: return "Request too large"
     case 500: 
     case 503:
       return "Internal Server Error"
@@ -492,7 +493,8 @@ const tips = ["Press <kbd>/</kbd> to access the navigation menu.", "🧀",
              "Don't worry! It's fine... We can fix it!",
              "Have you tried placebo-ing yourself?",
              "If you fall down and can't get up, fall upwards.",
-             "Tofu is solidified bean water. On that note, try Humanity(r) Bean Water today!"]
+             "Tofu is solidified bean water. On that note, try Humanity(r) Bean Water today!",
+             "The void orb watches over you."]
 addEventListener("DOMContentLoaded", function() {
   overlay = document.createElement("div");
   overlay.className = "overlayLoader"

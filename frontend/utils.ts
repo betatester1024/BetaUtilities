@@ -12,7 +12,7 @@ let HASNETWORK = false;
 let branch = "STABLE";
 let userData = null;
 async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
-
+  
   if (!networkLess) {
     var script = document.createElement('script');
     script.src = "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js";
@@ -54,6 +54,9 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
     (res) => {
       userData = res.data;
       if (res.data.branch) branch = res.data.branch;
+      if (branch == "unstable") {
+        byClass("main_content").width = 
+      }
       document.documentElement.className = res.data.darkQ?"dark":"";
       console.log("Dark mode toggle:",res.data.darkQ);
       // let overlay = document.getElementById("overlayL");
@@ -482,7 +485,8 @@ let overlay:HTMLDivElement;
 const tips = ["Press <kbd>/</kbd> to access the navigation menu.", "🧀", 
               "Have you tried turning it off and on again?", "Use <kbd>space</kbd> to start/stop timer/stopwatch.",
               "Press <kbd>E</kbd> to edit the timer.", "Press <kbd>R</kbd> to reset the timer/stopwatch.",
-              "Try <a href='/clickit'>ClickIt</a> today!"]
+              "Try <a href='/clickit'>ClickIt</a> today!",
+             "Your insanity will pay off. Eventually."]
 addEventListener("DOMContentLoaded", function() {
   overlay = document.createElement("div");
   overlay.className = "overlayLoader"

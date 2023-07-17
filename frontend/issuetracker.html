@@ -35,7 +35,18 @@
         ISSUECT = Number(u.searchParams.get("ct")??20);
         if (FROM < 0) FROM = 1;
         if (ISSUECT<0) ISSUECT = 20;
-        byId("showing").innerHTML = `Showing "+ISSUECT+" issues from #"+FROM`;
+        byId("showing").innerHTML = `Showing 
+        <div class="inpContainer">
+          <select onchange="updateIssueCt()" style="width: 90px;">
+          <option disabled value='${ISSUECT}'>${ISSUECT}</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          </select> 
+        </div>
+        issues from #
+          <input id="fromInp" value="${FROM}" style="width: unset;" placeholder="From ID" class="szThird" size="2">`;
         if (!userData.error && userData.perms >= 2) byId("priority").disabled=false;
         else byId("priority").className = "disabled";
         loadIssues();
@@ -127,12 +138,15 @@
       }
       function deleteissue(ele) 
       {
-        let issueele = ele.parentElement.parentElement;
-        send(JSON.stringify({action:"deleteissue", data:{id:issueele.id}}), (res)=>{
-          if (res.status != "SUCCESS") {alertDialog("Error: "+res.data.error, ()=>{}); return;}
-          issueele.remove();
-          alertDialog("Issue deleted!", ()=>{});
-        });
+        alertDialog("Confirm deletion?", ()=>{
+          let issueele = ele.parentElement.parentElement;
+          send(JSON.stringify({action:"deleteissue", data:{id:issueele.id}}), (res)=>{
+            if (res.status != "SUCCESS") {alertDialog("Error: "+res.data.error, ()=>{}); return;}
+            issueele.remove();
+            alertDialog("Issue deleted!", ()=>{});
+          });
+        }, true);
+        
       }
 
       function complete(ele) 

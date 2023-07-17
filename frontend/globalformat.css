@@ -309,10 +309,10 @@ div.anim.inp {
 input, select {
   outline: 2.3px solid var(--system-bg);
   background-color: var(--system-grey2);
-  height: 1.6em;
+  height: 50px;
   outline: none;
   border: none;
-  font-size: 2.5em;
+  font-size: 40px;
   font-weight: 500;
   color: var(--system-blue);
   font-family: 'Noto Sans Display';

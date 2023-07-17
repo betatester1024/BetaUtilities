@@ -486,7 +486,13 @@ const tips = ["Press <kbd>/</kbd> to access the navigation menu.", "🧀",
               "Have you tried turning it off and on again?", "Use <kbd>space</kbd> to start/stop timer/stopwatch.",
               "Press <kbd>E</kbd> to edit the timer.", "Press <kbd>R</kbd> to reset the timer/stopwatch.",
               "Try <a href='/clickit'>ClickIt</a> today!",
-             "Your insanity will pay off. Eventually."]
+             "Your insanity will pay off. Eventually.",
+             "Don't be a not-water-needer. You won't last a week.",
+             "<i>Don't</i> eat the void orb.",
+             "Don't worry! It's fine... We can fix it!",
+             "Have you tried placebo-ing yourself?",
+             "If you fall down and can't get up, fall upwards.",
+             "Tofu is solidified bean water. On that note, try Humanity(r) Bean Water today!"]
 addEventListener("DOMContentLoaded", function() {
   overlay = document.createElement("div");
   overlay.className = "overlayLoader"

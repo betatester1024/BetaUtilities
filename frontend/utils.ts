@@ -55,7 +55,15 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
       userData = res.data;
       if (res.data.branch) branch = res.data.branch;
       if (branch == "unstable") {
-        byClass("main_content").width = 
+        let mainContent = byClass("main_content");
+        mainContent.style.width = "calc(100% - 30px)";
+        mainContent.style.margin = "0px";
+        let box = document.createElement("p");
+        box.className = "sidebar-unstable";
+        box.innerHTML = `<span class="material-symbols-outlined">warning</span>\
+        Unstable version. Features may be unfinished or broken. 
+        <a class="grn" href="https://betatester1024.repl.co">Switch to stable branch</a>`;
+        document.body.appendChild(box);
       }
       document.documentElement.className = res.data.darkQ?"dark":"";
       console.log("Dark mode toggle:",res.data.darkQ);

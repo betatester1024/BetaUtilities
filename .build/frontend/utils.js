@@ -39,6 +39,16 @@ async function globalOnload(cbk, networkLess = false) {
         userData = res.data;
         if (res.data.branch)
           branch = res.data.branch;
+        if (branch == "unstable") {
+          let mainContent = byClass("main_content");
+          mainContent.style.width = "calc(100% - 30px)";
+          mainContent.style.margin = "0px";
+          let box = document.createElement("p");
+          box.className = "sidebar-unstable";
+          box.innerHTML = `<span class="material-symbols-outlined">warning</span>        Unstable version. Features may be unfinished or broken. 
+        <a class="grn" href="https://betatester1024.repl.co">Switch to stable branch</a>`;
+          document.body.appendChild(box);
+        }
         document.documentElement.className = res.data.darkQ ? "dark" : "";
         console.log("Dark mode toggle:", res.data.darkQ);
         let maincontent = document.getElementsByClassName("main_content").item(0);
@@ -173,6 +183,8 @@ function decodeStatus(status) {
       return "Unauthorised";
     case 400:
       return "Invalid request";
+    case 413:
+      return "Request too large";
     case 500:
     case 503:
       return "Internal Server Error";
@@ -402,7 +414,15 @@ const tips = [
   "Use <kbd>space</kbd> to start/stop timer/stopwatch.",
   "Press <kbd>E</kbd> to edit the timer.",
   "Press <kbd>R</kbd> to reset the timer/stopwatch.",
-  "Try <a href='/clickit'>ClickIt</a> today!"
+  "Try <a href='/clickit'>ClickIt</a> today!",
+  "Your insanity will pay off. Eventually.",
+  "Don't be a not-water-needer. You won't last a week.",
+  "<i>Don't</i> eat the void orb.",
+  "Don't worry! It's fine... We can fix it!",
+  "Have you tried placebo-ing yourself?",
+  "If you fall down and can't get up, fall upwards.",
+  "Tofu is solidified bean water. On that note, try Humanity(r) Bean Water today!",
+  "The void orb watches over you."
 ];
 addEventListener("DOMContentLoaded", function() {
   overlay = document.createElement("div");

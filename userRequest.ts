@@ -29,3 +29,9 @@ export async function extendSession(token:string) {
   await authDB.updateOne({fieldName:"Token", token:token}, {$set:{expiry:newExpiry}});
   return {status:"SUCCESS", data: {expiry: newExpiry}, token:token};
 }
+
+
+export async function userListing(token:string) 
+{
+  
+}

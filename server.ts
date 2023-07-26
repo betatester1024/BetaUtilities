@@ -232,12 +232,20 @@ export async function initServer() {
     incrRequests();
   })
   
-  
+
+  const banList= ["172.31.196.1"];
   app.post('/server', urlencodedParser, async (req:any, res:any) => {
     incrRequests();
     if (req.headers['content-length'] > 60000) {
       res.set("Connection", "close");
       res.status(413).end();
+      return;
+    }
+    let addr = req.headers['x-forwarded-for'].match(":([^:]*)$")[1]; 
+    console.log(addr);
+    if (banList.indexOf(addr) >= 0) 
+    {
+      res.end(JSON.stringify({status:"ERROR", data:{error: "IP banned, contact BetaOS if this was done in error."}}));
       return;
     }
     var body = await parse.json(req);

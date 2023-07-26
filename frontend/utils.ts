@@ -111,7 +111,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
         (res) => {
           
           if (res.status != "SUCCESS") {
-            alertDialog("Database connection failure. Please contact BetaOS.", ()=>{});
+            alertDialog("Database connection failure. Please contact BetaOS. Error: "+res.data.error, ()=>{});
             ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`
           }// this means the database died 
           document.getElementById("footer").innerHTML += " | <kbd>Total requests made: "+res.data.data+"</kbd>";

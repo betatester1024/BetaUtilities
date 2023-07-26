@@ -90,7 +90,7 @@ async function globalOnload(cbk, networkLess = false) {
           JSON.stringify({ action: "visits" }),
           (res2) => {
             if (res2.status != "SUCCESS") {
-              alertDialog("Database connection failure. Please contact BetaOS.", () => {
+              alertDialog("Database connection failure. Please contact BetaOS. Error: " + res2.data.error, () => {
               });
               ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`;
             }

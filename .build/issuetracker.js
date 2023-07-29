@@ -28,6 +28,8 @@ module.exports = __toCommonJS(issuetracker_exports);
 var import_consts = require("./consts");
 var import_userRequest = require("./userRequest");
 async function newIssue(title, body, prio, tags, token, sessID, existingID = -1) {
+  if (body.length == 0)
+    body = "(No description provided)";
   if (title.length == 0 || body.length == 0)
     return { status: "ERROR", data: { error: "Please provide a title and a description." }, token };
   let data = await import_consts.issueDB.findOne({ fieldName: "MetaData" });
@@ -50,9 +52,9 @@ async function newIssue(title, body, prio, tags, token, sessID, existingID = -1)
     await import_consts.issueDB.insertOne({ fieldName: "MetaData", issueCt: 1 });
   return { status: "SUCCESS", data: { id: data.issueCt + 1 }, token };
 }
-async function loadIssues(from, ct, token) {
-  let out = await import_consts.issueDB.find({ fieldName: "Issue", id: { $gte: from } }).sort({ id: 1 }).limit(ct).toArray();
-  let minIssue = await import_consts.issueDB.find({ fieldName: "Issue" }).sort({ id: 1 }).limit(1).toArray();
+async function loadIssues(from, ct, completedOnly, token) {
+  let out = await import_consts.issueDB.find({ fieldName: completedOnly ? "CompletedIssue" : "Issue", id: { $gte: from } }).sort({ id: 1 }).limit(ct).toArray();
+  let minIssue = await import_consts.issueDB.find({ fieldName: completedOnly ? "CompletedIssue" : "Issue" }).sort({ id: 1 }).limit(1).toArray();
   return { status: "SUCCESS", data: { issues: out, minID: minIssue.length > 0 ? minIssue[0].id : 9999 }, token };
 }
 async function deleteIssue(id, token) {

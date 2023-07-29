@@ -12,7 +12,7 @@ let HASNETWORK = false;
 let branch = "STABLE";
 let userData = null;
 async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
-
+  
   if (!networkLess) {
     var script = document.createElement('script');
     script.src = "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js";
@@ -54,8 +54,19 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
     (res) => {
       userData = res.data;
       if (res.data.branch) branch = res.data.branch;
-      document.documentElement.className = res.data.darkQ?"dark":"";
-      console.log("Dark mode toggle:",res.data.darkQ);
+      if (branch == "unstable") {
+        let mainContent = byClass("main_content");
+        mainContent.style.width = "calc(100% - 30px)";
+        mainContent.style.margin = "0px";
+        let box = document.createElement("p");
+        box.className = "sidebar-unstable";
+        box.innerHTML = `<span class="material-symbols-outlined">warning</span>\
+        Unstable version. Features may be unfinished or broken. 
+        <a class="grn" href="https://betatester1024.repl.co">Switch to stable branch</a>`;
+        document.body.appendChild(box);
+      }
+      // document.documentElement.className = res.data.darkQ?"dark":"";
+      // console.log("Dark mode toggle:",res.data.darkQ);
       // let overlay = document.getElementById("overlayL");
       // if (overlay) {
       //   // overlay.style.left="0vh";
@@ -100,7 +111,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
         (res) => {
           
           if (res.status != "SUCCESS") {
-            alertDialog("Database connection failure. Please contact BetaOS.", ()=>{});
+            alertDialog("Database connection failure. Please contact BetaOS. Error: "+res.data.error, ()=>{});
             ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`
           }// this means the database died 
           document.getElementById("footer").innerHTML += " | <kbd>Total requests made: "+res.data.data+"</kbd>";
@@ -119,10 +130,10 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
               cpl.style.pointerEvents="none";
             }
             if (cbk) cbk();
-          });
-        });
+          }, true);
+        }, true);
       
-    });
+    }, true);
   }
   
   let ele2 = document.getElementById("overlay");
@@ -198,6 +209,7 @@ function decodeStatus(status:number) {
     case 403: return "Forbidden"
     case 401: return "Unauthorised"
     case 400: return "Invalid request"
+    case 413: return "Request too large"
     case 500: 
     case 503:
       return "Internal Server Error"
@@ -205,9 +217,9 @@ function decodeStatus(status:number) {
   return "Unknown error";
 }
 
-function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false) {
+function send(params: any, callback: (thing: any) => any, silentLoading:boolean=false) {
   let overlay = document.getElementById("overlayL");
-  if (overlay && !onLoadQ) {
+  if (overlay && !silentLoading) {
     console.log("overlay active")
     overlay.style.opacity="1";
     overlay.style.backgroundColor="var(--system-overlay)";
@@ -231,7 +243,7 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
       // if (failureTimeout) clearTimeout(failureTimeout);
       // else closeAlert(true);
       // failureTimeout = null;
-      alertDialog("Received status code " +xhr.status+" ("+decodeStatus(xhr.status)+") -- resend request?", ()=>{send(params, callback, onLoadQ);}, true);
+      alertDialog("Received status code " +xhr.status+" ("+decodeStatus(xhr.status)+") -- resend request?", ()=>{send(params, callback, silentLoading);}, true);
       
     }
     if (overlay) {
@@ -482,14 +494,23 @@ let overlay:HTMLDivElement;
 const tips = ["Press <kbd>/</kbd> to access the navigation menu.", "🧀", 
               "Have you tried turning it off and on again?", "Use <kbd>space</kbd> to start/stop timer/stopwatch.",
               "Press <kbd>E</kbd> to edit the timer.", "Press <kbd>R</kbd> to reset the timer/stopwatch.",
-              "Try <a href='/clickit'>ClickIt</a> today!"]
+              "Try <a href='/clickit'>ClickIt</a> today!",
+             "Your insanity will pay off. Eventually.",
+             "Don't be a not-water-needer. You won't last a week.",
+             "<i>Don't</i> eat the void orb.",
+             "Don't worry! It's fine... We can fix it!",
+             "Have you tried placebo-ing yourself?",
+             "If you fall down and can't get up, fall upwards.",
+             "Tofu is solidified bean water. On that note, try Humanity(r) Bean Water today!",
+             "The void orb watches over you."];
+
 addEventListener("DOMContentLoaded", function() {
   overlay = document.createElement("div");
   overlay.className = "overlayLoader"
   overlay.id = "overlayL";
   // overlay.style.left="0vh";
   overlay.style.backgroundColor="var(--system-overlay)";
-  overlay.style.opacity="1";
+  overlay.style.opacity="0"; // no more loader at start
   overlay.innerHTML = `<div id="overlayLContainer" style='pointer-events:auto;'>
   <p class="fslg grn nohover">Loading.</p>
   <span class="material-symbols-outlined loader">sync</span>

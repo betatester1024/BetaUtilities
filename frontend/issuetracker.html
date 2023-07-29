@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="{{mainClass}}">
   <head>
     <script src='./utils.js'></script>
     <title>IssueTracker | BetaOS Systems</title>
@@ -19,7 +19,7 @@
             byId("title").value="";
             byId("priority").value="";
             alertDialog("Successfully posted issue #"+res.data.id, ()=>{
-              location.href="?from="+(res.data.id)+"&ct="+ISSUECT
+              location.href="?from="+(res.data.id)+"&ct="+ISSUECT+"&completedOnly="+COMPLETEDONLY
             });
           }
         })
@@ -27,33 +27,54 @@
       }
       let FROM=0, ISSUECT = 0;
       let MINID, MAXID;
+      let COMPLETEDONLY = false;
       let TOTALMINID = 0;
       function onLoad() 
       {
         let u = new URL(document.URL);
         FROM = Number(u.searchParams.get("from")??1);
         ISSUECT = Number(u.searchParams.get("ct")??20);
+        console.log(u.searchParams);
+        COMPLETEDONLY = u.searchParams.get("completedOnly")=="true";
+        byId("ckInp").checked=COMPLETEDONLY
         if (FROM < 0) FROM = 1;
         if (ISSUECT<0) ISSUECT = 20;
-        byId("showing").innerHTML = `Showing "+ISSUECT+" issues from #"+FROM`;
+        byId("showing").innerHTML = `Showing 
+        <div class="inpContainer" style="width: unset; display: inline-block; margin: 5px;">
+          <select id="sel" onchange="" style="width: 90px;">
+          <option disabled selected value='${ISSUECT}'>${ISSUECT}</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          </select> 
+          <div class="anim inp"></div>
+        </div>
+        issues from #
+          <input id="fromInp" type="number" min='0' value="${FROM}" style="width: unset;" placeholder="From ID" class="szThird" size="2">`;
         if (!userData.error && userData.perms >= 2) byId("priority").disabled=false;
         else byId("priority").className = "disabled";
         loadIssues();
       }
 
+      function updateRanges() 
+      {
+        location.href="?from="+Number(byId("fromInp").value)+"&ct="+Number(byId("sel").value)+"&completedOnly="+byId("ckInp").checked;
+      }
+
       function goForward() 
       {
-        location.href="?from="+(MAXID+1)+"&ct="+ISSUECT
+        location.href="?from="+(MAXID+1)+"&ct="+ISSUECT+"&completedOnly="+COMPLETEDONLY
       }
 
       function goBack() 
       {
-        location.href="?from="+(MINID-ISSUECT-1)+"&ct="+ISSUECT;
+        location.href="?from="+(MINID-ISSUECT-1)+"&ct="+ISSUECT+"&completedOnly="+COMPLETEDONLY;
       }
       const colours = ["", "low", "low", "low", "med", "med", "med", "high", "high", "max", "max"];
       function loadIssues() 
       {
-        send(JSON.stringify({action:"loadIssues", data:{from:FROM, ct:ISSUECT}}), (res)=>{
+        send(JSON.stringify({action:"loadIssues", data:{from:FROM, ct:ISSUECT, completedOnly:COMPLETEDONLY}}), (res)=>{
           if (res.status != "SUCCESS") alertDialog("Failed to load issues: "+res.data.error, ()=>{});
           else {
             byId("issueArea").innerHTML = "";
@@ -111,12 +132,12 @@
               MINID = res.data.issues[0].id;
               MAXID = res.data.issues[res.data.issues.length-1].id;
             }
-            if (res.data.issues.length < ISSUECT) {
+            if (res.data.issues.length < ISSUECT) { // did not have enough issues to fill the page
               byId("next").className += " disabled";
               byId("next").disabled=true;
             }
             TOTALMINID = res.data.minID;
-            if (res.data.issues.length == 0 || 
+            if (MINID < res.data.minID || 
                 res.data.issues[0].id <= res.data.minID) {
               byId("prev").className += " disabled";
               byId("prev").disabled=true;
@@ -127,12 +148,15 @@
       }
       function deleteissue(ele) 
       {
-        let issueele = ele.parentElement.parentElement;
-        send(JSON.stringify({action:"deleteissue", data:{id:issueele.id}}), (res)=>{
-          if (res.status != "SUCCESS") {alertDialog("Error: "+res.data.error, ()=>{}); return;}
-          issueele.remove();
-          alertDialog("Issue deleted!", ()=>{});
-        });
+        alertDialog("Confirm deletion?", ()=>{
+          let issueele = ele.parentElement.parentElement;
+          send(JSON.stringify({action:"deleteissue", data:{id:issueele.id}}), (res)=>{
+            if (res.status != "SUCCESS") {alertDialog("Error: "+res.data.error, ()=>{}); return;}
+            issueele.remove();
+            alertDialog("Issue deleted!", ()=>{});
+          });
+        }, true);
+        
       }
 
       function complete(ele) 
@@ -156,7 +180,7 @@
           <div class="inp anim"></div>
           </div>
           <p class="nobreak fssml" style="margin: 0px;" >Update description:</p> 
-          <textarea id="body" placeholder="Detailed description...">${issueele.querySelector(".issueBody").innerHTML}</textarea>
+          <textarea id="body" placeholder="Detailed description (optional) ...">${issueele.querySelector(".issueBody").innerHTML}</textarea>
           <p class="blu fsmed nohover rounded" style="margin: 0px;">Additional information</p>
           <p class="blu fssml nohover szFull" style=" margin: 10px; text-align: left">Priority level (Administrator config)</p>
           <div class="inpContainer" style="margin: 0px;">
@@ -259,6 +283,18 @@
         color: var(--system-red);
         font-weight: 600;
       }
+
+      form
+      {
+        width: 80%;
+        margin: 0px auto;
+        /* margin:  */
+      }
+      form > div.inpContainer 
+      {
+        margin-left: 0px;
+        margin-right: 0px;
+      }
     </style>
   </head>
   <body onload = "globalOnload(()=>{onLoad()}); ">
@@ -273,7 +309,7 @@
           <input id="title" class="sml" placeholder="Enter a title...">
           <div class="inp anim"></div>
         </div>
-        <textarea id="body" placeholder="Detailed description..."></textarea>
+        <textarea id="body" placeholder="Detailed description (optional)..."></textarea>
         <p class="blu fsmed nohover rounded">Additional information</p>
         <p class="blu fssml nohover szFull" style=" margin: 10px; text-align: left">Priority level (Administrator config)</p>
         <div class="inpContainer">
@@ -289,14 +325,22 @@
          <span class="material-symbols-outlined">refresh</span>
           Refresh listing
         <div class="anim"></div></button><br>
-      <b id="showing" class="blu nohover fsmed">Showing issues #LOADING to #LOADING</b>
-     <div class="inpContainer">
+      <form action="javascript:updateRanges()" style="text-align: left;">
+        <b id="showing" class="blu nohover fsmed">Loading...</b>
+        <div class="inpContainer">
         <label class="inpContainer">
           <input id="ckInp" type="checkbox">
           <span class="blu nohover fsmed">Only show completed issues</span>
           <div class="anim inp"></div>
         </label>
-      </div>
+        </div>
+        <button class="btn fssml">
+          Go
+          <span class="material-symbols-outlined">arrow_forward</span>
+          <div class="anim"></div></button>
+        
+      </form>
+     
       <hr class="rounded" id="hr">
       <div id="issueArea">
       </div>

@@ -4,6 +4,7 @@ const app = express()
 const crypto = require("crypto");
 const parse = require("co-body");
 const fs = require('fs');
+import Handlebars from "handlebars";
  // for generating secure random #'s
 import {connectionSuccess} from './index';
 import {port, msgDB, authDB, frontendDir, roomRegex, rootDir, jsDir, uDB} from './consts';
@@ -28,6 +29,40 @@ import {supportHandler, roomRequest, sendMsg,
 const urlencodedParser = bodyParser.urlencoded({ extended: false }) 
 var RateLimit = require('express-rate-limit');
 
+async function getMainClass(token:string) 
+{
+  let res = await userRequest(token); 
+  if (res.status != "SUCCESS") return "";
+  else return res.data.darkQ?"dark":"";
+}
+
+function getToken(req:any) 
+{
+  return req.cookies.accountID;
+}
+
+function sendFile(res:any, token:string, filePath:string) 
+{
+  if (!filePath.match(/\.html$/)) {
+    // console.log(filePath);
+    res.sendFile(filePath); 
+    return;
+  }
+  else {
+    fs.readFile(filePath, 'utf8', async (err:an, fileContents:string) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      const template = Handlebars.compile(fileContents);
+      // console.log("is html");
+      res.set('Content-Type', 'text/html')
+      res.send(Buffer.from(template({mainClass: await getMainClass(token)})));
+      // console.log(data);
+    });
+  }
+} // sendFile
+
 export async function initServer() {
 
 
@@ -50,20 +85,21 @@ export async function initServer() {
   });
   app.use(limiter);
   app.use(new cookieParser());
+  app.enable('trust proxy');
   
   app.get('/', (req:Request, res:any) => {
-    res.sendFile(frontendDir+'/index.html');
+    sendFile(res, getToken(req), frontendDir+'/index.html');
     incrRequests();
   })
   
   app.get('/register', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/signup.html');
+    sendFile(res, getToken(req), frontendDir+'/signup.html');
     incrRequests();
   });
 
 
   app.get('/account', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/config.html');
+    sendFile(res, getToken(req), frontendDir+'/config.html');
     incrRequests();
   });
   
@@ -95,37 +131,37 @@ export async function initServer() {
     if (match) {
       if (!supportHandler.checkFoundQ(match[1])) {
         console.log("Room not found")
-        res.sendFile(frontendDir+"/room404.html");
+        sendFile(res, getToken(req), frontendDir+"/room404.html");
         return;
       }
-      else res.sendFile(frontendDir+'/support.html');
+      else sendFile(res, getToken(req), frontendDir+'/support.html');
     }
-    else res.sendFile(frontendDir+'/supportIndex.html');
+    else sendFile(res, getToken(req), frontendDir+'/supportIndex.html');
     incrRequests();
   });
 
   app.get('/accountDel', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/delAcc.html');
+    sendFile(res, getToken(req), frontendDir+'/delAcc.html');
     incrRequests();
   });
 
    app.get('/whois', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/aboutme.html');
+    sendFile(res, getToken(req), frontendDir+'/aboutme.html');
     incrRequests();
   });
 
   app.get("/cmd", urlencodedParser, async (req:any, res:any) => {
     makeRequest(req.query.action, req.cookies.accountID, null, (s:string, d:any, token:string)=>{
       console.log(d);
-      if (s == "SUCCESS") res.sendFile(frontendDir+'/actionComplete.html');
-      else {res.sendFile(frontendDir+'/error.html')}
+      if (s == "SUCCESS") sendFile(res, getToken(req), frontendDir+'/actionComplete.html');
+      else {sendFile(res, getToken(req), frontendDir+'/error.html')}
     })
     incrRequests();
   })
 
   app.get("*/nodemodules/*", (req:any, res:any) => {
     // fuck off with your long requests
-    if (req.url.length > 500) res.sendFile(frontendDir+"/404.html");
+    if (req.url.length > 500) sendFile(res, getToken(req), frontendDir+"/404.html");
     else res.sendFile(rootDir+"node_modules"+req.url.replace(/.*nodemodules/, ""));
     incrRequests();
   })
@@ -133,38 +169,38 @@ export async function initServer() {
 
 
   app.get("/paste", (req:any, res:any) => {
-    res.sendFile(frontendDir+"newpaste.html");
+    sendFile(res, getToken(req), frontendDir+"newpaste.html");
     incrRequests();
   })
   
   // app.get("/paste/", (req:any, res:any) => {
-  //   res.sendFile(frontendDir+"/newpaste.html");
+  //   sendFile(res, getToken(req), frontendDir+"/newpaste.html");
   //   incrRequests();
   // })
   
   app.get("/paste/*", (req:any, res:any) => {
-    res.sendFile(frontendDir+"paste.html");
+    sendFile(res, getToken(req), frontendDir+"paste.html");
     incrRequests();
   })
 
   
   app.get('*/favicon.ico', (req:Request, res:any)=> {
-    res.sendFile(rootDir+'favicon.ico')
+    sendFile(res, getToken(req), rootDir+'favicon.ico')
     incrRequests();
   })
 
   app.get('*/icon.png', (req:Request, res:any)=> {
-    res.sendFile(rootDir+'temp.png')
+    sendFile(res, getToken(req), rootDir+'temp.png')
     incrRequests();
   })
 
   app.get('*/notif.wav', (req:Request, res:any)=> {
-    res.sendFile(rootDir+'notif.wav')
+    sendFile(res, getToken(req), rootDir+'notif.wav')
     incrRequests();
   })
   
   app.get('/support.js', (req:any, res:any) => {
-    res.sendFile(frontendDir+"support.js");
+    sendFile(res, getToken(req), frontendDir+"support.js");
     incrRequests();
   })
 
@@ -212,7 +248,7 @@ export async function initServer() {
   });
 
   app.get('/redirector', (req:any, res:any)=>{
-    res.sendFile(rootDir+"/.github/pages/index.html");
+    sendFile(res, getToken(req), rootDir+"/.github/pages/index.html");
     incrRequests();
   });
   
@@ -222,17 +258,18 @@ export async function initServer() {
   })
 
   app.get('/*', (req:any, res:any) => {
-    let requrl = req.url.match("([^?]*)\\??.*")[1]
+    let requrl = req.url.match("([^?]*)\\??.*")[1]; // do not care about the stuff after the ?
     let idx = validPages.findIndex((obj)=>obj.toLowerCase()==requrl.toLowerCase());
-    if (idx>=0) res.sendFile(frontendDir+validPages[idx]+".html");
+    if (idx>=0) sendFile(res, getToken(req), frontendDir+validPages[idx]+".html");
     else {
       res.status(404);
-      res.sendFile(frontendDir+"404.html");
+      sendFile(res, getToken(req), frontendDir+"404.html");
     }
     incrRequests();
   })
   
-  
+
+  // const banList= ["172.31.196.1"];
   app.post('/server', urlencodedParser, async (req:any, res:any) => {
     incrRequests();
     if (req.headers['content-length'] > 60000) {
@@ -240,6 +277,13 @@ export async function initServer() {
       res.status(413).end();
       return;
     }
+    // let addr = req.headers['x-forwarded-for'].match(":([^:]*)$")[1]; 
+    // console.log(addr);
+    // if (banList.indexOf(addr) >= 0) 
+    // {
+    //   res.end(JSON.stringify({status:"ERROR", data:{error: "IP banned, contact BetaOS if this was done in error."}}));
+    //   return;
+    // }
     var body = await parse.json(req);
     if (!body) res.end(JSON.stringify({status:"ERROR", data:{error:"No command string"}}));
     // let cookiematch = req.cookies.match("accountID=[0-9a-zA-Z\\-]");
@@ -513,7 +557,7 @@ function makeRequest(action:string|null, token:string, data:any|null, sessID:str
         break;
       case "loadIssues":
         // console.log(sessID);
-        loadIssues(data.from, data.ct, token)
+        loadIssues(data.from, data.ct, data.completedOnly, token)
           .then((obj:{status:string, data:any, token:string})=>
             {callback(obj.status, obj.data, obj.token)});
         break;
@@ -544,9 +588,9 @@ function makeRequest(action:string|null, token:string, data:any|null, sessID:str
 }
 
 
-function eeFormat(data:string) {
+function eeFormat(data:string, mainClass:string) {
   return `<!DOCTYPE html>
-<html>
+<html class="${mainClass}">
   <head>
     <script src='./utils.js'></script>
     <title>Everyone Edits | BetaOS Systems</title>
@@ -595,7 +639,7 @@ function eeFormat(data:string) {
 
 function tooManyRequests() {
   return `<!DOCTYPE html>
-<html>
+<html class="{{mainClass}}">
   <head>
     <title>Error 429 | BetaOS Systems</title>
     <script>

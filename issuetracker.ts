@@ -2,6 +2,7 @@ import {issueDB} from './consts'
 import {userRequest} from './userRequest'
 export async function newIssue(title:string, body:string, prio:number, tags:string[], token:string, sessID:string, existingID:number=-1) 
 {
+  if (body.length == 0) body = "(No description provided)";
   if (title.length == 0 || body.length == 0) return {status:"ERROR", data:{error:"Please provide a title and a description."}, token:token}
   let data = await issueDB.findOne({fieldName:"MetaData"});
   let req = await userRequest(token);
@@ -21,10 +22,10 @@ export async function newIssue(title:string, body:string, prio:number, tags:stri
   return {status:"SUCCESS", data:{id:data.issueCt+1}, token:token};
 }
 
-export async function loadIssues(from:number, ct:number, token:string) 
+export async function loadIssues(from:number, ct:number, completedOnly:boolean, token:string) 
 {
-  let out = await issueDB.find({fieldName:"Issue", id:{$gte:from}}).sort({id:1}).limit(ct).toArray();
-  let minIssue = await issueDB.find({fieldName:"Issue"}).sort({id: 1}).limit(1).toArray();
+  let out = await issueDB.find({fieldName:completedOnly?"CompletedIssue":"Issue", id:{$gte:from}}).sort({id:1}).limit(ct).toArray();
+  let minIssue = await issueDB.find({fieldName:completedOnly?"CompletedIssue":"Issue"}).sort({id: 1}).limit(1).toArray();
   return {status:"SUCCESS", data:{issues:out, minID:(minIssue.length>0?minIssue[0].id:9999)}, token:token};
 }
 

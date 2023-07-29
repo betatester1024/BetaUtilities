@@ -12,7 +12,7 @@ export async function paste(content:string, loc:string, pwd:string, token:string
   let userData = await userRequest(token);
   
   let user = userData.status=="SUCCESS"?userData.data.user:null
-  pasteDB.insertOne({fieldName:"PASTE", data:encryptMessage(content, pwd), pwd:hashed, name:loc, author:user});
+  pasteDB.insertOne({fieldName:"PASTE", data:content, pwd:hashed, name:loc, author:user});
   return {status:"SUCCESS", data:null, token:token};
 }
 

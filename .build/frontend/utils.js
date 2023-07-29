@@ -39,8 +39,16 @@ async function globalOnload(cbk, networkLess = false) {
         userData = res.data;
         if (res.data.branch)
           branch = res.data.branch;
-        document.documentElement.className = res.data.darkQ ? "dark" : "";
-        console.log("Dark mode toggle:", res.data.darkQ);
+        if (branch == "unstable") {
+          let mainContent = byClass("main_content");
+          mainContent.style.width = "calc(100% - 30px)";
+          mainContent.style.margin = "0px";
+          let box = document.createElement("p");
+          box.className = "sidebar-unstable";
+          box.innerHTML = `<span class="material-symbols-outlined">warning</span>        Unstable version. Features may be unfinished or broken. 
+        <a class="grn" href="https://betatester1024.repl.co">Switch to stable branch</a>`;
+          document.body.appendChild(box);
+        }
         let maincontent = document.getElementsByClassName("main_content").item(0);
         let ftr = byId("ftrOverride") ?? document.createElement("footer");
         if (!byId("ftrOverride"))
@@ -80,7 +88,7 @@ async function globalOnload(cbk, networkLess = false) {
           JSON.stringify({ action: "visits" }),
           (res2) => {
             if (res2.status != "SUCCESS") {
-              alertDialog("Database connection failure. Please contact BetaOS.", () => {
+              alertDialog("Database connection failure. Please contact BetaOS. Error: " + res2.data.error, () => {
               });
               ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`;
             }
@@ -98,10 +106,12 @@ async function globalOnload(cbk, networkLess = false) {
               }
               if (cbk)
                 cbk();
-            });
-          }
+            }, true);
+          },
+          true
         );
-      }
+      },
+      true
     );
   }
   let ele2 = document.getElementById("overlay");
@@ -173,15 +183,17 @@ function decodeStatus(status) {
       return "Unauthorised";
     case 400:
       return "Invalid request";
+    case 413:
+      return "Request too large";
     case 500:
     case 503:
       return "Internal Server Error";
   }
   return "Unknown error";
 }
-function send(params, callback, onLoadQ = false) {
+function send(params, callback, silentLoading = false) {
   let overlay2 = document.getElementById("overlayL");
-  if (overlay2 && !onLoadQ) {
+  if (overlay2 && !silentLoading) {
     console.log("overlay active");
     overlay2.style.opacity = "1";
     overlay2.style.backgroundColor = "var(--system-overlay)";
@@ -197,7 +209,7 @@ function send(params, callback, onLoadQ = false) {
       callback(JSON.parse(xhr.responseText));
     } else if (xhr.readyState == 4 && xhr.status != 200) {
       alertDialog("Received status code " + xhr.status + " (" + decodeStatus(xhr.status) + ") -- resend request?", () => {
-        send(params, callback, onLoadQ);
+        send(params, callback, silentLoading);
       }, true);
     }
     if (overlay2) {
@@ -402,14 +414,22 @@ const tips = [
   "Use <kbd>space</kbd> to start/stop timer/stopwatch.",
   "Press <kbd>E</kbd> to edit the timer.",
   "Press <kbd>R</kbd> to reset the timer/stopwatch.",
-  "Try <a href='/clickit'>ClickIt</a> today!"
+  "Try <a href='/clickit'>ClickIt</a> today!",
+  "Your insanity will pay off. Eventually.",
+  "Don't be a not-water-needer. You won't last a week.",
+  "<i>Don't</i> eat the void orb.",
+  "Don't worry! It's fine... We can fix it!",
+  "Have you tried placebo-ing yourself?",
+  "If you fall down and can't get up, fall upwards.",
+  "Tofu is solidified bean water. On that note, try Humanity(r) Bean Water today!",
+  "The void orb watches over you."
 ];
 addEventListener("DOMContentLoaded", function() {
   overlay = document.createElement("div");
   overlay.className = "overlayLoader";
   overlay.id = "overlayL";
   overlay.style.backgroundColor = "var(--system-overlay)";
-  overlay.style.opacity = "1";
+  overlay.style.opacity = "0";
   overlay.innerHTML = `<div id="overlayLContainer" style='pointer-events:auto;'>
   <p class="fslg grn nohover">Loading.</p>
   <span class="material-symbols-outlined loader">sync</span>

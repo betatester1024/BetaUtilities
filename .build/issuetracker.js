@@ -28,6 +28,8 @@ module.exports = __toCommonJS(issuetracker_exports);
 var import_consts = require("./consts");
 var import_userRequest = require("./userRequest");
 async function newIssue(title, body, prio, tags, token, sessID, existingID = -1) {
+  if (body.length == 0)
+    body = "(No description provided)";
   if (title.length == 0 || body.length == 0)
     return { status: "ERROR", data: { error: "Please provide a title and a description." }, token };
   let data = await import_consts.issueDB.findOne({ fieldName: "MetaData" });

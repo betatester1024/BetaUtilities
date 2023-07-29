@@ -2,6 +2,7 @@ import {issueDB} from './consts'
 import {userRequest} from './userRequest'
 export async function newIssue(title:string, body:string, prio:number, tags:string[], token:string, sessID:string, existingID:number=-1) 
 {
+  if (body.length == 0) body = "(No description provided)";
   if (title.length == 0 || body.length == 0) return {status:"ERROR", data:{error:"Please provide a title and a description."}, token:token}
   let data = await issueDB.findOne({fieldName:"MetaData"});
   let req = await userRequest(token);

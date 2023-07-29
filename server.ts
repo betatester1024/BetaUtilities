@@ -209,23 +209,23 @@ export async function initServer() {
     date.setFullYear(date.getFullYear() + 1);
     res.setHeader("expires", date.toUTCString());
     res.setHeader("cache-control", "public, max-age=31536000, immutable");
-    sendFile(res, getToken(req), frontendDir+req.url);
+    res.sendFile(frontendDir+req.url);
     incrRequests();
   })
   
   app.get('/*.js*', (req:any, res:any) => {
-    sendFile(res, getToken(req), jsDir+req.url);
+    res.sendFile(jsDir+req.url);
     incrRequests();
   })
 
   
   app.get('/*.ts', (req:any, res:any) => {
-    sendFile(res, getToken(req), jsDir+req.url);
+    res.sendFile(jsDir+req.url);
     incrRequests();
   })
 
   app.get('/*.css', (req:any, res:any) => {
-    sendFile(res, getToken(req), frontendDir+req.url);
+    res.sendFile(frontendDir+req.url);
     incrRequests();
   })
 

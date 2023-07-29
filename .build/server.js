@@ -569,7 +569,7 @@ function makeRequest(action, token, data, sessID, callback) {
         });
         break;
       case "loadIssues":
-        (0, import_issuetracker.loadIssues)(data.from, data.ct, token).then((obj) => {
+        (0, import_issuetracker.loadIssues)(data.from, data.ct, data.completedOnly, token).then((obj) => {
           callback(obj.status, obj.data, obj.token);
         });
         break;

@@ -74,7 +74,7 @@
       const colours = ["", "low", "low", "low", "med", "med", "med", "high", "high", "max", "max"];
       function loadIssues() 
       {
-        send(JSON.stringify({action:"loadIssues", data:{from:FROM, ct:ISSUECT}}), (res)=>{
+        send(JSON.stringify({action:"loadIssues", data:{from:FROM, ct:ISSUECT, completedOnly:COMPLETEDONLY}}), (res)=>{
           if (res.status != "SUCCESS") alertDialog("Failed to load issues: "+res.data.error, ()=>{});
           else {
             byId("issueArea").innerHTML = "";

@@ -557,7 +557,7 @@ function makeRequest(action:string|null, token:string, data:any|null, sessID:str
         break;
       case "loadIssues":
         // console.log(sessID);
-        loadIssues(data.from, data.ct, token)
+        loadIssues(data.from, data.ct, data.completedOnly, token)
           .then((obj:{status:string, data:any, token:string})=>
             {callback(obj.status, obj.data, obj.token)});
         break;

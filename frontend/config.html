@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="{{mainClass}}">
   <head>
     <script src='./utils.js'></script>
     <title>Account Management | BetaOS Systems</title>
@@ -7,7 +7,10 @@
       const accessLevels = ["Error-level", "User", "Admin", "Super-admin"];
       function onLoad() {
         send(JSON.stringify({action:"userRequest"}), (res)=> {
-          if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{window.open('/login?redirect=config', '_self')});
+          if (res.status == "ERROR") {
+            document.getElementById("userInp").value="[ERROR] Failed to fetch data";
+            alertDialog("Error: "+res.data.error, ()=>{window.open('/login?redirect=config', '_self')});
+          }
           else {
             document.getElementById("userInp").value=res.data.user;
           }
@@ -49,6 +52,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
     <style>
+      #userInp 
+      {
+        margin-bottom: 24px;
+      }
     </style>
   </head>
   <body onload = "globalOnload(onLoad)">
@@ -60,7 +67,7 @@
       <div class="btnRow">
         <form action="javascript:updateInfo()">
           <div class="inpContainer">
-            <input id="userInp" placeholder="Username" value="[ERROR] Account info could not be loaded" disabled>
+            <input id="userInp" class="disabled" placeholder="Username" value="Loading account info..." disabled>
           </div>
           <div class="inpContainer">
             <input id="pwdInpO" type="password" placeholder="Old password">

@@ -65,8 +65,8 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
         <a class="grn" href="https://betatester1024.repl.co">Switch to stable branch</a>`;
         document.body.appendChild(box);
       }
-      document.documentElement.className = res.data.darkQ?"dark":"";
-      console.log("Dark mode toggle:",res.data.darkQ);
+      // document.documentElement.className = res.data.darkQ?"dark":"";
+      // console.log("Dark mode toggle:",res.data.darkQ);
       // let overlay = document.getElementById("overlayL");
       // if (overlay) {
       //   // overlay.style.left="0vh";
@@ -130,10 +130,10 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
               cpl.style.pointerEvents="none";
             }
             if (cbk) cbk();
-          });
-        });
+          }, true);
+        }, true);
       
-    });
+    }, true);
   }
   
   let ele2 = document.getElementById("overlay");
@@ -217,9 +217,9 @@ function decodeStatus(status:number) {
   return "Unknown error";
 }
 
-function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false) {
+function send(params: any, callback: (thing: any) => any, silentLoading:boolean=false) {
   let overlay = document.getElementById("overlayL");
-  if (overlay && !onLoadQ) {
+  if (overlay && !silentLoading) {
     console.log("overlay active")
     overlay.style.opacity="1";
     overlay.style.backgroundColor="var(--system-overlay)";
@@ -243,7 +243,7 @@ function send(params: any, callback: (thing: any) => any, onLoadQ:boolean=false)
       // if (failureTimeout) clearTimeout(failureTimeout);
       // else closeAlert(true);
       // failureTimeout = null;
-      alertDialog("Received status code " +xhr.status+" ("+decodeStatus(xhr.status)+") -- resend request?", ()=>{send(params, callback, onLoadQ);}, true);
+      alertDialog("Received status code " +xhr.status+" ("+decodeStatus(xhr.status)+") -- resend request?", ()=>{send(params, callback, silentLoading);}, true);
       
     }
     if (overlay) {
@@ -502,14 +502,15 @@ const tips = ["Press <kbd>/</kbd> to access the navigation menu.", "🧀",
              "Have you tried placebo-ing yourself?",
              "If you fall down and can't get up, fall upwards.",
              "Tofu is solidified bean water. On that note, try Humanity(r) Bean Water today!",
-             "The void orb watches over you."]
+             "The void orb watches over you."];
+
 addEventListener("DOMContentLoaded", function() {
   overlay = document.createElement("div");
   overlay.className = "overlayLoader"
   overlay.id = "overlayL";
   // overlay.style.left="0vh";
   overlay.style.backgroundColor="var(--system-overlay)";
-  overlay.style.opacity="1";
+  overlay.style.opacity="0"; // no more loader at start
   overlay.innerHTML = `<div id="overlayLContainer" style='pointer-events:auto;'>
   <p class="fslg grn nohover">Loading.</p>
   <span class="material-symbols-outlined loader">sync</span>

@@ -1,7 +1,9 @@
 "use strict";
+var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -15,12 +17,17 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var server_exports = {};
 __export(server_exports, {
   initServer: () => initServer
 });
 module.exports = __toCommonJS(server_exports);
+var import_handlebars = __toESM(require("handlebars"));
 var import_index = require("./index");
 var import_consts = require("./consts");
 var import_validateLogin = require("./validateLogin");
@@ -45,6 +52,32 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 var RateLimit = require("express-rate-limit");
+async function getMainClass(token) {
+  let res = await (0, import_userRequest.userRequest)(token);
+  if (res.status != "SUCCESS")
+    return "";
+  else
+    return res.data.darkQ ? "dark" : "";
+}
+function getToken(req) {
+  return req.cookies.accountID;
+}
+function sendFile(res, token, filePath) {
+  if (!filePath.match(/.*\.html$/)) {
+    res.sendFile(filePath);
+    return;
+  } else {
+    fs.readFile(filePath, "utf8", async (err, fileContents) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      const template = import_handlebars.default.compile(fileContents);
+      res.set("Content-Type", "text/html");
+      res.send(Buffer.from(template({ mainClass: await getMainClass(token) })));
+    });
+  }
+}
 async function initServer() {
   enableWs(app);
   var limiter = RateLimit({
@@ -55,16 +88,17 @@ async function initServer() {
   });
   app.use(limiter);
   app.use(new cookieParser());
+  app.enable("trust proxy");
   app.get("/", (req, res) => {
-    res.sendFile(import_consts.frontendDir + "/index.html");
+    sendFile(res, getToken(req), import_consts.frontendDir + "/index.html");
     (0, import_logging.incrRequests)();
   });
   app.get("/register", (req, res) => {
-    res.sendFile(import_consts.frontendDir + "/signup.html");
+    sendFile(res, getToken(req), import_consts.frontendDir + "/signup.html");
     (0, import_logging.incrRequests)();
   });
   app.get("/account", (req, res) => {
-    res.sendFile(import_consts.frontendDir + "/config.html");
+    sendFile(res, getToken(req), import_consts.frontendDir + "/config.html");
     (0, import_logging.incrRequests)();
   });
   app.get("/EE", (req, res) => {
@@ -91,62 +125,62 @@ async function initServer() {
     if (match) {
       if (!import_supportRooms.supportHandler.checkFoundQ(match[1])) {
         console.log("Room not found");
-        res.sendFile(import_consts.frontendDir + "/room404.html");
+        sendFile(res, getToken(req), import_consts.frontendDir + "/room404.html");
         return;
       } else
-        res.sendFile(import_consts.frontendDir + "/support.html");
+        sendFile(res, getToken(req), import_consts.frontendDir + "/support.html");
     } else
-      res.sendFile(import_consts.frontendDir + "/supportIndex.html");
+      sendFile(res, getToken(req), import_consts.frontendDir + "/supportIndex.html");
     (0, import_logging.incrRequests)();
   });
   app.get("/accountDel", (req, res) => {
-    res.sendFile(import_consts.frontendDir + "/delAcc.html");
+    sendFile(res, getToken(req), import_consts.frontendDir + "/delAcc.html");
     (0, import_logging.incrRequests)();
   });
   app.get("/whois", (req, res) => {
-    res.sendFile(import_consts.frontendDir + "/aboutme.html");
+    sendFile(res, getToken(req), import_consts.frontendDir + "/aboutme.html");
     (0, import_logging.incrRequests)();
   });
   app.get("/cmd", urlencodedParser, async (req, res) => {
     makeRequest(req.query.action, req.cookies.accountID, null, (s, d, token) => {
       console.log(d);
       if (s == "SUCCESS")
-        res.sendFile(import_consts.frontendDir + "/actionComplete.html");
+        sendFile(res, getToken(req), import_consts.frontendDir + "/actionComplete.html");
       else {
-        res.sendFile(import_consts.frontendDir + "/error.html");
+        sendFile(res, getToken(req), import_consts.frontendDir + "/error.html");
       }
     });
     (0, import_logging.incrRequests)();
   });
   app.get("*/nodemodules/*", (req, res) => {
     if (req.url.length > 500)
-      res.sendFile(import_consts.frontendDir + "/404.html");
+      sendFile(res, getToken(req), import_consts.frontendDir + "/404.html");
     else
-      res.sendFile(import_consts.rootDir + "node_modules" + req.url.replace(/.*nodemodules/, ""));
+      sendFile(res, getToken(req), import_consts.rootDir + "node_modules" + req.url.replace(/.*nodemodules/, ""));
     (0, import_logging.incrRequests)();
   });
   app.get("/paste", (req, res) => {
-    res.sendFile(import_consts.frontendDir + "newpaste.html");
+    sendFile(res, getToken(req), import_consts.frontendDir + "newpaste.html");
     (0, import_logging.incrRequests)();
   });
   app.get("/paste/*", (req, res) => {
-    res.sendFile(import_consts.frontendDir + "paste.html");
+    sendFile(res, getToken(req), import_consts.frontendDir + "paste.html");
     (0, import_logging.incrRequests)();
   });
   app.get("*/favicon.ico", (req, res) => {
-    res.sendFile(import_consts.rootDir + "favicon.ico");
+    sendFile(res, getToken(req), import_consts.rootDir + "favicon.ico");
     (0, import_logging.incrRequests)();
   });
   app.get("*/icon.png", (req, res) => {
-    res.sendFile(import_consts.rootDir + "temp.png");
+    sendFile(res, getToken(req), import_consts.rootDir + "temp.png");
     (0, import_logging.incrRequests)();
   });
   app.get("*/notif.wav", (req, res) => {
-    res.sendFile(import_consts.rootDir + "notif.wav");
+    sendFile(res, getToken(req), import_consts.rootDir + "notif.wav");
     (0, import_logging.incrRequests)();
   });
   app.get("/support.js", (req, res) => {
-    res.sendFile(import_consts.frontendDir + "support.js");
+    sendFile(res, getToken(req), import_consts.frontendDir + "support.js");
     (0, import_logging.incrRequests)();
   });
   app.get("*.svg", (req, res) => {
@@ -154,19 +188,19 @@ async function initServer() {
     date.setFullYear(date.getFullYear() + 1);
     res.setHeader("expires", date.toUTCString());
     res.setHeader("cache-control", "public, max-age=31536000, immutable");
-    res.sendFile(import_consts.frontendDir + req.url);
+    sendFile(res, getToken(req), import_consts.frontendDir + req.url);
     (0, import_logging.incrRequests)();
   });
   app.get("/*.js*", (req, res) => {
-    res.sendFile(import_consts.jsDir + req.url);
+    sendFile(res, getToken(req), import_consts.jsDir + req.url);
     (0, import_logging.incrRequests)();
   });
   app.get("/*.ts", (req, res) => {
-    res.sendFile(import_consts.jsDir + req.url);
+    sendFile(res, getToken(req), import_consts.jsDir + req.url);
     (0, import_logging.incrRequests)();
   });
   app.get("/*.css", (req, res) => {
-    res.sendFile(import_consts.frontendDir + req.url);
+    sendFile(res, getToken(req), import_consts.frontendDir + req.url);
     (0, import_logging.incrRequests)();
   });
   app.get("/stream", (req, res) => {
@@ -184,7 +218,7 @@ async function initServer() {
     });
   });
   app.get("/redirector", (req, res) => {
-    res.sendFile(import_consts.rootDir + "/.github/pages/index.html");
+    sendFile(res, getToken(req), import_consts.rootDir + "/.github/pages/index.html");
     (0, import_logging.incrRequests)();
   });
   app.post("/oauth2callback", (req, res) => {
@@ -193,25 +227,18 @@ async function initServer() {
     let requrl = req.url.match("([^?]*)\\??.*")[1];
     let idx = validPages.findIndex((obj) => obj.toLowerCase() == requrl.toLowerCase());
     if (idx >= 0)
-      res.sendFile(import_consts.frontendDir + validPages[idx] + ".html");
+      sendFile(res, getToken(req), import_consts.frontendDir + validPages[idx] + ".html");
     else {
       res.status(404);
-      res.sendFile(import_consts.frontendDir + "404.html");
+      sendFile(res, getToken(req), import_consts.frontendDir + "404.html");
     }
     (0, import_logging.incrRequests)();
   });
-  const banList = ["172.31.196.1"];
   app.post("/server", urlencodedParser, async (req, res) => {
     (0, import_logging.incrRequests)();
     if (req.headers["content-length"] > 6e4) {
       res.set("Connection", "close");
       res.status(413).end();
-      return;
-    }
-    let addr = req.headers["x-forwarded-for"].match(":([^:]*)$")[1];
-    console.log(addr);
-    if (banList.indexOf(addr) >= 0) {
-      res.end(JSON.stringify({ status: "ERROR", data: { error: "IP banned, contact BetaOS if this was done in error." } }));
       return;
     }
     var body = await parse.json(req);
@@ -569,9 +596,9 @@ function makeRequest(action, token, data, sessID, callback) {
   }
   return;
 }
-function eeFormat(data) {
+function eeFormat(data, mainClass) {
   return `<!DOCTYPE html>
-<html>
+<html class="${mainClass}">
   <head>
     <script src='./utils.js'><\/script>
     <title>Everyone Edits | BetaOS Systems</title>
@@ -619,7 +646,7 @@ function eeFormat(data) {
 }
 function tooManyRequests() {
   return `<!DOCTYPE html>
-<html>
+<html class="{{mainClass}}">
   <head>
     <title>Error 429 | BetaOS Systems</title>
     <script>

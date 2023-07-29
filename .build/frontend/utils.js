@@ -49,8 +49,6 @@ async function globalOnload(cbk, networkLess = false) {
         <a class="grn" href="https://betatester1024.repl.co">Switch to stable branch</a>`;
           document.body.appendChild(box);
         }
-        document.documentElement.className = res.data.darkQ ? "dark" : "";
-        console.log("Dark mode toggle:", res.data.darkQ);
         let maincontent = document.getElementsByClassName("main_content").item(0);
         let ftr = byId("ftrOverride") ?? document.createElement("footer");
         if (!byId("ftrOverride"))
@@ -108,10 +106,12 @@ async function globalOnload(cbk, networkLess = false) {
               }
               if (cbk)
                 cbk();
-            });
-          }
+            }, true);
+          },
+          true
         );
-      }
+      },
+      true
     );
   }
   let ele2 = document.getElementById("overlay");
@@ -191,9 +191,9 @@ function decodeStatus(status) {
   }
   return "Unknown error";
 }
-function send(params, callback, onLoadQ = false) {
+function send(params, callback, silentLoading = false) {
   let overlay2 = document.getElementById("overlayL");
-  if (overlay2 && !onLoadQ) {
+  if (overlay2 && !silentLoading) {
     console.log("overlay active");
     overlay2.style.opacity = "1";
     overlay2.style.backgroundColor = "var(--system-overlay)";
@@ -209,7 +209,7 @@ function send(params, callback, onLoadQ = false) {
       callback(JSON.parse(xhr.responseText));
     } else if (xhr.readyState == 4 && xhr.status != 200) {
       alertDialog("Received status code " + xhr.status + " (" + decodeStatus(xhr.status) + ") -- resend request?", () => {
-        send(params, callback, onLoadQ);
+        send(params, callback, silentLoading);
       }, true);
     }
     if (overlay2) {
@@ -429,7 +429,7 @@ addEventListener("DOMContentLoaded", function() {
   overlay.className = "overlayLoader";
   overlay.id = "overlayL";
   overlay.style.backgroundColor = "var(--system-overlay)";
-  overlay.style.opacity = "1";
+  overlay.style.opacity = "0";
   overlay.innerHTML = `<div id="overlayLContainer" style='pointer-events:auto;'>
   <p class="fslg grn nohover">Loading.</p>
   <span class="material-symbols-outlined loader">sync</span>

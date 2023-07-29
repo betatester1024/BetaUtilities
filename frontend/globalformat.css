@@ -373,6 +373,7 @@ select {
 }
 
 option {
+  background-color: var(--system-bg);
   font-family: 'Noto Sans Display';
 }
 

@@ -43,7 +43,7 @@ function getToken(req:any)
 
 function sendFile(res:any, token:string, filePath:string) 
 {
-  if (!filePath.match(/.*\.html$/)) {
+  if (!filePath.match(/\.html$/)) {
     // console.log(filePath);
     res.sendFile(filePath); 
     return;
@@ -162,7 +162,7 @@ export async function initServer() {
   app.get("*/nodemodules/*", (req:any, res:any) => {
     // fuck off with your long requests
     if (req.url.length > 500) sendFile(res, getToken(req), frontendDir+"/404.html");
-    else sendFile(res, getToken(req), rootDir+"node_modules"+req.url.replace(/.*nodemodules/, ""));
+    else res.sendFile(rootDir+"node_modules"+req.url.replace(/.*nodemodules/, ""));
     incrRequests();
   })
     

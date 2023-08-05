@@ -384,6 +384,15 @@ function keydown(e) {
     e.target.blur();
   }
 }
+function suffix(i) {
+  if (i % 10 == 1 && i % 100 != 11)
+    return "st";
+  if (i % 10 == 2 && i % 100 != 12)
+    return "nd";
+  if (i % 10 == 3 && i % 100 != 13)
+    return "rd";
+  return "th";
+}
 function toTime(ms, inclMs) {
   let day = Math.floor(ms / 1e3 / 60 / 60 / 24);
   ms = ms % (1e3 * 60 * 60 * 24);

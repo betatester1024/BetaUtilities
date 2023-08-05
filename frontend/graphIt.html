@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html class="{{mainClass}}">
+  <head>
+    <audio id="notif">
+      <source src="notif.wav" type="audio/wav">
+    </audio>
+    <script src='./utils.js'></script>
+    <title>Grapher | BetaOS Systems</title></title>
+    <script>
+      // let STARTTIME = 0;
+      // let TOTALTIME = 0;
+      // let ADDTIME = 0;
+      // let TIMERID = -1;
+      
+      // // function openDialog() {
+      // //   let div = document.getElementById("internal");
+      // //   div.style.top = "0vh";
+        
+      // //   document.getElementById("dialog").style.opacity = "1";
+      // //   // div.style.opacity = "1";
+        
+      // //   // setTimeout(()=>{document.getElementById("inp").focus()}, 200);
+      // // }
+      // function updateTime() {
+      //   let h = document.getElementById("h");
+      //   let m = document.getElementById("m");
+      //   let s = document.getElementById("s");
+      //   if (!h.checkValidity()||!m.checkValidity()||!s.checkValidity()) alertDialog("Invalid input!", ()=>{})
+      //   else {
+      //     closeDialog(()=>{document.getElementById("startBtn").focus();});
+      //     resetTimer();
+      //     resetUI();
+      //     TOTALTIME = h.value*3600*1000 + m.value*60*1000 + s.value*1000;
+      //     STARTTIME = Date.now();
+      //     redraw()
+      //   }
+        
+      // }
+      // function startTimer() {
+      //   STARTTIME = Date.now();
+      //   TIMERID = setInterval(redraw, 25);
+      //   let startBtn = document.getElementById("startBtn");
+      //   startBtn.className = "btn szFull red nooutline override";
+      //   startBtn.onclick=stopTimer;
+      //   startBtn.innerHTML = `<span class="material-symbols-outlined">close</span>
+      //   Stop <div class="anim"></div>`
+      // }
+      // function resetUI() {
+      //   document.getElementById("resetBtn").style.display="none";
+      //   let startBtn = document.getElementById("startBtn");
+      //   startBtn.className = "btn szFull grn nooutline override";
+      //   startBtn.onclick=startTimer;
+      //   startBtn.innerHTML = `<span class="material-symbols-outlined">arrow_forward_ios</span>
+      //   Start <div class="anim"></div>`
+      // }
+      // function resetTimer() {
+      //   STARTTIME = Date.now();
+      //   ADDTIME = 0;
+      //   redraw(true)
+      //   clearInterval(TIMERID);
+      //   TIMERID = -1;
+        
+      // }
+      const gTitle = "Languages in DSA"
+      const rawData = `England - 3 
+Ukraine - 3
+Turkiye - 4
+Hungary - 2
+China - 3
+Taiwan - 1
+Philippines - 1
+Jamaica - 1
+Spain - 1
+Palestine - 1
+Algeria - 1
+Greece - 1
+Australia - 2 
+Germany - 1 
+Croatia - 1 
+France - 5
+Switzerland - 1
+Brazil - 1
+Bulgaria - 2
+Azerbaijan - 1
+Poland - 1
+Russia - 14 
+Slovakia - 1
+Canada - 2
+USA - 46
+`;
+      const colours = ["ffadad","ffd6a5","fdffb6","caffbf","9bf6ff","a0c4ff","bdb2ff","ffc6ff","fffffc"];
+      let data = [
+        {frac: 0.01, clr:"#000000", name:"7.0000000000003"},
+        {frac: 0.1, clr:"#0000ff", name:"1"},
+        {frac: 0.2, clr:"#00ff00", name:"2"},
+        {frac: 0.4, clr:"#ff0000", name:"3"},
+        {frac: 0.05, clr:"#ffff00", name:"four"},
+        {frac: 0.02, clr:"#00ffff", name:"5"},
+        {frac: 0.001, clr:"#ff00ff", name:"SIX"},
+        {frac: 0.1, clr:"#ffffff", name:"eight"},
+      ]
+      let activeSector = -1, clickedSector = -1;
+      function redraw() {
+
+        function draw(i) 
+        {
+          ctx.beginPath();
+          ctx.strokeStyle=(i==clickedSector?
+                         getComputedStyle(document.body).getPropertyValue('--system-green'):
+                           (i==activeSector?
+                            getComputedStyle(document.body).getPropertyValue('--system-grey'):
+                            getComputedStyle(document.body).getPropertyValue('--system-grey3')));
+          ctx.moveTo(canv.width/2, canv.height/2);
+          // ctx.lineTo(canv.width/2+RAD*Math.cos(ang), canv.height/2+RAD*Math.sin(ang));
+          ctx.arc(canv.width/2, canv.height/2, RAD, ang, nextAng);
+          ctx.lineTo(canv.width/2, canv.height/2);
+          ctx.fillStyle = dat.clr;
+          // console.log("Fillstyle "+dat.clr)
+          ctx.textBaseline = "middle";
+          // FILL B4 STROKING !!!
+          ctx.fill();
+          ctx.stroke();
+          ctx.beginPath();
+          // console.log(FONTSZ, FONTSZ*1.1);
+          ctx.font =(FONTSZ*(i==activeSector||i==clickedSector?1.3:1))+"px Noto Sans Display";
+          ctx.fillStyle = activeSector>=0||clickedSector>=0?
+            getComputedStyle(document.body).getPropertyValue('--system-grey'):
+            getComputedStyle(document.body).getPropertyValue('--system-black');
+          let avgAng = (ang+nextAng)/2;
+          let HEIGHT = RAD*Math.sin(avgAng);
+          let WIDTH = RAD*Math.cos(avgAng);
+          ctx.moveTo(canv.width/2+WIDTH*0.95, canv.height/2+HEIGHT*0.95);
+          ctx.lineTo(canv.width/2+WIDTH*1.1, canv.height/2+HEIGHT*1.1);
+          if (avgAng+Math.PI/2< Math.PI) // ang < 180*, is on the right
+          {
+            ctx.textAlign = "left";
+            // -10 for margin
+            ctx.lineTo(canv.width*0.55+WIDTH-10, canv.height/2+HEIGHT*1.1);
+            ctx.stroke();
+            ctx.beginPath();
+            if (i==activeSector || i==clickedSector) {
+              ctx.font ="normal 600 "+FONTSZ+"px Noto Sans Display";
+              ctx.clearRect(canv.width*0.55+WIDTH-5, canv.height/2+HEIGHT*1.1-FONTSZ/2-2, canv.width, FONTSZ);
+              ctx.fillStyle = i==clickedSector?
+                getComputedStyle(document.body).getPropertyValue('--system-green'):
+                getComputedStyle(document.body).getPropertyValue('--system-black');
+              ctx.fillText(dat.name, canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1)
+            }
+            else ctx.fillText(dat.name, canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1)
+            ctx.closePath();
+          }  
+          else {
+            ctx.textAlign = "right";
+            // +10 for margin
+            ctx.lineTo(canv.width*0.45+WIDTH+10, canv.height/2+HEIGHT*1.1);
+            ctx.stroke();
+            ctx.beginPath();
+            if (i==activeSector || i==clickedSector) {
+              ctx.font ="normal 600 "+FONTSZ+"px Noto Sans Display";
+              ctx.clearRect(canv.width*0.45+WIDTH+5-canv.width, canv.height/2+HEIGHT*1.1-FONTSZ/2-2, canv.width, FONTSZ);
+              ctx.fillStyle = i==clickedSector?
+                getComputedStyle(document.body).getPropertyValue('--system-green'):
+                getComputedStyle(document.body).getPropertyValue('--system-black');
+              ctx.fillText(dat.name, canv.width*0.45+WIDTH, canv.height/2+HEIGHT*1.1)
+            }
+            else ctx.fillText(dat.name, canv.width*0.45+WIDTH, canv.height/2+HEIGHT*1.1)
+            ctx.closePath();
+          }
+          // ctx.stroke();
+          // ctx.beginPath();
+        }
+
+        
+        let canv = document.getElementById("canv");
+        let FONTSZ = canv.width/30;
+        let ctx = canv.getContext("2d");
+        ctx.imageSmoothingQuality = "high";
+        // ctx.beginPath();
+        ctx.textAlign="center";
+        ctx.textBaseline="middle";
+        ctx.lineCap = "round";
+        ctx.clearRect(0, 0, canv.width, canv.height);
+        // ctx.moveTo(canv.width/2, canv.height/2);
+        ctx.font =FONTSZ+"px Noto Sans Display";
+        // ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--system-blue');
+        
+        ctx.strokeStyle=getComputedStyle(document.body).getPropertyValue('--system-grey');
+        // ctx.arc(canv.width/2, canv.height/2, canv.width*0.4, 0, Math.PI*2);
+        ctx.lineWidth=Math.floor(canv.width/150);
+        const RAD = canv.width*0.3;
+        let ang = -Math.PI/2, nextAng = 0, activeSectorAng = 0, clickedSectorAng = 0;
+        let dat = null;
+        for (let i=0; i<data.length; i++) 
+        {
+          dat = data[i];
+          nextAng = ang+(Math.PI*2*dat.frac);
+          if (i==activeSector) activeSectorAng = ang;
+          if (i==clickedSector) clickedSectorAng = ang;
+          draw(i);
+          ang = nextAng;
+        }
+        
+        ctx.textAlign="center";
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--system-blue');
+        ctx.font = FONTSZ*2+'px Noto Sans Display';
+        ctx.fillText(gTitle, canv.width/2, FONTSZ)
+        ctx.font =FONTSZ+"px Noto Sans Display";
+        ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--system-red');
+        if (Math.abs(ang - Math.PI*3/2)>0.002) // floating point
+          ctx.fillText("WARNING: Values do not add ("+((100*ang/Math.PI/2)+25)+"%) to 100%", canv.width/2, FONTSZ*3);
+        ctx.textAlign="left";
+        
+        if (activeSector >= 0) {
+          dat = data[activeSector];
+          ang = activeSectorAng;
+          nextAng = activeSectorAng+(Math.PI*2*dat.frac);
+          draw(activeSector);
+        }
+
+        if (clickedSector >= 0) {
+          dat = data[clickedSector];
+          ang =  clickedSectorAng;
+          nextAng = clickedSectorAng+(Math.PI*2*dat.frac);
+          draw(clickedSector);
+        }
+
+        // ctx.stroke();
+        // ctx.beginPath();
+        // if (frac >= 1) {
+        //   return;
+        // }
+        // frac = Math.min(1, frac);
+        // ctx.strokeStyle=getComputedStyle(document.body).getPropertyValue('--system-blue');
+        
+        // ctx.lineCap="round";
+        // ctx.arc(canv.width/2, canv.height/2, canv.width*0.4, -Math.PI/2, -Math.PI/2+frac*2*Math.PI, true);
+        // ctx.stroke();
+      }
+
+      function onLoad() 
+      {
+        data = [];
+        let matches = rawData.match(/(?:([^\s]+) - ([0-9]+)\n)/gmiu);
+        // console.log(matches);
+        let sum=0;
+        for (let i=0; i<matches.length; i++) 
+        {
+          let currParts = matches[i].match(/(?:([^\s]+) - ([0-9]+)\n)/);
+          sum += parseInt(currParts[2]);
+        }
+        let sum2 = 0;
+        for (let i=0; i<matches.length; i++) 
+        {
+          let currParts = matches[i].match(/(?:([^\s]+) - ([0-9]+)\n)/);
+          // console.log(currParts);
+          sum2 += Number(currParts[2])/sum;
+          data.push({frac:Number(currParts[2])/sum, clr:"#"+colours[i%colours.length], name:currParts[1]});
+        }
+        data.sort((ele1, ele2)=>{return ele2.frac-ele1.frac;});
+        console.log(sum2);
+      }
+
+      function onmousemove(e) {
+        let rect = byId("canv").getBoundingClientRect();
+        let x = e.clientX - rect.left; //x position within the element.
+        let y = e.clientY - rect.top;  //y position within the element.
+        let dy = y-rect.width/2;
+        let dx = x-rect.width/2;
+        let ang = Math.atan2(dy, dx);
+        ang = (ang+2.5*Math.PI)%(2*Math.PI); // - 90deg
+        let rad = Math.sqrt(dy*dy+dx*dx);
+        let datAng = 0;
+        let tooltip = byId("canv_tooltip");
+        let tooltip2 = byId("clicked_tooltip");
+        tooltip.style.opacity = 0;
+        activeSector = -1;
+        canv.style.backgroundColor = "var(--system-bg)";
+        canv.style.cursor="default";
+        if (rad >canv.width*0.3) {
+          redraw();
+          return;
+        }
+        for (let i=0; i<data.length; i++) 
+        {
+          let dat = data[i];
+          let nextAng = datAng+dat.frac*Math.PI*2;
+          if (ang > datAng && ang < nextAng) 
+          {
+            // canv.style.backgroundColor = "var(--system-grey2)";
+            canv.style.cursor = "pointer";
+            activeSector = i;
+            tooltip.style.left = e.clientX+15+"px";
+            tooltip.style.top = e.clientY+"px";
+            tooltip.style.opacity = 1;
+            if (i==clickedSector)
+              tooltip.style.opacity = 0;
+            else 
+              tooltip.style.opacity = 1;
+            byId("tooltipTitle").innerText = data[i].name;
+            byId("tooltipData").innerText = `${(data[i].frac*100).toFixed(6)}% of total share
+            ${i+1}${suffix(i+1)} place by size`;
+            redraw();
+          }
+          datAng = nextAng;
+        }
+        // console.log(activeSector);
+        redraw();
+        // console.log((ang+2*Math.PI)%(2*Math.PI), rad); // make it +ve
+      }
+      function onclick(e) 
+      {
+        clickedSector = activeSector==clickedSector?-1:activeSector;
+        let tooltip2 = byId("clicked_tooltip");
+        if (clickedSector >= 0) 
+        {
+          tooltip2.style.opacity = 1;
+          tooltip2.style.left = e.clientX+15+"px";
+          tooltip2.style.top = e.clientY+"px";
+          byId("tooltipTitle2").innerText = data[clickedSector].name;
+          byId("tooltipData2").innerText = `${(data[clickedSector].frac*100).toFixed(6)}% of total share
+          ${clickedSector+1}${suffix(clickedSector+1)} place by size`;
+        }
+        else tooltip2.style.opacity = 0;
+      }
+  
+      function windowResize() {
+        let canv = document.getElementById("canv");
+        canv.width = Math.min(window.innerWidth*0.8, window.innerHeight*0.8);
+        canv.height= Math.min(window.innerWidth*0.8, window.innerHeight*0.8);
+        // STARTTIME = Date.now();
+        redraw();
+      }
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      canvas {
+        transition: all 0.4s ease;
+        width: min(80vw, 80vh);
+        height: min(80vw, 80vh);
+        /* cursor: pointer; */
+      }
+      canvas:hover {
+        
+        /* background-color: var(--system-grey2); */
+        border-radius: 15px;
+      }
+      input {
+        background-color: var(--system-grey2)
+      }
+      .timerCtn {
+        margin-left: 0px !important;
+        margin-right: 0px !important;
+        text-align: center !important;
+      }
+      .btn {
+        transition: all 0.4s ease;
+      }
+      #dialog {
+        top: 50vh; 
+        opacity: 0;
+        pointer-events: none;
+      }
+      #dialog > .internal {
+        display: relative;
+        margin: 10px auto;
+        border-radius: 15px;
+        width: 90%;
+        background-color: var(--system-bg);
+        padding: 15px;
+      }
+      #canv_tooltip, #clicked_tooltip {
+        border-radius: 5px;
+        background-color: var(--system-overlay);
+        transition: opacity 0.5s ease;
+        position: absolute;
+        padding: 5px;
+        opacity: 0;
+        pointer-events: none;
+        cursor: pointer;
+        text-align: left;
+        outline: 1px solid var(--system-grey2);
+        box-shadow: 3px 3px 3px var(--system-grey);
+      }
+      #clicked_tooltip {
+        transition: all 0.5s ease;
+        pointer-events: auto;
+        cursor: default;
+      }
+      #clicked_tooltip > b, #clicked_tooltip > p 
+      {
+        cursor: text;
+      }
+      #clicked_tooltip:hover ~ #canv_tooltip 
+      {
+        opacity: 0 !important;
+        pointer-events: none;
+      }
+      b{
+        color: var(--system-black);
+      }
+    </style>
+  </head>
+  <body onload = "
+      globalOnload(()=>{
+        // document.getElementById('h').focus(); 
+        // openDialog(); 
+        byId('canv').addEventListener('pointermove', onmousemove);
+        byId('canv').addEventListener('pointerup', (e)=>{onclick(e); onmousemove(e);});
+        onLoad();
+        windowResize();
+        document.documentElement.addEventListener('beforeunload', function(e) {
+          return 'You have unsaved stuff. Are you sure you want to leave?';
+        });
+        redraw();
+      }); 
+      // startDraw()
+      " 
+    onresize="windowResize()">
+    <div class="main_content">
+      <header>
+        <h2 class="fsmed">Grapher</h2>
+        <hr class="rounded">
+      </header>
+      <canvas id="canv" width="500" height="500"></canvas><br>
+       <div id="clicked_tooltip">
+        <b id="tooltipTitle2"></b>
+        <p id="tooltipData2"></p>
+      </div>
+      <div id="canv_tooltip">
+        <b id="tooltipTitle"></b>
+        <p id="tooltipData"></p>
+      </div>
+     
+      <a class="btn override" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+    </div>
+    <div class="overlay" id="overlay"></div>
+    <div class="overlay_dialog" id="dialog">
+      <div class="internal">
+        <h2 class="fsmed">Enter a time: </h2>
+        <form style="text-align: center; margin: 10px auto;" action="javascript:updateTime()">
+          <div class="inpContainer szThird nowrap timerCtn">
+            <input class="inp szFull noMin" id="h" type="number" value="" max="99" min="0" placeholder="Hrs">
+            <div class="anim inp"></div>
+          </div>
+          <div class="inpContainer szThird nowrap timerCtn">
+            <input class="inp szFull noMin" id="m" type="number" value="" max="99" min="0" placeholder="Min">
+            <div class="anim inp"></div>
+          </div>
+          <div class="inpContainer szThird nowrap timerCtn">
+            <input class="inp szFull noMin" id="s" type="number" value="" max="99" min="0" placeholder="Sec">
+            <div class="anim inp"></div>
+          </div><br>
+          <button style="display: none;">
+          </button>
+        </form>
+        
+      </div>
+      <button onclick="updateTime()" class="btn grn">
+        <span class="material-symbols-outlined">check</span>
+        <div class="anim"></div>
+      </button>
+      <button onclick="closeDialog(()=>{document.getElementById('startBtn').focus();})" class="btn red nooutline">
+        <span class="material-symbols-outlined">close</span>
+        <div class="anim"></div>
+      </button>
+    </div>
+    
+  </body>
+</html>

@@ -85,7 +85,7 @@ export async function initServer() {
   });
   app.use(limiter);
   app.use(new cookieParser());
-  app.enable('trust proxy');
+  // app.enable('trust proxy');
   
   app.get('/', (req:Request, res:any) => {
     sendFile(res, getToken(req), frontendDir+'/index.html');
@@ -683,7 +683,7 @@ function tooManyRequests() {
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
                     '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest',
                     "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle', '/sweepthatmine',
-                   "/stopwatch", "/testbed", '/credits', '/atomicmoose', '/issuetracker'];
+                   "/stopwatch", "/testbed", '/credits', '/atomicmoose', '/issuetracker', '/graphIt'];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',
                   'paste', 'findPaste'];

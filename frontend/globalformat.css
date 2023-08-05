@@ -857,6 +857,7 @@ summary::marker {
   text-align: center;
   text-orientation: sideways;
   font-size: 20px;
+  overflow-y: auto;
 }
 .sidebar-unstable > span 
 {

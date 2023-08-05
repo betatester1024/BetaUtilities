@@ -63,7 +63,7 @@ function getToken(req) {
   return req.cookies.accountID;
 }
 function sendFile(res, token, filePath) {
-  if (!filePath.match(/.*\.html$/)) {
+  if (!filePath.match(/\.html$/)) {
     res.sendFile(filePath);
     return;
   } else {
@@ -88,7 +88,6 @@ async function initServer() {
   });
   app.use(limiter);
   app.use(new cookieParser());
-  app.enable("trust proxy");
   app.get("/", (req, res) => {
     sendFile(res, getToken(req), import_consts.frontendDir + "/index.html");
     (0, import_logging.incrRequests)();
@@ -156,7 +155,7 @@ async function initServer() {
     if (req.url.length > 500)
       sendFile(res, getToken(req), import_consts.frontendDir + "/404.html");
     else
-      sendFile(res, getToken(req), import_consts.rootDir + "node_modules" + req.url.replace(/.*nodemodules/, ""));
+      res.sendFile(import_consts.rootDir + "node_modules" + req.url.replace(/.*nodemodules/, ""));
     (0, import_logging.incrRequests)();
   });
   app.get("/paste", (req, res) => {
@@ -188,19 +187,19 @@ async function initServer() {
     date.setFullYear(date.getFullYear() + 1);
     res.setHeader("expires", date.toUTCString());
     res.setHeader("cache-control", "public, max-age=31536000, immutable");
-    sendFile(res, getToken(req), import_consts.frontendDir + req.url);
+    res.sendFile(import_consts.frontendDir + req.url);
     (0, import_logging.incrRequests)();
   });
   app.get("/*.js*", (req, res) => {
-    sendFile(res, getToken(req), import_consts.jsDir + req.url);
+    res.sendFile(import_consts.jsDir + req.url);
     (0, import_logging.incrRequests)();
   });
   app.get("/*.ts", (req, res) => {
-    sendFile(res, getToken(req), import_consts.jsDir + req.url);
+    res.sendFile(import_consts.jsDir + req.url);
     (0, import_logging.incrRequests)();
   });
   app.get("/*.css", (req, res) => {
-    sendFile(res, getToken(req), import_consts.frontendDir + req.url);
+    res.sendFile(import_consts.frontendDir + req.url);
     (0, import_logging.incrRequests)();
   });
   app.get("/stream", (req, res) => {
@@ -711,7 +710,8 @@ const validPages = [
   "/testbed",
   "/credits",
   "/atomicmoose",
-  "/issuetracker"
+  "/issuetracker",
+  "/graphIt"
 ];
 const ignoreLog = [
   "getEE",

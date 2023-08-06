@@ -7,98 +7,36 @@
     <script src='./utils.js'></script>
     <title>Grapher | BetaOS Systems</title></title>
     <script>
-      // let STARTTIME = 0;
-      // let TOTALTIME = 0;
-      // let ADDTIME = 0;
-      // let TIMERID = -1;
-      
-      // // function openDialog() {
-      // //   let div = document.getElementById("internal");
-      // //   div.style.top = "0vh";
-        
-      // //   document.getElementById("dialog").style.opacity = "1";
-      // //   // div.style.opacity = "1";
-        
-      // //   // setTimeout(()=>{document.getElementById("inp").focus()}, 200);
-      // // }
-      // function updateTime() {
-      //   let h = document.getElementById("h");
-      //   let m = document.getElementById("m");
-      //   let s = document.getElementById("s");
-      //   if (!h.checkValidity()||!m.checkValidity()||!s.checkValidity()) alertDialog("Invalid input!", ()=>{})
-      //   else {
-      //     closeDialog(()=>{document.getElementById("startBtn").focus();});
-      //     resetTimer();
-      //     resetUI();
-      //     TOTALTIME = h.value*3600*1000 + m.value*60*1000 + s.value*1000;
-      //     STARTTIME = Date.now();
-      //     redraw()
-      //   }
-        
-      // }
-      // function startTimer() {
-      //   STARTTIME = Date.now();
-      //   TIMERID = setInterval(redraw, 25);
-      //   let startBtn = document.getElementById("startBtn");
-      //   startBtn.className = "btn szFull red nooutline override";
-      //   startBtn.onclick=stopTimer;
-      //   startBtn.innerHTML = `<span class="material-symbols-outlined">close</span>
-      //   Stop <div class="anim"></div>`
-      // }
-      // function resetUI() {
-      //   document.getElementById("resetBtn").style.display="none";
-      //   let startBtn = document.getElementById("startBtn");
-      //   startBtn.className = "btn szFull grn nooutline override";
-      //   startBtn.onclick=startTimer;
-      //   startBtn.innerHTML = `<span class="material-symbols-outlined">arrow_forward_ios</span>
-      //   Start <div class="anim"></div>`
-      // }
-      // function resetTimer() {
-      //   STARTTIME = Date.now();
-      //   ADDTIME = 0;
-      //   redraw(true)
-      //   clearInterval(TIMERID);
-      //   TIMERID = -1;
-        
-      // }
-      const gTitle = "Languages in DSA"
-      const rawData = `England - 3 
-Ukraine - 3
-Turkiye - 4
-Hungary - 2
-China - 3
-Taiwan - 1
-Philippines - 1
-Jamaica - 1
-Spain - 1
-Palestine - 1
-Algeria - 1
-Greece - 1
-Australia - 2 
-Germany - 1 
-Croatia - 1 
-France - 5
-Switzerland - 1
-Brazil - 1
-Bulgaria - 2
-Azerbaijan - 1
-Poland - 1
-Russia - 14 
-Slovakia - 1
-Canada - 2
-USA - 46
-`;
+      let totalCt = 0;
+      const gTitle = "Countries of DSA"
+      const rawData =         
+`Croatia 1
+Türkiye 6 
+France 5
+Ukraine 3
+United States 45 
+China 4 
+Algeria 1
+Russia 14
+Australia 2
+Bulgaria 2
+Hungary 2
+Taiwan 1
+Germany 1
+Jamaica 1
+Philippines 1
+Spain 1
+Greece 1
+Palestine 1
+Slovakia 1
+Canada 2
+England 1
+Brazil 1
+Azerbaijan 1
+Switzerland 2
+Poland 1`
       const colours = ["ffadad","ffd6a5","fdffb6","caffbf","9bf6ff","a0c4ff","bdb2ff","ffc6ff","fffffc"];
-      let data = [
-        {frac: 0.01, clr:"#000000", name:"7.0000000000003"},
-        {frac: 0.1, clr:"#0000ff", name:"1"},
-        {frac: 0.2, clr:"#00ff00", name:"2"},
-        {frac: 0.4, clr:"#ff0000", name:"3"},
-        {frac: 0.05, clr:"#ffff00", name:"four"},
-        {frac: 0.02, clr:"#00ffff", name:"5"},
-        {frac: 0.001, clr:"#ff00ff", name:"SIX"},
-        {frac: 0.1, clr:"#ffffff", name:"eight"},
-      ]
+      let data = []
       let activeSector = -1, clickedSector = -1;
       function redraw() {
 
@@ -107,7 +45,7 @@ USA - 46
           ctx.beginPath();
           ctx.strokeStyle=(i==clickedSector?
                          getComputedStyle(document.body).getPropertyValue('--system-green'):
-                           (i==activeSector?
+                           (i==activeSector || (activeSector<0 && clickedSector<0)?
                             getComputedStyle(document.body).getPropertyValue('--system-grey'):
                             getComputedStyle(document.body).getPropertyValue('--system-grey3')));
           ctx.moveTo(canv.width/2, canv.height/2);
@@ -174,7 +112,6 @@ USA - 46
         let canv = document.getElementById("canv");
         let FONTSZ = canv.width/30;
         let ctx = canv.getContext("2d");
-        ctx.imageSmoothingQuality = "high";
         // ctx.beginPath();
         ctx.textAlign="center";
         ctx.textBaseline="middle";
@@ -240,21 +177,23 @@ USA - 46
       function onLoad() 
       {
         data = [];
-        let matches = rawData.match(/(?:([^\s]+) - ([0-9]+)\n)/gmiu);
+        
+        let matches = rawData.match(/(?:([^\s]+) - ([0-9]+))/gmiu);
         // console.log(matches);
         let sum=0;
         for (let i=0; i<matches.length; i++) 
         {
-          let currParts = matches[i].match(/(?:([^\s]+) - ([0-9]+)\n)/);
+          let currParts = matches[i].match(/(?:([^\s]+) - ([0-9]+))/);
           sum += parseInt(currParts[2]);
         }
+        totalCt = sum;
         let sum2 = 0;
         for (let i=0; i<matches.length; i++) 
         {
-          let currParts = matches[i].match(/(?:([^\s]+) - ([0-9]+)\n)/);
+          let currParts = matches[i].match(/(?:([^\s]+) - ([0-9]+))/);
           // console.log(currParts);
           sum2 += Number(currParts[2])/sum;
-          data.push({frac:Number(currParts[2])/sum, clr:"#"+colours[i%colours.length], name:currParts[1]});
+          data.push({ct: Number(currParts[2]), frac:Number(currParts[2])/sum, clr:"#"+colours[i%colours.length], name:currParts[1]});
         }
         data.sort((ele1, ele2)=>{return ele2.frac-ele1.frac;});
         console.log(sum2);
@@ -297,7 +236,9 @@ USA - 46
             else 
               tooltip.style.opacity = 1;
             byId("tooltipTitle").innerText = data[i].name;
-            byId("tooltipData").innerText = `${(data[i].frac*100).toFixed(6)}% of total share
+            byId("tooltipData").innerText = `
+            ${(data[i].ct)} ${data[i].ct==1?"person":"people"}
+            ${(data[i].frac*100).toFixed(6)}% of total share
             ${i+1}${suffix(i+1)} place by size`;
             redraw();
           }
@@ -317,10 +258,15 @@ USA - 46
           tooltip2.style.left = e.clientX+15+"px";
           tooltip2.style.top = e.clientY+"px";
           byId("tooltipTitle2").innerText = data[clickedSector].name;
-          byId("tooltipData2").innerText = `${(data[clickedSector].frac*100).toFixed(6)}% of total share
+          byId("tooltipData2").innerText = `
+          ${(data[clickedSector].ct)} ${data[clickedSector].ct==1?"person":"people"}
+          ${(data[clickedSector].frac*100).toFixed(6)}% of total share
           ${clickedSector+1}${suffix(clickedSector+1)} place by size`;
         }
-        else tooltip2.style.opacity = 0;
+        else {
+          tooltip2.style.opacity = 0;
+          tooltip2.style.pointerEvents = "none";
+        }
       }
   
       function windowResize() {
@@ -328,7 +274,20 @@ USA - 46
         canv.width = Math.min(window.innerWidth*0.8, window.innerHeight*0.8);
         canv.height= Math.min(window.innerWidth*0.8, window.innerHeight*0.8);
         // STARTTIME = Date.now();
-        redraw();
+        // redraw();
+      }
+
+      function startDraw() 
+      {
+        let canv = byId("canv");
+        let ctx = canv.getContext("2d");
+        let FONTSZ = canv.width/30;
+        ctx.imageSmoothingQuality = "high";
+        ctx.font = FONTSZ+"px Noto Sans Display";
+        ctx.textAlign="center";
+        ctx.textBaseline="middle";
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--system-blue');
+        ctx.fillText("Loading data... ", canv.width/2, canv.height/2);
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -409,18 +368,16 @@ USA - 46
       globalOnload(()=>{
         // document.getElementById('h').focus(); 
         // openDialog(); 
-        byId('canv').addEventListener('pointermove', onmousemove);
-        byId('canv').addEventListener('pointerup', (e)=>{onclick(e); onmousemove(e);});
-        onLoad();
         windowResize();
-        document.documentElement.addEventListener('beforeunload', function(e) {
-          return 'You have unsaved stuff. Are you sure you want to leave?';
-        });
+        // startDraw();
+        byId('canv').addEventListener('pointermove', onmousemove);
+        document.documentElement.addEventListener('pointerup', (e)=>{onclick(e); onmousemove(e);});
+        onLoad();
         redraw();
       }); 
-      // startDraw()
+
       " 
-    onresize="windowResize()">
+    onresize="windowResize(); redraw();">
     <div class="main_content">
       <header>
         <h2 class="fsmed">Grapher</h2>

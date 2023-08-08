@@ -23,28 +23,29 @@ try {
   connectDB().then((err:any)=>{
     // console.log(thing)
     if (!connectionSuccess) return;
-    uDB.findOne({fieldName:"lastActive"}).then((document:{time:number})=>{
-      if (Date.now - time < 10000)  // <10sec since last report, assume it is active
-      {
-        let readline = require('readline');
+    // uDB.findOne({fieldName:"lastActive"}).then((document:{time:number})=>{
+    //   if (Date.now - time < 10000)  // <10sec since last report, assume it is active
+    //   {
+    //     let readline = require('readline');
 
-        let rl = readline.createInterface({
-          input: process.stdin,
-          output: process.stdout
+    //     let rl = readline.createInterface({
+    //       input: process.stdin,
+    //       output: process.stdout
         
-        });
+    //     });
         
-        rl.question("Confirm start extra instance? ", (answer:string)=>{
-          rl.close();
-          answer = answer.trim().toLowerCase();
-          if (answer != "y" && answer != "yes") exec("kill")
-          else {
-            init()
-          } // extra instances approved
-        });
-      }
-      else init();
-    })
+    //     rl.question("Confirm start extra instance? ", (answer:string)=>{
+    //       rl.close();
+    //       answer = answer.trim().toLowerCase();
+    //       if (answer != "y" && answer != "yes") exec("kill")
+    //       else {
+    //         init()
+    //       } // extra instances approved
+    //     });
+    //   }
+    //   else init();
+    // })
+    init();
   });
   DBConnectFailure = setTimeout(()=>{
     connectionSuccess=false; 

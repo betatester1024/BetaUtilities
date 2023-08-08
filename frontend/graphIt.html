@@ -10,31 +10,30 @@
       let totalCt = 0;
       const gTitle = "Countries of DSA"
       const rawData =         
-`Croatia 1
-Türkiye 6 
-France 5
-Ukraine 3
-United States 45 
-China 4 
-Algeria 1
-Russia 14
-Australia 2
-Bulgaria 2
-Hungary 2
-Taiwan 1
-Germany 1
-Jamaica 1
-Philippines 1
-Spain 1
-Greece 1
-Palestine 1
-Slovakia 1
-Canada 2
-England 1
-Brazil 1
-Azerbaijan 1
-Switzerland 2
-Poland 1`
+`Turkiye - 6 [🇹🇷]
+Switzerland - 2 [🇨🇭]
+Ukraine - 3 [🇺🇦]
+United States - 45 [🇺🇸]
+Croatia - 1 [🇭🇷]
+China - 4 [🇨🇳]
+Algeria - 1 [🇩🇿]
+Australia - 2 [🇦🇺]
+Russian Federation - 14 [🇷🇺]
+Canada - 3 [🇨🇦]
+Bulgaria - 2 [🇧🇬]
+Hungary - 2 [🇭🇺]
+Azerbaijan - 1 [🇦🇿]
+Brazil - 1 [🇧🇷]
+United Kingdom - 2 [🇬🇧]
+Slovakia - 1 [🇸🇰]
+France - 3 [🇫🇷]
+Spain - 1 [🇪🇸]
+Jamaica - 1 [🇯🇲] 
+Taiwan - 1 [🇹🇼]
+Greece - 1 [🇬🇷]
+Palestine - 1 [🇵🇸] 
+Germany - 1 [🇩🇪]
+Philippines - 1 [🇵🇭]`
       const colours = ["ffadad","ffd6a5","fdffb6","caffbf","9bf6ff","a0c4ff","bdb2ff","ffc6ff","fffffc"];
       let data = []
       let activeSector = -1, clickedSector = -1;
@@ -60,7 +59,7 @@ Poland 1`
           ctx.stroke();
           ctx.beginPath();
           // console.log(FONTSZ, FONTSZ*1.1);
-          ctx.font =(FONTSZ*(i==activeSector||i==clickedSector?1.3:1))+"px Noto Sans Display";
+          ctx.font =(FONTSZ*(i==activeSector||i==clickedSector?1.3:1))+"px Noto Sans Display, Noto Color Emoji";
           ctx.fillStyle = activeSector>=0||clickedSector>=0?
             getComputedStyle(document.body).getPropertyValue('--system-grey'):
             getComputedStyle(document.body).getPropertyValue('--system-black');
@@ -77,14 +76,14 @@ Poland 1`
             ctx.stroke();
             ctx.beginPath();
             if (i==activeSector || i==clickedSector) {
-              ctx.font ="normal 600 "+FONTSZ+"px Noto Sans Display";
+              ctx.font ="normal 600 "+FONTSZ+"px Noto Sans Display, Noto Color Emoji";
               ctx.clearRect(canv.width*0.55+WIDTH-5, canv.height/2+HEIGHT*1.1-FONTSZ/2-2, canv.width, FONTSZ);
               ctx.fillStyle = i==clickedSector?
                 getComputedStyle(document.body).getPropertyValue('--system-green'):
                 getComputedStyle(document.body).getPropertyValue('--system-black');
-              ctx.fillText(dat.name, canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1)
+              ctx.fillText(dat.ico, canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1)
             }
-            else ctx.fillText(dat.name, canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1)
+            else ctx.fillText(dat.ico, canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1)
             ctx.closePath();
           }  
           else {
@@ -94,14 +93,14 @@ Poland 1`
             ctx.stroke();
             ctx.beginPath();
             if (i==activeSector || i==clickedSector) {
-              ctx.font ="normal 600 "+FONTSZ+"px Noto Sans Display";
+              ctx.font ="normal 600 "+FONTSZ+"px Noto Sans Display, Noto Color Emoji";
               ctx.clearRect(canv.width*0.45+WIDTH+5-canv.width, canv.height/2+HEIGHT*1.1-FONTSZ/2-2, canv.width, FONTSZ);
               ctx.fillStyle = i==clickedSector?
                 getComputedStyle(document.body).getPropertyValue('--system-green'):
                 getComputedStyle(document.body).getPropertyValue('--system-black');
-              ctx.fillText(dat.name, canv.width*0.45+WIDTH, canv.height/2+HEIGHT*1.1)
+              ctx.fillText(dat.ico, canv.width*0.45+WIDTH, canv.height/2+HEIGHT*1.1)
             }
-            else ctx.fillText(dat.name, canv.width*0.45+WIDTH, canv.height/2+HEIGHT*1.1)
+            else ctx.fillText(dat.ico, canv.width*0.45+WIDTH, canv.height/2+HEIGHT*1.1)
             ctx.closePath();
           }
           // ctx.stroke();
@@ -118,7 +117,7 @@ Poland 1`
         ctx.lineCap = "round";
         ctx.clearRect(0, 0, canv.width, canv.height);
         // ctx.moveTo(canv.width/2, canv.height/2);
-        ctx.font =FONTSZ+"px Noto Sans Display";
+        ctx.font =FONTSZ+"px Noto Sans Display, Noto Color Emoji";
         // ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--system-blue');
         
         ctx.strokeStyle=getComputedStyle(document.body).getPropertyValue('--system-grey');
@@ -139,9 +138,9 @@ Poland 1`
         
         ctx.textAlign="center";
         ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--system-blue');
-        ctx.font = FONTSZ*2+'px Noto Sans Display';
+        ctx.font = FONTSZ*2+'px Noto Sans Display, Noto Color Emoji';
         ctx.fillText(gTitle, canv.width/2, FONTSZ)
-        ctx.font =FONTSZ+"px Noto Sans Display";
+        ctx.font =FONTSZ+"px Noto Sans Display, Noto Color Emoji";
         ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--system-red');
         if (Math.abs(ang - Math.PI*3/2)>0.002) // floating point
           ctx.fillText("WARNING: Values do not add ("+((100*ang/Math.PI/2)+25)+"%) to 100%", canv.width/2, FONTSZ*3);
@@ -178,22 +177,23 @@ Poland 1`
       {
         data = [];
         
-        let matches = rawData.match(/(?:([^\s]+) - ([0-9]+))/gmiu);
-        // console.log(matches);
+        let matches = rawData.match(/(?:(.+) - ([0-9]+) \[(.+)\])/gmiu);
+        console.log(matches);
         let sum=0;
         for (let i=0; i<matches.length; i++) 
         {
-          let currParts = matches[i].match(/(?:([^\s]+) - ([0-9]+))/);
+          let currParts = matches[i].match(/(?:(.+) - ([0-9]+) \[(.+)\])/);
           sum += parseInt(currParts[2]);
         }
         totalCt = sum;
         let sum2 = 0;
         for (let i=0; i<matches.length; i++) 
         {
-          let currParts = matches[i].match(/(?:([^\s]+) - ([0-9]+))/);
+          let currParts = matches[i].match(/(?:(.+) - ([0-9]+)) \[(.+)\]/);
           // console.log(currParts);
           sum2 += Number(currParts[2])/sum;
-          data.push({ct: Number(currParts[2]), frac:Number(currParts[2])/sum, clr:"#"+colours[i%colours.length], name:currParts[1]});
+          data.push({ct: Number(currParts[2]), frac:Number(currParts[2])/sum, 
+                     clr:"#"+colours[i%colours.length], name:currParts[1], ico:currParts[3]});
         }
         data.sort((ele1, ele2)=>{return ele2.frac-ele1.frac;});
         console.log(sum2);
@@ -212,6 +212,7 @@ Poland 1`
         let tooltip = byId("canv_tooltip");
         let tooltip2 = byId("clicked_tooltip");
         tooltip.style.opacity = 0;
+        tooltip.style.pointerEvents = "none";
         activeSector = -1;
         canv.style.backgroundColor = "var(--system-bg)";
         canv.style.cursor="default";
@@ -230,11 +231,12 @@ Poland 1`
             activeSector = i;
             tooltip.style.left = e.clientX+15+"px";
             tooltip.style.top = e.clientY+"px";
-            tooltip.style.opacity = 1;
+            tooltip.style.opacity = 0;
             if (i==clickedSector)
               tooltip.style.opacity = 0;
             else 
               tooltip.style.opacity = 1;
+            tooltip.style.pointerEvents = tooltip.style.opacity==0?"none":"auto";
             byId("tooltipTitle").innerText = data[i].name;
             byId("tooltipData").innerText = `
             ${(data[i].ct)} ${data[i].ct==1?"person":"people"}
@@ -255,6 +257,7 @@ Poland 1`
         if (clickedSector >= 0) 
         {
           tooltip2.style.opacity = 1;
+          tooltip2.style.pointerEvents = "auto";
           tooltip2.style.left = e.clientX+15+"px";
           tooltip2.style.top = e.clientY+"px";
           byId("tooltipTitle2").innerText = data[clickedSector].name;
@@ -283,7 +286,7 @@ Poland 1`
         let ctx = canv.getContext("2d");
         let FONTSZ = canv.width/30;
         ctx.imageSmoothingQuality = "high";
-        ctx.font = FONTSZ+"px Noto Sans Display";
+        ctx.font = FONTSZ+"px Noto Sans Display, Noto Color Emoji";
         ctx.textAlign="center";
         ctx.textBaseline="middle";
         ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--system-blue');
@@ -297,7 +300,7 @@ Poland 1`
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
     <style>
-      canvas {
+      svg, canvas {
         transition: all 0.4s ease;
         width: min(80vw, 80vh);
         height: min(80vw, 80vh);
@@ -339,7 +342,7 @@ Poland 1`
         position: absolute;
         padding: 5px;
         opacity: 0;
-        pointer-events: none;
+        pointer-events: auto;
         cursor: pointer;
         text-align: left;
         outline: 1px solid var(--system-grey2);
@@ -369,11 +372,12 @@ Poland 1`
         // document.getElementById('h').focus(); 
         // openDialog(); 
         windowResize();
-        // startDraw();
+        startDraw();
+        setTimeout(()=>{
         byId('canv').addEventListener('pointermove', onmousemove);
         document.documentElement.addEventListener('pointerup', (e)=>{onclick(e); onmousemove(e);});
         onLoad();
-        redraw();
+        redraw();}, 1000);
       }); 
 
       " 
@@ -383,6 +387,10 @@ Poland 1`
         <h2 class="fsmed">Grapher</h2>
         <hr class="rounded">
       </header>
+      <!-- <svg id="svg" width="100" height="100" xmlns="http://www.w3.org/2000/svg"> -->
+        <!-- <path d="M 50 50 A 30 30 0 0 1 50 0" 
+          stroke="black" fill="green" stroke-width="2" fill-opacity="0.5"/>
+      </svg> -->
       <canvas id="canv" width="500" height="500"></canvas><br>
        <div id="clicked_tooltip">
         <b id="tooltipTitle2"></b>

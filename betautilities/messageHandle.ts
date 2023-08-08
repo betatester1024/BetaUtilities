@@ -38,6 +38,10 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     systemLog(validWords[todayWordID]+" "+todayLeetCODE.join(""));
     return "> See console <"
   }
+  if (msg == "!branch") 
+  {
+    return process.env['branch'];
+  }
   if (msg == "!acquirecake") {
     return ":cake:";
   }

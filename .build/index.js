@@ -42,21 +42,7 @@ try {
     (0, import_database.connectDB)().then((err) => {
       if (!connectionSuccess)
         return;
-      import_consts.uDB.findOne({ fieldName: "ROOMS" });
-      let readline = require("readline");
-      let rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-      });
-      rl.question("Confirm start extra instance? ", (answer) => {
-        rl.close();
-        answer = answer.trim().toLowerCase();
-        if (answer != "y" && answer != "yes")
-          exec("kill");
-        else {
-          init();
-        }
-      });
+      init();
     });
   DBConnectFailure = setTimeout(() => {
     connectionSuccess = false;

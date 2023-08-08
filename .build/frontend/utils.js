@@ -17,7 +17,7 @@ async function globalOnload(cbk, networkLess = false) {
     script.onload = () => {
       WebFont.load({
         google: {
-          families: ["Noto Sans Mono", "Noto Sans Display"]
+          families: ["Noto Sans Mono", "Noto Sans Display", "Noto Color Emoji"]
         }
       });
       console.log("Font loaded!");
@@ -447,7 +447,7 @@ addEventListener("DOMContentLoaded", function() {
   </div>`;
   document.body.appendChild(overlay);
   let metatags = document.createElement("meta");
-  metatags.content = "width=device-width; initial-scale=1.0; min-scale=1.0";
+  metatags.content = "width=device-width, initial-scale=1.0, min-scale=1.0";
   metatags.name = "viewport";
   document.head.appendChild(metatags);
 });

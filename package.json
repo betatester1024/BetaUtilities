@@ -13,7 +13,7 @@
     "@google-cloud/local-auth": "^2.1.1",
     "@replit/database": "^2.0.5",
     "@trycourier/courier": "^5.0.0",
-    "argon2": "^0.30.3",
+    "argon2": "^0.31.0",
     "bad-words": "^3.0.4",
     "bcrypt": "^5.1.0",
     "bcrypt-ts": "^4.0.0",

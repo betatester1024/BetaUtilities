@@ -10,32 +10,46 @@
       let totalCt = 0;
       const gTitle = "Countries of DSA"
       const rawData =         
-`Turkiye - 6 [🇹🇷]
-Switzerland - 2 [🇨🇭]
-Ukraine - 3 [🇺🇦]
-United States - 45 [🇺🇸]
-Croatia - 1 [🇭🇷]
-China - 4 [🇨🇳]
-Algeria - 1 [🇩🇿]
-Australia - 2 [🇦🇺]
-Russian Federation - 14 [🇷🇺]
-Canada - 3 [🇨🇦]
+`Turkiye - 21 [🇹🇷]
+Switzerland - 3 [🇨🇭]
+Ukraine - 4 [🇺🇦]
+United States - 76 [🇺🇸]
+Prussia - 2 [P]
+Croatia - 2 [🇭🇷]
+China - 6 [🇨🇳]
+Algeria - 2 [🇩🇿]
+Australia - 3 [🇦🇺]
+Russian Federation - 27 [🇷🇺]
+Canada - 5 [🇨🇦]
 Bulgaria - 2 [🇧🇬]
 Hungary - 2 [🇭🇺]
-Azerbaijan - 1 [🇦🇿]
-Brazil - 1 [🇧🇷]
-United Kingdom - 2 [🇬🇧]
+Azerbaijan - 2 [🇦🇿]
+Brazil - 8 [🇧🇷]
+United Kingdom - 3 [🇬🇧]
 Slovakia - 1 [🇸🇰]
 France - 3 [🇫🇷]
-Spain - 1 [🇪🇸]
+Spain - 2 [🇪🇸]
 Jamaica - 1 [🇯🇲] 
 Taiwan - 1 [🇹🇼]
 Greece - 1 [🇬🇷]
-Palestine - 1 [🇵🇸] 
-Germany - 1 [🇩🇪]
-Philippines - 1 [🇵🇭]`
+Palestine - 2 [🇵🇸] 
+Germany - 3 [🇩🇪]
+Philippines - 4 [🇵🇭]
+Poland - 3 [🇵🇱]
+Japan - 2 [🇯🇵]
+Sweden - 2 [🇸🇪]
+Serbia - 1 [🇷🇸]
+Moldova - 1 [🇲🇩]
+South Africa - 1 [🇿🇦]
+Ecuador - 2 [🇪🇨]
+Czech Republic - 2 [🇨🇿]
+Venezuela - 1 [🇻🇪]
+Mexico - 1 [🇲🇽]
+Colombia - 1 [🇨🇴]
+Indonesia - 1 [🇮🇩]`
       const colours = ["ffadad","ffd6a5","fdffb6","caffbf","9bf6ff","a0c4ff","bdb2ff","ffc6ff","fffffc"];
       let data = []
+      let IMG;
       let activeSector = -1, clickedSector = -1;
       function redraw() {
 
@@ -81,9 +95,15 @@ Philippines - 1 [🇵🇭]`
               ctx.fillStyle = i==clickedSector?
                 getComputedStyle(document.body).getPropertyValue('--system-green'):
                 getComputedStyle(document.body).getPropertyValue('--system-black');
-              ctx.fillText(dat.ico, canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1)
+              if (dat.ico=="P")
+                ctx.drawImage(IMG,  canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, 20, scaledImgHeight);
+              else ctx.fillText(dat.ico, canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1)
             }
-            else ctx.fillText(dat.ico, canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1)
+            else {
+              if (dat.ico=="P")
+                ctx.drawImage(IMG,  canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, 20, scaledImgHeight);
+              else ctx.fillText(dat.ico, canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1)
+            }
             ctx.closePath();
           }  
           else {
@@ -98,9 +118,15 @@ Philippines - 1 [🇵🇭]`
               ctx.fillStyle = i==clickedSector?
                 getComputedStyle(document.body).getPropertyValue('--system-green'):
                 getComputedStyle(document.body).getPropertyValue('--system-black');
-              ctx.fillText(dat.ico, canv.width*0.45+WIDTH, canv.height/2+HEIGHT*1.1)
+              if (dat.ico=="P")
+                ctx.drawImage(IMG,  canv.width*0.45+WIDTH-20, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, 20, scaledImgHeight);
+              else ctx.fillText(dat.ico, canv.width*0.45+WIDTH, canv.height/2+HEIGHT*1.1)
             }
-            else ctx.fillText(dat.ico, canv.width*0.45+WIDTH, canv.height/2+HEIGHT*1.1)
+            else {
+              if (dat.ico=="P")
+                ctx.drawImage(IMG,  canv.width*0.45+WIDTH-20, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, 20, scaledImgHeight);
+              else ctx.fillText(dat.ico, canv.width*0.45+WIDTH, canv.height/2+HEIGHT*1.1)
+            }
             ctx.closePath();
           }
           // ctx.stroke();
@@ -176,7 +202,8 @@ Philippines - 1 [🇵🇭]`
       function onLoad() 
       {
         data = [];
-        
+        IMG = byId("IMG");
+        scaledImgHeight = 20*IMG.height/IMG.width;
         let matches = rawData.match(/(?:(.+) - ([0-9]+) \[(.+)\])/gmiu);
         console.log(matches);
         let sum=0;
@@ -387,6 +414,7 @@ Philippines - 1 [🇵🇭]`
         <h2 class="fsmed">Grapher</h2>
         <hr class="rounded">
       </header>
+      <image style="display:none" id="IMG" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Flag_of_Prussia_%281892-1918%29.svg/640px-Flag_of_Prussia_%281892-1918%29.svg.png"></image>
       <!-- <svg id="svg" width="100" height="100" xmlns="http://www.w3.org/2000/svg"> -->
         <!-- <path d="M 50 50 A 30 30 0 0 1 50 0" 
           stroke="black" fill="green" stroke-width="2" fill-opacity="0.5"/>

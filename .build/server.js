@@ -711,7 +711,8 @@ const validPages = [
   "/credits",
   "/atomicmoose",
   "/issuetracker",
-  "/graphIt"
+  "/graphIt",
+  "/betterselect"
 ];
 const ignoreLog = [
   "getEE",

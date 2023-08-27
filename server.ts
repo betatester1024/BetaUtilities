@@ -683,7 +683,7 @@ function tooManyRequests() {
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
                     '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest',
                     "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle', '/sweepthatmine',
-                   "/stopwatch", "/testbed", '/credits', '/atomicmoose', '/issuetracker', '/graphIt'];
+                   "/stopwatch", "/testbed", '/credits', '/atomicmoose', '/issuetracker', '/graphIt', '/betterselect'];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',
                   'paste', 'findPaste'];

@@ -50,6 +50,7 @@ Indonesia - 1 [🇮🇩]`
       const colours = ["ffadad","ffd6a5","fdffb6","caffbf","9bf6ff","a0c4ff","bdb2ff","ffc6ff","fffffc"];
       let data = []
       let IMG;
+      const imgWidth = 50;
       let activeSector = -1, clickedSector = -1;
       function redraw() {
 
@@ -96,12 +97,12 @@ Indonesia - 1 [🇮🇩]`
                 getComputedStyle(document.body).getPropertyValue('--system-green'):
                 getComputedStyle(document.body).getPropertyValue('--system-black');
               if (dat.ico=="P")
-                ctx.drawImage(IMG,  canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, 20, scaledImgHeight);
+                ctx.drawImage(IMG,  canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, imgWidth, scaledImgHeight);
               else ctx.fillText(dat.ico, canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1)
             }
             else {
               if (dat.ico=="P")
-                ctx.drawImage(IMG,  canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, 20, scaledImgHeight);
+                ctx.drawImage(IMG,  canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, imgWidth, scaledImgHeight);
               else ctx.fillText(dat.ico, canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1)
             }
             ctx.closePath();
@@ -119,12 +120,12 @@ Indonesia - 1 [🇮🇩]`
                 getComputedStyle(document.body).getPropertyValue('--system-green'):
                 getComputedStyle(document.body).getPropertyValue('--system-black');
               if (dat.ico=="P")
-                ctx.drawImage(IMG,  canv.width*0.45+WIDTH-20, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, 20, scaledImgHeight);
+                ctx.drawImage(IMG,  canv.width*0.45+WIDTH-imgWidth, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, imgWidth, scaledImgHeight);
               else ctx.fillText(dat.ico, canv.width*0.45+WIDTH, canv.height/2+HEIGHT*1.1)
             }
             else {
               if (dat.ico=="P")
-                ctx.drawImage(IMG,  canv.width*0.45+WIDTH-20, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, 20, scaledImgHeight);
+                ctx.drawImage(IMG,  canv.width*0.45+WIDTH-imgWidth, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, imgWidth, scaledImgHeight);
               else ctx.fillText(dat.ico, canv.width*0.45+WIDTH, canv.height/2+HEIGHT*1.1)
             }
             ctx.closePath();
@@ -203,7 +204,7 @@ Indonesia - 1 [🇮🇩]`
       {
         data = [];
         IMG = byId("IMG");
-        scaledImgHeight = 20*IMG.height/IMG.width;
+        scaledImgHeight = imgWidth*IMG.height/IMG.width;
         let matches = rawData.match(/(?:(.+) - ([0-9]+) \[(.+)\])/gmiu);
         console.log(matches);
         let sum=0;

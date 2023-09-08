@@ -145,10 +145,10 @@ h2 {
   color: var(--system-grey) !important;
   background-color: var(--system-grey2) !important;
 }
-input:focus + div.anim,
-input:hover + div.anim,
-select:focus + div.anim,
-select:hover + div.anim,
+input:focus ~ div.anim,
+input:hover ~ div.anim,
+select:focus ~ div.anim,
+select:hover ~ div.anim,
 div.inpContainer:hover > div.anim {
   width: 100%;
   opacity: 1;
@@ -857,6 +857,7 @@ summary::marker {
   text-align: center;
   text-orientation: sideways;
   font-size: 20px;
+  overflow-y: auto;
 }
 .sidebar-unstable > span 
 {

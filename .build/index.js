@@ -39,33 +39,10 @@ const { exec } = require("child_process");
 let UPSINCESTR = "";
 try {
   if (connectionSuccess)
-    (0, import_database.connectDB)().then((thing) => {
-      console.log(thing);
+    (0, import_database.connectDB)().then((err) => {
       if (!connectionSuccess)
         return;
-      (0, import_server.initServer)();
-      (0, import_database.DBMaintenance)();
-      (0, import_wordler.serverUpdate)();
-      let now = new Date(Date.now());
-      UPSINCESTR = "----------------------Systems restarted at " + now.toLocaleString("en-US", { timeZone: "America/New_York" }) + "-------------------";
-      (0, import_logging.log)(UPSINCESTR);
-      import_consts.uDB.findOne({ fieldName: "ROOMS" }).then((obj) => {
-        console.log(obj);
-        for (let i = 0; i < obj.euphRooms.length; i++) {
-          import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("EUPH_ROOM", obj.euphRooms[i]));
-          new import_wsHandler.WS("wss://euphoria.io/room/" + obj.euphRooms[i] + "/ws", "BetaUtilities", obj.euphRooms[i], !(obj.euphRooms[i] == "test" || obj.euphRooms[i] == "bots"));
-          (0, import_logging.log)("Connected euph_room") + obj.euphRooms[i];
-          console.log("Connected euph_room", obj.euphRooms[i]);
-        }
-        for (let i = 0; i < obj.rooms.length; i++) {
-          new import_webHandler.WebH(obj.rooms[i], false);
-          console.log("Loaded support room", obj.rooms[i]);
-        }
-        for (let i = 0; i < obj.hidRooms.length; i++) {
-          new import_webHandler.WebH(obj.hidRooms[i], true);
-          console.log("Loaded hidden support room", obj.hidRooms[i]);
-        }
-      });
+      init();
     });
   DBConnectFailure = setTimeout(() => {
     connectionSuccess = false;
@@ -79,6 +56,31 @@ try {
   }, 29e3);
 } catch (e) {
   console.log(e);
+}
+async function init() {
+  (0, import_server.initServer)();
+  (0, import_database.DBMaintenance)();
+  (0, import_wordler.serverUpdate)();
+  let now = new Date(Date.now());
+  UPSINCESTR = "----------------------Systems restarted at " + now.toLocaleString("en-US", { timeZone: "America/New_York" }) + "-------------------";
+  (0, import_logging.log)(UPSINCESTR);
+  import_consts.uDB.findOne({ fieldName: "ROOMS" }).then((obj) => {
+    console.log(obj);
+    for (let i = 0; i < obj.euphRooms.length; i++) {
+      import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("EUPH_ROOM", obj.euphRooms[i]));
+      new import_wsHandler.WS("wss://euphoria.io/room/" + obj.euphRooms[i] + "/ws", "BetaUtilities", obj.euphRooms[i], !(obj.euphRooms[i] == "test" || obj.euphRooms[i] == "bots"));
+      (0, import_logging.log)("Connected euph_room") + obj.euphRooms[i];
+      console.log("Connected euph_room", obj.euphRooms[i]);
+    }
+    for (let i = 0; i < obj.rooms.length; i++) {
+      new import_webHandler.WebH(obj.rooms[i], false);
+      console.log("Loaded support room", obj.rooms[i]);
+    }
+    for (let i = 0; i < obj.hidRooms.length; i++) {
+      new import_webHandler.WebH(obj.hidRooms[i], true);
+      console.log("Loaded hidden support room", obj.hidRooms[i]);
+    }
+  });
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

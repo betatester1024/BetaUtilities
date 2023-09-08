@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html class="{{mainClass}}">
+  <head>
+    <audio id="notif">
+      <source src="notif.wav" type="audio/wav">
+    </audio>
+    <script src='./utils.js'></script>
+    <title>Grapher | BetaOS Systems</title></title>
+    <script>
+      let totalCt = 0;
+      const gTitle = "Countries of DSA"
+      const rawData =         
+`Turkiye - 21 [🇹🇷]
+Switzerland - 3 [🇨🇭]
+Ukraine - 4 [🇺🇦]
+United States - 76 [🇺🇸]
+Prussia - 2 [P]
+Croatia - 2 [🇭🇷]
+China - 6 [🇨🇳]
+Algeria - 2 [🇩🇿]
+Australia - 3 [🇦🇺]
+Russian Federation - 27 [🇷🇺]
+Canada - 5 [🇨🇦]
+Bulgaria - 2 [🇧🇬]
+Hungary - 2 [🇭🇺]
+Azerbaijan - 2 [🇦🇿]
+Brazil - 8 [🇧🇷]
+United Kingdom - 3 [🇬🇧]
+Slovakia - 1 [🇸🇰]
+France - 3 [🇫🇷]
+Spain - 2 [🇪🇸]
+Jamaica - 1 [🇯🇲] 
+Taiwan - 1 [🇹🇼]
+Greece - 1 [🇬🇷]
+Palestine - 2 [🇵🇸] 
+Germany - 3 [🇩🇪]
+Philippines - 4 [🇵🇭]
+Poland - 3 [🇵🇱]
+Japan - 2 [🇯🇵]
+Sweden - 2 [🇸🇪]
+Serbia - 1 [🇷🇸]
+Moldova - 1 [🇲🇩]
+South Africa - 1 [🇿🇦]
+Ecuador - 2 [🇪🇨]
+Czech Republic - 2 [🇨🇿]
+Venezuela - 1 [🇻🇪]
+Mexico - 1 [🇲🇽]
+Colombia - 1 [🇨🇴]
+Indonesia - 1 [🇮🇩]`
+      const colours = ["ffadad","ffd6a5","fdffb6","caffbf","9bf6ff","a0c4ff","bdb2ff","ffc6ff","fffffc"];
+      let data = []
+      let IMG;
+      const imgWidth = 50;
+      let activeSector = -1, clickedSector = -1;
+      function redraw() {
+
+        function draw(i) 
+        {
+          ctx.beginPath();
+          ctx.strokeStyle=(i==clickedSector?
+                         getComputedStyle(document.body).getPropertyValue('--system-green'):
+                           (i==activeSector || (activeSector<0 && clickedSector<0)?
+                            getComputedStyle(document.body).getPropertyValue('--system-grey'):
+                            getComputedStyle(document.body).getPropertyValue('--system-grey3')));
+          ctx.moveTo(canv.width/2, canv.height/2);
+          // ctx.lineTo(canv.width/2+RAD*Math.cos(ang), canv.height/2+RAD*Math.sin(ang));
+          ctx.arc(canv.width/2, canv.height/2, RAD, ang, nextAng);
+          ctx.lineTo(canv.width/2, canv.height/2);
+          ctx.fillStyle = dat.clr;
+          // console.log("Fillstyle "+dat.clr)
+          ctx.textBaseline = "middle";
+          // FILL B4 STROKING !!!
+          ctx.fill();
+          ctx.stroke();
+          ctx.beginPath();
+          // console.log(FONTSZ, FONTSZ*1.1);
+          ctx.font =(FONTSZ*(i==activeSector||i==clickedSector?1.3:1))+"px Noto Sans Display, Noto Color Emoji";
+          ctx.fillStyle = activeSector>=0||clickedSector>=0?
+            getComputedStyle(document.body).getPropertyValue('--system-grey'):
+            getComputedStyle(document.body).getPropertyValue('--system-black');
+          let avgAng = (ang+nextAng)/2;
+          let HEIGHT = RAD*Math.sin(avgAng);
+          let WIDTH = RAD*Math.cos(avgAng);
+          ctx.moveTo(canv.width/2+WIDTH*0.95, canv.height/2+HEIGHT*0.95);
+          ctx.lineTo(canv.width/2+WIDTH*1.1, canv.height/2+HEIGHT*1.1);
+          if (avgAng+Math.PI/2< Math.PI) // ang < 180*, is on the right
+          {
+            ctx.textAlign = "left";
+            // -10 for margin
+            ctx.lineTo(canv.width*0.55+WIDTH-10, canv.height/2+HEIGHT*1.1);
+            ctx.stroke();
+            ctx.beginPath();
+            if (i==activeSector || i==clickedSector) {
+              ctx.font ="normal 600 "+FONTSZ+"px Noto Sans Display, Noto Color Emoji";
+              ctx.clearRect(canv.width*0.55+WIDTH-5, canv.height/2+HEIGHT*1.1-FONTSZ/2-2, canv.width, FONTSZ);
+              ctx.fillStyle = i==clickedSector?
+                getComputedStyle(document.body).getPropertyValue('--system-green'):
+                getComputedStyle(document.body).getPropertyValue('--system-black');
+              if (dat.ico=="P")
+                ctx.drawImage(IMG,  canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, imgWidth, scaledImgHeight);
+              else ctx.fillText(dat.ico, canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1)
+            }
+            else {
+              if (dat.ico=="P")
+                ctx.drawImage(IMG,  canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, imgWidth, scaledImgHeight);
+              else ctx.fillText(dat.ico, canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1)
+            }
+            ctx.closePath();
+          }  
+          else {
+            ctx.textAlign = "right";
+            // +10 for margin
+            ctx.lineTo(canv.width*0.45+WIDTH+10, canv.height/2+HEIGHT*1.1);
+            ctx.stroke();
+            ctx.beginPath();
+            if (i==activeSector || i==clickedSector) {
+              ctx.font ="normal 600 "+FONTSZ+"px Noto Sans Display, Noto Color Emoji";
+              ctx.clearRect(canv.width*0.45+WIDTH+5-canv.width, canv.height/2+HEIGHT*1.1-FONTSZ/2-2, canv.width, FONTSZ);
+              ctx.fillStyle = i==clickedSector?
+                getComputedStyle(document.body).getPropertyValue('--system-green'):
+                getComputedStyle(document.body).getPropertyValue('--system-black');
+              if (dat.ico=="P")
+                ctx.drawImage(IMG,  canv.width*0.45+WIDTH-imgWidth, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, imgWidth, scaledImgHeight);
+              else ctx.fillText(dat.ico, canv.width*0.45+WIDTH, canv.height/2+HEIGHT*1.1)
+            }
+            else {
+              if (dat.ico=="P")
+                ctx.drawImage(IMG,  canv.width*0.45+WIDTH-imgWidth, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, imgWidth, scaledImgHeight);
+              else ctx.fillText(dat.ico, canv.width*0.45+WIDTH, canv.height/2+HEIGHT*1.1)
+            }
+            ctx.closePath();
+          }
+          // ctx.stroke();
+          // ctx.beginPath();
+        }
+
+        
+        let canv = document.getElementById("canv");
+        let FONTSZ = canv.width/30;
+        let ctx = canv.getContext("2d");
+        // ctx.beginPath();
+        ctx.textAlign="center";
+        ctx.textBaseline="middle";
+        ctx.lineCap = "round";
+        ctx.clearRect(0, 0, canv.width, canv.height);
+        // ctx.moveTo(canv.width/2, canv.height/2);
+        ctx.font =FONTSZ+"px Noto Sans Display, Noto Color Emoji";
+        // ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--system-blue');
+        
+        ctx.strokeStyle=getComputedStyle(document.body).getPropertyValue('--system-grey');
+        // ctx.arc(canv.width/2, canv.height/2, canv.width*0.4, 0, Math.PI*2);
+        ctx.lineWidth=Math.floor(canv.width/150);
+        const RAD = canv.width*0.3;
+        let ang = -Math.PI/2, nextAng = 0, activeSectorAng = 0, clickedSectorAng = 0;
+        let dat = null;
+        for (let i=0; i<data.length; i++) 
+        {
+          dat = data[i];
+          nextAng = ang+(Math.PI*2*dat.frac);
+          if (i==activeSector) activeSectorAng = ang;
+          if (i==clickedSector) clickedSectorAng = ang;
+          draw(i);
+          ang = nextAng;
+        }
+        
+        ctx.textAlign="center";
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--system-blue');
+        ctx.font = FONTSZ*2+'px Noto Sans Display, Noto Color Emoji';
+        ctx.fillText(gTitle, canv.width/2, FONTSZ)
+        ctx.font =FONTSZ+"px Noto Sans Display, Noto Color Emoji";
+        ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--system-red');
+        if (Math.abs(ang - Math.PI*3/2)>0.002) // floating point
+          ctx.fillText("WARNING: Values do not add ("+((100*ang/Math.PI/2)+25)+"%) to 100%", canv.width/2, FONTSZ*3);
+        ctx.textAlign="left";
+        
+        if (activeSector >= 0) {
+          dat = data[activeSector];
+          ang = activeSectorAng;
+          nextAng = activeSectorAng+(Math.PI*2*dat.frac);
+          draw(activeSector);
+        }
+
+        if (clickedSector >= 0) {
+          dat = data[clickedSector];
+          ang =  clickedSectorAng;
+          nextAng = clickedSectorAng+(Math.PI*2*dat.frac);
+          draw(clickedSector);
+        }
+
+        // ctx.stroke();
+        // ctx.beginPath();
+        // if (frac >= 1) {
+        //   return;
+        // }
+        // frac = Math.min(1, frac);
+        // ctx.strokeStyle=getComputedStyle(document.body).getPropertyValue('--system-blue');
+        
+        // ctx.lineCap="round";
+        // ctx.arc(canv.width/2, canv.height/2, canv.width*0.4, -Math.PI/2, -Math.PI/2+frac*2*Math.PI, true);
+        // ctx.stroke();
+      }
+
+      function onLoad() 
+      {
+        data = [];
+        IMG = byId("IMG");
+        scaledImgHeight = imgWidth*IMG.height/IMG.width;
+        let matches = rawData.match(/(?:(.+) - ([0-9]+) \[(.+)\])/gmiu);
+        console.log(matches);
+        let sum=0;
+        for (let i=0; i<matches.length; i++) 
+        {
+          let currParts = matches[i].match(/(?:(.+) - ([0-9]+) \[(.+)\])/);
+          sum += parseInt(currParts[2]);
+        }
+        totalCt = sum;
+        let sum2 = 0;
+        for (let i=0; i<matches.length; i++) 
+        {
+          let currParts = matches[i].match(/(?:(.+) - ([0-9]+)) \[(.+)\]/);
+          // console.log(currParts);
+          sum2 += Number(currParts[2])/sum;
+          data.push({ct: Number(currParts[2]), frac:Number(currParts[2])/sum, 
+                     clr:"#"+colours[i%colours.length], name:currParts[1], ico:currParts[3]});
+        }
+        data.sort((ele1, ele2)=>{return ele2.frac-ele1.frac;});
+        console.log(sum2);
+      }
+
+      function onmousemove(e) {
+        let rect = byId("canv").getBoundingClientRect();
+        let x = e.clientX - rect.left; //x position within the element.
+        let y = e.clientY - rect.top;  //y position within the element.
+        let dy = y-rect.width/2;
+        let dx = x-rect.width/2;
+        let ang = Math.atan2(dy, dx);
+        ang = (ang+2.5*Math.PI)%(2*Math.PI); // - 90deg
+        let rad = Math.sqrt(dy*dy+dx*dx);
+        let datAng = 0;
+        let tooltip = byId("canv_tooltip");
+        let tooltip2 = byId("clicked_tooltip");
+        tooltip.style.opacity = 0;
+        tooltip.style.pointerEvents = "none";
+        activeSector = -1;
+        canv.style.backgroundColor = "var(--system-bg)";
+        canv.style.cursor="default";
+        if (rad >canv.width*0.3) {
+          redraw();
+          return;
+        }
+        for (let i=0; i<data.length; i++) 
+        {
+          let dat = data[i];
+          let nextAng = datAng+dat.frac*Math.PI*2;
+          if (ang > datAng && ang < nextAng) 
+          {
+            // canv.style.backgroundColor = "var(--system-grey2)";
+            canv.style.cursor = "pointer";
+            activeSector = i;
+            tooltip.style.left = e.clientX+15+"px";
+            tooltip.style.top = e.clientY+"px";
+            tooltip.style.opacity = 0;
+            if (i==clickedSector)
+              tooltip.style.opacity = 0;
+            else 
+              tooltip.style.opacity = 1;
+            tooltip.style.pointerEvents = tooltip.style.opacity==0?"none":"auto";
+            byId("tooltipTitle").innerText = data[i].name;
+            byId("tooltipData").innerText = `
+            ${(data[i].ct)} ${data[i].ct==1?"person":"people"}
+            ${(data[i].frac*100).toFixed(6)}% of total share
+            ${i+1}${suffix(i+1)} place by size`;
+            redraw();
+          }
+          datAng = nextAng;
+        }
+        // console.log(activeSector);
+        redraw();
+        // console.log((ang+2*Math.PI)%(2*Math.PI), rad); // make it +ve
+      }
+      function onclick(e) 
+      {
+        clickedSector = activeSector==clickedSector?-1:activeSector;
+        let tooltip2 = byId("clicked_tooltip");
+        if (clickedSector >= 0) 
+        {
+          tooltip2.style.opacity = 1;
+          tooltip2.style.pointerEvents = "auto";
+          tooltip2.style.left = e.clientX+15+"px";
+          tooltip2.style.top = e.clientY+"px";
+          byId("tooltipTitle2").innerText = data[clickedSector].name;
+          byId("tooltipData2").innerText = `
+          ${(data[clickedSector].ct)} ${data[clickedSector].ct==1?"person":"people"}
+          ${(data[clickedSector].frac*100).toFixed(6)}% of total share
+          ${clickedSector+1}${suffix(clickedSector+1)} place by size`;
+        }
+        else {
+          tooltip2.style.opacity = 0;
+          tooltip2.style.pointerEvents = "none";
+        }
+      }
+  
+      function windowResize() {
+        let canv = document.getElementById("canv");
+        canv.width = Math.min(window.innerWidth*0.8, window.innerHeight*0.8);
+        canv.height= Math.min(window.innerWidth*0.8, window.innerHeight*0.8);
+        // STARTTIME = Date.now();
+        // redraw();
+      }
+
+      function startDraw() 
+      {
+        let canv = byId("canv");
+        let ctx = canv.getContext("2d");
+        let FONTSZ = canv.width/30;
+        ctx.imageSmoothingQuality = "high";
+        ctx.font = FONTSZ+"px Noto Sans Display, Noto Color Emoji";
+        ctx.textAlign="center";
+        ctx.textBaseline="middle";
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--system-blue');
+        ctx.fillText("Loading data... ", canv.width/2, canv.height/2);
+      }
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      svg, canvas {
+        transition: all 0.4s ease;
+        width: min(80vw, 80vh);
+        height: min(80vw, 80vh);
+        /* cursor: pointer; */
+      }
+      canvas:hover {
+        
+        /* background-color: var(--system-grey2); */
+        border-radius: 15px;
+      }
+      input {
+        background-color: var(--system-grey2)
+      }
+      .timerCtn {
+        margin-left: 0px !important;
+        margin-right: 0px !important;
+        text-align: center !important;
+      }
+      .btn {
+        transition: all 0.4s ease;
+      }
+      #dialog {
+        top: 50vh; 
+        opacity: 0;
+        pointer-events: none;
+      }
+      #dialog > .internal {
+        display: relative;
+        margin: 10px auto;
+        border-radius: 15px;
+        width: 90%;
+        background-color: var(--system-bg);
+        padding: 15px;
+      }
+      #canv_tooltip, #clicked_tooltip {
+        border-radius: 5px;
+        background-color: var(--system-overlay);
+        transition: opacity 0.5s ease;
+        position: absolute;
+        padding: 5px;
+        opacity: 0;
+        pointer-events: auto;
+        cursor: pointer;
+        text-align: left;
+        outline: 1px solid var(--system-grey2);
+        box-shadow: 3px 3px 3px var(--system-grey);
+      }
+      #clicked_tooltip {
+        transition: all 0.5s ease;
+        pointer-events: auto;
+        cursor: default;
+      }
+      #clicked_tooltip > b, #clicked_tooltip > p 
+      {
+        cursor: text;
+      }
+      #clicked_tooltip:hover ~ #canv_tooltip 
+      {
+        opacity: 0 !important;
+        pointer-events: none;
+      }
+      b{
+        color: var(--system-black);
+      }
+    </style>
+  </head>
+  <body onload = "
+      globalOnload(()=>{
+        // document.getElementById('h').focus(); 
+        // openDialog(); 
+        windowResize();
+        startDraw();
+        setTimeout(()=>{
+        byId('canv').addEventListener('pointermove', onmousemove);
+        document.documentElement.addEventListener('pointerup', (e)=>{onclick(e); onmousemove(e);});
+        onLoad();
+        redraw();}, 1000);
+      }); 
+
+      " 
+    onresize="windowResize(); redraw();">
+    <div class="main_content">
+      <header>
+        <h2 class="fsmed">Grapher</h2>
+        <hr class="rounded">
+      </header>
+      <image style="display:none" id="IMG" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Flag_of_Prussia_%281892-1918%29.svg/640px-Flag_of_Prussia_%281892-1918%29.svg.png"></image>
+      <!-- <svg id="svg" width="100" height="100" xmlns="http://www.w3.org/2000/svg"> -->
+        <!-- <path d="M 50 50 A 30 30 0 0 1 50 0" 
+          stroke="black" fill="green" stroke-width="2" fill-opacity="0.5"/>
+      </svg> -->
+      <canvas id="canv" width="500" height="500"></canvas><br>
+       <div id="clicked_tooltip">
+        <b id="tooltipTitle2"></b>
+        <p id="tooltipData2"></p>
+      </div>
+      <div id="canv_tooltip">
+        <b id="tooltipTitle"></b>
+        <p id="tooltipData"></p>
+      </div>
+     
+      <a class="btn override" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+    </div>
+    <div class="overlay" id="overlay"></div>
+    <div class="overlay_dialog" id="dialog">
+      <div class="internal">
+        <h2 class="fsmed">Enter a time: </h2>
+        <form style="text-align: center; margin: 10px auto;" action="javascript:updateTime()">
+          <div class="inpContainer szThird nowrap timerCtn">
+            <input class="inp szFull noMin" id="h" type="number" value="" max="99" min="0" placeholder="Hrs">
+            <div class="anim inp"></div>
+          </div>
+          <div class="inpContainer szThird nowrap timerCtn">
+            <input class="inp szFull noMin" id="m" type="number" value="" max="99" min="0" placeholder="Min">
+            <div class="anim inp"></div>
+          </div>
+          <div class="inpContainer szThird nowrap timerCtn">
+            <input class="inp szFull noMin" id="s" type="number" value="" max="99" min="0" placeholder="Sec">
+            <div class="anim inp"></div>
+          </div><br>
+          <button style="display: none;">
+          </button>
+        </form>
+        
+      </div>
+      <button onclick="updateTime()" class="btn grn">
+        <span class="material-symbols-outlined">check</span>
+        <div class="anim"></div>
+      </button>
+      <button onclick="closeDialog(()=>{document.getElementById('startBtn').focus();})" class="btn red nooutline">
+        <span class="material-symbols-outlined">close</span>
+        <div class="anim"></div>
+      </button>
+    </div>
+    
+  </body>
+</html>

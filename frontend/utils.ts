@@ -20,7 +20,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
     script.onload=()=>{
       WebFont.load({
         google: {
-          families: ['Noto Sans Mono', 'Noto Sans Display']
+          families: ['Noto Sans Mono', 'Noto Sans Display', 'Noto Color Emoji']
         }
       });
       console.log("Font loaded!")
@@ -469,6 +469,15 @@ function keydown(e: Event) {
   }
 }
 
+function suffix(i:number) 
+{
+  // 11st is wrong, it is 11th. 111st is also wrong, and so is 1011th... 21st OK
+  if (i%10==1 && i%100 != 11) return "st";
+  // 12nd is wrong, so is 112, etc...
+  if (i%10==2 && i%100 != 12) return "nd";
+  if (i%10==3 && i%100 != 13) return "rd";
+  return "th";
+}
 function toTime(ms: number, inclMs) {
   let day = Math.floor(ms / 1000 / 60 / 60 / 24);
   ms = ms % (1000 * 60 * 60 * 24);
@@ -523,7 +532,7 @@ addEventListener("DOMContentLoaded", function() {
   
   // screw with the meta tags
   let metatags = document.createElement("meta");
-  metatags.content = "width=device-width; initial-scale=1.0; min-scale=1.0";
+  metatags.content = "width=device-width, initial-scale=1.0, min-scale=1.0";
   metatags.name = "viewport";
   document.head.appendChild(metatags);
 });

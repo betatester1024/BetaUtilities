@@ -151,8 +151,11 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
     <div class="anim"></div>
     </button>
   </div>`;
-  if (networkLess) {let cpl = document.getElementById("compliance");
-  cpl.style.opacity="1"; }
+  if (networkLess) {
+    let cpl = document.getElementById("compliance");
+    cpl.style.opacity="1"; 
+    cpl.style.height="auto";
+  }
               // cpl.style.pointerEvents="none";
 }
 let DRAGGING = null;

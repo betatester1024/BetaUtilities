@@ -31,7 +31,7 @@
     "linkify-html": "^4.1.1",
     "mongodb": "^6.1.0",
     "mongojs": "^3.1.0",
-    "nodemailer": "^6.9.4",
+    "nodemailer": "^6.9.5",
     "websocket-ts": "^1.1.1",
     "ws": "^8.13.0"
   },

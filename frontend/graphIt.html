@@ -15,6 +15,7 @@ Switzerland - 3 [🇨🇭]
 Ukraine - 4 [🇺🇦]
 United States - 76 [🇺🇸]
 Prussia - 2 [P]
+Novious  - 57 [N]
 Croatia - 2 [🇭🇷]
 China - 6 [🇨🇳]
 Algeria - 2 [🇩🇿]
@@ -98,11 +99,15 @@ Indonesia - 1 [🇮🇩]`
                 getComputedStyle(document.body).getPropertyValue('--system-black');
               if (dat.ico=="P")
                 ctx.drawImage(IMG,  canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, imgWidth, scaledImgHeight);
+              else if (dat.ico=="N")
+                ctx.drawImage(IMG2,  canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, imgWidth, scaledImgHeight);
               else ctx.fillText(dat.ico, canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1)
             }
             else {
               if (dat.ico=="P")
                 ctx.drawImage(IMG,  canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, imgWidth, scaledImgHeight);
+              else if (dat.ico=="N")
+                ctx.drawImage(IMG2,  canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, imgWidth, scaledImgHeight);
               else ctx.fillText(dat.ico, canv.width*0.55+WIDTH, canv.height/2+HEIGHT*1.1)
             }
             ctx.closePath();
@@ -121,11 +126,15 @@ Indonesia - 1 [🇮🇩]`
                 getComputedStyle(document.body).getPropertyValue('--system-black');
               if (dat.ico=="P")
                 ctx.drawImage(IMG,  canv.width*0.45+WIDTH-imgWidth, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, imgWidth, scaledImgHeight);
+              else if (dat.ico=="N")
+                ctx.drawImage(IMG2,  canv.width*0.45+WIDTH-imgWidth, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, imgWidth, scaledImgHeight);
               else ctx.fillText(dat.ico, canv.width*0.45+WIDTH, canv.height/2+HEIGHT*1.1)
             }
             else {
               if (dat.ico=="P")
                 ctx.drawImage(IMG,  canv.width*0.45+WIDTH-imgWidth, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, imgWidth, scaledImgHeight);
+              else if (dat.ico=="N")
+                ctx.drawImage(IMG2,  canv.width*0.45+WIDTH-imgWidth, canv.height/2+HEIGHT*1.1-scaledImgHeight/2, imgWidth, scaledImgHeight);
               else ctx.fillText(dat.ico, canv.width*0.45+WIDTH, canv.height/2+HEIGHT*1.1)
             }
             ctx.closePath();
@@ -204,6 +213,7 @@ Indonesia - 1 [🇮🇩]`
       {
         data = [];
         IMG = byId("IMG");
+        IMG2 = byId("IMG2");
         scaledImgHeight = imgWidth*IMG.height/IMG.width;
         let matches = rawData.match(/(?:(.+) - ([0-9]+) \[(.+)\])/gmiu);
         console.log(matches);
@@ -416,6 +426,7 @@ Indonesia - 1 [🇮🇩]`
         <hr class="rounded">
       </header>
       <image style="display:none" id="IMG" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Flag_of_Prussia_%281892-1918%29.svg/640px-Flag_of_Prussia_%281892-1918%29.svg.png"></image>
+      <image style="display:none" id="IMG2" src="https://i.ibb.co/PDykXzb/image.png"></image>
       <!-- <svg id="svg" width="100" height="100" xmlns="http://www.w3.org/2000/svg"> -->
         <!-- <path d="M 50 50 A 30 30 0 0 1 50 0" 
           stroke="black" fill="green" stroke-width="2" fill-opacity="0.5"/>

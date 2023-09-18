@@ -132,6 +132,7 @@ async function globalOnload(cbk, networkLess = false) {
   if (networkLess) {
     let cpl = document.getElementById("compliance");
     cpl.style.opacity = "1";
+    cpl.style.height = "auto";
   }
 }
 let DRAGGING = null;

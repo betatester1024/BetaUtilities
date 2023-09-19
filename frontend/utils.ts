@@ -11,7 +11,7 @@ function byClass(name:string, ct:number=0) {
 let HASNETWORK = false;
 let branch = "STABLE";
 let userData = null;
-async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
+async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string="/server") {
   
   if (!networkLess) {
     var script = document.createElement('script');
@@ -29,7 +29,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
     script.src = "./nodemodules/dialog-polyfill/dist/dialog-polyfill.js";
     document.head.appendChild(script);
   }
-  else byId("overlayL").remove();
+  // else byId("overlayL").remove();
   HASNETWORK = !networkLess;
   // load NotoSansMono
   // const NSM = new FontFace('Noto Sans Mono', 'url(https://fonts.googleapis.com/css2?family=Noto+Sans+Mono&display=swap)');
@@ -48,13 +48,18 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
   //     closeAlert(-1);
   //   }
   // };
-  
+  if (!byId("overlay")) 
+  {
+    let ovr = document.createElement("div");
+    ovr.id="overlay";
+    document.body.appendChild(ovr);
+  }
   if (!networkLess) {
   send(JSON.stringify({ action: "userRequest" }),
     (res) => {
       userData = res.data;
       if (res.data.branch) branch = res.data.branch;
-      if (branch == "unstable") {
+      if (branch == "unstable" && link == "/server") {
         let mainContent = byClass("main_content");
         mainContent.style.width = "calc(100% - 30px)";
         mainContent.style.margin = "0px";
@@ -80,7 +85,15 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
       ele.id="footer";
       let urlEle = new URL(location.href);
       let redirector = urlEle.pathname + "?"+urlEle.searchParams.toString();
-      if (res.status != "SUCCESS")
+      if (link !="/server") 
+        ele.innerHTML = `<a href="betatester1024.repl.co">BetaOS Services site</a> | 
+                         <a href="//betatester1024.repl.co/login?redirect=//keepalive.betatester1024.repl.co">Login</a> | 
+                      <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
+                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
+                        <div class="anim"></div>
+                      </form> |
+        BetaOS Systems V3, 2023`
+      else if (res.status != "SUCCESS") {
         ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
@@ -90,8 +103,9 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
                         <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                         <div class="anim"></div>
                       </form> |
-                      BetaOS Systems V2, 2023`;
-      else {
+                      BetaOS Systems V3, 2023`;
+      }
+      else if (res.status == "SUCCESS" && link == "/server") {
         resetExpiry(res);
         ele.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
                       <a href='/logout'>Logout</a> | 
@@ -104,7 +118,19 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
                         <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                         <div class="anim"></div>
                       </form> |
-                      BetaOS Systems V2, 2023`;
+                      BetaOS Systems V3, 2023`;
+      }
+      else 
+      {
+        ele.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
+                      <a href='//betatester1024.repl.co/logout'>Logout</a> | 
+                      <a href="betatester1024.repl.co">BetaOS Services site</a> | 
+                      <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
+                      <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
+                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
+                        <div class="anim"></div>
+                      </form> |
+                      BetaOS Systems V3, 2023`;
       }
       ftr.appendChild(ele);
       send(JSON.stringify({ action: "visits" }),
@@ -114,7 +140,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
             alertDialog("Database connection failure. Please contact BetaOS. Error: "+res.data.error, ()=>{});
             ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`
           }// this means the database died 
-          document.getElementById("footer").innerHTML += " | <kbd>Total requests made: "+res.data.data+"</kbd>";
+          else document.getElementById("footer").innerHTML += " | <kbd>Total requests made: "+res.data.data+"</kbd>";
           send(JSON.stringify({action:"cookieRequest"}), (res)=>{
             if (res.data.toString() == "false") {
               // console.log("thing");
@@ -130,10 +156,10 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
               cpl.style.pointerEvents="none";
             }
             if (cbk) cbk();
-          }, true);
-        }, true);
+          }, true, link);
+        }, true, link);
       
-    }, true);
+    }, true, link);
   }
   
   let ele2 = document.getElementById("overlay");
@@ -145,7 +171,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false) {
     <p>We use only <kbd>strictly necessary cookies</kbd> to verify and persist 
     your login session, and to confirm your acceptance of these cookies. <br>
     By continuing to use this site, you consent to our use of these cookies.</p>
-    <button class='blu btn fsmed' onclick="acceptCookies()">
+    <button class='blu btn fsmed' onclick="acceptCookies('${link}')">
     <span class="material-symbols-outlined">check</span>
     I understand
     <div class="anim"></div>
@@ -220,7 +246,7 @@ function decodeStatus(status:number) {
   return "Unknown error";
 }
 
-function send(params: any, callback: (thing: any) => any, silentLoading:boolean=false) {
+function send(params: any, callback: (thing: any) => any, silentLoading:boolean=false, link:string="/server") {
   let overlay = document.getElementById("overlayL");
   if (overlay && !silentLoading) {
     console.log("overlay active")
@@ -231,7 +257,7 @@ function send(params: any, callback: (thing: any) => any, silentLoading:boolean=
     byId("overlayLContainer").style.pointerEvents="auto";
   }
   var xhr = new XMLHttpRequest();
-  xhr.open("POST", "/server", true);
+  xhr.open("POST", link, true);
   xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
@@ -265,12 +291,12 @@ function send(params: any, callback: (thing: any) => any, silentLoading:boolean=
   // }, 5000);
 }
 
-function acceptCookies() {
+function acceptCookies(link:string="/server") {
   let cpm = document.getElementById("compliance")
   cpm.style.transition="all 0.5s ease";
   cpm.style.opacity="0";
   cpm.style.pointerEvents="none";
-  send(JSON.stringify({action:"acceptCookies"}), (res)=> {});
+  send(JSON.stringify({action:"acceptCookies"}), (res)=> {}, false, link);
 
 }
 

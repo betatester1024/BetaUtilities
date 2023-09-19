@@ -408,6 +408,157 @@ export function cueBot(hnd:(WebH|WS), msg:string, sender:string, data:any) {
     hnd.delaySendMsg(`xkcd.com/simplewriter`, data, 0);
     setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
   }
+  if (msg.match(/\bblog\b/) && Math.random() < 0.33) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*blag`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/(!blag|!blog)/) && Math.random() < 1) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`blog.xkcd.com`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\bwebsite\b/) && Math.random() < 0.07) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*wobsite`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\bgaffe\b/) && Math.random() < 1) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*magic spell`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/^!aidungeon$/) && Math.random() < 1) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(random([`You are in the middle of town.`,
+                             `The king walks up to you, and, [YOU ARE OUT OF MOVES.]`,
+                             `You stand in the center of the clearing.`,
+                            `You look about.`,
+                            `An elf walks jauntily out of the forest to your right, whistling a tune that, [YOU ARE OUT OF MOVES]`]), data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\bancient\b/) && Math.random() < 0.2) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*haunted`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\bstar-studdedb/) && Math.random() < 1) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*blood-soaked`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\bremains to be seen\b/) && Math.random() < 0.33) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*will never be known`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\bsilver bullet\b/) && Math.random() < 1) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*way to kill werewolves`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\bsubway system\b/) && Math.random() < 0.5) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*tunnels I found`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/^!ekko$b/) && Math.random() < 1) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`DID YOU MEAN: !echo`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/^(echo|!echo)$/) && Math.random() < 1) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(random(["Echo ... echo ... echo ...", "Echo ...  echo ... echo ...",
+                            "Echo ... echo ... echo ... ", "Echo ... echo ... echo ...", "echo", "echo", "ekko"]), data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\bwar of words\b/) && Math.random() < 1) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*interplanetary war`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\bcautiously optimistic\b/) && Math.random() < 1) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*delusional`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\bdoctor who\b/i) && Math.random() < 1) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*The Big Bang Theory`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\bwin votes\b/) && Math.random() < 1) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*find Pokémon`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\bbehind the headlines\b/) && Math.random() < 1) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*beyond the grave`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\bemail\b/) && Math.random() < 0.2) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*poem`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\bfacebook post\b/i) && Math.random() < 0.25) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*poem`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\btweet\b/i) && Math.random() < 0.25) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*poem`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\bx\b/) && Math.random() < 0.25) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*tweet (updated 2023)`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/^(!headache|3d|!3d)$/) && Math.random() < 1) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`xk3d.xkcd.com/848`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/^(!smashbros|!smash-bros|smash bros|!smashwishlist|!smash|smash|smash wishlist|smashwishlist|!smash-wish-list)$/) && Math.random() < 1) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(random([`Every Smash character merged into an Undertale-style Amalgamate`,
+                            `Crash Bandicoot`, `Undyne`, "Robert Downey Jr.", "Crewmate/Impostor",
+                            'The knight from Hollow Knight', 'Waluigi', "Sora", "Victor and Gloria",
+                            "Snoo", "Madeline", "Companion Cube", "Kris", "Luirio (Mario/Luigi Hybrid)",
+                            "Cueball", "Megan", "Cuegan", "The SkiFree Monster", "Siri",
+                            "Roomba", "Ellie from Up", "Composite Superman", "Etymology-Man", "Clippy",
+                            "No internet dinosaur, ", "Goku", "Bigfoot",
+                            "Zordon", "The Sarlaac", "The InstallShield Wizard",
+                            "Mr. Clean", "Comet Cursor", "Beta O'Rouke", "The Monopoly Boot", "Lot's Wife",
+                            "D. B. Cooper"," Mavis Beacon"," The Blair Witch"," A Pokemon Snap Station",
+                             " That one alien Dr. Wily turns into"," Doctor Wah-wee from Mega Man 8",
+                             " Berenstein Bears (alt skin for Berenstain Bears)"," Meta-Meta-Meta-Knight"," ERROR from Adventure of Link",
+                             " The Letter H"," Mrs. Game and Watch"," The Left Paddle from Pong"," Some Minor Character From Final Fantasy",
+                             " A Fidget Spinner"," The KFConsole"," Mii Layabout"," Batman"," Final Destination",
+                             " Anybody who isn't Goku"," The Antigoku"," only one Ice Climber"," Florida Man"," Detective Pikachu",
+                             " Galoomba"," The dude who milks the cow in the 1-2 Switch Tutorial"," Loot Box"," Black Hat",
+                             " White Hat"," Beret Guy"," Masahiro Sakurai"," Smash Ball"," Every Pokemon (as one character)",
+                             " Professor Oak"," The Super Nintendo Entertainment System"," Reckless Safety Warning Guy from the Wii",
+                             " King Bob-Omb"," Elon Musk"," CATS"," Shovel Knight"," Generic Human Fighter"," Rash from Battletoads",
+                             " Master Chief"," Nintendog"," Safety Control Rod Axe Man"," Barry B. Benson"," The Oompa-Loompas","Snyder-Man"
+                            ]), data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/^(!rng)$/) && Math.random() < 1) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`This command will generate between 1 and 50, chosen by a fair dice roll and guaranteed to be random.`, data, 0);
+    hnd.delaySendMsg(random([1, 2, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 27, 27, 27, 28, 28, 29, 29, 30, 30, 31, 31, 32, 32, 32, 33, 33, 34, 34, 35, 35, 36, 36, 37, 37, 38, 38, 39, 39, 39, 40, 40, 41, 41, 42, 42, 42, 42, 42, 42, 43, 43, 44, 44, 44, 45, 45, 46, 46, 47, 47, 48, 48, 49, 50, 50, 50, 221, 1277, "ERROR 404"]), data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
+  if (msg.match(/\bsilver bullet\b/) && Math.random() < 1) {
+    hnd.changeNick("CueBot");
+    hnd.delaySendMsg(`*way to kill werewolves`, data, 0);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
+  }
 }
 
 function random(list:any[]) {

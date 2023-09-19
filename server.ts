@@ -3,6 +3,7 @@ const enableWs = require('express-ws');
 const app = express()
 const crypto = require("crypto");
 const parse = require("co-body");
+const cors = require("cors");
 const fs = require('fs');
 import Handlebars from "handlebars";
  // for generating secure random #'s
@@ -49,7 +50,7 @@ function sendFile(res:any, token:string, filePath:string)
     return;
   }
   else {
-    fs.readFile(filePath, 'utf8', async (err:an, fileContents:string) => {
+    fs.readFile(filePath, 'utf8', async (err:any, fileContents:string) => {
       if (err) {
         console.error(err);
         return;
@@ -84,6 +85,11 @@ export async function initServer() {
     statusCode: 429, // 429 status = Too Many Requests (RFC 6585)
   });
   app.use(limiter);
+  let corsOptions = {
+    credentials: true, 
+    origin: true
+  };
+  app.use(cors(corsOptions));
   app.use(new cookieParser());
   // app.enable('trust proxy');
   
@@ -160,7 +166,7 @@ export async function initServer() {
   })
 
   app.get("*/nodemodules/*", (req:any, res:any) => {
-    // fuck off with your long requests
+    // no long requests!
     if (req.url.length > 500) sendFile(res, getToken(req), frontendDir+"/404.html");
     else res.sendFile(rootDir+"node_modules"+req.url.replace(/.*nodemodules/, ""));
     incrRequests();
@@ -293,7 +299,7 @@ export async function initServer() {
       return;
     }
     if (body.action == "acceptCookies") {
-      res.cookie('acceptedQ', true, {httpOnly: true, secure:true, sameSite:"Strict"})
+      res.cookie('acceptedQ', true, {httpOnly: true, secure:true, sameSite:"None"})
       res.end(JSON.stringify(""));
       return;
     }

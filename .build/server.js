@@ -47,6 +47,7 @@ const enableWs = require("express-ws");
 const app = express();
 const crypto = require("crypto");
 const parse = require("co-body");
+const cors = require("cors");
 const fs = require("fs");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
@@ -87,6 +88,11 @@ async function initServer() {
     statusCode: 429
   });
   app.use(limiter);
+  let corsOptions = {
+    credentials: true,
+    origin: true
+  };
+  app.use(cors(corsOptions));
   app.use(new cookieParser());
   app.get("/", (req, res) => {
     sendFile(res, getToken(req), import_consts.frontendDir + "/index.html");
@@ -248,7 +254,7 @@ async function initServer() {
       return;
     }
     if (body.action == "acceptCookies") {
-      res.cookie("acceptedQ", true, { httpOnly: true, secure: true, sameSite: "Strict" });
+      res.cookie("acceptedQ", true, { httpOnly: true, secure: true, sameSite: "None" });
       res.end(JSON.stringify(""));
       return;
     }

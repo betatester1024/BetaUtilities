@@ -281,6 +281,10 @@ div.anim.inp {
   margin: 8px;
 }
 
+.addPadding {
+  padding: 8px;
+}
+
 .roundhover {
   transition: all 0.2s ease;
 }

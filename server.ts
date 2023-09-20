@@ -87,7 +87,8 @@ export async function initServer() {
   app.use(limiter);
   let corsOptions = {
     credentials: true, 
-    origin: true
+    origin: true,
+    allowedHeaders: true
   };
   app.use(cors(corsOptions));
   app.use(new cookieParser());

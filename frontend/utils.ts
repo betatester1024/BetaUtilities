@@ -283,7 +283,8 @@ function send(params: any, callback: (thing: any) => any, silentLoading:boolean=
       byId("overlayLContainer").style.pointerEvents="none";
     } else closeAlert(-1);
   }
-  console.log(params);
+  console.log("about to send with params:", params);
+  xhr.withCredentials = true;
   xhr.send(params);
   // let failureTimeout = setTimeout(() => {
   //   failureTimeout = null;

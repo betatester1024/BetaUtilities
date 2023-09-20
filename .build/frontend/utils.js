@@ -63,7 +63,7 @@ async function globalOnload(cbk, networkLess = false, link = "/server") {
         let redirector = urlEle.pathname + "?" + urlEle.searchParams.toString();
         if (link != "/server")
           ele.innerHTML = `<a href="betatester1024.repl.co">BetaOS Services site</a> | 
-                         <a href="//betatester1024.repl.co/login?redirect=//keepalive.betatester1024.repl.co">Login</a> | 
+                         <a href="//unstable.betatester1024.repl.co/login?redirect=/redirect?to=${encodeURI("https://keepalive.betatester1024.repl.co/callback?return=" + encodeURIComponent(redirector))}">Login</a> | 
                       <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
                         <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                         <div class="anim"></div>
@@ -246,7 +246,8 @@ function send(params, callback, silentLoading = false, link = "/server") {
     } else
       closeAlert(-1);
   };
-  console.log(params);
+  console.log("about to send with params:", params);
+  xhr.withCredentials = true;
   xhr.send(params);
 }
 function acceptCookies(link = "/server") {

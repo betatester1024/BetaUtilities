@@ -88,7 +88,7 @@ export async function initServer() {
   let corsOptions = {
     credentials: true, 
     origin: true,
-    allowedHeaders: true
+    // allowedHeaders: true
   };
   app.use(cors(corsOptions));
   app.use(new cookieParser());
@@ -302,6 +302,18 @@ export async function initServer() {
     if (body.action == "acceptCookies") {
       res.cookie('acceptedQ', true, {httpOnly: true, secure:true, sameSite:"None"})
       res.end(JSON.stringify(""));
+      return;
+    }
+    if (body.action == "accountID") {
+      if (req.cookies.accountID) 
+        res.end(JSON.stringify({status:"SUCCESS", data:{id:req.cookies.accountID}}));
+      else 
+        res.end(JSON.stringify({status:"ERROR", data:{error:"Not logged in"}}));
+      return;
+    }
+    if (body.action == "setAccountID") {
+      res.cookie('accountID', body.data.id, {httpOnly: true, secure:true, sameSite:"None"})
+      res.end(JSON.stringify({status:"SUCCESS", data:null}));
       return;
     }
 
@@ -690,7 +702,8 @@ function tooManyRequests() {
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
                     '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest',
                     "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle', '/sweepthatmine',
-                   "/stopwatch", "/testbed", '/credits', '/atomicmoose', '/issuetracker', '/graphIt', '/betterselect'];
+                   "/stopwatch", "/testbed", '/credits', '/atomicmoose', '/issuetracker', '/graphIt', 
+                    '/betterselect', '/redirect'];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',
                   'paste', 'findPaste'];

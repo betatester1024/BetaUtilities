@@ -258,6 +258,18 @@ async function initServer() {
       res.end(JSON.stringify(""));
       return;
     }
+    if (body.action == "accountID") {
+      if (req.cookies.accountID)
+        res.end(JSON.stringify({ status: "SUCCESS", data: { id: req.cookies.accountID } }));
+      else
+        res.end(JSON.stringify({ status: "ERROR", data: { error: "Not logged in" } }));
+      return;
+    }
+    if (body.action == "setAccountID") {
+      res.cookie("accountID", body.data.id, { httpOnly: true, secure: true, sameSite: "None" });
+      res.end(JSON.stringify({ status: "SUCCESS", data: null }));
+      return;
+    }
     if (!req.cookies.sessionID)
       res.cookie("sessionID", crypto.randomUUID(), { httpOnly: true, secure: true, sameSite: "Strict" });
     makeRequest(body.action, req.cookies.accountID, body.data, req.cookies.sessionID, (s, d, token) => {
@@ -718,7 +730,8 @@ const validPages = [
   "/atomicmoose",
   "/issuetracker",
   "/graphIt",
-  "/betterselect"
+  "/betterselect",
+  "/redirect"
 ];
 const ignoreLog = [
   "getEE",

@@ -87,7 +87,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string=
       let redirector = urlEle.pathname + "?"+urlEle.searchParams.toString();
       if (link !="/server") 
         ele.innerHTML = `<a href="betatester1024.repl.co">BetaOS Services site</a> | 
-                         <a href="//betatester1024.repl.co/login?redirect=//keepalive.betatester1024.repl.co">Login</a> | 
+                         <a href="//unstable.betatester1024.repl.co/login?redirect=/redirect?to=${encodeURI("https://keepalive.betatester1024.repl.co/callback?return="+encodeURIComponent(redirector))}">Login</a> | 
                       <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
                         <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                         <div class="anim"></div>

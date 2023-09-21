@@ -85,8 +85,8 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string=
       ele.id="footer";
       let urlEle = new URL(location.href);
       let redirector = urlEle.pathname + "?"+urlEle.searchParams.toString();
-      if (link !="/server") 
-        ele.innerHTML = `<a href="betatester1024.repl.co">BetaOS Services site</a> | 
+      if (link !="/server" && res.status != "SUCCESS") 
+        ele.innerHTML = `<a href="//betatester1024.repl.co">BetaOS Services site</a> | 
                          <a href="//unstable.betatester1024.repl.co/login?redirect=/redirect?to=${encodeURI("https://keepalive.betatester1024.repl.co/callback?return="+encodeURIComponent(redirector))}">Login</a> | 
                       <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
                         <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
@@ -124,8 +124,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string=
       {
         ele.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
                       <a href='//betatester1024.repl.co/logout'>Logout</a> | 
-                      <a href="betatester1024.repl.co">BetaOS Services site</a> | 
-                      <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
+                      <a href="//betatester1024.repl.co">BetaOS Services site</a> | 
                       <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
                         <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                         <div class="anim"></div>

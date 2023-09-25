@@ -267,6 +267,14 @@ function replyMessage(hnd, msg, sender, data) {
     hnd.changeNick(hnd.nick);
     return "https://instant.leet.nu/room/" + hnd.roomName;
   }
+  let tellMatch = msg.match("^!yell (@[^ ]+ .*)");
+  if (tellMatch) {
+    hnd.changeNick(sender);
+    setTimeout(() => {
+      hnd.changeNick(hnd.nick);
+    }, 200);
+    return "!tell " + tellMatch[1].toUpperCase();
+  }
   if (msg.match("!version[ ]+@" + hnd.nick.toLowerCase())) {
     return VERSION;
   }
@@ -587,7 +595,7 @@ function replyMessage(hnd, msg, sender, data) {
     return "Enter any 5-letter word. Green tiles mean the letter is positionned in the correct location, yellow tiles mean the letter is positionned incorrectly but the letter exists in the word at least once, and red means that the letter does not exist in the word. You currently have infinite guesses.";
   }
   if (msg.match("@" + hnd.nick.toLowerCase() + "$")) {
-    return "Yes?";
+    return "hello!";
   } else
     return "";
 }

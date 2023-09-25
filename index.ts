@@ -75,7 +75,7 @@ async function init(startBots:boolean)
     if (startBots)
     for (let i=0; i<obj.euphRooms.length; i++) {
       supportHandler.addRoom(new Room("EUPH_ROOM", obj.euphRooms[i]));
-      new WS("wss://euphoria.io/room/" + obj.euphRooms[i] +"/ws", "BetaUtilities"+process.env['branch'], obj.euphRooms[i], !(obj.euphRooms[i]=="test" || obj.euphRooms[i]=="bots"))
+      new WS("wss://euphoria.io/room/" + obj.euphRooms[i] +"/ws", "BetaUtilities"+(process.env['branch']=="unstable"?"-U":""), obj.euphRooms[i], !(obj.euphRooms[i]=="test" || obj.euphRooms[i]=="bots"))
       log("Connected euph_room")+obj.euphRooms[i];
       console.log("Connected euph_room", obj.euphRooms[i]);
     }

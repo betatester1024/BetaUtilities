@@ -1,7 +1,8 @@
 import {WS} from './wsHandler';
 import {WebH} from './webHandler'
 import {systemLog} from '../logging';
-import {cueBot} from './cuebot'
+import {cueBot} from './cuebot';
+import {decodeHeimMessage} from '../decodegold';
 const fs = require('fs');
 //import {rooms} from './initialiser'
 // import {getUptimeStr, systemLog} from './misc';
@@ -267,6 +268,12 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
   if (msg == "!instant") {
     hnd.changeNick(hnd.nick);
     return "https://instant.leet.nu/room/"+hnd.roomName;
+  }
+  let tellMatch = msg.match("^!yell (@[^ ]+ .*)");
+  if (tellMatch) {
+    hnd.changeNick(sender);
+    setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);
+    return "!tell "+tellMatch[1].toUpperCase();
   }
 
   if (msg.match("!version[ ]+@"+hnd.nick.toLowerCase())) {return VERSION;}
@@ -567,7 +574,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
   }
   
   if (msg.match("@" + hnd.nick.toLowerCase() + "$")) {
-    return "Yes?";
+    return "hello!";
   }
 
   else return "";

@@ -6,7 +6,7 @@ import { updateActive } from '../supportRooms';
 // import {systemLog} from './misc';
 import {systemLog} from '../logging'
 const fs = require('fs')
-
+import {processHeimMessage, maybeGold, scramble} from '../decodegold';
 
 
 export class WS 
@@ -32,10 +32,11 @@ export class WS
   confirmcode = -1;
   // static db = new Database();
   static toSendInfo(msg: string, data:any=null) {
-    if (data) return `{"type":"send", "data":{"content":"${msg}","parent":"${data["data"]["id"]}"}}`;
-    else {
-      return `{"type":"send", "data":{"content":"${msg}"}}`;
-    }
+    if (data) return JSON.stringify({
+      type:"send",
+      data:{content:msg, parent:data["data"]["id"]}});
+    else 
+      return JSON.stringify({type:"send", data:{content:msg}});
   }
 
   incrRunCt() {
@@ -132,6 +133,7 @@ export class WS
     if (data["type"] == "send-event") {
       // check whether the message contents match the pattern
       let msg = data["data"]["content"].toLowerCase().trim();
+      let rawMsg = data["data"]["content"];
       let snd = data["data"]["sender"]["name"];
       if (this.DATALOGGING) {
         // console.log("LOG");
@@ -190,37 +192,80 @@ export class WS
         this.sendMsg("Enter !help @"+this.nick+" for help!", data);
       } 
 
+      // ws-exclusive commands
+      else if (msg == "!decodegold") 
+      {
+        // get parentMessage
+        console.log("thing");
+        let parentID = data["data"]["parent"];
+        this.socket.send(JSON.stringify({
+          id:"decodeGold",
+          data:{id:parentID},
+          type:"get-message",
+        }));
+      }
+      else if (maybeGold(rawMsg)) 
+      {
+        let content = data["data"]["content"];
+        let sender = data["data"]["sender"]["name"];
+        processHeimMessage(content, (msg:string)=>{
+          scramble(this.replyMessage(msg, snd, data), (result:string)=>{
+            // console.log("scrambled",result)
+            this.euphReply(result, data)
+          });
+        });
+        
+       
+      }
       // send to messageHandle to process messages.
       else if (!this.pausedQ) {
         if (data["data"]["sender"]["id"].match("bot:")) {
           // don't respond to the bots.
           return;
         }
-        let outStr = this.replyMessage(msg.trim(), snd, data);
-        if (this.failedQ && outStr != "") outStr = "/me is rebooting."
-        if (outStr == "") return;
-        if (!this.bypass) {
-          this.callTimes.push(Date.now());
-          setTimeout(() => {this.callTimes.shift();}, 60*5*1000) // five minutes.
-        }
-        if (!this.bypass && this.callTimes.length >= 5) {
-          // if (i == 2)
-            if (this.callTimes.length < 10) {
-              outStr = this.transferOutQ?outStr+"\\n[ANTISPAM] Consider moving to &bots or &test for large-scale testing. Thank you for your understanding."
-                : outStr+" [ANTISPAM WARNING]";
-            } else if (this.transferOutQ) {
-              outStr = outStr+"\\n[ANTISPAM] Automatically paused @"+this.nick;
-              this.pausedQ = true;
-              this.pauser = "BetaOS_ANTISPAM";
-              this.resetCall(data);
-            }
-            else {
-              outStr = outStr+"[ANTISPAM AUTOPAUSE OVERRIDDEN]"
-            }
-        }
-        this.sendMsg(outStr, data);
+        this.euphReply(this.replyMessage(msg.toLowerCase().trim(), snd, data), data);
+        // scramble(msg, (result:string)=>{
+          // console.log("scrambled",result)
+          // this.euphReply(this.replyMessage(result, snd, data))
+        // });
       }
+    } // sendevent
+    else if (data["type"] == "get-message-reply" && data["id"] == "decodeGold") 
+    {
+      let content = data["data"]["content"];
+      let sender = data["data"]["sender"]["name"];
+      processHeimMessage(content, (result:string)=>{
+        this.euphReply(result.toLowerCase().trim(), data);
+      });
     }
+  }
+
+  euphReply(msg:string, data:any) 
+  {
+    let outStr = msg;
+    if (this.failedQ && outStr != "") outStr = "/me is rebooting."
+    if (outStr == "") return;
+    if (!this.bypass) {
+      this.callTimes.push(Date.now());
+      setTimeout(() => {this.callTimes.shift();}, 60*5*1000) // five minutes.
+    }
+    if (!this.bypass && this.callTimes.length >= 5) {
+      // if (i == 2)
+        if (this.callTimes.length < 10) {
+          outStr = this.transferOutQ?outStr+"\\n[AntiSpam] Consider moving to &bots or &test for large-scale testing. Thank you for your understanding."
+            : outStr+" [AntiSpam warning]";
+        } else if (this.transferOutQ) {
+          outStr = outStr+"\\n[ANTISPAM] Automatically paused @"+this.nick;
+          this.pausedQ = true;
+          this.pauser = "BetaOS_ANTISPAM";
+          this.resetCall(data);
+        }
+        else {
+          outStr = outStr+" (AntiSpam overriden)"
+        }
+    }
+    console.log("out", outStr)
+    this.sendMsg(outStr, data);
   }
 
   errorSocket() {

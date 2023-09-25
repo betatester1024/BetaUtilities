@@ -24,28 +24,31 @@ try {
     // console.log(thing)
     if (!connectionSuccess) return;
     // uDB.findOne({fieldName:"lastActive"}).then((document:{time:number})=>{
+    if (process.env["branch"] == "unstable") {
+      let readline = require('readline');
+
+      let rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      
+      });
+      
+      rl.question("Confirm start extra instance? ", (answer:string)=>{
+        rl.close();
+        answer = answer.trim().toLowerCase();
+        if (answer != "y" && answer != "yes") init(false);
+        else {
+          init(true)
+        } // extra instances approved
+      });
+    }
+    else init(true);
     //   if (Date.now - time < 10000)  // <10sec since last report, assume it is active
     //   {
-    //     let readline = require('readline');
-
-    //     let rl = readline.createInterface({
-    //       input: process.stdin,
-    //       output: process.stdout
-        
-    //     });
-        
-    //     rl.question("Confirm start extra instance? ", (answer:string)=>{
-    //       rl.close();
-    //       answer = answer.trim().toLowerCase();
-    //       if (answer != "y" && answer != "yes") exec("kill")
-    //       else {
-    //         init()
-    //       } // extra instances approved
-    //     });
-    //   }
+    //     
     //   else init();
     // })
-    init();
+    // init();
   });
   DBConnectFailure = setTimeout(()=>{
     connectionSuccess=false; 
@@ -59,7 +62,7 @@ try {
   console.log(e);
 }
 
-async function init() 
+async function init(startBots:boolean) 
 {
   initServer();
   DBMaintenance();
@@ -69,9 +72,10 @@ async function init()
   log(UPSINCESTR);
   uDB.findOne({fieldName:"ROOMS"}).then((obj:{euphRooms:string[], rooms:string[], hidRooms:string[]})=>{
     console.log(obj);
+    if (startBots)
     for (let i=0; i<obj.euphRooms.length; i++) {
       supportHandler.addRoom(new Room("EUPH_ROOM", obj.euphRooms[i]));
-      new WS("wss://euphoria.io/room/" + obj.euphRooms[i] +"/ws", "BetaUtilities", obj.euphRooms[i], !(obj.euphRooms[i]=="test" || obj.euphRooms[i]=="bots"))
+      new WS("wss://euphoria.io/room/" + obj.euphRooms[i] +"/ws", "BetaUtilities"+(process.env['branch']=="unstable"?"-U":""), obj.euphRooms[i], !(obj.euphRooms[i]=="test" || obj.euphRooms[i]=="bots"))
       log("Connected euph_room")+obj.euphRooms[i];
       console.log("Connected euph_room", obj.euphRooms[i]);
     }

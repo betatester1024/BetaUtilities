@@ -16,13 +16,13 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var unstable_exports = {};
-__export(unstable_exports, {
+var BetaOS_exports = {};
+__export(BetaOS_exports, {
   DBConnectFailure: () => DBConnectFailure,
   UPSINCESTR: () => UPSINCESTR,
   connectionSuccess: () => connectionSuccess
 });
-module.exports = __toCommonJS(unstable_exports);
+module.exports = __toCommonJS(BetaOS_exports);
 var import_server = require("./server");
 var import_database = require("./database");
 var import_supportRooms = require("./supportRooms");
@@ -42,7 +42,23 @@ try {
     (0, import_database.connectDB)().then((err) => {
       if (!connectionSuccess)
         return;
-      init();
+      if (process.env["branch"] == "unstable") {
+        let readline = require("readline");
+        let rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout
+        });
+        rl.question("Confirm start extra instance? ", (answer) => {
+          rl.close();
+          answer = answer.trim().toLowerCase();
+          if (answer != "y" && answer != "yes")
+            init(false);
+          else {
+            init(true);
+          }
+        });
+      } else
+        init(true);
     });
   DBConnectFailure = setTimeout(() => {
     connectionSuccess = false;
@@ -57,7 +73,7 @@ try {
 } catch (e) {
   console.log(e);
 }
-async function init() {
+async function init(startBots) {
   (0, import_server.initServer)();
   (0, import_database.DBMaintenance)();
   (0, import_wordler.serverUpdate)();
@@ -66,12 +82,13 @@ async function init() {
   (0, import_logging.log)(UPSINCESTR);
   import_consts.uDB.findOne({ fieldName: "ROOMS" }).then((obj) => {
     console.log(obj);
-    for (let i = 0; i < obj.euphRooms.length; i++) {
-      import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("EUPH_ROOM", obj.euphRooms[i]));
-      new import_wsHandler.WS("wss://euphoria.io/room/" + obj.euphRooms[i] + "/ws", "BetaUtilities", obj.euphRooms[i], !(obj.euphRooms[i] == "test" || obj.euphRooms[i] == "bots"));
-      (0, import_logging.log)("Connected euph_room") + obj.euphRooms[i];
-      console.log("Connected euph_room", obj.euphRooms[i]);
-    }
+    if (startBots)
+      for (let i = 0; i < obj.euphRooms.length; i++) {
+        import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("EUPH_ROOM", obj.euphRooms[i]));
+        new import_wsHandler.WS("wss://euphoria.io/room/" + obj.euphRooms[i] + "/ws", "BetaUtilities" + (process.env["branch"] == "unstable" ? "-U" : ""), obj.euphRooms[i], !(obj.euphRooms[i] == "test" || obj.euphRooms[i] == "bots"));
+        (0, import_logging.log)("Connected euph_room") + obj.euphRooms[i];
+        console.log("Connected euph_room", obj.euphRooms[i]);
+      }
     for (let i = 0; i < obj.rooms.length; i++) {
       new import_webHandler.WebH(obj.rooms[i], false);
       console.log("Loaded support room", obj.rooms[i]);

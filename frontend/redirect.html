@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html class="{{mainClass}}">
+  <head>
+    <script src='./utils.js'></script>
+    <title>Redirecting... | BetaOS Systems</title>
+    <script>
+      function onLoad() 
+      {
+        let URLObj = new URL(document.URL);
+        byId("h2").innerText += " "+URLObj.searchParams.get("to")+"...";
+        send(JSON.stringify({action:"accountID"}), (res)=>{
+          if (res.status == "SUCCESS") {
+            let toURL = new URL(decodeURI(URLObj.searchParams.get("to")));
+            toURL.searchParams.set("accountID", res.data.id);
+            toURL.searchParams.set("callback", URLObj.searchParams.get("callback"));
+            location.href = toURL.toString();
+          }
+          else {alertDialog("Error: "+res.data.error, ()=>{})}
+        });
+      }
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      #superadmin {
+        border-radius:50px;
+        width: 90%;
+        margin: 0 auto;
+        transition: all 1s ease;
+      }
+    </style>
+  </head>
+  <body onload = "globalOnload(()=>{onLoad()});">
+    <div class="main_content">
+      <header class="redrounded">
+        <h2 id="h2">Redirecting to </h2>
+        <hr class="rounded">
+      </header>
+      </div>
+    </div>
+    <div class="overlay" id="overlay">
+    </div>
+  </body>
+</html>

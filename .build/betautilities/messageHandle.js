@@ -267,13 +267,28 @@ function replyMessage(hnd, msg, sender, data) {
     hnd.changeNick(hnd.nick);
     return "https://instant.leet.nu/room/" + hnd.roomName;
   }
-  let tellMatch = msg.match("^!yell (@[^ ]+ .*)");
+  let tellMatch = msg.match(/^!yell ((@[^ ]+|\*[^ ]+) .*)/);
   if (tellMatch) {
     hnd.changeNick(sender);
     setTimeout(() => {
       hnd.changeNick(hnd.nick);
     }, 200);
     return "!tell " + tellMatch[1].toUpperCase();
+  }
+  let tellMatch2 = msg.match(/^!whisper ((@[^ ]+|\*[^ ]+) .*)/);
+  if (tellMatch2) {
+    hnd.changeNick(sender);
+    setTimeout(() => {
+      hnd.changeNick(hnd.nick);
+    }, 200);
+    return "!tell " + tellMatch2[1].toLowerCase();
+  }
+  if (msg.match("^!dinbox$")) {
+    hnd.changeNick(sender);
+    setTimeout(() => {
+      hnd.changeNick(hnd.nick);
+    }, 200);
+    return "!inbox";
   }
   if (msg.match("!version[ ]+@" + hnd.nick.toLowerCase())) {
     return VERSION;

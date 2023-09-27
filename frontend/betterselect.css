@@ -1,0 +1,81 @@
+.bSel.inpContainer 
+{
+  height: 50px;
+  margin-top: 5px;
+  margin-bottom: 20px;
+}
+.betterSelect:focus 
+{
+  cursor: text;
+}
+.betterSelect 
+{
+  cursor: pointer;
+  height: 40px;
+  font-size: 35px;
+  padding: 5px;
+  width: calc(100% - 10px);
+  transition: all 0.2s ease;
+  border-radius: 10px 10px 0px 0px;
+}
+/* .selCtn 
+{
+  width: 50%;
+} */
+.optionMenu
+{
+  position: relative;
+  top: 6px;
+  
+  width: 100%;
+  transition: all 0.2s ease, outline 0s;
+  opacity: 0;
+  height: 0px;
+  pointer-events: none;
+  border-radius: 0px 0px 10px 10px;
+  z-index:1;
+  font-family: 'Noto Sans Display';
+}
+.optionMenu > .option:nth-last-of-type(1) 
+{
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+.optionMenu > .option 
+{
+  transition: all 0.2s ease;
+  width: calc(100% - 16px);
+  height: 0px;
+  padding: 8px;
+  font-size: 35px;
+  font-family: inherit;
+  background-color: var(--system-overlay3);
+  cursor: pointer;
+  color: var(--system-blue);
+  font-weight: 600;
+  /* unselectable */
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.option:hover, .option:focus
+{
+  background-color: var(--system-overlay);
+  outline: 3px solid var(--system-blue);
+  transition: outline 0s, background-color 0.3s;
+}
+
+.optionMenu.open 
+{
+  outline: 3px solid var(--system-overlay3);
+  height: unset;
+  width: unset;
+  pointer-events: auto;
+  opacity: 1;
+}
+.optionMenu.open > .option 
+{
+  height: 40px;
+}

@@ -731,7 +731,8 @@ const validPages = [
   "/issuetracker",
   "/graphIt",
   "/betterselect",
-  "/redirect"
+  "/redirect",
+  "/betterSelect.js"
 ];
 const ignoreLog = [
   "getEE",

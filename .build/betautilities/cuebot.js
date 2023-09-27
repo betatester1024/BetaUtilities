@@ -859,7 +859,7 @@ function cueBot(hnd, msg, sender, data) {
     }, 200);
     ;
   }
-  if (msg.match(/\bx\b/) && Math.random() < 0.25) {
+  if (msg.match(/\bx\b/) && Math.random() < 0.05) {
     hnd.changeNick("CueBot");
     hnd.delaySendMsg(`*tweet (updated 2023)`, data, 0);
     setTimeout(() => {

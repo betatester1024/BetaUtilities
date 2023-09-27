@@ -20,6 +20,7 @@ html, ::backdrop {
   --system-bg: #eee;
   --system-overlay: rgba(200, 200, 200, 0.95);
   --system-overlay2: rgba(200, 200, 200, 0.5);
+  --system-overlay3: rgba(200, 200, 200, 0.7);
   --system-transp: rgba(0, 0, 0, 0);
   --system-black: #222;
   transition: all 1s ease;
@@ -40,6 +41,7 @@ html, ::backdrop {
     --system-yellow2:rgba(255, 204, 31, 0.25);
     --system-overlay: rgba(52, 52, 52, 0.95);
     --system-overlay2: rgba(52, 52, 52, 0.5);
+    --system-overlay3: rgba(52, 52, 52, 0.7);
     --system-blue: #0cc8fe;
   }
 }
@@ -57,6 +59,7 @@ html, ::backdrop {
   --system-yellow2:rgba(255, 204, 31, 0.25);
   --system-overlay: rgba(52, 52, 52, 0.95);
   --system-overlay2: rgba(52, 52, 52, 0.5);
+  --system-overlay3: rgba(52, 52, 52, 0.7);
   --system-blue: #0cc8fe;
 }
 
@@ -164,7 +167,8 @@ div.anim {
   transition: all 0.5s ease;
 }
 
-input:invalid + div.anim {
+input:invalid + div.anim,
+input.invalid ~ div.anim {
   border: 2.3px solid var(--system-red);
 }
 
@@ -227,11 +231,11 @@ div.anim.inp {
 .ylw > .anim{
   border: 2.3px solid var(--system-yellow);
 }
-.red, input:invalid {
+.red, input:invalid, input.invalid {
   color: var(--system-red);
   outline: 3px solid var(--system-red);
 }
-.red:hover, .red:focus, input:invalid {
+.red:hover, .red:focus, input:invalid, input.invalid {
   background-color: var(--system-red2);
 }
 .red > .anim {
@@ -387,7 +391,7 @@ input:focus, select:focus {
 /*   cursor: text; */
 }
 
-input:focus:invalid{
+input:focus:invalid, input.invalid:focus{
   outline: 3px solid var(--system-red);
   transition: all 0.5s ease;
 /*   cursor: text; */

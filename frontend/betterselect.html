@@ -4,52 +4,154 @@
     <script src='./utils.js'></script>
     <title>BetterSelect | BetaOS Systems</title>
     <script>
-      let selectOpen=false;
-      let selectedVal = "Make a selection..."
-      function clickSelect(openQ=0) 
+      
+      function clickSelect(whichOne, openQ=0) 
       {
-        console.log(openQ);
-        if (openQ != 0) selectOpen = (openQ==1);
-        else selectOpen=!selectOpen;
-        console.log(selectOpen);
-        let ctn = byId("selCtn");
-        let inp = ctn.querySelector(".betterSelect");
-        inp.readOnly=!selectOpen;
-        ctn.querySelector(".optionMenu").className = "optionMenu "+ (selectOpen?"open":"");
-        if (!clickSelect) {
-          inp.value = "";
-          inp.placeholder = selectedVal;
+        // console.log("which one?", whichOne);
+        let ctn = byId(whichOne);
+        // console.log(openQ);
+        if (openQ != 0) ctn.selectOpen = (openQ==1);
+        else ctn.selectOpen=!ctn.selectOpen;
+        // console.log(ctn.selectOpen);
+        
+        if (!ctn) {
+          console.error("No container found!");
+          return;
         }
+        // if open then close all others
+        // if (ctn.selectOpen)
+        // {
+          // if (currOpen) clickSelect(currOpen, -1);
+          // currOpen = whichOne;
+        // }
+        let inp = ctn.querySelector(".betterSelect");
+        inp.readOnly=!ctn.selectOpen;
+        inp.style.cursor = ctn.selectOpen?"text":"pointer";
+        ctn.querySelector(".optionMenu").className = "optionMenu "+ (ctn.selectOpen?"open":"");
+        // if (!ctn.selectOpen) {
+        {
+          inp.value = "";
+          // check if value is valid
+          let children = inp.nextElementSibling.children;
+          let valid = ctn.selectOpen; // valid if open
+          for (let i=0; i<children.length; i++) {
+            if (inp.selectedVal == children[i].innerText) { 
+              valid = true;
+              inp.bSelValid = true;
+            }
+            if (ctn.selectOpen) children[i].tabIndex = 0;
+            else children[i].tabIndex=-1;
+          }
+          if (valid || !inp.selectedVal) {
+            inp.placeholder = inp.selectedVal??"Make a selection...";
+            inp.classList.remove("invalid");
+          }
+          else {
+            inp.selectedVal = "";
+            inp.bSelValid = false;
+            inp.classList.add("invalid");
+            inp.placeholder = "Invalid selection";
+          }
+        } // true
       }
 
-      function registerBS(id) 
+      function enterEvent(inp, e) 
+      {
+        if (!e.target.classList.contains("betterSelect"))
+          inp.value = e.target.innerText;
+        inp.selectedVal = inp.value;
+        // console.log('enter');
+        clickSelect(inp.parentElement.id);
+        inp.focus();
+        if (inp.bSelOnChangeEvent) inp.bSelOnChangeEvent(inp.selectedVal);
+        e.preventDefault();
+      }
+      let registered = [];
+      function registerBS(id, onChange) 
       {
         let ctn = byId(id);
+        registered.push(id);
         let inp = ctn.querySelector(".betterSelect");
-        inp.addEventListener("click", ()=>{clickSelect(1)});
+        inp.bSelOnChangeEvent = onChange;
+        console.log(onChange);
+        inp.placeholder = "Make a selection...";
+        inp.addEventListener("click", (e)=>{
+          // console.log(e.target);
+          clickSelect(e.target.parentElement.id, 1);
+          e.preventDefault();
+        });
+        ctn.addEventListener("click", (e)=>{
+          if (e.target.classList.contains("option")) 
+          {
+            let inp = e.target.parentElement.parentElement.querySelector("input");
+            // e.target.focus()
+            enterEvent(inp, e);
+          }
+        })
+        inp.bSelValid = false;
       }
 
       function onLoad() {
-        registerBS("selCtn");
+        registerBS("selCtn", (value)=>{console.log(value);});
+        registerBS("selCtn2");
         document.addEventListener("click", (e)=>{
           if (e.target.closest(".bSel")) return;
-          console.log("clicked away");
-          clickSelect(-1);
+          // console.log("clicked away");
+          for (let i=0; i<registered.length; i++) 
+            clickSelect(registered[i], -1);
         })
         document.addEventListener("keydown", (e)=>
         {
-          if (e.target.className != "betterSelect") return;
+          if (!e.target.classList.contains("betterSelect") 
+           && !e.target.classList.contains("option")) return;
+          console.log(e.key);
+          let inp;
+          if (!e.target.classList.contains("betterSelect")) 
+            inp = e.target.parentElement.parentElement.querySelector("input");
+          else inp = e.target;
           switch (e.key) 
           {
             case " ":
+              if (e.target.classList.contains("betterSelect"))
+                break;
             case "Enter":
-              clickSelect();
-              e.preventDefault();
+              enterEvent(inp, e);
               return;
             case 'Escape':
-              clickSelect(-1);
+              clickSelect(inp.parentElement.id, -1);
+              inp.value = "";
               e.preventDefault();
-          }
+              break;
+            case 'ArrowDown':
+              clickSelect(inp.parentElement.id, 1);
+              if (e.target.classList.contains("option")) 
+                if (e.target.nextElementSibling)
+                  e.target.nextElementSibling.focus();
+                else 
+                  e.target.parentElement.children[0].focus();
+              else 
+                e.target.nextElementSibling.children[0].focus();
+              break;
+            case 'ArrowUp':
+              clickSelect(inp.parentElement.id, 1);
+              if (e.target.classList.contains("option")) 
+                if (e.target.previousElementSibling)
+                  e.target.previousElementSibling.focus();
+                else 
+                  e.target.parentElement.lastElementChild.focus();
+              else 
+                // console.log(e.target.nextElementSibling);
+                e.target.nextElementSibling.lastElementChild.focus();
+            break;
+            default:
+              if (e.key.length == 1 && !e.target.classList.contains("betterSelect")) // nothing stupid likee backspace/etc 
+              {
+                let inp = e.target.parentElement.parentElement.querySelector("input");
+                // inp.value = e.key;
+                inp.focus();
+                
+              }
+          } // switch (key)
         })
       };
     </script>
@@ -62,7 +164,9 @@
     <style>
       .bSel.inpContainer 
       {
-        height: 40px;
+        height: 50px;
+        margin-top: 5px;
+        margin-bottom: 20px;
       }
       .betterSelect:focus 
       {
@@ -78,10 +182,10 @@
         transition: all 0.2s ease;
         border-radius: 10px 10px 0px 0px;
       }
-      #selCtn 
+      /* .selCtn 
       {
         width: 50%;
-      }
+      } */
       .optionMenu
       {
         position: relative;
@@ -109,17 +213,26 @@
         padding: 8px;
         font-size: 35px;
         font-family: inherit;
-        background-color: var(--system-overlay2);
+        background-color: var(--system-overlay3);
         cursor: pointer;
+        color: var(--system-blue);
+        font-weight: 600;
+        /* unselectable */
+        -moz-user-select: -moz-none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        -o-user-select: none;
+        user-select: none;
       }
-      .option:hover 
+      .option:hover, .option:focus
       {
-        background-color: var(--system-overlay)
+        background-color: var(--system-overlay);
+        outline: 3px solid var(--system-overlay);
       }
       
       .optionMenu.open 
       {
-        outline: 3px solid var(--system-overlay2);
+        outline: 3px solid var(--system-overlay3);
         height: unset;
         width: unset;
         pointer-events: auto;
@@ -143,6 +256,16 @@
           <div class="option">ABC.</div>
           <div class="option">DEF</div>
           <div class="option">GHI</div>
+        </div>
+        <div class="anim inp"></div>
+      </div>
+
+      <div class="bSel inpContainer" id="selCtn2">
+        <input class="betterSelect" readonly>
+        <div class="optionMenu">
+          <div class="option">HELLO</div>
+          <div class="option">MoreSel</div>
+          <div class="option">lowercase</div>
         </div>
         <div class="anim inp"></div>
       </div>

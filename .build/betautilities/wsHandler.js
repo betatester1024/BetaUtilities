@@ -156,7 +156,7 @@ class WS {
         fs.writeFileSync("./msgLog.txt", fs.readFileSync("./msgLog.txt").toString() + `(${this.roomName})[${snd}] ${msg}
 `);
       }
-      if (msg == "!kill @" + this.nick.toLowerCase()) {
+      if (msg == "!kill @" + this.nick.toLowerCase() || msg == "!kill @cuebot") {
         this.sendMsg("/me crashes", data);
         setTimeout(() => {
           this.socket.close(1e3, "!killed by user.");

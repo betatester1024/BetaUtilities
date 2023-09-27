@@ -141,7 +141,8 @@ export class WS
       }
       // Required methods
       // !kill
-      if (msg == "!kill @" + this.nick.toLowerCase()) {
+      if (msg == "!kill @" + this.nick.toLowerCase()
+      || msg == "!kill @cuebot") {
         this.sendMsg("/me crashes", data);
         setTimeout(()=>{
           this.socket.close(1000, "!killed by user.");

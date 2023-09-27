@@ -36,6 +36,7 @@ let connectionSuccess = true;
 let DBConnectFailure = null;
 const localEuphRooms = [];
 const { exec } = require("child_process");
+let timedOutQ = false;
 let UPSINCESTR = "";
 try {
   if (connectionSuccess)
@@ -48,15 +49,22 @@ try {
           input: process.stdin,
           output: process.stdout
         });
+        let timeout;
         rl.question("Confirm start extra instance? ", (answer) => {
+          clearTimeout(timeout);
           rl.close();
           answer = answer.trim().toLowerCase();
+          if (timedOutQ)
+            return;
           if (answer != "y" && answer != "yes")
             init(false);
           else {
             init(true);
           }
         });
+        timeout = setTimeout(() => {
+          init(false);
+        }, 3e4);
       } else
         init(true);
     });

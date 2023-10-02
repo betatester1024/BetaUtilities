@@ -1,14 +1,14 @@
 "use strict";
 function clickSelect(whichOne, openQ = 0) {
   let ctn = byId(whichOne);
-  if (openQ != 0)
-    ctn.selectOpen = openQ == 1;
-  else
-    ctn.selectOpen = !ctn.selectOpen;
   if (!ctn) {
     console.error("No container found!");
     return;
   }
+  if (openQ != 0)
+    ctn.selectOpen = openQ == 1;
+  else
+    ctn.selectOpen = !ctn.selectOpen;
   let inp = ctn.querySelector(".betterSelect");
   inp.readOnly = !ctn.selectOpen;
   inp.style.cursor = ctn.selectOpen ? "text" : "pointer";
@@ -44,17 +44,20 @@ function enterEvent(inp, e) {
   inp.selectedVal = inp.value;
   clickSelect(inp.parentElement.id);
   inp.focus();
-  if (inp.bSelOnChangeEvent)
+  if (inp.bSelOnChangeEvent && inp.bSelValid)
     inp.bSelOnChangeEvent(inp.selectedVal);
   e.preventDefault();
 }
 let registered = [];
 function bSelRegister(id, onChange) {
   let ctn = byId(id);
+  if (!ctn) {
+    console.error("Error: No BetterSelect container with this ID");
+    return;
+  }
   registered.push(id);
   let inp = ctn.querySelector(".betterSelect");
   inp.bSelOnChangeEvent = onChange;
-  console.log(onChange);
   inp.placeholder = "Make a selection...";
   inp.addEventListener("click", (e) => {
     clickSelect(e.target.parentElement.id, 1);
@@ -79,7 +82,6 @@ function bSelInitialise() {
   document.addEventListener("keydown", (e) => {
     if (!e.target.classList.contains("betterSelect") && !e.target.classList.contains("option"))
       return;
-    console.log(e.key);
     let inp;
     if (!e.target.classList.contains("betterSelect"))
       inp = e.target.parentElement.parentElement.querySelector("input");

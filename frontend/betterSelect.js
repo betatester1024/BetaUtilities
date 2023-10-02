@@ -2,16 +2,17 @@ function clickSelect(whichOne, openQ=0)
 {
   // console.log("which one?", whichOne);
   let ctn = byId(whichOne);
+  if (!ctn) {
+    console.error("No container found!");
+    return;
+  }
   // console.log(ctn);
   // console.log(openQ);
   if (openQ != 0) ctn.selectOpen = (openQ==1);
   else ctn.selectOpen=!ctn.selectOpen;
   // console.log(ctn.selectOpen);
   
-  if (!ctn) {
-    console.error("No container found!");
-    return;
-  }
+
   // if open then close all others
   // if (ctn.selectOpen)
   // {
@@ -57,17 +58,21 @@ function enterEvent(inp, e)
   // console.log('enter');
   clickSelect(inp.parentElement.id);
   inp.focus();
-  if (inp.bSelOnChangeEvent) inp.bSelOnChangeEvent(inp.selectedVal);
+  if (inp.bSelOnChangeEvent && inp.bSelValid) inp.bSelOnChangeEvent(inp.selectedVal);
   e.preventDefault();
 }
 let registered = [];
 function bSelRegister(id, onChange) 
 {
   let ctn = byId(id);
+  if (!ctn) {
+    console.error("Error: No BetterSelect container with this ID");
+    return;
+  }
   registered.push(id);
   let inp = ctn.querySelector(".betterSelect");
   inp.bSelOnChangeEvent = onChange;
-  console.log(onChange);
+  // console.log(onChange);
   inp.placeholder = "Make a selection...";
   inp.addEventListener("click", (e)=>{
     // console.log(e.target);
@@ -99,7 +104,7 @@ function bSelInitialise() {
   {
     if (!e.target.classList.contains("betterSelect") 
      && !e.target.classList.contains("option")) return;
-    console.log(e.key);
+    // console.log(e.key);
     let inp;
     if (!e.target.classList.contains("betterSelect")) 
       inp = e.target.parentElement.parentElement.querySelector("input");

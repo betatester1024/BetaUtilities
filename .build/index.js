@@ -16,13 +16,13 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var BetaOS_exports = {};
-__export(BetaOS_exports, {
+var unstable_exports = {};
+__export(unstable_exports, {
   DBConnectFailure: () => DBConnectFailure,
   UPSINCESTR: () => UPSINCESTR,
   connectionSuccess: () => connectionSuccess
 });
-module.exports = __toCommonJS(BetaOS_exports);
+module.exports = __toCommonJS(unstable_exports);
 var import_server = require("./server");
 var import_database = require("./database");
 var import_supportRooms = require("./supportRooms");
@@ -36,6 +36,7 @@ let connectionSuccess = true;
 let DBConnectFailure = null;
 const localEuphRooms = [];
 const { exec } = require("child_process");
+let timedOutQ = false;
 let UPSINCESTR = "";
 try {
   if (connectionSuccess)
@@ -48,15 +49,22 @@ try {
           input: process.stdin,
           output: process.stdout
         });
+        let timeout;
         rl.question("Confirm start extra instance? ", (answer) => {
+          clearTimeout(timeout);
           rl.close();
           answer = answer.trim().toLowerCase();
+          if (timedOutQ)
+            return;
           if (answer != "y" && answer != "yes")
             init(false);
           else {
             init(true);
           }
         });
+        timeout = setTimeout(() => {
+          init(false);
+        }, 3e4);
       } else
         init(true);
     });

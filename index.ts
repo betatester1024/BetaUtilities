@@ -15,6 +15,7 @@ const localEuphRooms = [
 ]
 const { exec } = require("child_process");
 
+let timedOutQ = false;
 export let UPSINCESTR = "";
 try {
   // mail();
@@ -32,17 +33,21 @@ try {
         output: process.stdout
       
       });
-      
+      let timeout;
       rl.question("Confirm start extra instance? ", (answer:string)=>{
+        clearTimeout(timeout);
         rl.close();
         answer = answer.trim().toLowerCase();
+        if (timedOutQ) return;
         if (answer != "y" && answer != "yes") init(false);
         else {
           init(true)
         } // extra instances approved
       });
+      timeout = setTimeout(()=>{init(false)}, 30000);
     }
     else init(true);
+    
     //   if (Date.now - time < 10000)  // <10sec since last report, assume it is active
     //   {
     //     

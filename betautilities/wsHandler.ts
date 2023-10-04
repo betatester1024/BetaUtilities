@@ -141,7 +141,8 @@ export class WS
       }
       // Required methods
       // !kill
-      if (msg == "!kill @" + this.nick.toLowerCase()) {
+      if (msg == "!kill @" + this.nick.toLowerCase()
+      || msg == "!kill @cuebot") {
         this.sendMsg("/me crashes", data);
         setTimeout(()=>{
           this.socket.close(1000, "!killed by user.");
@@ -337,7 +338,7 @@ export class WS
     this.socket.on('open', this.onOpen.bind(this));
     this.socket.on('message', this.onMessage.bind(this));
     this.socket.on('close', this.onClose.bind(this));
-    this.socket.on('error', (e)=>{
+    this.socket.on('error', (e:any)=>{
       this.socket.close(1000, "");
       // systemLog(("ERROR for room-ID: "+this.roomName)
       updateActive(this.roomName, false);

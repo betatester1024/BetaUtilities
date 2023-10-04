@@ -3,135 +3,19 @@
   <head>
     <script src='./utils.js'></script>
     <title>BetterSelect | BetaOS Systems</title>
-    <script>
-      let selectOpen=false;
-      let selectedVal = "Make a selection..."
-      function clickSelect(openQ=0) 
-      {
-        console.log(openQ);
-        if (openQ != 0) selectOpen = (openQ==1);
-        else selectOpen=!selectOpen;
-        console.log(selectOpen);
-        let ctn = byId("selCtn");
-        let inp = ctn.querySelector(".betterSelect");
-        inp.readOnly=!selectOpen;
-        ctn.querySelector(".optionMenu").className = "optionMenu "+ (selectOpen?"open":"");
-        if (!clickSelect) {
-          inp.value = "";
-          inp.placeholder = selectedVal;
-        }
-      }
-
-      function registerBS(id) 
-      {
-        let ctn = byId(id);
-        let inp = ctn.querySelector(".betterSelect");
-        inp.addEventListener("click", ()=>{clickSelect(1)});
-      }
-
-      function onLoad() {
-        registerBS("selCtn");
-        document.addEventListener("click", (e)=>{
-          if (e.target.closest(".bSel")) return;
-          console.log("clicked away");
-          clickSelect(-1);
-        })
-        document.addEventListener("keydown", (e)=>
-        {
-          if (e.target.className != "betterSelect") return;
-          switch (e.key) 
-          {
-            case " ":
-            case "Enter":
-              clickSelect();
-              e.preventDefault();
-              return;
-            case 'Escape':
-              clickSelect(-1);
-              e.preventDefault();
-          }
-        })
-      };
-    </script>
+    <script src="./betterSelect.js"></script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
+    <link rel="stylesheet" href="/betterselect.css">
     <style>
-      .bSel.inpContainer 
-      {
-        height: 40px;
-      }
-      .betterSelect:focus 
-      {
-        cursor: text;
-      }
-      .betterSelect 
-      {
-        cursor: pointer;
-        height: 40px;
-        font-size: 35px;
-        padding: 5px;
-        width: calc(100% - 10px);
-        transition: all 0.2s ease;
-        border-radius: 10px 10px 0px 0px;
-      }
-      #selCtn 
-      {
-        width: 50%;
-      }
-      .optionMenu
-      {
-        position: relative;
-        top: 6px;
-        
-        width: 100%;
-        transition: all 0.2s ease, outline 0s;
-        opacity: 0;
-        height: 0px;
-        pointer-events: none;
-        border-radius: 0px 0px 10px 10px;
-        z-index:1;
-        font-family: 'Noto Sans Display';
-      }
-      .optionMenu > .option:nth-last-of-type(1) 
-      {
-        border-bottom-right-radius: 10px;
-        border-bottom-left-radius: 10px;
-      }
-      .optionMenu > .option 
-      {
-        transition: all 0.2s ease;
-        width: calc(100% - 16px);
-        height: 0px;
-        padding: 8px;
-        font-size: 35px;
-        font-family: inherit;
-        background-color: var(--system-overlay2);
-        cursor: pointer;
-      }
-      .option:hover 
-      {
-        background-color: var(--system-overlay)
-      }
-      
-      .optionMenu.open 
-      {
-        outline: 3px solid var(--system-overlay2);
-        height: unset;
-        width: unset;
-        pointer-events: auto;
-        opacity: 1;
-      }
-      .optionMenu.open > .option 
-      {
-        height: 40px;
-      }
+
     </style>
   </head>
-  <body onload = "globalOnload(()=>{onLoad()}); ">
+  <body onload = "globalOnload(()=>{}); bSelInitialise(); bSelRegister('selCtn'); bSelRegister('selCtn2');">
     <div class="main_content">
       <header class="redrounded">
         <h2>BetterSelect</h2>
@@ -143,6 +27,16 @@
           <div class="option">ABC.</div>
           <div class="option">DEF</div>
           <div class="option">GHI</div>
+        </div>
+        <div class="anim inp"></div>
+      </div>
+
+      <div class="bSel inpContainer" id="selCtn2">
+        <input class="betterSelect" readonly>
+        <div class="optionMenu">
+          <div class="option">HELLO</div>
+          <div class="option">MoreSel</div>
+          <div class="option">lowercase</div>
         </div>
         <div class="anim inp"></div>
       </div>

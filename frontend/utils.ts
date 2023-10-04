@@ -165,13 +165,13 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string=
   if (ele2)
     ele2.innerHTML = `<div class="internal" style="opacity: 0; text-align: center !important"> </div>`
   document.body.innerHTML += `
-  <div id="compliance">
-    <h2 class="blu nohover"><span class="material-symbols-outlined">cookie </span> BetaOS Services uses cookies to operate.</h2>
-    <p>We use only <kbd>strictly necessary cookies</kbd> to verify and persist 
+  <div id="compliance" style="display:none">
+    <h2 class="blu nohover fssml"><span class="material-symbols-outlined">cookie </span> BetaOS Services uses cookies to operate.</h2>
+    <p style="font-size: 10px">We use only <kbd>strictly necessary cookies</kbd> to verify and persist 
     your login session, and to confirm your acceptance of these cookies. <br>
     By continuing to use this site, you consent to our use of these cookies.</p>
-    <button class='blu btn fsmed' onclick="acceptCookies('${link}')">
-    <span class="material-symbols-outlined">check</span>
+    <button class='blu btn fssml' onclick="acceptCookies('${link}')">
+    <span class="material-symbols-outlined" style="font-size: 20pt !important">check</span>
     I understand
     <div class="anim"></div>
     </button>
@@ -231,6 +231,7 @@ function decodeStatus(status:number) {
   switch(status) 
   {
     case 0: return "Network failure"
+    case 200: return "Success"
     case 502: return "Internal Server Error"
     case 404: return "Not found"
     case 429: return "Too many requests"

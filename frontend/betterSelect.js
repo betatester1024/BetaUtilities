@@ -1,3 +1,5 @@
+let version="v3";
+
 function clickSelect(whichOne, openQ=0) 
 {
   // console.log("which one?", whichOne);
@@ -36,11 +38,12 @@ function clickSelect(whichOne, openQ=0)
       if (ctn.selectOpen) children[i].tabIndex = 0;
       else children[i].tabIndex=-1;
     }
-    if (valid || !inp.selectedVal) {
-      inp.placeholder = inp.selectedVal??"Make a selection...";
+    if (valid) {
+      // console.log("valid");
+      inp.placeholder = inp.selectedVal?inp.selectedVal:"Make a selection...";
       inp.classList.remove("invalid");
     }
-    else {
+    else if (inp.selectedVal != undefined) {
       inp.selectedVal = "";
       inp.bSelValid = false;
       inp.classList.add("invalid");
@@ -57,7 +60,8 @@ function enterEvent(inp, e)
   // console.log('enter');
   clickSelect(inp.parentElement.id);
   inp.focus();
-  if (inp.bSelOnChangeEvent) inp.bSelOnChangeEvent(inp.selectedVal);
+  // console.log(inp.valueMap.get(inp.selectedVal));
+  if (inp.bSelOnChangeEvent && inp.bSelValid) inp.bSelOnChangeEvent(inp.selectedVal, inp.valueMap.get(inp.selectedVal));
   e.preventDefault();
 }
 let registered = [];
@@ -68,6 +72,11 @@ function bSelRegister(id, onChange)
   let inp = ctn.querySelector(".betterSelect");
   inp.bSelOnChangeEvent = onChange;
   console.log(onChange);
+  inp.valueMap = new Map();
+  let children = inp.nextElementSibling.children;
+  for (let i=0; i<children.length; i++) {
+    inp.valueMap.set(children[i].innerText, children[i].getAttribute("val"));
+  }
   inp.placeholder = "Make a selection...";
   inp.addEventListener("click", (e)=>{
     // console.log(e.target);
@@ -99,7 +108,7 @@ function bSelInitialise() {
   {
     if (!e.target.classList.contains("betterSelect") 
      && !e.target.classList.contains("option")) return;
-    console.log(e.key);
+    // console.log(e.key);
     let inp;
     if (!e.target.classList.contains("betterSelect")) 
       inp = e.target.parentElement.parentElement.querySelector("input");

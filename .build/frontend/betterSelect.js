@@ -1,4 +1,5 @@
 "use strict";
+let version = "v3";
 function clickSelect(whichOne, openQ = 0) {
   let ctn = byId(whichOne);
   if (openQ != 0)
@@ -27,10 +28,10 @@ function clickSelect(whichOne, openQ = 0) {
       else
         children[i].tabIndex = -1;
     }
-    if (valid || !inp.selectedVal) {
-      inp.placeholder = inp.selectedVal ?? "Make a selection...";
+    if (valid) {
+      inp.placeholder = inp.selectedVal ? inp.selectedVal : "Make a selection...";
       inp.classList.remove("invalid");
-    } else {
+    } else if (inp.selectedVal != void 0) {
       inp.selectedVal = "";
       inp.bSelValid = false;
       inp.classList.add("invalid");
@@ -44,8 +45,8 @@ function enterEvent(inp, e) {
   inp.selectedVal = inp.value;
   clickSelect(inp.parentElement.id);
   inp.focus();
-  if (inp.bSelOnChangeEvent)
-    inp.bSelOnChangeEvent(inp.selectedVal);
+  if (inp.bSelOnChangeEvent && inp.bSelValid)
+    inp.bSelOnChangeEvent(inp.selectedVal, inp.valueMap.get(inp.selectedVal));
   e.preventDefault();
 }
 let registered = [];
@@ -55,6 +56,11 @@ function bSelRegister(id, onChange) {
   let inp = ctn.querySelector(".betterSelect");
   inp.bSelOnChangeEvent = onChange;
   console.log(onChange);
+  inp.valueMap = /* @__PURE__ */ new Map();
+  let children = inp.nextElementSibling.children;
+  for (let i = 0; i < children.length; i++) {
+    inp.valueMap.set(children[i].innerText, children[i].getAttribute("val"));
+  }
   inp.placeholder = "Make a selection...";
   inp.addEventListener("click", (e) => {
     clickSelect(e.target.parentElement.id, 1);
@@ -79,7 +85,6 @@ function bSelInitialise() {
   document.addEventListener("keydown", (e) => {
     if (!e.target.classList.contains("betterSelect") && !e.target.classList.contains("option"))
       return;
-    console.log(e.key);
     let inp;
     if (!e.target.classList.contains("betterSelect"))
       inp = e.target.parentElement.parentElement.querySelector("input");

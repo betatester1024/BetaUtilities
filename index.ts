@@ -25,7 +25,8 @@ try {
     // console.log(thing)
     if (!connectionSuccess) return;
     // uDB.findOne({fieldName:"lastActive"}).then((document:{time:number})=>{
-    if (process.env["branch"] == "unstable") {
+    if (process.env["branch"] == "unstable" && 
+        (!process.env["promptInstances"]||process.env["promptInstances"]=="0")) {
       let readline = require('readline');
 
       let rl = readline.createInterface({

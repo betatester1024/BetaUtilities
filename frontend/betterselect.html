@@ -15,7 +15,7 @@
 
     </style>
   </head>
-  <body onload = "globalOnload(()=>{}); bSelInitialise(); bSelRegister('selCtn'); bSelRegister('selCtn2');">
+  <body onload = "globalOnload(()=>{}); bSelInitialise(); bSelRegister('selCtn'); bSelRegister('selCtn2', (val1, val2)=>{console.log(val1, val2)});">
     <div class="main_content">
       <header class="redrounded">
         <h2>BetterSelect</h2>
@@ -34,8 +34,8 @@
       <div class="bSel inpContainer" id="selCtn2">
         <input class="betterSelect" readonly>
         <div class="optionMenu">
-          <div class="option">HELLO</div>
-          <div class="option">MoreSel</div>
+          <div class="option" val="hel">HELLO</div>
+          <div class="option" val="mosel">MoreSel</div>
           <div class="option">lowercase</div>
         </div>
         <div class="anim inp"></div>

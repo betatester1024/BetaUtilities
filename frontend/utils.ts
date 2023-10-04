@@ -231,6 +231,7 @@ function decodeStatus(status:number) {
   switch(status) 
   {
     case 0: return "Network failure"
+    case 200: return "Success"
     case 502: return "Internal Server Error"
     case 404: return "Not found"
     case 429: return "Too many requests"

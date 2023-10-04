@@ -338,7 +338,7 @@ export class WS
     this.socket.on('open', this.onOpen.bind(this));
     this.socket.on('message', this.onMessage.bind(this));
     this.socket.on('close', this.onClose.bind(this));
-    this.socket.on('error', (e)=>{
+    this.socket.on('error', (e:any)=>{
       this.socket.close(1000, "");
       // systemLog(("ERROR for room-ID: "+this.roomName)
       updateActive(this.roomName, false);

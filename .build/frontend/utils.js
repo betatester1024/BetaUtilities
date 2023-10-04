@@ -195,6 +195,8 @@ function decodeStatus(status) {
   switch (status) {
     case 0:
       return "Network failure";
+    case 200:
+      return "Success";
     case 502:
       return "Internal Server Error";
     case 404:

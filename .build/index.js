@@ -43,7 +43,7 @@ try {
     (0, import_database.connectDB)().then((err) => {
       if (!connectionSuccess)
         return;
-      if (process.env["branch"] == "unstable" && (!process.env["promptInstances"] || process.env["promptInstances"] == "0")) {
+      if (process.env["branch"] == "unstable" && (!process.env["promptInstances"] || process.env["promptInstances"] != "0")) {
         let readline = require("readline");
         let rl = readline.createInterface({
           input: process.stdin,
@@ -66,7 +66,7 @@ try {
           init(false);
         }, 3e4);
       } else
-        init(true);
+        init(process.env["branch"] != "unstable");
     });
   DBConnectFailure = setTimeout(() => {
     connectionSuccess = false;

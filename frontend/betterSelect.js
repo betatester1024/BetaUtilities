@@ -127,6 +127,7 @@ function bSelInitialise() {
         e.preventDefault();
         break;
       case 'ArrowDown':
+        e.preventDefault();
         clickSelect(inp.parentElement.id, 1);
         if (e.target.classList.contains("option")) 
           if (e.target.nextElementSibling)
@@ -137,6 +138,7 @@ function bSelInitialise() {
           e.target.nextElementSibling.children[0].focus();
         break;
       case 'ArrowUp':
+        e.preventDefault();
         clickSelect(inp.parentElement.id, 1);
         if (e.target.classList.contains("option")) 
           if (e.target.previousElementSibling)

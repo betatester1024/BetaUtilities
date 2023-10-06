@@ -508,7 +508,7 @@ function suffix(i:number)
   if (i%10==3 && i%100 != 13) return "rd";
   return "th";
 }
-function toTime(ms: number, inclMs) {
+function toTime(ms: number, inclMs:boolean=false) {
   let day = Math.floor(ms / 1000 / 60 / 60 / 24);
   ms = ms % (1000 * 60 * 60 * 24);
   let hr = Math.floor(ms / 1000 / 60 / 60);
@@ -550,7 +550,8 @@ addEventListener("DOMContentLoaded", function() {
   // overlay.style.left="0vh";
   overlay.style.backgroundColor="var(--system-overlay)";
   overlay.style.opacity="0"; // no more loader at start
-  overlay.innerHTML = `<div id="overlayLContainer" style='pointer-events:auto;'>
+  overlay.style.pointerEvents = "none"; // no more loader at start
+  overlay.innerHTML = `<div id="overlayLContainer" style='pointer-events:none;'>
   <p class="fslg grn nohover">Loading.</p>
   <span class="material-symbols-outlined loader">sync</span>
   <hr class="rounded">

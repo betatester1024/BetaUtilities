@@ -13,12 +13,35 @@ import { supportHandler, Room } from '../supportRooms';
 // const authDB = 
 const serviceResponse = process.env['serviceResponse'];
 
+
+function toTime(ms: number, inclMs:boolean=false) {
+  let day = Math.floor(ms / 1000 / 60 / 60 / 24);
+  ms = ms % (1000 * 60 * 60 * 24);
+  let hr = Math.floor(ms / 1000 / 60 / 60);
+  ms = ms % (1000 * 60 * 60);
+  let min = Math.floor(ms / 1000 / 60);
+  ms = ms % (1000 * 60);
+  let sec = Math.floor(ms / 1000);
+  if (ms < 0) return "00:00:00";
+  return (day > 0 ? day + "d " : "") + padWithZero(hr) + ":" + padWithZero(min) + ":" + padWithZero(sec)+(inclMs?"."+padWithThreeZeroes(ms%1000):"");
+}
+
+
+function padWithThreeZeroes(n:number) {
+  if (n < 10) return "00"+n;
+  if (n < 100) return "0"+n;
+  return n;
+}
+function padWithZero(n: number) {
+  return n < 10 ? "0" + n : n;
+}
+
 // const uDB = uDB
 let DATE = new Date();
 
 let VERSION = "ServiceVersion BETA 2.5671 | Build-time: "+
   DATE.toUTCString();
-const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! Press :three: to toggle ANTISPAM.\\n\\n Press :zero: to exit support at any time.`;
+const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! Press :three: to toggle ANTISPAM.\n\n Press :zero: to exit support at any time.`;
 let workingUsers:string[] = [];
 let leetlentCt= 1;
 let wordleCt = 1;
@@ -77,6 +100,30 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
   }
   if (msg == "!issue" || msg == "!bug" || msg == "!feature") {
     return "https://github.com/betatester1024/BetaUtilities/issues/new/choose"
+  }
+
+  if (msg == "!pendingreminders" && sender.match("beta")) {
+    let out = "";
+    (async ()=>{
+      let pendingReminders = await uDB.find({fieldName:"TIMER"}).toArray()
+      for (let i=0; i<pendingReminders.length; i++) 
+      {
+        /** 
+        fieldName:"TIMER",
+      expiry:exp, 
+      notifyingUser:remindUser=="me "?norm(sender):remindUser.slice(2, remindUser.length-1), 
+      msg:remindMsg,
+      author:remindUser=="me "?null:norm(sender)
+      */
+        out += `Reminder to @${pendingReminders[i].notifyingUser} about ${pendingReminders[i].msg} `+
+          `in ${toTime(pendingReminders[i].expiry-Date.now())}`;
+        out += "\n";
+      }
+      console.log(out);
+      hnd.delaySendMsg(out, data, 0);
+    })();
+    
+    return "";
   }
 
   if (msg.match(/(\W|^)ass(\W|$)/)&& Math.random() < 0.2) {
@@ -229,7 +276,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     return "Set information for @"+norm(sender);
   }
 
-  let match = msg.match("^!remind(me | +@[^ ]+ )(in )?()()([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?(.+)")
+  let match = msg.match("^!remind(me | +@[^ ]+ )(in )?()()([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?(?: of)? (.+)")
   if (match) {
     console.log(match);
     let remindUser = match[1];
@@ -250,7 +297,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
       msg:remindMsg,
       author:remindUser=="me "?null:norm(sender)
     });
-    return "Will remind "+(remindUser=="me "?"you":remindUser.slice(2, remindUser.length-1))+" in "+((exp-Date.now())/60000).toFixed(2)+"min";
+    return "Will remind "+(remindUser=="me "?"you":remindUser.slice(2, remindUser.length-1))+" in "+toTime(exp-Date.now());
   }
   else if (msg.match(/^!remind/)) {
     return "Syntax: !remindme 1d2h3m4s message OR !remind @user 1d2h3m4s message"
@@ -348,8 +395,8 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     return "ping!";
   }
   if (msg.match("(!help[ ]+@" + hnd.nick.toLowerCase() + "$|^[ ]+!help[ ]+$)|!contact @"+hnd.nick.toLowerCase()) != null) {
-    if (hnd.transferOutQ) return "Due to spamming concerns, please start your call in another room like &test or &bots! \\nThank you for your understanding."+
-      "\\n Enter !help @"+hnd.nick+" -FORCE to enter the help-menu here.";
+    if (hnd.transferOutQ) return "Due to spamming concerns, please start your call in another room like &test or &bots! \nThank you for your understanding."+
+      "\n Enter !help @"+hnd.nick+" -FORCE to enter the help-menu here.";
     if (hnd.callStatus == 6) return "You're currently on hold! A moment, please."
     hnd.callStatus = 0;
     hnd.bumpCallReset(data);
@@ -394,7 +441,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     hnd.clearCallReset();
     if (msg.match(exp3)) match = msg.match(exp3);
     return "https://womginx.betatester1024.repl.co/main/https://" + match[1] +
-      "\\n[NEW] The FIREFOX-ON-REPLIT may provide more reliable unblocking! > https://replit.com/@betatester1024/firefox#main.py";
+      "\n[NEW] The FIREFOX-ON-REPLIT may provide more reliable unblocking! > https://replit.com/@betatester1024/firefox#main.py";
 
   }
   if (hnd.callStatus == 0 &&(msg == ":one:" || msg == "one" || msg == "1")) {
@@ -408,14 +455,14 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
       "Press :six: for more information about the creator. " +
       "Press :seven: to enter your access code. " +
       "Press :eight: to provide feedback on our calling services! " +
-      "Press :nine: for more options. \\n\\n" +
+      "Press :nine: for more options. \n\n" +
       "Press :zero: to end call at any time.";
   }
   if (
     hnd.callStatus == 1 &&(msg == ":one:" || msg == "one" || msg == "1")) {
     hnd.clearCallReset();
     return (
-      "Important commands: !ping, !help, !pause, !restore, !kill, !pong, !uptime, !uuid. \\n " +
+      "Important commands: !ping, !help, !pause, !restore, !kill, !pong, !uptime, !uuid. \n " +
       "Bot-specific commands: see https://betatester1024.repl.co/commands?nick=BetaUtilities"
     );
   }
@@ -446,9 +493,9 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
   if (msg == "!creatorinfo" || hnd.callStatus == 1 && (msg == ":six:" || msg == "six" || msg == "6")) {
     hnd.clearCallReset();
     hnd.callStatus = -1;
-    return "BetaUtilities, created by @betatester1024.\\nVersion: " + VERSION + "\\n" +
-      "Hosted on repl.it free hosting; Only online when the creator is. \\n" +
-      "Unblockers forked by @betatester1024 and should be able to automatically come online.\\n" +
+    return "BetaUtilities, created by @betatester1024.\nVersion: " + VERSION + "\n" +
+      "Hosted on repl.it free hosting; Only online when the creator is. \n" +
+      "Unblockers forked by @betatester1024 and should be able to automatically come online.\n" +
       ":white_check_mark: BetaOS services ONLINE";
   }
   if (hnd.callStatus == 1 && (msg == ":seven:" || msg == "seven" || msg == "7")) {

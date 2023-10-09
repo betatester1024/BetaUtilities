@@ -1,18 +1,19 @@
+let version="v3";
+
 function clickSelect(whichOne, openQ=0) 
 {
   // console.log("which one?", whichOne);
   let ctn = byId(whichOne);
-  if (!ctn) {
-    console.error("No container found!");
-    return;
-  }
   // console.log(ctn);
   // console.log(openQ);
   if (openQ != 0) ctn.selectOpen = (openQ==1);
   else ctn.selectOpen=!ctn.selectOpen;
   // console.log(ctn.selectOpen);
   
-
+  if (!ctn) {
+    console.error("No container found!");
+    return;
+  }
   // if open then close all others
   // if (ctn.selectOpen)
   // {
@@ -37,11 +38,12 @@ function clickSelect(whichOne, openQ=0)
       if (ctn.selectOpen) children[i].tabIndex = 0;
       else children[i].tabIndex=-1;
     }
-    if (valid || !inp.selectedVal) {
-      inp.placeholder = inp.selectedVal??"Make a selection...";
+    if (valid) {
+      // console.log("valid");
+      inp.placeholder = inp.selectedVal?inp.selectedVal:"Make a selection...";
       inp.classList.remove("invalid");
     }
-    else {
+    else if (inp.selectedVal != undefined) {
       inp.selectedVal = "";
       inp.bSelValid = false;
       inp.classList.add("invalid");
@@ -58,21 +60,23 @@ function enterEvent(inp, e)
   // console.log('enter');
   clickSelect(inp.parentElement.id);
   inp.focus();
-  if (inp.bSelOnChangeEvent && inp.bSelValid) inp.bSelOnChangeEvent(inp.selectedVal);
+  // console.log(inp.valueMap.get(inp.selectedVal));
+  if (inp.bSelOnChangeEvent && inp.bSelValid) inp.bSelOnChangeEvent(inp.selectedVal, inp.valueMap.get(inp.selectedVal));
   e.preventDefault();
 }
 let registered = [];
 function bSelRegister(id, onChange) 
 {
   let ctn = byId(id);
-  if (!ctn) {
-    console.error("Error: No BetterSelect container with this ID");
-    return;
-  }
   registered.push(id);
   let inp = ctn.querySelector(".betterSelect");
   inp.bSelOnChangeEvent = onChange;
-  // console.log(onChange);
+  console.log(onChange);
+  inp.valueMap = new Map();
+  let children = inp.nextElementSibling.children;
+  for (let i=0; i<children.length; i++) {
+    inp.valueMap.set(children[i].innerText, children[i].getAttribute("val"));
+  }
   inp.placeholder = "Make a selection...";
   inp.addEventListener("click", (e)=>{
     // console.log(e.target);
@@ -123,6 +127,7 @@ function bSelInitialise() {
         e.preventDefault();
         break;
       case 'ArrowDown':
+        e.preventDefault();
         clickSelect(inp.parentElement.id, 1);
         if (e.target.classList.contains("option")) 
           if (e.target.nextElementSibling)
@@ -133,6 +138,7 @@ function bSelInitialise() {
           e.target.nextElementSibling.children[0].focus();
         break;
       case 'ArrowUp':
+        e.preventDefault();
         clickSelect(inp.parentElement.id, 1);
         if (e.target.classList.contains("option")) 
           if (e.target.previousElementSibling)

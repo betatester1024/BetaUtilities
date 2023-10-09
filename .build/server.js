@@ -271,14 +271,14 @@ async function initServer() {
       return;
     }
     if (!req.cookies.sessionID)
-      res.cookie("sessionID", crypto.randomUUID(), { httpOnly: true, secure: true, sameSite: "Strict" });
+      res.cookie("sessionID", crypto.randomUUID(), { httpOnly: true, secure: true, sameSite: "None" });
     makeRequest(body.action, req.cookies.accountID, body.data, req.cookies.sessionID, (s, d, token) => {
       if (ignoreLog.indexOf(body.action) >= 0) {
       } else if (s == "SUCCESS") {
         (0, import_logging.log)("Action performed:" + body.action + ", response:" + JSON.stringify(d));
       } else
         (0, import_logging.log)("Action performed, error on " + body.action + ", error:" + d.error);
-      res.cookie("accountID", token ? token : "", { httpOnly: true, secure: true, sameSite: "Strict", maxAge: 9e12 });
+      res.cookie("accountID", token ? token : "", { httpOnly: true, secure: true, sameSite: "None", maxAge: 9e12 });
       res.end(JSON.stringify({ status: s, data: d }));
     });
   });
@@ -732,7 +732,8 @@ const validPages = [
   "/graphIt",
   "/betterselect",
   "/redirect",
-  "/betterSelect.js"
+  "/betterselect.js",
+  "/8192"
 ];
 const ignoreLog = [
   "getEE",

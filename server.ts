@@ -317,7 +317,7 @@ export async function initServer() {
       return;
     }
 
-    if (!req.cookies.sessionID) res.cookie('sessionID', crypto.randomUUID(), {httpOnly:true, secure:true, sameSite:"Strict"});
+    if (!req.cookies.sessionID) res.cookie('sessionID', crypto.randomUUID(), {httpOnly:true, secure:true, sameSite:"None"});
     //////////////////////////
 
     makeRequest(body.action, req.cookies.accountID, body.data, req.cookies.sessionID, (s:string, d:any, token:string)=>{
@@ -328,7 +328,7 @@ export async function initServer() {
         log("Action performed:"+body.action+", response:"+JSON.stringify(d));
       }
       else log("Action performed, error on "+body.action+", error:"+d.error);
-      res.cookie('accountID', token?token:"", {httpOnly: true, secure:true, sameSite:"Strict", maxAge:9e12});
+      res.cookie('accountID', token?token:"", {httpOnly: true, secure:true, sameSite:"None", maxAge:9e12});
       res.end(JSON.stringify({status:s, data:d}));
     })
   });
@@ -703,7 +703,7 @@ const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/log
                     '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest',
                     "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle', '/sweepthatmine',
                    "/stopwatch", "/testbed", '/credits', '/atomicmoose', '/issuetracker', '/graphIt', 
-                    '/betterselect', '/redirect', '/betterSelect.js'];
+                    '/betterselect', '/redirect', '/betterselect.js', "/8192"];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',
                   'paste', 'findPaste'];

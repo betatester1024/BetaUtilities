@@ -25,7 +25,8 @@ try {
     // console.log(thing)
     if (!connectionSuccess) return;
     // uDB.findOne({fieldName:"lastActive"}).then((document:{time:number})=>{
-    if (process.env["branch"] == "unstable") {
+    if (process.env["branch"] == "unstable" && 
+        (!process.env["promptInstances"] || process.env["promptInstances"]!="0")) {
       let readline = require('readline');
 
       let rl = readline.createInterface({
@@ -46,7 +47,7 @@ try {
       });
       timeout = setTimeout(()=>{init(false)}, 30000);
     }
-    else init(true);
+    else init(process.env["branch"]!= "unstable");
     
     //   if (Date.now - time < 10000)  // <10sec since last report, assume it is active
     //   {

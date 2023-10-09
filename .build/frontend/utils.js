@@ -420,7 +420,7 @@ function suffix(i) {
     return "rd";
   return "th";
 }
-function toTime(ms, inclMs) {
+function toTime(ms, inclMs = false) {
   let day = Math.floor(ms / 1e3 / 60 / 60 / 24);
   ms = ms % (1e3 * 60 * 60 * 24);
   let hr = Math.floor(ms / 1e3 / 60 / 60);
@@ -466,7 +466,8 @@ addEventListener("DOMContentLoaded", function() {
   overlay.id = "overlayL";
   overlay.style.backgroundColor = "var(--system-overlay)";
   overlay.style.opacity = "0";
-  overlay.innerHTML = `<div id="overlayLContainer" style='pointer-events:auto;'>
+  overlay.style.pointerEvents = "none";
+  overlay.innerHTML = `<div id="overlayLContainer" style='pointer-events:none;'>
   <p class="fslg grn nohover">Loading.</p>
   <span class="material-symbols-outlined loader">sync</span>
   <hr class="rounded">

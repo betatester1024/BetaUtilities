@@ -433,7 +433,7 @@ function closeAlert(sel:number) {
   let dialog = coll.item(coll.length-1);
   if (!dialog) return;
   let overridecallback=false;
-  if (dialog.getAttribute("type")=="true" && sel < 0) overridecallback = true;
+  if ((dialog.getAttribute("type")=="true" || dialog.getAttribute("type")=="2" )&& sel < 0) overridecallback = true;
   if (!ele) {
     console.log("Alert dialogs not enabled in this page");
     return;

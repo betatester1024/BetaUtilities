@@ -82,6 +82,8 @@ try {
   console.log(e);
 }
 async function init(startBots) {
+  if (startBots)
+    console.log("Starting EuphBots...");
   (0, import_server.initServer)();
   (0, import_database.DBMaintenance)();
   (0, import_wordler.serverUpdate)();

@@ -70,6 +70,7 @@ try {
 
 async function init(startBots:boolean) 
 {
+  if (startBots) console.log("Starting EuphBots...");
   initServer();
   DBMaintenance();
   serverUpdate();

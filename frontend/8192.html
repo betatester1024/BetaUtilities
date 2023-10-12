@@ -2,34 +2,169 @@
 <html class="{{mainClass}}">
   <head>
     <script src='./utils.js'></script>
-    <title>2048⁴ | BetaOS Systems</title>
+    <title>2048ⁿ | BetaOS Systems</title>
     <script>
-      function resizeCanvas() 
+      let version = "v6";
+      let howManyGrids = 0;
+      let gSz = 0; // 5x5 grid * howManyGrids
+      const fillStyles = ["#eee", "#ccc", "#bbb", "#aaa", "#999", "#888", "#777", "#666", "#555", 
+                          "#444", "#333", "#222", "#111", "#000"];
+      function resizeCanvases() 
       {
-        for (let i=0; i<4; i++) {
+        for (let i=0; i<howManyGrids; i++) {
           let canv = byId("canv"+i);
-          canv.width = Math.min(window.innerWidth*4, window.innerHeight*0.3);
-          canv.height = Math.min(window.innerWidth*4, window.innerHeight*0.3);
+          canv.width = Math.min(window.innerWidth*0.4, window.innerHeight*0.3);
+          canv.height = Math.min(window.innerWidth*0.4, window.innerHeight*0.3);
         }
         redraw();
       }
-      function preLoad() 
+      function preLoad() {}
+      function startGame() 
       {
-        resizeCanvas();
+        byId("loading").style.display="none";
+        closeDialog(()=>{}, "initCtn");
+        howManyGrids = Number(byId("inp").value);
+        gSz = Number(byId("inp2").value);
+        if (!(Number.isInteger(gSz) && howManyGrids > 0 && 
+           Number.isInteger(howManyGrids) && gSz > 0 && gSz < 10)) openDialog("initCtn");
+        byId("h2").innerHTML = "2048<sup>"+howManyGrids+"</sup>";
+        for (let i=0; i<howManyGrids; i++) {
+          byClass("ctn").innerHTML += "<canvas id=canv"+i+"></canvas>"
+          grids.push([]);
+          wonQ.push(false);
+          for (let j=0; j<gSz*gSz; j++) grids[i].push(0);
+          grids[i][randgSz()*gSz+randgSz()] = 2;
+          grids[i][randgSz()*gSz+randgSz()] = 4;
+          grids[i][randgSz()*gSz+randgSz()] = 2;
+        }
+        resizeCanvases();
+        document.addEventListener("keydown", (e)=>
+        {
+          if (e.key == "ArrowDown") move(DOWN);
+          else if (e.key == "ArrowUp") move(UP);
+          else if (e.key == "ArrowLeft") move(LEFT);
+          else if (e.key == "ArrowRight") move(RIGHT);
+          else return;
+          e.preventDefault();
+        })
       }
-      grids = [];
+      let grids = [];
+      let wonQ = [];
+      let wonAll = false;
+      let alertedQ = false;
       function onLoad() 
       {
-        for (let i=0; i<4; i++) {
-          grids.push([]);
-          for (let i=0; i<16; i++) grids[i].push(0);
-        }
+        openDialog("initCtn");
+        resizeCanvases();
       }
-      function moveLeft() 
+      function randgSz() 
       {
-        for (let grid = 0; grid < 4; grid++) 
+        return Math.floor(Math.random()*gSz);
+      }
+      function id(dir, pV, sV) // primary value, secondary value 
+      {
+        return dir<2?pV*gSz+(dir%2==0?(sV):(gSz-sV-1))
+          :(dir%2==0?(sV):(gSz-sV-1))*gSz+pV; // 0/2: left, 1/3: right
+      }
+      const LEFT = 0;
+      const RIGHT = 1;
+      const UP = 2;
+      const DOWN = 3;
+      function move(dir, moveQ=true) // 0-1: horz, 2-3: vert 
+      {
+        // if (wonAll) return;
+        let horzAxis = dir<2;
+        let allGone = true;
+        for (let i = 0; i < howManyGrids; i++) {
+          moveOne(dir, i, true);
+          if (!moveOne(LEFT, i, false) && !moveOne(RIGHT, i, false) 
+           && !moveOne(UP, i, false) && !moveOne(DOWN, i, false) && !wonQ[i]) 
+          {
+            byId("canv"+i).style.filter = "brightness(50%)";
+          }
+          else allGone = false;
+        }
+        if (allGone && !alertedQ && gSz!= 0) {
+          alertedQ = true;
+          alertDialog("You've lost! ... like a sucker!", ()=>{location.reload()});
+        }
+        redraw();
+        return false;
+      }
+
+      function moveOne(dir, i, moveQ) 
+      {
+        let movedQ = false;
+        for (let pV = 0; pV < gSz; pV++ ) // primary axis value
+          for (let sV=0; sV<gSz-1; sV++) // secondary axis value
+            // attempt to move them left
+            while (grids[i][id(dir, pV, sV)] == 0 && grids[i][id(dir, pV, sV+1)] > 0 // simple movement in direction
+                  || (grids[i][id(dir, pV, sV)] == grids[i][id(dir, pV, sV+1)] && grids[i][id(dir, pV, sV)]!=0)
+                   /*mergeable*/) // curr is empty and next is open
+              if (moveQ) {
+                let mergedQ = grids[i][id(dir, pV, sV)] == grids[i][id(dir, pV, sV+1)];
+                let combVal = (mergedQ?2:1)*grids[i][id(dir, pV, sV+1)];
+                grids[i][id(dir, pV, sV)] = combVal;
+                grids[i][id(dir, pV, sV+1)] = 0;
+                sV=0;
+                movedQ = true;
+                // if (mergedQ) console.log(grids[i][id(dir, pV, sV)]);
+                if (mergedQ && combVal==2048 && !wonQ[i]) {// rounding errors?? 
+                  wonQ[i] = true;// has won
+                  let canv = byId("canv"+i);
+                  canv.style.backgroundColor = "var(--system-green)";
+                  wonAll = true;
+                  alertDialog("You won!", ()=>{});
+                  for (let i=0; i<howManyGrids && wonAll; i++) 
+                    wonAll = wonQ[i];
+                  if (wonAll) alertDialog("You won everything! Start new game?", ()=>{location.reload()}, 2);
+                }
+                // if (sV < 0) break;
+              }
+              else return true;
+        if (moveQ && movedQ) {
+          let randid = -1
+          while (grids[i][randid] != 0) randid = randgSz()*gSz+randgSz();
+          grids[i][randid] = Math.random()>0.5?4:2;
+        } // add one of those little squares to the board
+      }
+      function redraw() 
+      {
+        for (let i=0; i<howManyGrids; i++) 
         {
-          grids[i]
+          let canv = byId("canv"+i);
+          let ctx = canv.getContext("2d");
+          ctx.clearRect(0, 0, canv.height, canv.width);
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.strokeStyle = getComputedStyle(canv).getPropertyValue("--system-overlay");
+          // ctx.font = canv.height/5+"px Noto Sans Display";
+          
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          for (let cell=0; cell<gSz*gSz; cell++) 
+          {
+            if (grids[i][cell] == 0) continue;
+            ctx.font = canv.height/((gSz-0.5)+1.2*Math.ceil(Math.log(grids[i][cell])))+"px Noto Sans Display";
+            let y = Math.floor(cell/gSz);
+            let x = Math.floor(cell%gSz);
+            if (wonQ[i]) ctx.fillStyle = getComputedStyle(canv).getPropertyValue("--system-green");
+            else ctx.fillStyle = fillStyles[Math.round(Math.log2(grids[i][cell]))]??"#000";
+            ctx.fillRect(x*canv.width/gSz, y*canv.height/gSz, canv.width/gSz, canv.height/gSz);
+            ctx.beginPath();
+            ctx.fillStyle = getComputedStyle(canv).getPropertyValue("--system-blue");
+            ctx.fillText(grids[i][cell], (x+0.5)*canv.width/gSz, (y+0.5)*canv.height/gSz);
+            // ctx.
+          }
+          ctx.beginPath();
+          for (let j=1; j<gSz; j++) 
+          {
+            ctx.moveTo(j*canv.width/gSz, 0);
+            ctx.lineTo(j*canv.width/gSz, canv.height);
+            ctx.moveTo(0, j*canv.height/gSz);
+            ctx.lineTo(canv.width, j*canv.height/gSz);
+          }
+          ctx.stroke();
         }
       }
     </script>
@@ -46,7 +181,7 @@
         height: min(30vh, 40vw);
         border-radius: 15px;
         outline: 5px solid var(--system-overlay);
-        margin: 5px;
+        margin: 10px;
       }
       #controls 
       {
@@ -59,26 +194,41 @@
         opacity: 1;
         transition: all 0.3s ease;
       }
+      #initCtn {
+        top: 100vh; 
+        /* height: unset; */
+        z-index: 1;
+        pointer-events: auto;
+        transition: all 0.3s ease;
+      }
+      #initCtn > .internal 
+      {
+        height: unset;
+        margin: 10px auto;
+        border-radius: 15px;
+        width: 90%;
+        background-color: var(--system-bg);
+        padding: 15px;
+      }
       .main_content {
-        height: calc(100% - 300px);
+        /* height: calc(100% - 300px); */
         transition: all 0.3s ease;
       }
     </style>
   </head>
-  <body onload = "globalOnload(onLoad);" onresize = resizeCanvases()>
+  <body onload = "globalOnload(onLoad); preLoad();" onresize = resizeCanvases()>
     <div class="main_content">
       <header class="redrounded">
-        <h2>2048<sup>4</sup></h2>
+        <h2 id="h2" class="fssml">2048<sup>n</sup></h2>
         <hr class="rounded">
       </header>
-      <div class="ctn">
-        <canvas id="canv0"></canvas>
-        <canvas id="canv1"></canvas>
-        <br>
-        <canvas id="canv2"></canvas>
-        <canvas id="canv3"></canvas>
+      <div id="loading">
+        <h2><span class="material-symbols-outlined">sync</span> Loading...</h2>
       </div>
-      <div id="controls">
+      <div class="ctn">
+        
+      </div>
+      <!-- <div id="controls"> -->
         
       </div>
       <a class="btn szFull override" href="/">
@@ -86,18 +236,34 @@
         Return to home<div class="anim"></div></a>
         
     </div>
-    <div class="ephemerals">
-      
-    </div>
-    <div class="overlay" id="overlay">
+    <div class="overlay" id="overlay"></div>
+    <div class="ephemerals"></div>
+    <div class="overlay_dialog" id="initCtn">
       <div class="internal">
-        <p class="fsmed" id="alerttext">Hey, some text here</p>
-        <button class="btn szTwoThirds" onclick="closeAlert()">
-          Continue
-          <span class="material-symbols-outlined">arrow_forward_ios</span>
-          <div class="anim"></div>
-        </button>
+        <h2 id="h2" class="fssml">2048<sup>n</sup></h2>
+        <hr class="rounded">
+        <form id="form" style="text-align: center; margin: 10px auto;" action="javascript:startGame()">
+          <h2 class="fsmed">How many grids?</h2>
+          <div class="inpContainer szFull nowrap pwdCtn">
+            <input class="inp sz100 noMin" id="inp" type=number min=1 step=1>
+            <div class="anim inp"></div>
+          </div>
+          <h2 class="fsmed">Grid size?</h2>
+          <div class="inpContainer szFull nowrap pwdCtn">
+            <input class="inp sz100 noMin" id="inp2" type=number min=1 max=9 step=1>
+            <div class="anim inp"></div>
+          </div>
+          <button style="display: none;">
+          </button>
+        </form>
+        
       </div>
+      <button class="btn grn" onclick="startGame()">
+        Start game!
+        <span class="material-symbols-outlined">arrow_forward</span>
+        <div class="anim"></div>
+      </button>
     </div>
+    
   </body>
 </html>

@@ -296,7 +296,7 @@ class WS {
   }
   constructor(url, nick, roomName, transferQ) {
     this.nick = nick;
-    if (roomName == "bots")
+    if (roomName == "test")
       WS.notifRoom = this;
     WS.sockets.push(this);
     this.url = url;

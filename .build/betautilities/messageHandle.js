@@ -32,6 +32,10 @@ var import_supportRooms = require("../supportRooms");
 const fs = require("fs");
 const serviceKey = process.env["serviceKey"];
 const serviceResponse = process.env["serviceResponse"];
+function betaLocalTime(STARTTIME2 = Date.now()) {
+  let date2 = new Date(STARTTIME2);
+  return date2.toLocaleString("en-US", { timeZone: "America/New_York" });
+}
 function toTime(ms, inclMs = false) {
   let day = Math.floor(ms / 1e3 / 60 / 60 / 24);
   ms = ms % (1e3 * 60 * 60 * 24);
@@ -55,7 +59,7 @@ function padWithZero(n) {
   return n < 10 ? "0" + n : n;
 }
 let DATE = new Date();
-let VERSION = "ServiceVersion BETA 2.5671 | Build-time: " + DATE.toUTCString();
+let VERSION = "ServiceVersion BETA 2.5671 \n Build-time: " + betaLocalTime();
 const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! Press :three: to toggle ANTISPAM.
 
  Press :zero: to exit support at any time.`;
@@ -328,7 +332,7 @@ function replyMessage(hnd, msg, sender, data) {
     return "!inbox";
   }
   if (msg.match("!version[ ]+@" + hnd.nick.toLowerCase())) {
-    return VERSION;
+    return VERSION + " \n Branch: " + process.env["branch"] + " | Notifying in: &" + import_wsHandler.WS.notifRoom.roomName;
   }
   let match2 = msg.match("@" + hnd.nick.toLowerCase() + " !mitoseto &([a-z0-9]+) as @(.+)");
   if (match2) {
@@ -445,7 +449,7 @@ function replyMessage(hnd, msg, sender, data) {
     hnd.clearCallReset();
     if (msg.match(exp3))
       match = msg.match(exp3);
-    return "https://womginx.betatester1024.repl.co/main/https://" + match[1] + "\n[NEW] The FIREFOX-ON-REPLIT may provide more reliable unblocking! > https://replit.com/@betatester1024/firefox#main.py";
+    return "https://womginx.betaos.repl.co/main/https://" + match[1];
   }
   if (hnd.callStatus == 0 && (msg == ":one:" || msg == "one" || msg == "1")) {
     hnd.bumpCallReset(data);
@@ -487,7 +491,7 @@ function replyMessage(hnd, msg, sender, data) {
   if (msg == "!creatorinfo" || hnd.callStatus == 1 && (msg == ":six:" || msg == "six" || msg == "6")) {
     hnd.clearCallReset();
     hnd.callStatus = -1;
-    return "BetaUtilities, created by @betatester1024.\nVersion: " + VERSION + "\nHosted on repl.it free hosting; Only online when the creator is. \nUnblockers forked by @betatester1024 and should be able to automatically come online.\n:white_check_mark: BetaOS services ONLINE";
+    return "BetaUtilities, created by @betatester1024.\nVersion: " + VERSION + "\nUnblockers forked by @betatester1024 and should be able to automatically come online.\n:white_check_mark: BetaOS services ONLINE";
   }
   if (hnd.callStatus == 1 && (msg == ":seven:" || msg == "seven" || msg == "7")) {
     hnd.bumpCallReset(data);
@@ -669,8 +673,7 @@ async function getUptimeStr(STARTTIME2 = -1) {
     return formatTime(time.uptime);
   }
   let timeElapsed = Date.now() - STARTTIME2;
-  let date = new Date(STARTTIME2);
-  var usaTime = date.toLocaleString("en-US", { timeZone: "America/New_York" });
+  let usaTime = betaLocalTime(STARTTIME2);
   console.log("USA time: " + usaTime);
   return `/me has been up since ${date.toUTCString()} / EST: ${usaTime} | Time elapsed: ${formatTime(timeElapsed)}`;
 }

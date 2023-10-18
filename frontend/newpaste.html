@@ -32,7 +32,7 @@
             document.getElementById("inp_pwd").value="";
             openDialog("pwdInp");
           });
-          else document.getElementById("text").value=res.data;
+          else document.getElementById("text").value=res.data.content;
         })
       }
       function onLoad() {
@@ -50,7 +50,8 @@
           loc.value=match;
           document.getElementById("form").action="javascript:update()";
           loc.disabled=true;
-          document.getElementById("inp").placeholder="(Unchanged)"
+          loc.classList.add("disabled");
+          // document.getElementById("inp").placeholder="(Unchanged)"
         }
         else document.getElementById('pwdInp').style.display="none";
       }

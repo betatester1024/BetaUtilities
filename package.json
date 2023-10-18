@@ -1,5 +1,5 @@
 {
-  "name": "BetaOS_System",
+  "name": "betaos_system",
   "version": "1.0.0",
   "description": "BetaOS Systems home-page and BetaUtilities on Euphoria.io",
   "main": ".build/index.js",
@@ -16,6 +16,7 @@
     "co-body": "^6.1.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "cryptr": "^6.3.0",
     "dialog-polyfill": "^0.5.6",
     "express": "^4.18.2",
     "express-rate-limit": "^7.1.0",
@@ -23,6 +24,18 @@
     "get-random-values": "^3.0.0",
     "handlebars": "^4.7.8",
     "mongodb": "^6.1.0",
+    "npm": "^10.2.0",
     "ws": "^8.14.2"
-  }
+  },
+  "devDependencies": {
+    "node": "^20.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/betatester1024/BetaUtilities.git"
+  },
+  "bugs": {
+    "url": "https://github.com/betatester1024/BetaUtilities/issues"
+  },
+  "homepage": "https://github.com/betatester1024/BetaUtilities#readme"
 }

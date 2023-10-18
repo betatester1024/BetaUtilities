@@ -11,9 +11,20 @@
           document.getElementById("inp").value="";
           if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{openDialog('pwdInp');});
           else {
-            document.getElementById("text").value=res.data;
+            handleIncomingPaste(res);
           }
         })
+      }
+      function handleIncomingPaste(res) {
+        closeDialog(()=>{}, 'pwdInp');
+        document.getElementById('text').value=res.data.content;
+        let secEle = byId('security');
+        secEle.innerText = res.data.security;
+        if (res.data.security == 'none') {
+          secEle.classList.remove('grn'); 
+          secEle.classList.add('red');
+          secEle.classList.add('nooutline');
+        }
       }
       // function closeDialog('pwdInp'); {
       //   let div = document.getElementById("pwdInp");
@@ -70,6 +81,12 @@
     </style>
   </head>
   <body onload = "globalOnload(()=>{
+    send(JSON.stringify({action:'findPaste', 
+    data:{pwd:'', name:(new URL(document.URL)).pathname.match(/\/paste\/(.*)$/)[1]}}), (res)=>{
+      if (res.status == 'SUCCESS') { // passwordless paste / is author
+        handleIncomingPaste(res)
+      }
+    })
     openDialog('pwdInp');
     var transitionEnd = whichTransitionEvent();
     byId('pwdInp').addEventListener(transitionEnd, theFunctionToInvoke, false);
@@ -84,6 +101,8 @@
         <h2>PasteIt!</h2>
         <hr class="rounded">
       </header>
+      <div class="blu nohover fssml nobreak" >Paste security: </div>
+      <div class="grn nohover fssml nobreak" id="security"></div>
       <textarea id="text" readonly></textarea>
       <a class="btn szHalf grn" href="/paste">
         <span class="material-symbols-outlined">add</span>

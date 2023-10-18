@@ -7,11 +7,11 @@ export function cueBot(hnd:(WebH|WS), msg:string, sender:string, data:any) {
   if (msg == "!help @cuebot") {
     console.log("test");
     hnd.changeNick("CueBot");
-    hnd.delaySendMsg(` I am a bot that does lots of things, most of them unhelpful. Some such features include:\\n\\n`+
-                     `-making Substitutions\\n\\n`+
-                     `-providing shortcuts and unhelpful tools (!maskup, !shop, !coinflip, !xkcdalert, !rng, and more!)\\n\\n`+
-                    `-having some random fun stuff! (!hint to find some of these.).\\n\\n`+
-                    `For more info, ask @...`, data, 0);
+    hnd.delaySendMsg(` I am a bot that does lots of things, most of them unhelpful. Some such features include:\n\n`+
+                     `-making Substitutions\n\n`+
+                     `-providing shortcuts and unhelpful tools (!maskup, !shop, !coinflip, !xkcdalert, !rng, and more!)\n\n`+
+                    `-having some random fun stuff! (!hint to find some of these.).\n\n`+
+                    `For more info, please !tell @betatester1024.`, data, 0);
     setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
   }
   if (msg.match(/\ballegedly\b/) && Math.random() < 0.2) {

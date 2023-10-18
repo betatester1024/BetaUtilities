@@ -27,7 +27,15 @@ function cueBot(hnd, msg, sender, data) {
   if (msg == "!help @cuebot") {
     console.log("test");
     hnd.changeNick("CueBot");
-    hnd.delaySendMsg(` I am a bot that does lots of things, most of them unhelpful. Some such features include:\\n\\n-making Substitutions\\n\\n-providing shortcuts and unhelpful tools (!maskup, !shop, !coinflip, !xkcdalert, !rng, and more!)\\n\\n-having some random fun stuff! (!hint to find some of these.).\\n\\nFor more info, ask @...`, data, 0);
+    hnd.delaySendMsg(` I am a bot that does lots of things, most of them unhelpful. Some such features include:
+
+-making Substitutions
+
+-providing shortcuts and unhelpful tools (!maskup, !shop, !coinflip, !xkcdalert, !rng, and more!)
+
+-having some random fun stuff! (!hint to find some of these.).
+
+For more info, please !tell @betatester1024.`, data, 0);
     setTimeout(() => {
       hnd.changeNick(hnd.nick);
     }, 200);

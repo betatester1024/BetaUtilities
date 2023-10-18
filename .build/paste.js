@@ -25,7 +25,7 @@ __export(paste_exports, {
 module.exports = __toCommonJS(paste_exports);
 var import_consts = require("./consts");
 var import_userRequest = require("./userRequest");
-const crypto = require("node:crypto").webcrypto;
+const Cryptr = require("cryptr");
 const argon2 = require("argon2");
 const pasteMatch = /^[0-9a-zA-Z_\-]{1,30}$/;
 async function paste(content, loc, pwd, token) {
@@ -33,25 +33,29 @@ async function paste(content, loc, pwd, token) {
     return { status: "ERROR", data: { error: "Invalid paste-name." }, token };
   if (pwd.length == 0)
     return { status: "ERROR", data: { error: "No password provided." }, token };
-  let hashed = await argon2.hash(pwd, import_consts.hashingOptions);
   let existingDoc = await import_consts.pasteDB.findOne({ fieldName: "PASTE", name: loc });
   if (existingDoc)
     return { status: "ERROR", data: { error: "Paste already exists! Please select another name." }, token };
   let userData = await (0, import_userRequest.userRequest)(token);
   let user = userData.status == "SUCCESS" ? userData.data.user : null;
-  import_consts.pasteDB.insertOne({ fieldName: "PASTE", data: content, pwd: hashed, name: loc, author: user });
+  import_consts.pasteDB.insertOne({
+    fieldName: "PASTE",
+    isSecure: true,
+    encryptedData: await encrypt(content, pwd),
+    name: loc,
+    author: user
+  });
   return { status: "SUCCESS", data: null, token };
 }
-function encryptMessage(msg, key) {
-  const enc = new TextEncoder();
-  const encoded = enc.encode(msg);
-  console.log(crypto);
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  return crypto.subtle.encrypt(
-    { name: "AES-GCM", iv },
-    key,
-    encoded
-  );
+const algorithm = "aes-256-ctr";
+const secretKey = process.env["encryptionKey"];
+async function encrypt(text, pwd) {
+  const cryptr = new Cryptr(pwd);
+  return cryptr.encrypt(text);
+}
+async function decrypt(encr, pwd) {
+  const cryptr = new Cryptr(pwd);
+  return cryptr.decrypt(encr);
 }
 async function findPaste(loc, pwd, token) {
   if (!loc.match(pasteMatch))
@@ -59,8 +63,19 @@ async function findPaste(loc, pwd, token) {
   let existingDoc = await import_consts.pasteDB.findOne({ fieldName: "PASTE", name: loc });
   if (!existingDoc)
     return { status: "ERROR", data: { error: "Paste does not exist!" }, token };
-  if (await argon2.verify(existingDoc.pwd, pwd)) {
-    return { status: "SUCCESS", data: existingDoc.data, token };
+  let userInfo = await (0, import_userRequest.userRequest)(token);
+  if (existingDoc.pwd && await argon2.verify(existingDoc.pwd, pwd)) {
+    return { status: "SUCCESS", data: { content: existingDoc.data, security: "none" }, token };
+  } else if (existingDoc.encryptedData) {
+    let out = "Unknown Decode Error";
+    console.log(existingDoc.encryptedData);
+    try {
+      out = await decrypt(existingDoc.encryptedData, pwd);
+    } catch (e) {
+      console.log(e);
+      return { status: "ERROR", data: { error: "Decode error! \n This is probably because you entered an invalidpassword, or your paste was corrupted." }, token };
+    }
+    return { status: "SUCCESS", data: { content: out, security: "encrypted" }, token };
   } else
     return { status: "ERROR", data: { error: "Invalid password!" }, token };
 }
@@ -79,14 +94,10 @@ async function editPaste(content, loc, pwd, token) {
   else if (userInfo.data.user != existingDoc.author)
     return { status: "ERROR", data: { error: "You are not the author of the paste and cannot edit it." }, token };
   if (pwd.length == 0)
-    import_consts.pasteDB.updateOne({ fieldName: "PASTE", name: loc }, { $set: {
-      data: content
-    } });
-  else
-    await import_consts.pasteDB.updateOne({ fieldName: "PASTE", name: loc }, { $set: {
-      data: content,
-      pwd: hashed
-    } });
+    return { status: "ERROR", data: { error: "No password provided!" }, token };
+  await import_consts.pasteDB.updateOne({ fieldName: "PASTE", name: loc }, { $set: {
+    encryptedData: await encrypt(content, pwd)
+  } });
   return { status: "SUCCESS", data: null, token };
 }
 // Annotate the CommonJS export names for ESM import in node:

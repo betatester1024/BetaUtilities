@@ -733,7 +733,8 @@ const validPages = [
   "/betterselect",
   "/redirect",
   "/betterselect.js",
-  "/8192"
+  "/8192",
+  "/imgedit"
 ];
 const ignoreLog = [
   "getEE",

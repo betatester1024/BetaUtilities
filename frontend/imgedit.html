@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html class="{{mainClass}}">
+  <head>
+    <script src='./utils.js'></script>
+    <title>ImageEdit | BetaOS Systems</title>
+    <script>
+      function onLoad() 
+      {
+        
+      }
+      let currX = 0, currY = 0;
+      let cDrawing = false;
+      let ctx = null;
+      let rImg = null;
+      function preLoad() {
+        let canv = byId("editingArea");
+        ctx = byId("editingArea").getContext("2d");
+        
+        canv.width = 1000;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.font = "50px Noto Sans Display";
+        ctx.fillText("Please paste an image here...", canv.width/2, canv.height/2);
+        
+        saveImg();
+        rImg = new Image();
+        rImg.src = byId("outImg").src;
+        document.onpaste = (ev) => {
+          const data = ev.clipboardData || window.clipboardData;
+          const file = data.files[0];
+          // console.log(file.data);
+          if (file && file.type.match("^image/")) // is *probably* an image
+          {  
+            rImg = new Image();
+            // img.id = "outImg";
+            // console.log(file);
+            rImg.onload = ()=>{
+              // console.log(img);
+              // console.log(rImg.width, "x", rImg.height);
+              resize();
+              // console.log(canv.width);
+              let ctx = canv.getContext("2d");
+              ctx.drawImage(rImg, 0, 0, canv.width, canv.height);
+              // ctx.moveTo(0, 0);
+              // ctx.lineTo(30, 50);
+              // ctx.stroke();
+              // img.onload = null;
+              saveImg();
+              
+            }
+            // console.log(URL.createObjectURL(file));
+            rImg.src = URL.createObjectURL(file);
+            // byClass("main_content").appendChild(img);
+            
+          } 
+          // console.log( file );
+        };
+        
+        document.onpointerdown = (ev)=>
+        {
+          if (ev.target.nodeName != "IMG") {
+            cDrawing = false;
+            return;
+          }
+          let bb = byId("outImg").getBoundingClientRect();
+          currX = ev.clientX - bb.left;
+          currY = ev.clientY - bb.top;
+          cDrawing = true;
+
+          ctx.beginPath();
+          ctx.moveTo(currX, currY);
+          ev.preventDefault();
+        }
+        document.onpointermove = (ev)=>
+        {
+          // if (ev.target.nodeName != "IMG") return;
+          if (cDrawing) {
+            let bb = byId("outImg").getBoundingClientRect();
+            currX = ev.clientX - bb.left;
+            currY = ev.clientY - bb.top;
+            if (currX < 0 || currY < 0 || 
+                currX > canv.width || currY > canv.height) {
+              // cDrawing = false;
+              ctx.beginPath();
+              console.log("outofbounds");
+              return;
+            }
+            ctx.lineTo(currX, currY);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(currX, currY);
+            saveImg();
+          }
+          ev.preventDefault();
+        }
+        document.onpointerup = ()=>{
+          cDrawing=false;
+          ctx.beginPath();
+        }
+      }
+      function resize() 
+      {
+        let canv = byId("editingArea");
+        let img = byId("outImg");
+        if (rImg) ref = rImg;
+        else ref = img;
+        let ARImg = ref.width/ref.height;
+        let ARScr = window.innerWidth/window.innerHeight;
+        if (ARImg > ARScr) {
+          canv.width = window.innerWidth*0.8;
+          canv.height = window.innerWidth*0.8/ARImg;
+        }
+        else {
+          canv.height = window.innerHeight*0.8;
+          canv.width = window.innerHeight*0.8*ARImg;
+        }
+        // console.log(rImg.width, "x", rImg.height);
+        // img.style.width = canv.width+"px";
+        // img.style.height = canv.height+"px";
+        if (rImg) {
+          img.width = canv.width;
+          img.height = canv.height;
+        }
+      }
+      function saveImg() 
+      {
+        var canvas = document.getElementById("editingArea");
+        var img    = canvas.toDataURL("image/png");
+        byId("outImg").src = img;
+      }
+      function updateStyles() 
+      {
+        ctx.lineWidth = byId("sz").value;
+        ctx.strokeStyle = byId("clr").value;
+      }
+      function downloadImg() 
+      {
+        var link = document.createElement('a');
+        link.download = 'filename.png';
+        link.href = document.getElementById('editingArea').toDataURL()
+        link.click();
+      }
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      h1 {
+        font-size: 4em;
+        font-weight: 700;
+        margin: 0px;
+        width: 80%;
+        margin: auto;
+      }
+      img {
+        outline: 3px solid var(--system-green);
+        /* width: 80%; */
+        /* object-fit: cover; */
+        /* width: min(80vh, 80vw); */
+        /* height: min(80vh, 80vw); */
+
+        /* height: 80%; */
+      }
+    </style>
+  </head>
+  <body onload= "globalOnload(onLoad); preLoad();" onresize = resize()>
+    <div class="main_content">
+      <header>
+        <h1>Éditeur d'Images BétaOS</h1>
+        <hr class="rounded">
+      </header>
+      <form action="javascript:updateStyles()">
+        <div class="inpContainer szThird nobreak" style="margin-right: 5px;">
+          <input class="inp" id="clr" placeholder = "Hex colour"/>
+          <div class="anim inp"></div>
+        </div>
+        <div class="inpContainer szThird nobreak" style="margin-left: 5px">
+          <input class="inp" id="sz" placeholder="Line size" type="number" value = "1" min=1 max=20>
+          <div class="anim inp"></div>
+        </div>
+        <button style="display:none"></button>
+      </form>
+      <img id="outImg">
+      <!-- <div contenteditable>You can paste the image here</div> -->
+      <canvas id="editingArea" style="display:none;"></canvas>
+      <a class="btn szFull override" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div>
+      </a>
+    </div>
+  </body>
+</html>

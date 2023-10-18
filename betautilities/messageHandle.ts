@@ -12,7 +12,11 @@ import {uDB, authDB} from '../consts';
 import { supportHandler, Room } from '../supportRooms';
 // const authDB = 
 const serviceResponse = process.env['serviceResponse'];
-
+function betaLocalTime(STARTTIME:number=Date.now()) 
+{
+  let date = new Date(STARTTIME);
+  return date.toLocaleString("en-US", {timeZone: "America/New_York"});
+}
 
 function toTime(ms: number, inclMs:boolean=false) {
   let day = Math.floor(ms / 1000 / 60 / 60 / 24);
@@ -39,8 +43,8 @@ function padWithZero(n: number) {
 // const uDB = uDB
 let DATE = new Date();
 
-let VERSION = "ServiceVersion BETA 2.5671 | Build-time: "+
-  DATE.toUTCString();
+let VERSION = "ServiceVersion BETA 2.5671 \n Build-time: "+
+  betaLocalTime();
 const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! Press :three: to toggle ANTISPAM.\n\n Press :zero: to exit support at any time.`;
 let workingUsers:string[] = [];
 let leetlentCt= 1;
@@ -334,7 +338,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     return "!inbox";
   }
 
-  if (msg.match("!version[ ]+@"+hnd.nick.toLowerCase())) {return VERSION;}
+  if (msg.match("!version[ ]+@"+hnd.nick.toLowerCase())) {return VERSION+" \n Branch: "+process.env["branch"]+" | Notifying in: &"+WS.notifRoom.roomName;}
   let match2  = msg.match("@"+hnd.nick.toLowerCase()+" !mitoseto &([a-z0-9]+) as @(.+)");
   if (match2) {
     systemLog(match2);
@@ -440,8 +444,8 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     // so damn cursed
     hnd.clearCallReset();
     if (msg.match(exp3)) match = msg.match(exp3);
-    return "https://womginx.betatester1024.repl.co/main/https://" + match[1] +
-      "\n[NEW] The FIREFOX-ON-REPLIT may provide more reliable unblocking! > https://replit.com/@betatester1024/firefox#main.py";
+    return "https://womginx.betaos.repl.co/main/https://" + match[1];
+      // "\n[NEW] The FIREFOX-ON-REPLIT may provide more reliable unblocking! > https://replit.com/@betatester1024/firefox#main.py";
 
   }
   if (hnd.callStatus == 0 &&(msg == ":one:" || msg == "one" || msg == "1")) {
@@ -494,7 +498,6 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     hnd.clearCallReset();
     hnd.callStatus = -1;
     return "BetaUtilities, created by @betatester1024.\nVersion: " + VERSION + "\n" +
-      "Hosted on repl.it free hosting; Only online when the creator is. \n" +
       "Unblockers forked by @betatester1024 and should be able to automatically come online.\n" +
       ":white_check_mark: BetaOS services ONLINE";
   }
@@ -660,8 +663,7 @@ async function getUptimeStr(STARTTIME:number=-1) {
     return formatTime(time.uptime);
   }
   let timeElapsed = Date.now() - STARTTIME;
-  let date = new Date(STARTTIME);
-  var usaTime = date.toLocaleString("en-US", {timeZone: "America/New_York"});
+  let usaTime = betaLocalTime(STARTTIME);
   console.log('USA time: '+ usaTime);
   return `/me has been up since ${date.toUTCString()} / EST: ${usaTime} | Time elapsed: ${formatTime(timeElapsed)}`
 }

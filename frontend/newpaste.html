@@ -31,6 +31,7 @@
           if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{
             document.getElementById("inp_pwd").value="";
             openDialog("pwdInp");
+            
           });
           else document.getElementById("text").value=res.data.content;
         })
@@ -93,7 +94,15 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload(()=>{onLoad()});">
+  <body onload = "globalOnload(()=>{onLoad()});
+    var transitionEnd = whichTransitionEvent();
+    byId('pwdInp').addEventListener(transitionEnd, theFunctionToInvoke, false);
+
+    function theFunctionToInvoke(ev){
+      let target = ev.target.querySelector('.internal form .inpContainer #inp_pwd.noMin');
+      console.log(target);
+      if (target) target.focus();
+    }">
     <div class="main_content">
       <header>
         <h2 id="h2">PasteIt!</h2>

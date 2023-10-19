@@ -703,7 +703,7 @@ const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/log
                     '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest',
                     "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle', '/sweepthatmine',
                    "/stopwatch", "/testbed", '/credits', '/atomicmoose', '/issuetracker', '/graphIt', 
-                    '/betterselect', '/redirect', '/betterselect.js', "/8192", "/imgedit"];
+                    '/betterselect', '/redirect', '/betterselect.js', "/minimalLogin", "/8192", "/imgedit"];
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',
                   'paste', 'findPaste'];

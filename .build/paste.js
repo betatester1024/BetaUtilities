@@ -68,12 +68,10 @@ async function findPaste(loc, pwd, token) {
     return { status: "SUCCESS", data: { content: existingDoc.data, security: "none" }, token };
   } else if (existingDoc.encryptedData) {
     let out = "Unknown Decode Error";
-    console.log(existingDoc.encryptedData);
     try {
       out = await decrypt(existingDoc.encryptedData, pwd);
     } catch (e) {
-      console.log(e);
-      return { status: "ERROR", data: { error: "Decode error! \n This is probably because you entered an invalidpassword, or your paste was corrupted." }, token };
+      return { status: "ERROR", data: { error: "Decode error! \n This is probably because you entered an invalid password, or your paste was corrupted." }, token };
     }
     return { status: "SUCCESS", data: { content: out, security: "encrypted" }, token };
   } else
@@ -89,15 +87,19 @@ async function editPaste(content, loc, pwd, token) {
   let userInfo = await (0, import_userRequest.userRequest)(token);
   if (userInfo.status != "SUCCESS")
     return userInfo;
-  if (!existingDoc.author)
+  if (!existingDoc.author && userInfo.data.perms < 2)
     return { status: "ERROR", data: { error: "This paste was either created before 2023-04-27, or was created anonymously. It is not editable." }, token };
-  else if (userInfo.data.user != existingDoc.author)
+  else if (userInfo.data.user != existingDoc.author && userInfo.perms < 2)
     return { status: "ERROR", data: { error: "You are not the author of the paste and cannot edit it." }, token };
   if (pwd.length == 0)
     return { status: "ERROR", data: { error: "No password provided!" }, token };
-  await import_consts.pasteDB.updateOne({ fieldName: "PASTE", name: loc }, { $set: {
-    encryptedData: await encrypt(content, pwd)
-  } });
+  await import_consts.pasteDB.updateOne({ fieldName: "PASTE", name: loc }, {
+    $set: {
+      encryptedData: await encrypt(content, pwd),
+      content: "",
+      pwd: null
+    }
+  });
   return { status: "SUCCESS", data: null, token };
 }
 // Annotate the CommonJS export names for ESM import in node:

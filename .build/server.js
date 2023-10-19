@@ -733,6 +733,7 @@ const validPages = [
   "/betterselect",
   "/redirect",
   "/betterselect.js",
+  "/minimalLogin",
   "/8192",
   "/imgedit"
 ];

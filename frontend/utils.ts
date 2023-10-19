@@ -2,7 +2,9 @@
 let SESSIONTIMEOUT, SESSIONTIMEOUT2 = null;
 
 function byId(name:string) {
-  return document.getElementById(name);
+  let ele = document.getElementById(name);
+  // if (ele == null) throw "Element with id "+name+" is null";
+  return ele;
 }
 function byClass(name:string, ct:number=0) {
   return document.getElementsByClassName(name).item(ct);
@@ -94,7 +96,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string=
                       </form> |
         BetaOS Systems V3, 2023`
       else if (res.status != "SUCCESS") {
-        ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}">Login</a> | 
+        ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}" onclick="login_v2(event)">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
                       <a href='https://${branch=="unstable"?"betatester1024.repl.co":"unstable.betatester1024.repl.co"}'>
@@ -132,6 +134,11 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string=
                       BetaOS Systems V3, 2023`;
       }
       ftr.appendChild(ele);
+      let ephDiv = byId("ephemerals")??document.createElement("div");
+      if (!ephDiv.id) {
+        ephDiv.id = "ephemerals";
+        document.body.appendChild(ephDiv);
+      }
       send(JSON.stringify({ action: "visits" }),
         (res) => {
           
@@ -143,6 +150,8 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string=
           send(JSON.stringify({action:"cookieRequest"}), (res)=>{
             if (res.data.toString() == "false") {
               // console.log("thing");
+
+              
               let cpl = document.getElementById("compliance");
               cpl.style.opacity="1";
               cpl.style.height="auto";
@@ -187,6 +196,7 @@ let DRAGGING = null;
 let origLeft = -1;
 let origTop = -1;
 let origX = -1;
+let lastPtrUp = -1;
 let origY = -1;
 function pointerUp(ev:PointerEvent) 
 {
@@ -195,12 +205,22 @@ function pointerUp(ev:PointerEvent)
   origTop = -1;
   // if (ev.target.className == "close red") closeNBD(ev.target.parentElement.parentElement, false)
   
-  // this is stupid. who cares.
   if (ev.target.nodeName == "SPAN" && ev.target.parentElement &&
-      ev.target.parentElement.parentElement &&
-      ev.target.parentElement.parentElement.parentElement &&
-      ev.target.parentElement.parentElement.parentElement.className == "ALERT_NONBLOCK")  
+      ev.target.closest(".ALERT_NONBLOCK") != null)  
     closeNBD(ev.target.parentElement.parentElement.parentElement, false)
+  if (ev.target.classList.contains("ALERT_DRAGGER")) {
+    if (Date.now() - lastPtrUp < 300) // up-up = doubleclick
+    {
+      toggleNBDFullScr(ev.target.closest(".ALERT_NONBLOCK").querySelector(".content"))
+    }
+    else console.log(Date.now() - lastPtrUp)
+    lastPtrUp = Date.now();
+  }
+}
+function toggleNBDFullScr(contentEle:HTMLDivElement) 
+{
+  contentEle.style.height = contentEle.style.height?"":"calc(100vh - 150px)";
+  contentEle.style.width = contentEle.style.width?"":"calc(100vw - 50px)";
 }
 function pointerMove(ev:PointerEvent) 
 {
@@ -213,14 +233,13 @@ function pointerMove(ev:PointerEvent)
 }
 function pointerDown(ev:PointerEvent) {
   DRAGGING = ev.currentTarget;
-  document.body.appendChild(DRAGGING.parentElement);
+  // document.body.appendChild(DRAGGING.parentElement);
   ev.preventDefault();
   ev.stopPropagation();
   origX = ev.screenX;
   origY = ev.screenY;
   origLeft = toIntPx(window.getComputedStyle(DRAGGING.parentElement).left);
   origTop = toIntPx(window.getComputedStyle(DRAGGING.parentElement).top);
-  
 }
 
 function toIntPx(val:string) {
@@ -301,10 +320,12 @@ function acceptCookies(link:string="/server") {
 
 }
 
+// set text to "NOCONFIRM" to remove the confirm button
 function nonBlockingDialog(str:string, callback:()=>any = ()=>{}, text:string="Continue", clr:string="grn", ico:string="arrow_forward") 
 {
   let div = document.createElement("div");
   div.className="ALERT_NONBLOCK";
+  div.isOpen = true;
   div.innerHTML = `
   
   <div class="content">${str}</div>`; // yes, it can be html'd
@@ -325,18 +346,21 @@ function nonBlockingDialog(str:string, callback:()=>any = ()=>{}, text:string="C
   }, 20);
   let button = document.createElement("button");
   div.appendChild(document.createElement("br"));
-  div.appendChild(button);
-  button.outerHTML = `
-  <button class="${clr} btn fsmed closeBtn" onclick="closeNBD(this.parentElement, true)">
-  <span class='material-symbols-outlined'>${ico}</span>
-  ${text}<div class="anim"></div>
-  </button>`;
-  
+  if (text != "NOCONFIRM") {
+    div.appendChild(button);
+    button.outerHTML = `
+    <button class="${clr} btn fsmed closeBtn" onclick="closeNBD(this.parentElement, true)">
+    <span class='material-symbols-outlined'>${ico}</span>
+    ${text}<div class="anim"></div>
+    </button>`;
+  }
+  return div;
 }
 
 function closeNBD(ele:HTMLElement, confirmQ:boolean) {
   // console.log(ele);
   ele.style.opacity="0";
+  ele.isOpen = false;
   ele.style.pointerEvents = "none";
   if (confirmQ) ele.callback(ele.querySelector(".content"));
 }
@@ -352,7 +376,8 @@ function alertDialog(str: string, callback: () => any = ()=>{}, requiresConfirma
   // e.preventDefault();
   let newDialog = document.createElement("dialog");
   try {dialogPolyfill.registerDialog(newDialog);}
-  catch (e:Exception) {str += "\n\nAdditionally, an error occurred while loading dialogs: "+e}
+  catch(e:any) {}
+  // catch (e:Exception) {str += "\n\nAdditionally, an error occurred while loading dialogs: "+e}
   document.body.appendChild(newDialog);
   newDialog.className = "internal ALERT";
   newDialog.id="internal_alerts";
@@ -662,3 +687,44 @@ function whichTransitionEvent(){
     }
 }
 
+function ephemeralDialog(text:string) 
+{
+  let dialog = document.createElement("div");
+  dialog.classList.add("ephemeral");
+  dialog.innerHTML = text;
+  dialog.style.animation = "appear 0.7s forwards";
+  byId("ephemerals").prepend(dialog);
+  setTimeout(()=>{
+    closeEphemeral(dialog)
+  }, 20000);
+  dialog.onclick = ()=>{closeEphemeral(dialog)}
+}
+function closeEphemeral(dialog:HTMLDivElement) 
+{
+  dialog.style.animation = "disappear 0.5s forwards";
+}
+let loginDialog = null;
+function login_v2(ev:any) 
+{
+  ev.preventDefault();
+  if (loginDialog && loginDialog.isOpen) return; // do not open TWO 
+  loginDialog = nonBlockingDialog(`<iframe class="loginiframe" src="/minimalLogin"></iframe>`, ()=>{}, "NOCONFIRM");
+  toggleNBDFullScr(loginDialog.querySelector(".content"))
+}
+
+function closeLogin()
+{
+  closeNBD(loginDialog);
+}
+
+function globalReload() 
+{
+  byId("overlay").remove();
+  // byId("overlayL").remove();
+  byId("compliance").remove();
+  byId("footer").remove();
+  let uSidebar = byClass("sidebar-unstable");
+  if (uSidebar) uSidebar.remove();
+  byId("ephemerals").remove();
+  globalOnload(()=>{});
+}

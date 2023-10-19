@@ -1,4 +1,4 @@
-let version="v3";
+let version="v4";
 
 function clickSelect(whichOne, openQ=0) 
 {
@@ -78,12 +78,13 @@ function bSelRegister(id, onChange)
     inp.valueMap.set(children[i].innerText, children[i].getAttribute("val"));
   }
   inp.placeholder = "Make a selection...";
-  inp.addEventListener("click", (e)=>{
+  inp.addEventListener("pointerdown", (e)=>{
     // console.log(e.target);
+    console.log("pointerdown");
     clickSelect(e.target.parentElement.id, 1);
     e.preventDefault();
   });
-  ctn.addEventListener("click", (e)=>{
+  ctn.addEventListener("pointerup", (e)=>{
     if (e.target.classList.contains("option")) 
     {
       let inp = e.target.parentElement.parentElement.querySelector("input");
@@ -98,7 +99,7 @@ function bSelInitialise() {
   console.log("Initialising BetterSelects");
   // bSelRegister("selCtn", (value)=>{console.log(value);});
   // <!-- bSelRegister("selCtn2"); -->
-  document.addEventListener("click", (e)=>{
+  document.addEventListener("pointerup", (e)=>{
     if (e.target.closest(".bSel")) return;
     // console.log("clicked away");
     for (let i=0; i<registered.length; i++) 

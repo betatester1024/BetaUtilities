@@ -1,7 +1,8 @@
 "use strict";
 let SESSIONTIMEOUT, SESSIONTIMEOUT2 = null;
 function byId(name) {
-  return document.getElementById(name);
+  let ele = document.getElementById(name);
+  return ele;
 }
 function byClass(name, ct = 0) {
   return document.getElementsByClassName(name).item(ct);
@@ -70,7 +71,7 @@ async function globalOnload(cbk, networkLess = false, link = "/server") {
                       </form> |
         BetaOS Systems V3, 2023`;
         else if (res.status != "SUCCESS") {
-          ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}">Login</a> | 
+          ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}" onclick="login_v2(event)">Login</a> | 
                       <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
                       <a href='https://${branch == "unstable" ? "betatester1024.repl.co" : "unstable.betatester1024.repl.co"}'>
@@ -105,6 +106,11 @@ async function globalOnload(cbk, networkLess = false, link = "/server") {
                       BetaOS Systems V3, 2023`;
         }
         ftr.appendChild(ele);
+        let ephDiv = byId("ephemerals") ?? document.createElement("div");
+        if (!ephDiv.id) {
+          ephDiv.id = "ephemerals";
+          document.body.appendChild(ephDiv);
+        }
         send(
           JSON.stringify({ action: "visits" }),
           (res2) => {
@@ -162,13 +168,25 @@ let DRAGGING = null;
 let origLeft = -1;
 let origTop = -1;
 let origX = -1;
+let lastPtrUp = -1;
 let origY = -1;
 function pointerUp(ev) {
   DRAGGING = null;
   origLeft = -1;
   origTop = -1;
-  if (ev.target.nodeName == "SPAN" && ev.target.parentElement && ev.target.parentElement.parentElement && ev.target.parentElement.parentElement.parentElement && ev.target.parentElement.parentElement.parentElement.className == "ALERT_NONBLOCK")
+  if (ev.target.nodeName == "SPAN" && ev.target.parentElement && ev.target.closest(".ALERT_NONBLOCK") != null)
     closeNBD(ev.target.parentElement.parentElement.parentElement, false);
+  if (ev.target.classList.contains("ALERT_DRAGGER")) {
+    if (Date.now() - lastPtrUp < 300) {
+      toggleNBDFullScr(ev.target.closest(".ALERT_NONBLOCK").querySelector(".content"));
+    } else
+      console.log(Date.now() - lastPtrUp);
+    lastPtrUp = Date.now();
+  }
+}
+function toggleNBDFullScr(contentEle) {
+  contentEle.style.height = contentEle.style.height ? "" : "calc(100vh - 150px)";
+  contentEle.style.width = contentEle.style.width ? "" : "calc(100vw - 50px)";
 }
 function pointerMove(ev) {
   if (DRAGGING) {
@@ -180,7 +198,6 @@ function pointerMove(ev) {
 }
 function pointerDown(ev) {
   DRAGGING = ev.currentTarget;
-  document.body.appendChild(DRAGGING.parentElement);
   ev.preventDefault();
   ev.stopPropagation();
   origX = ev.screenX;
@@ -263,6 +280,7 @@ function nonBlockingDialog(str, callback = () => {
 }, text = "Continue", clr = "grn", ico = "arrow_forward") {
   let div = document.createElement("div");
   div.className = "ALERT_NONBLOCK";
+  div.isOpen = true;
   div.innerHTML = `
   
   <div class="content">${str}</div>`;
@@ -282,15 +300,19 @@ function nonBlockingDialog(str, callback = () => {
   }, 20);
   let button = document.createElement("button");
   div.appendChild(document.createElement("br"));
-  div.appendChild(button);
-  button.outerHTML = `
-  <button class="${clr} btn fsmed closeBtn" onclick="closeNBD(this.parentElement, true)">
-  <span class='material-symbols-outlined'>${ico}</span>
-  ${text}<div class="anim"></div>
-  </button>`;
+  if (text != "NOCONFIRM") {
+    div.appendChild(button);
+    button.outerHTML = `
+    <button class="${clr} btn fsmed closeBtn" onclick="closeNBD(this.parentElement, true)">
+    <span class='material-symbols-outlined'>${ico}</span>
+    ${text}<div class="anim"></div>
+    </button>`;
+  }
+  return div;
 }
 function closeNBD(ele, confirmQ) {
   ele.style.opacity = "0";
+  ele.isOpen = false;
   ele.style.pointerEvents = "none";
   if (confirmQ)
     ele.callback(ele.querySelector(".content"));
@@ -302,7 +324,6 @@ function alertDialog(str, callback = () => {
   try {
     dialogPolyfill.registerDialog(newDialog);
   } catch (e) {
-    str += "\n\nAdditionally, an error occurred while loading dialogs: " + e;
   }
   document.body.appendChild(newDialog);
   newDialog.className = "internal ALERT";
@@ -559,5 +580,44 @@ function whichTransitionEvent() {
       return transitions[t2];
     }
   }
+}
+function ephemeralDialog(text) {
+  let dialog = document.createElement("div");
+  dialog.classList.add("ephemeral");
+  dialog.innerHTML = text;
+  dialog.style.animation = "appear 0.7s forwards";
+  byId("ephemerals").prepend(dialog);
+  setTimeout(() => {
+    closeEphemeral(dialog);
+  }, 2e4);
+  dialog.onclick = () => {
+    closeEphemeral(dialog);
+  };
+}
+function closeEphemeral(dialog) {
+  dialog.style.animation = "disappear 0.5s forwards";
+}
+let loginDialog = null;
+function login_v2(ev) {
+  ev.preventDefault();
+  if (loginDialog && loginDialog.isOpen)
+    return;
+  loginDialog = nonBlockingDialog(`<iframe class="loginiframe" src="/minimalLogin"></iframe>`, () => {
+  }, "NOCONFIRM");
+  toggleNBDFullScr(loginDialog.querySelector(".content"));
+}
+function closeLogin() {
+  closeNBD(loginDialog);
+}
+function globalReload() {
+  byId("overlay").remove();
+  byId("compliance").remove();
+  byId("footer").remove();
+  let uSidebar = byClass("sidebar-unstable");
+  if (uSidebar)
+    uSidebar.remove();
+  byId("ephemerals").remove();
+  globalOnload(() => {
+  });
 }
 //# sourceMappingURL=utils.js.map

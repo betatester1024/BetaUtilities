@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@trycourier/courier": "^5.4.0",
+    "@trycourier/courier": "^5.5.0",
     "argon2": "^0.31.1",
     "body-parser": "^1.20.2",
     "co-body": "^6.1.0",

@@ -15,6 +15,22 @@
       {
         nonBlockingDialog('<a href="testbed">testing testing one two threeeeeee</a>?', ()=>{openMoreDialogs()});
       }
+      function openEphemeralDialog(text) 
+      {
+        let dialog = document.createElement("div");
+        dialog.classList.add("ephemeral");
+        dialog.innerText = text;
+        dialog.style.animation = "appear 0.7s forwards";
+        byId("ephemerals").prepend(dialog);
+        setTimeout(()=>{
+          closeEphemeral(dialog)
+        }, 2000);
+        dialog.onclick = ()=>{closeEphemeral(dialog)}
+      }
+      function closeEphemeral(dialog) 
+      {
+        dialog.style.animation = "disappear 0.5s forwards";
+      }
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -23,6 +39,36 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
     <style>
+      #ephemerals {
+        position: absolute;
+        right: 50px;
+        bottom: 50px;
+        width: 300px;
+      }
+      .ephemeral {
+        background-color: var(--system-overlay);
+        color: var(--system-blue);
+                             /* animation-durat) */
+        padding: 15px;
+        margin-bottom: 10px;
+        width: calc(100% - 20px);
+        height: fit-content;
+        /* top: 0px;
+        position: relative; */
+      }
+      @keyframes appear {
+       0% { opacity: 0; max-height: 0px;}
+        100% {opacity: 1; max-height: 100vh;}
+      }
+      @keyframes disappear {
+        0% {opacity: 1; max-height: 100vh;}
+        100% {
+          opacity: 0; 
+          max-height: 0vh; 
+          padding-top: 0px; 
+          padding-bottom: 0px;
+          margin-bottom: 0px;}
+      }
     </style>
   </head>
   <body onload = "globalOnload();">
@@ -44,7 +90,7 @@
         Return to home<div class="anim"></div></a>
         
     </div>
-    <div class="ephemerals">
+    <div id="ephemerals">
       
     </div>
     <div class="overlay" id="overlay">

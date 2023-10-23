@@ -735,7 +735,8 @@ const validPages = [
   "/betterselect.js",
   "/minimalLogin",
   "/8192",
-  "/imgedit"
+  "/imgedit",
+  "/leaderboard"
 ];
 const ignoreLog = [
   "getEE",

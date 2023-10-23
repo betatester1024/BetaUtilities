@@ -89,7 +89,7 @@ async function editPaste(content, loc, pwd, token) {
     return userInfo;
   if (!existingDoc.author && userInfo.data.perms < 2)
     return { status: "ERROR", data: { error: "This paste was either created before 2023-04-27, or was created anonymously. It is not editable." }, token };
-  else if (userInfo.data.user != existingDoc.author && userInfo.perms < 2)
+  else if (userInfo.data.user != existingDoc.author && userInfo.dataperms < 2)
     return { status: "ERROR", data: { error: "You are not the author of the paste and cannot edit it." }, token };
   if (pwd.length == 0)
     return { status: "ERROR", data: { error: "No password provided!" }, token };

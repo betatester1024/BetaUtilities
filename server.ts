@@ -705,6 +705,7 @@ const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/log
                    "/stopwatch", "/testbed", '/credits', '/atomicmoose', '/issuetracker', '/graphIt', 
                     '/betterselect', '/redirect', '/betterselect.js', "/minimalLogin", 
                     "/8192", "/imgedit", "/leaderboard"];
+
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',
                   'paste', 'findPaste'];

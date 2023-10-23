@@ -665,6 +665,7 @@ async function getUptimeStr(STARTTIME:number=-1) {
   let timeElapsed = Date.now() - STARTTIME;
   let usaTime = betaLocalTime(STARTTIME);
   console.log('USA time: '+ usaTime);
+  let date = new Date();
   return `/me has been up since ${date.toUTCString()} / EST: ${usaTime} | Time elapsed: ${formatTime(timeElapsed)}`
 }
 

@@ -33,8 +33,8 @@ const fs = require("fs");
 const serviceKey = process.env["serviceKey"];
 const serviceResponse = process.env["serviceResponse"];
 function betaLocalTime(STARTTIME2 = Date.now()) {
-  let date2 = new Date(STARTTIME2);
-  return date2.toLocaleString("en-US", { timeZone: "America/New_York" });
+  let date = new Date(STARTTIME2);
+  return date.toLocaleString("en-US", { timeZone: "America/New_York" });
 }
 function toTime(ms, inclMs = false) {
   let day = Math.floor(ms / 1e3 / 60 / 60 / 24);
@@ -675,6 +675,7 @@ async function getUptimeStr(STARTTIME2 = -1) {
   let timeElapsed = Date.now() - STARTTIME2;
   let usaTime = betaLocalTime(STARTTIME2);
   console.log("USA time: " + usaTime);
+  let date = new Date();
   return `/me has been up since ${date.toUTCString()} / EST: ${usaTime} | Time elapsed: ${formatTime(timeElapsed)}`;
 }
 function formatTime(ms) {

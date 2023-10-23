@@ -515,11 +515,11 @@ For more info, please !tell @betatester1024.`, data, 0);
     }, 200);
     ;
   }
-  if (msg.match(/^(!hello|hello|hi|!hi)$/) && Math.random() < 0.3) {
+  if (msg.match(/^(!hello|hello|hi|!hi)$/) && Math.random() < 0.25) {
     hnd.changeNick("CueBot");
     hnd.delaySendMsg(random([
       "hello world",
-      "betaOShello",
+      "hello",
       "jelloworld",
       "greetings",
       "hello",

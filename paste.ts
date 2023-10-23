@@ -73,8 +73,10 @@ export async function editPaste(content:string, loc:string, pwd:string, token:st
   if (!existingDoc) return {status:"ERROR", data:{error:"Paste does not exist!"}, token:token}
   let userInfo = await userRequest(token);
   if (userInfo.status!= "SUCCESS") return userInfo;
-  if (!existingDoc.author && userInfo.data.perms < 2) return {status:"ERROR", data:{error:"This paste was either created before 2023-04-27, or was created anonymously. It is not editable."}, token:token};
-  else if (userInfo.data.user != existingDoc.author && userInfo.perms < 2) return {status:"ERROR", data:{error:"You are not the author of the paste and cannot edit it."}, token:token};
+  if (!existingDoc.author && userInfo.data.perms < 2) 
+    return {status:"ERROR", data:{error:"This paste was either created before 2023-04-27, or was created anonymously. It is not editable."}, token:token};
+  else if (userInfo.data.user != existingDoc.author && userInfo.data.perms < 2) return {status:"ERROR", data:{error:"You are not the author of the paste and cannot edit it."}, token:token};
+
   if (pwd.length == 0)
     return {status:"ERROR", data:{error:"No password provided!"}, token:token}
     // pasteDB.updateOne({fieldName:"PASTE", name:loc}, {$set:{

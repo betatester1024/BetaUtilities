@@ -306,9 +306,9 @@ export function cueBot(hnd:(WebH|WS), msg:string, sender:string, data:any) {
                             "NOT FOUND NGINX", "BUTTER OVERFLOW", "xkcd.com/404"]), data, 0);
     setTimeout(()=>{hnd.changeNick(hnd.nick)}, 200);;
   }
-  if (msg.match(/^(!hello|hello|hi|!hi)$/) && Math.random() < 0.3) {
+  if (msg.match(/^(!hello|hello|hi|!hi)$/) && Math.random() < 0.25) {
     hnd.changeNick("CueBot");
-    hnd.delaySendMsg(random(["hello world", "betaOShello", "jelloworld", 
+    hnd.delaySendMsg(random(["hello world", "hello", "jelloworld", 
                             "greetings", "hello", "Hello!", "hi", 
                             "Why, hello there!", "hello there", 
                              "hello there!", "greetings",

@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../adminAction.ts"],
-  "sourcesContent": ["import {uDB} from './consts';\n\nexport async function adminAction(action:string, options:any, token:string) \n{\n  let usrInfo = await userRequest(token);\n  if (usrInfo.status != \"SUCCESS\") return usrInfo;\n  if (usrInfo.data.perms < 2) \n    return {status:\"ERROR\", data:{error:\"No admin permissions\"}, token};\n  switch(action) \n  {\n    case \"suspendPage\":\n      await uDB.updateOne({fieldName:\"suspendedPages\", page:options.page},\n                          {$set:{suspended:options.suspendedQ}}, \n                          {upsert:true});\n      return {status:\"SUCCESS\", data:null, token:token};\n  }\n}"],
-  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,oBAAkB;AAElB,eAAsB,YAAY,QAAe,SAAa,OAC9D;AACE,MAAI,UAAU,MAAM,YAAY,KAAK;AACrC,MAAI,QAAQ,UAAU;AAAW,WAAO;AACxC,MAAI,QAAQ,KAAK,QAAQ;AACvB,WAAO,EAAC,QAAO,SAAS,MAAK,EAAC,OAAM,uBAAsB,GAAG,MAAK;AACpE,UAAO,QACP;AAAA,IACE,KAAK;AACH,YAAM,kBAAI;AAAA,QAAU,EAAC,WAAU,kBAAkB,MAAK,QAAQ,KAAI;AAAA,QAC9C,EAAC,MAAK,EAAC,WAAU,QAAQ,WAAU,EAAC;AAAA,QACpC,EAAC,QAAO,KAAI;AAAA,MAAC;AACjC,aAAO,EAAC,QAAO,WAAW,MAAK,MAAM,MAAW;AAAA,EACpD;AACF;",
-  "names": []
-}

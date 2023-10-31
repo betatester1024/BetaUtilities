@@ -59,12 +59,23 @@
             case "updateDefaultLoad": data={new:dat.split(",")}; break;
             case "hidRoom": data = {name:dat}; break;
             case "purge": data= {name:dat}; break;
+            case "suspend": 
+              cmd = "adminAction"; 
+              data = {action: "suspend", options:{suspendedQ:true, page:dat}}; 
+              break;
+            case "restore": 
+              cmd = "adminAction"; 
+              data = {action: "restore", options:{suspendedQ:false, page:dat}}; 
+              break;
             case "help":
+            default: 
               alertDialog(`Command syntax: \ndelMsg [MESSAGE] [ROOM] 
               updateDefaultLoad [ROOM1],[ROOM2],[ROOM3],...
               hidRoom [ROOMNAME]
-              purge [ROOMNAME]`, ()=>{});
-            default: return;
+              purge [ROOMNAME]
+              help
+              suspend [PAGE]
+              restore [PAGE]`, ()=>{return;});
           }
           
           send(JSON.stringify({action:cmd, data:data}), (res)=>{

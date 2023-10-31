@@ -10,7 +10,9 @@ function byClass(name, ct = 0) {
 let HASNETWORK = false;
 let branch = "STABLE";
 let userData = null;
+let onloadCallback = null;
 async function globalOnload(cbk, networkLess = false, link = "/server") {
+  onloadCallback = cbk;
   if (!networkLess) {
     var script = document.createElement("script");
     script.src = "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js";
@@ -72,7 +74,7 @@ async function globalOnload(cbk, networkLess = false, link = "/server") {
         BetaOS Systems V3, 2023`;
         else if (res.status != "SUCCESS") {
           ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}" onclick="login_v2(event)">Login</a> | 
-                      <a href='/signup'>Sign-up</a> | 
+                      <a href='/signup?redirect=${encodeURIComponent(redirector)}' onclick="login_v2(event, true)">Sign-up</a> | 
                       <a href='/status'>Status</a> | 
                       <a href='https://${branch == "unstable" ? "betatester1024.repl.co" : "unstable.betatester1024.repl.co"}'>
                       Switch to ${branch == "unstable" ? "stable" : "unstable"} branch</a> | 
@@ -84,7 +86,7 @@ async function globalOnload(cbk, networkLess = false, link = "/server") {
         } else if (res.status == "SUCCESS" && link == "/server") {
           resetExpiry(res);
           ele.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
-                      <a href='/logout'>Logout</a> | 
+                      <a href='/logout' onclick='logout_v2(event)'>Logout</a> | 
                       <a href='/config'>Account</a> | 
                       <a href='/status'>Status</a> | 
                       <a href='https://${branch == "unstable" ? "betatester1024.repl.co" : "unstable.betatester1024.repl.co"}'>
@@ -174,8 +176,6 @@ function pointerUp(ev) {
   DRAGGING = null;
   origLeft = -1;
   origTop = -1;
-  if (ev.target.nodeName == "SPAN" && ev.target.parentElement && ev.target.closest(".ALERT_NONBLOCK") != null)
-    closeNBD(ev.target.parentElement.parentElement.parentElement, false);
   if (ev.target.classList.contains("ALERT_DRAGGER")) {
     if (Date.now() - lastPtrUp < 300) {
       toggleNBDFullScr(ev.target.closest(".ALERT_NONBLOCK").querySelector(".content"));
@@ -187,6 +187,11 @@ function pointerUp(ev) {
 function toggleNBDFullScr(contentEle) {
   contentEle.style.height = contentEle.style.height ? "" : "calc(100vh - 150px)";
   contentEle.style.width = contentEle.style.width ? "" : "calc(100vw - 50px)";
+  let ele = contentEle.parentElement.querySelector(".fullscr > span");
+  if (ele.innerText == "fullscreen")
+    ele.innerText = "close_fullscreen";
+  else
+    ele.innerText = "fullscreen";
 }
 function pointerMove(ev) {
   if (DRAGGING) {
@@ -289,6 +294,9 @@ function nonBlockingDialog(str, callback = () => {
   draggable.innerText = "ServiceAlert";
   draggable.innerHTML += `<div class="close" onclick="closeNBD(this.parentElement.parentElement, false)">
   <span class="red nooutline material-symbols-outlined">close</span>
+  </div> 
+  <div class="close fullscr" onclick="toggleNBDFullScr(this.parentElement.parentElement.querySelector('.content'), false)">
+  <span class="blu nooutline material-symbols-outlined">fullscreen</span>
   </div>`;
   div.prepend(draggable);
   div.callback = callback;
@@ -598,11 +606,11 @@ function closeEphemeral(dialog) {
   dialog.style.animation = "disappear 0.5s forwards";
 }
 let loginDialog = null;
-function login_v2(ev) {
+function login_v2(ev, signup = false) {
   ev.preventDefault();
   if (loginDialog && loginDialog.isOpen)
     return;
-  loginDialog = nonBlockingDialog(`<iframe class="loginiframe" src="/minimalLogin"></iframe>`, () => {
+  loginDialog = nonBlockingDialog(`<iframe class="loginiframe" src="/minimal${signup ? "Signup" : "Login"}"></iframe>`, () => {
   }, "NOCONFIRM");
   toggleNBDFullScr(loginDialog.querySelector(".content"));
 }
@@ -617,7 +625,13 @@ function globalReload() {
   if (uSidebar)
     uSidebar.remove();
   byId("ephemerals").remove();
-  globalOnload(() => {
+  globalOnload(onloadCallback);
+}
+function logout_v2(event) {
+  event.preventDefault();
+  send(JSON.stringify({ action: "logout" }), (res) => {
+    ephemeralDialog("Successfully logged out!", () => {
+    });
   });
 }
 //# sourceMappingURL=utils.js.map

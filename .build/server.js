@@ -42,6 +42,7 @@ var import_button = require("./button");
 var import_issuetracker = require("./issuetracker");
 var import_messageHandle = require("./betautilities/messageHandle");
 var import_supportRooms = require("./supportRooms");
+var import_adminAction = require("./adminAction");
 const express = require("express");
 const enableWs = require("express-ws");
 const app = express();
@@ -63,7 +64,19 @@ async function getMainClass(token) {
 function getToken(req) {
   return req.cookies.accountID;
 }
-function sendFile(res, token, filePath) {
+async function sendFile(res, token, filePath) {
+  console.log(filePath.replace(/^(.+)\//, ""));
+  let suspensionFile = await import_consts.uDB.findOne({
+    fieldName: "suspendedPages",
+    page: filePath.replaceAll(/(^(.+)\/|\.html)/g, "")
+  });
+  let user = await (0, import_userRequest.userRequest)(token);
+  if (user.status != "SUCCESS")
+    user = { data: { perms: 0 } };
+  if (suspensionFile && suspensionFile.suspendedQ && user.data.perms < 2) {
+    res.sendFile(import_consts.frontendDir + "/403.html");
+    return;
+  }
   if (!filePath.match(/\.html$/)) {
     res.sendFile(filePath);
     return;
@@ -605,6 +618,11 @@ function makeRequest(action, token, data, sessID, callback) {
           callback(obj.status, obj.data, obj.token);
         });
         break;
+      case "adminAction":
+        (0, import_adminAction.adminAction)(data.action, data.options, token).then((obj) => {
+          callback(obj.status, obj.data, obj.token);
+        });
+        break;
       default:
         callback("ERROR", { error: "Unknown command string!" }, token);
     }
@@ -734,6 +752,7 @@ const validPages = [
   "/redirect",
   "/betterselect.js",
   "/minimalLogin",
+  "/minimalSignup",
   "/8192",
   "/imgedit",
   "/leaderboard"

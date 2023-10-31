@@ -882,10 +882,11 @@ summary::marker {
   position: absolute;
   right: 50px;
   bottom: 50px;
-  width: 300px;
+  width: 500px;
 }
 .ephemeral {
-  background-color: var(--system-grey3);
+  background-color: var(--system-overlay);
+  outline: var(--system-blue);
   border-radius: 15px;
   color: var(--system-blue);
   cursor: pointer;
@@ -893,6 +894,7 @@ summary::marker {
   padding: 15px;
   font-weight: 400;
   font-family: 'Noto Sans Mono';
+  font-size: 30px;
   margin-bottom: 10px;
   width: calc(100% - 20px);
   height: fit-content;

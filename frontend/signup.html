@@ -13,10 +13,10 @@
           else {
             alertDialog("Welcome, "+usr.value +"! You have successfully signed up for "+
                         "a BetaOS Services account.", 
-            () => {  
-              if (redirect) window.open(decodeURIComponent(redirect[1]), '_self'); 
-              else window.open('/', '_self');
-            });
+                        ()=>{ 
+                          if (redirect) window.open(decodeURIComponent(redirect[1]), '_self'); 
+                          else window.open('/', '_self');
+                        });
           }
         });
         pwd.value="";

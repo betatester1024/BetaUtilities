@@ -26,8 +26,7 @@ import {uptime} from './betautilities/messageHandle'
 import {supportHandler, roomRequest, sendMsg, 
         createRoom, deleteRoom, WHOIS, loadLogs, 
         delMsg, updateDefaultLoad, hidRoom, purge,
-       updateAbout} from './supportRooms';
-import {adminAction} from './adminAction';
+       updateAbout} from './supportRooms'
 const urlencodedParser = bodyParser.urlencoded({ extended: false }) 
 var RateLimit = require('express-rate-limit');
 
@@ -43,19 +42,8 @@ function getToken(req:any)
   return req.cookies.accountID;
 }
 
-async function sendFile(res:any, token:string, filePath:string) 
+function sendFile(res:any, token:string, filePath:string) 
 {
-  console.log(filePath.replace(/^(.+)\//, ""));
-  let suspensionFile = await uDB.findOne({fieldName:"suspendedPages", 
-                                      page:filePath.replaceAll(/(^(.+)\/|\.html)/g, "")});
-  let user = await userRequest(token);
-  if (user.status != "SUCCESS") user = {data:{perms:0}};
-  if (suspensionFile && 
-      suspensionFile.suspendedQ && user.data.perms < 2) 
-  {
-    res.sendFile(frontendDir+"/403.html");
-    return;
-  }
   if (!filePath.match(/\.html$/)) {
     // console.log(filePath);
     res.sendFile(filePath); 
@@ -608,11 +596,6 @@ function makeRequest(action:string|null, token:string, data:any|null, sessID:str
           .then((obj:{status:string, data:any, token:string})=>
             {callback(obj.status, obj.data, obj.token)});
         break;
-      case "adminAction":
-        adminAction(data.action, data.options, token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
-        break;
       default:
         callback("ERROR", {error: "Unknown command string!"}, token);
     }
@@ -720,7 +703,7 @@ const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/log
                     '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest',
                     "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle', '/sweepthatmine',
                    "/stopwatch", "/testbed", '/credits', '/atomicmoose', '/issuetracker', '/graphIt', 
-                    '/betterselect', '/redirect', '/betterselect.js', "/minimalLogin", "/minimalSignup",
+                    '/betterselect', '/redirect', '/betterselect.js', "/minimalLogin", 
                     "/8192", "/imgedit", "/leaderboard"];
 
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 

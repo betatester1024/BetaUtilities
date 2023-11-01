@@ -13,9 +13,8 @@ function byClass(name:string, ct:number=0) {
 let HASNETWORK = false;
 let branch = "STABLE";
 let userData = null;
-let onloadCallback:()=>any = null;
 async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string="/server") {
-  onloadCallback = cbk;
+  
   if (!networkLess) {
     var script = document.createElement('script');
     script.src = "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js";
@@ -98,7 +97,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string=
         BetaOS Systems V3, 2023`
       else if (res.status != "SUCCESS") {
         ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}" onclick="login_v2(event)">Login</a> | 
-                      <a href='/signup?redirect=${encodeURIComponent(redirector)}' onclick="login_v2(event, true)">Sign-up</a> | 
+                      <a href='/signup'>Sign-up</a> | 
                       <a href='/status'>Status</a> | 
                       <a href='https://${branch=="unstable"?"betatester1024.repl.co":"unstable.betatester1024.repl.co"}'>
                       Switch to ${branch=="unstable"?"stable":"unstable"} branch</a> | 
@@ -111,7 +110,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string=
       else if (res.status == "SUCCESS" && link == "/server") {
         resetExpiry(res);
         ele.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
-                      <a href='/logout' onclick='logout_v2(event)'>Logout</a> | 
+                      <a href='/logout'>Logout</a> | 
                       <a href='/config'>Account</a> | 
                       <a href='/status'>Status</a> | 
                       <a href='https://${branch=="unstable"?"betatester1024.repl.co":"unstable.betatester1024.repl.co"}'>
@@ -206,9 +205,9 @@ function pointerUp(ev:PointerEvent)
   origTop = -1;
   // if (ev.target.className == "close red") closeNBD(ev.target.parentElement.parentElement, false)
   
-  // if (ev.target.nodeName == "SPAN" && ev.target.parentElement &&
-      // ev.target.closest(".ALERT_NONBLOCK") != null)  
-    // closeNBD(ev.target.parentElement.parentElement.parentElement, false)
+  if (ev.target.nodeName == "SPAN" && ev.target.parentElement &&
+      ev.target.closest(".ALERT_NONBLOCK") != null)  
+    closeNBD(ev.target.parentElement.parentElement.parentElement, false)
   if (ev.target.classList.contains("ALERT_DRAGGER")) {
     if (Date.now() - lastPtrUp < 300) // up-up = doubleclick
     {
@@ -222,10 +221,7 @@ function toggleNBDFullScr(contentEle:HTMLDivElement)
 {
   contentEle.style.height = contentEle.style.height?"":"calc(100vh - 150px)";
   contentEle.style.width = contentEle.style.width?"":"calc(100vw - 50px)";
-  let ele = contentEle.parentElement.querySelector(".fullscr > span");
-  if (ele.innerText == "fullscreen") ele.innerText = "close_fullscreen";
-  else ele.innerText = "fullscreen";
- }
+}
 function pointerMove(ev:PointerEvent) 
 {
   if (DRAGGING) {
@@ -339,9 +335,6 @@ function nonBlockingDialog(str:string, callback:()=>any = ()=>{}, text:string="C
   draggable.innerText = "ServiceAlert"
   draggable.innerHTML += `<div class="close" onclick="closeNBD(this.parentElement.parentElement, false)">
   <span class="red nooutline material-symbols-outlined">close</span>
-  </div> 
-  <div class="close fullscr" onclick="toggleNBDFullScr(this.parentElement.parentElement.querySelector('.content'), false)">
-  <span class="blu nooutline material-symbols-outlined">fullscreen</span>
   </div>`
   div.prepend(draggable);
   div.callback=callback;
@@ -711,11 +704,11 @@ function closeEphemeral(dialog:HTMLDivElement)
   dialog.style.animation = "disappear 0.5s forwards";
 }
 let loginDialog = null;
-function login_v2(ev:any, signup:boolean=false) 
+function login_v2(ev:any) 
 {
   ev.preventDefault();
   if (loginDialog && loginDialog.isOpen) return; // do not open TWO 
-  loginDialog = nonBlockingDialog(`<iframe class="loginiframe" src="/minimal${signup?"Signup":"Login"}"></iframe>`, ()=>{}, "NOCONFIRM");
+  loginDialog = nonBlockingDialog(`<iframe class="loginiframe" src="/minimalLogin"></iframe>`, ()=>{}, "NOCONFIRM");
   toggleNBDFullScr(loginDialog.querySelector(".content"))
 }
 
@@ -733,13 +726,5 @@ function globalReload()
   let uSidebar = byClass("sidebar-unstable");
   if (uSidebar) uSidebar.remove();
   byId("ephemerals").remove();
-  globalOnload(onloadCallback);
-}
-
-function logout_v2(event) 
-{
-  event.preventDefault()
-  send(JSON.stringify({action: "logout"}), (res)=>{
-    ephemeralDialog("Successfully logged out!", ()=>{});
-  })
+  globalOnload(()=>{});
 }

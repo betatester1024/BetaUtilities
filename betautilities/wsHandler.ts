@@ -194,7 +194,7 @@ export class WS
       } 
 
       // ws-exclusive commands
-      else if (msg == "!decodegold") 
+      else if (msg == "!decodegoldDISABLED")  // feature still exists and works, unfortunately not allowed by xyzzy
       {
         // get parentMessage
         console.log("thing");
@@ -205,19 +205,19 @@ export class WS
           type:"get-message",
         }));
       }
-      else if (maybeGold(rawMsg)) 
-      {
-        let content = data["data"]["content"];
-        let sender = data["data"]["sender"]["name"];
-        processHeimMessage(content, (msg:string)=>{
-          scramble(this.replyMessage(msg, snd, data), (result:string)=>{
-            // console.log("scrambled",result)
-            this.euphReply(result, data)
-          });
-        });
+      // else if (maybeGold(rawMsg)) 
+      // {
+        // let content = data["data"]["content"];
+        // let sender = data["data"]["sender"]["name"];
+        // processHeimMessage(content, (msg:string)=>{
+        //   scramble(this.replyMessage(msg, snd, data), (result:string)=>{
+        //     // console.log("scrambled",result)
+        //     this.euphReply(result, data)
+        //   });
+        // });
         
        
-      }
+      // }
       // send to messageHandle to process messages.
       else if (!this.pausedQ) {
         if (data["data"]["sender"]["id"].match("bot:")) {
@@ -236,7 +236,7 @@ export class WS
       let content = data["data"]["content"];
       let sender = data["data"]["sender"]["name"];
       processHeimMessage(content, (result:string)=>{
-        this.euphReply(result.toLowerCase().trim(), data);
+        this.euphReply(result, data);
       });
     }
   }

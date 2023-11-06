@@ -185,7 +185,7 @@ class WS {
         this.incrPingCt();
       } else if (msg == "!help") {
         this.sendMsg("Enter !help @" + this.nick + " for help!", data);
-      } else if (msg == "!decodegold") {
+      } else if (msg == "!decodegoldDISABLED") {
         console.log("thing");
         let parentID = data["data"]["parent"];
         this.socket.send(JSON.stringify({
@@ -193,14 +193,6 @@ class WS {
           data: { id: parentID },
           type: "get-message"
         }));
-      } else if ((0, import_decodegold.maybeGold)(rawMsg)) {
-        let content = data["data"]["content"];
-        let sender = data["data"]["sender"]["name"];
-        (0, import_decodegold.processHeimMessage)(content, (msg2) => {
-          (0, import_decodegold.scramble)(this.replyMessage(msg2, snd, data), (result) => {
-            this.euphReply(result, data);
-          });
-        });
       } else if (!this.pausedQ) {
         if (data["data"]["sender"]["id"].match("bot:")) {
           return;
@@ -211,7 +203,7 @@ class WS {
       let content = data["data"]["content"];
       let sender = data["data"]["sender"]["name"];
       (0, import_decodegold.processHeimMessage)(content, (result) => {
-        this.euphReply(result.toLowerCase().trim(), data);
+        this.euphReply(result, data);
       });
     }
   }

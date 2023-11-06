@@ -1,7 +1,20 @@
 "use strict";
 function onLoad() {
-  document.getElementById("header").innerHTML = "Support: #" + document.URL.match("\\?room=(.*)")[1];
-  ROOMNAME = document.URL.match("\\?room=(.*)")[1];
+  document.getElementById("header").innerText = "Support: #" + new URL(document.URL).searchParams.get("room");
+  ROOMNAME = new URL(document.URL).searchParams.get("room");
+}
+let ACTIVEREPLY = -1;
+let awaitingParent = [];
+function toggleActiveReply(id) {
+  if (ACTIVEREPLY == id) {
+    byId(id).className = byId(id).className.replace("activeReply", "");
+    ACTIVEREPLY = -1;
+  } else {
+    if (ACTIVEREPLY >= 0)
+      toggleActiveReply(ACTIVEREPLY);
+    byId(id).className += " activeReply ";
+    ACTIVEREPLY = id;
+  }
 }
 function sendMsg() {
   let inp = document.getElementById("msgInp");
@@ -25,7 +38,7 @@ function sendMsg() {
         });
     }, true);
   } else
-    send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME } }), () => {
+    send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME, parent: ACTIVEREPLY } }), () => {
     }, true);
   inp.value = "";
 }
@@ -33,97 +46,111 @@ const rmvReg = /(>|^)\-(.+)\([0-9]\)>/gm;
 const addReg = /(>|^)\+(.+)\([0-9]\)>/gm;
 const classStr = ["error", "user", "admin", "superadmin"];
 let source = null;
+let CONNECTIONID = -1;
 async function initClient() {
   try {
     console.log("Starting client.");
-    source = new EventSource("/stream?room=" + document.URL.match("\\?room=([0-9a-zA-Z\\-_]{1,20})$")[1]);
-    source.addEventListener("message", (message) => {
+    source = new WebSocket("wss://" + new URL(document.URL).host + "?room=" + new URL(document.URL).searchParams.get("room"));
+    source.onclose = () => {
+      console.log("connection failed");
+      setTimeout(initClient, 500);
+    };
+    source.onerror = () => {
+      console.log("connection failed");
+      setTimeout(initClient, 500);
+    };
+    source.onmessage = (message) => {
       console.log("Got", message);
+      message = JSON.parse(message.data);
       ele = document.getElementById("userList");
-      let modif = message.data;
-      let cnMatch = modif.match(/(>|^)CONNECTIONID ([0-9]+)>/);
-      if (cnMatch) {
-        CONNECTIONID = cnMatch[2];
+      let action = message.action;
+      if (message.action == "CONNECTIONID") {
+        CONNECTIONID = message.data.id;
       }
-      modif = modif.replace(/(>|^)CONNECTIONID ([0-9]+)>/, "");
-      let clMatch = modif.match(/(>|^)CONNECTIONRELOAD>/);
-      if (clMatch) {
+      if (message.action == "RELOAD" || message.action == "RESTART") {
         document.getElementById("msgArea").innerHTML = `<h2 id="placeholder">
         <span class="material-symbols-outlined">update</span> 
         Reloading your messages, a moment please...</h2>`;
         document.getElementById("userList").innerHTML = "";
         LOADEDQ2 = false;
         STARTID = -1;
+        ACTIVEREPLY = -1;
         STARTIDVALID = false;
         UNREAD = 0;
         loadStatus = -1;
+        CONNECTIONID = -1;
+        awaitingParent = [];
+        if (message.action == "RESTART")
+          source.close();
       }
-      modif = modif.replace(/(>|^)CONNECTIONRELOAD>/, "");
-      let lcMatch = modif.match(/LOADCOMPLETE (-?[0-9]+)>/);
-      if (lcMatch) {
+      if (message.action == "delMsg") {
+        let ele2 = byId(message.data.id);
+        if (ele2)
+          ele2.remove();
+      }
+      if (message.action == "LOADCOMPLETE") {
         let thing = document.getElementById("msgArea");
-        if (lcMatch[1] < 0) {
-          let errorEle = document.createElement("b");
-          errorEle.className = "red";
-          errorEle.innerText = "No more messages to load";
-          errorEle.style.display = "block";
-          thing.prepend(errorEle);
+        if (message.data.id < 0) {
+          if (!byId("errorEle")) {
+            let errorEle = document.createElement("b");
+            errorEle.className = "red";
+            errorEle.id = "errorEle";
+            errorEle.innerText = "No more messages to load";
+            errorEle.style.display = "block";
+            thing.prepend(errorEle);
+          }
         } else {
           loadStatus = -1;
-          STARTID = lcMatch[1];
+          STARTID = message.data.id;
         }
-        thing.scrollTop = thing.scrollTop + 100;
+        console.log("Fixing awaitingParent.");
+        fixAwaitingParent();
+        thing.scrollTop = thing.scrollTop + 1;
       }
-      modif = modif.replace(/LOADCOMPLETE (-?[0-9]+)>/, "");
-      let removed = rmvReg.exec(modif);
-      let added = addReg.exec(modif);
-      while (removed || added) {
-        if (removed) {
-          ele.innerHTML = ele.innerHTML.replace(removed[2] + "<br>", "");
-        }
-        if (added) {
-          ele.innerHTML += added[2] + "<br>";
-        }
-        modif = modif.replaceAll(rmvReg, "");
-        modif = modif.replaceAll(addReg, "");
-        removed = modif.match(rmvReg);
-        added = modif.match(addReg);
+      if (message.action == "removeUser") {
+        ele.innerHTML = ele.innerHTML.replace(message.data.user + "<br>", "");
       }
-      console.log(modif);
+      if (message.action == "addUser") {
+        ele.innerHTML += message.data.user + "<br>";
+      }
+      let modif = "";
       let area = document.getElementById("msgArea");
       ele = document.createElement("p");
+      if (message && message.data && message.data.id && byId(Math.abs(message.data.id)))
+        return;
       let scrDistOKQ = area.scrollTop >= area.scrollHeight - area.offsetHeight - 100;
       let msgs = modif.split(">");
-      for (let i = 0; i < msgs.length; i++) {
-        let matches = msgs[i].match(/{(-?[0-9]+)}\[(.+)\]\(([0-9])\)(.*)/);
+      if (message.action == "msg") {
+        matches = ["ERROR", message.data.id, message.data.sender, message.data.perms, message.data.content];
         if (!matches)
-          continue;
+          return;
         PREPENDFLAG = false;
-        if (STARTID < 0) {
+        if (STARTID < 0 || matches[1] == 0) {
           STARTID = Number(matches[1]);
           STARTIDVALID = true;
         }
         if (matches[1][0] == "-") {
           PREPENDFLAG = true;
+          matches[1] = -matches[1];
           if (loadStatus == 0)
             loadStatus = 1;
         }
         let newMsgSender = document.createElement("b");
         newMsgSender.innerText = matches[2];
         newMsgSender.className = classStr[matches[3]];
-        if (!PREPENDFLAG)
-          area.appendChild(newMsgSender);
-        let msg = " " + matches[4].replaceAll("&gt;", ";gt;");
-        for (let i2 = 0; i2 < replacements.length; i2++) {
-          msg = msg.replaceAll(`:${replacements[i2].from}:`, ">EMOJI" + replacements[i2].to + ">");
+        let ctn = document.createElement("div");
+        ctn.id = matches[1];
+        ctn.className = "msgContainer";
+        let msg = " " + matches[4].replaceAll("&gt;", ";gt;").replaceAll(">", ";gt;");
+        for (let i = 0; i < replacements.length; i++) {
+          msg = msg.replaceAll(`:${replacements[i].from}:`, ">EMOJI" + replacements[i].to + ">");
         }
         let slashMe = false;
         msg = msg.replaceAll(/(&[a-zA-Z0-9]{1,20})([^;]|$)/gm, ">ROOM$1>$2");
         msg = msg.replaceAll(/(#[a-zA-Z0-9_\-]{1,20})([^;]|$)/gm, ">SUPPORT$1>$2");
         msg = msg.replaceAll(/(;gt;;gt;[^ ]{0,90})/gm, ">INTERNALLINK$1>");
         msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu, ">LINK$<test>>");
-        msg = msg.replaceAll(/\\n/gmiu, ">BR>");
-        console.log(msg);
+        msg = msg.replaceAll(/\n/gmiu, ">BR>");
         if (msg.match("^[ \n]*/me(.*)")) {
           msg = msg.match("^[ \n]*/me(.*)")[1];
           slashMe = true;
@@ -132,14 +159,14 @@ async function initClient() {
           ele.className = classStr[matches[3]];
         let split = msg.split(">");
         let out = "";
-        for (let i2 = 0; i2 < split.length; i2++) {
-          if (i2 % 2 == 0) {
-            let fragment = document.createTextNode(split[i2].replaceAll(";gt;", ">"));
+        for (let i = 0; i < split.length; i++) {
+          if (i % 2 == 0) {
+            let fragment = document.createTextNode(split[i].replaceAll(";gt;", ">"));
             fragment.className = classStr[matches[3]];
             ele.appendChild(fragment);
           } else {
-            let pref = split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)")[1];
-            let post = pref != "BR" ? split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)(.+)")[2] : "";
+            let pref = split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)")[1];
+            let post = pref != "BR" ? split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)(.+)")[2] : "";
             if (pref == "EMOJI") {
               let replaced = document.createElement("span");
               replaced.title = ":" + findReplacement(post) + ":";
@@ -149,8 +176,8 @@ async function initClient() {
             } else if (pref == "LINK") {
               let replaced = document.createElement("a");
               replaced.className = "supportMsg " + classStr[matches[3]];
-              replaced.href = "https://" + post;
-              replaced.innerText = post;
+              replaced.href = "https://" + post.replaceAll(";gt;", ">");
+              replaced.innerText = post.replaceAll(";gt;", ">");
               replaced.setAttribute("target", "_blank");
               ele.appendChild(replaced);
             } else if (pref == "ROOM") {
@@ -168,21 +195,49 @@ async function initClient() {
             } else if (pref == "INTERNALLINK") {
               let replaced = document.createElement("a");
               replaced.className = "supportMsg " + classStr[matches[3]];
-              replaced.href = post.slice(8);
-              replaced.innerText = ">>" + post.slice(8);
+              replaced.href = post.slice(8).replaceAll(";gt;", ">");
+              replaced.innerText = ">>" + post.slice(8).replaceAll(";gt;", ">");
               ele.appendChild(replaced);
             } else if (pref == "BR") {
               ele.appendChild(document.createElement("br"));
             }
           }
         }
-        if (!PREPENDFLAG) {
-          area.appendChild(ele);
-          area.appendChild(document.createElement("br"));
+        let ctn_inner = document.createElement("div");
+        ctn_inner.className = "msgContents";
+        ctn_inner.appendChild(newMsgSender);
+        ctn_inner.appendChild(ele);
+        let optn = document.createElement("div");
+        optn.className = "options";
+        optn.innerHTML = `
+      <button class="btn">
+        <span class="material-symbols-outlined">reply</span>
+      </button>`;
+        ctn_inner.appendChild(optn);
+        ctn.appendChild(ctn_inner);
+        ctn_inner.onclick = (ev) => {
+          toggleActiveReply(ctn.id);
+        };
+        if (message.data.perms == 3 && message.data.sender == "[SYSTEM]")
+          ctn.id = "-1";
+        if (message.data.parent >= 0) {
+          if (byId(message.data.parent)) {
+            byId(message.data.parent).appendChild(ctn);
+            for (let i = 0; i < awaitingParent.length; i++) {
+              if (awaitingParent[i].ele.id == ctn.id) {
+                awaitingParent.splice(i, 1);
+                break;
+              }
+            }
+          } else {
+            awaitingParent.push({ parent: message.data.parent, ele: ctn });
+            console.log("awaiting parent", message.data.parent, ctn);
+          }
         } else {
-          area.prepend(document.createElement("br"));
-          area.prepend(ele);
-          area.prepend(newMsgSender);
+          if (PREPENDFLAG)
+            area.prepend(ctn);
+          else
+            area.appendChild(ctn);
         }
         document.getElementById("placeholder").style.display = "none";
         if (!FOCUSSED) {
@@ -192,10 +247,9 @@ async function initClient() {
       }
       if (!LOADEDQ2 || scrDistOKQ) {
         area.scrollTop = area.scrollHeight;
-        console.log("Scrolling to bottom.");
         LOADEDQ2 = true;
       }
-    });
+    };
   } catch (e) {
     alert(e);
     console.log("Restartng client (" + e + ")");
@@ -255,4 +309,20 @@ function onScroll() {
     console.log("loadStatus" + loadStatus);
 }
 let loadStatus = -1;
+function fixAwaitingParent() {
+  console.log(awaitingParent);
+  for (let i = 0; i < awaitingParent.length; i++) {
+    if (byId(awaitingParent[i].parent)) {
+      let ctner = byId(awaitingParent[i].parent);
+      if (!byId(awaitingParent[i].ele.id)) {
+        ctner.appendChild(awaitingParent[i].ele);
+        console.log("actually added", awaitingParent[i].ele);
+      } else
+        console.log("didnt'actually add");
+      awaitingParent.splice(i, 1);
+      console.log(awaitingParent);
+      i = -1;
+    }
+  }
+}
 //# sourceMappingURL=support.js.map

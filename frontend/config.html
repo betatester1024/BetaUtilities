@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="{{mainClass}}">
   <head>
     <script src='./utils.js'></script>
     <title>Account Management | BetaOS Systems</title>
@@ -7,7 +7,10 @@
       const accessLevels = ["Error-level", "User", "Admin", "Super-admin"];
       function onLoad() {
         send(JSON.stringify({action:"userRequest"}), (res)=> {
-          if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{window.open('/login?redirect=config', '_self')});
+          if (res.status == "ERROR") {
+            document.getElementById("userInp").value="[ERROR] Failed to fetch data";
+            alertDialog("Error: "+res.data.error, ()=>{window.open('/login?redirect=config', '_self')});
+          }
           else {
             document.getElementById("userInp").value=res.data.user;
           }
@@ -44,11 +47,15 @@
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
     <style>
+      #userInp 
+      {
+        margin-bottom: 24px;
+      }
     </style>
   </head>
   <body onload = "globalOnload(onLoad)">
@@ -60,7 +67,7 @@
       <div class="btnRow">
         <form action="javascript:updateInfo()">
           <div class="inpContainer">
-            <input id="userInp" placeholder="Username" value="[ERROR] Account info could not be loaded" disabled>
+            <input id="userInp" class="disabled" placeholder="Username" value="Loading account info..." disabled>
           </div>
           <div class="inpContainer">
             <input id="pwdInpO" type="password" placeholder="Old password">
@@ -74,30 +81,32 @@
             <input id="pwdInp2" type="password" placeholder="Password confirmation">
             <div class="anim inp"></div>
           </div>
-          <button type=submit class="btn szFull grn">
-            <span class="material-symbols-outlined">update</span>
-            Update your information<div class="anim"></div></button>
-          <a class="btn szHalf override" href="/admin">
-            <span class="material-symbols-outlined">arrow_forward_ios</span>
-            Access admin panel<div class="anim"></div></a>
-          <button type="button" class="btn szHalf" onclick="updateTheme()">
-            <span class="material-symbols-outlined">light_mode</span>
-            Swap colour scheme<div class="anim"></div></button>
-          <a class="btn szThird ylw override" href="/logout">
-            <span class="material-symbols-outlined">logout</span>
-            Logout: <br>This session<div class="anim"></div></a>
-          <button type="button" class="btn szThird ylw override" onclick="alertDialog('Confirm logout from all accounts?', ()=>{window.open('/logout?options=all', '_self')}, 2)">
-            <span class="material-symbols-outlined">logout</span>
-            Logout: <br>All accounts<div class="anim"></div></button>
-          <a class="btn szThird red override" href="/accountDel">
-            <span class="material-symbols-outlined">warning</span>
-            Delete your account<div class="anim"></div></a>
-<!--           <button type=button class="btn szFull" onclick="alertDialog('TEST')">
-            <span class="material-symbols-outlined">looks_one</span>
-            Test alert dialog<div class="anim"></div></button> -->
-          <a class="btn szFull override" href="/">
-            <span class="material-symbols-outlined">arrow_back_ios</span>
-            Return to home<div class="anim"></div></a>
+          <div class="flex" style="margin: 8px;">
+            <button type=submit class="btn szFull grn">
+              <span class="material-symbols-outlined">update</span>
+              Update your information<div class="anim"></div></button>
+            <a class="btn szHalf override" href="/admin">
+              <span class="material-symbols-outlined">arrow_forward_ios</span>
+              Access admin panel<div class="anim"></div></a>
+            <button type="button" class="btn szHalf" onclick="updateTheme()">
+              <span class="material-symbols-outlined">light_mode</span>
+              Swap colour scheme<div class="anim"></div></button>
+            <a class="btn szThird ylw override" href="/logout">
+              <span class="material-symbols-outlined">logout</span>
+              Logout: <br>This session<div class="anim"></div></a>
+            <button type="button" class="btn szThird ylw override" onclick="alertDialog('Confirm logout from all accounts?', ()=>{window.open('/logout?options=all', '_self')}, true)">
+              <span class="material-symbols-outlined">logout</span>
+              Logout: <br>All accounts<div class="anim"></div></button>
+            <a class="btn szThird red override" href="/accountDel">
+              <span class="material-symbols-outlined">warning</span>
+              Delete your account<div class="anim"></div></a>
+  <!--           <button type=button class="btn szFull" onclick="alertDialog('TEST')">
+              <span class="material-symbols-outlined">looks_one</span>
+              Test alert dialog<div class="anim"></div></button> -->
+            <a class="btn szFull override" href="/">
+              <span class="material-symbols-outlined">arrow_back_ios</span>
+              Return to home<div class="anim"></div></a>
+          </div>
         </form>
       </div>
     </div>

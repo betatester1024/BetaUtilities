@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html class="{{mainClass}}">
+  <head>
+    <script src='./utils.js'></script>
+    <title>Credits | BetaOS Systems</title>
+    <script>
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      p {
+        width: 90%;
+        margin: 0 auto;
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body onload = "globalOnload();">
+    <div class="main_content">
+      <header>
+        <h2>Thank you!</h2>
+        <hr class="rounded">
+      </header>
+      <p>
+        Thanks to everyone who tested the site and found bugs. <br>
+        Especially these people:<br>
+        <kbd>@Sea Grapes</kbd><br>
+        <kbd>@SarahIsCode</kbd><br>
+        <kbd>Sumairu</kbd><br>
+        <kbd>Garmy</kbd><br>
+        <kbd>Feronia</kbd><br>
+        <kbd>@atomicmoose</kbd><br>
+        <p class="red nohover nooutline">todo: link these people<br>
+        also i am so sorry if i did not add you. please <a href="/contact" class="fsmed red nooutline">scream at me</a></p>
+      </p>
+      <a class="btn override" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+    </div>
+    
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

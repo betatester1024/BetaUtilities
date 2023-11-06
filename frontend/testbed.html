@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html class="{{mainClass}}">
+  <head>
+    <script src='./utils.js'></script>
+    <title>Testbed | BetaOS Systems</title>
+    <script>
+      function openMoreDialogs() 
+      {
+        alertDialog('this is the alert \n open a new dialog?', ()=>{
+          openMoreDialogs();
+          openMoreDialogs();}, true);
+      }
+
+      function openNonBlocking() 
+      {
+        nonBlockingDialog('<a href="testbed">testing testing one two threeeeeee</a>?', ()=>{openMoreDialogs()});
+      }
+      function openEph() 
+      {
+        ephemeralDialog('<a href="testbed">testing testing one two threeeeeee</a>?', ()=>{openMoreDialogs()});
+      }
+      
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+
+    </style>
+  </head>
+  <body onload = "globalOnload();">
+    <div class="main_content">
+      <header class="redrounded">
+        <h2>BetaOS Testbed</h2>
+        <hr class="rounded">
+      </header>
+      <button class="red btn szFull override" onclick="openMoreDialogs()">
+        <span class="material-symbols-outlined">add</span>
+        Open a dialog<div class="anim"></div>
+      </button>
+      <button class="org btn szFull override" onclick="openNonBlocking()">
+        <span class="material-symbols-outlined">add</span>
+        Open a non-blocking dialog<div class="anim"></div>
+      </button>
+      <button class="ylw btn szFull override" onclick="openEph()">
+        <span class="material-symbols-outlined">add</span>
+        Open an ephemeral dialog<div class="anim"></div>
+      </button>
+      <a class="btn szFull override" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+        
+    </div>
+   
+    <div class="overlay" id="overlay">
+     
+    </div>
+    <div id="ephemerals">
+
+    </div>
+  </body>
+</html>

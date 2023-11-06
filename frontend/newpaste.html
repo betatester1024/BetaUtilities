@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="{{mainClass}}">
   <head>
     <script src='/utils.js'></script>
     <title>PasteIt | BetaOS Systems</title></title>
@@ -27,16 +27,17 @@
       function unlock() {
         closeDialog(()=>{}, "pwdInp");
         let pwd = document.getElementById("inp_pwd").value
-        send(JSON.stringify({action:"findPaste", data:{pwd:pwd, name:document.URL.match(/\?edit=([0-9a-zA-Z_\-]{1,30})$/)[1]}}), (res)=>{
+        send(JSON.stringify({action:"findPaste", data:{pwd:pwd, name:(new URL(document.URL)).searchParams.get("edit")}}), (res)=>{
           if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{
             document.getElementById("inp_pwd").value="";
             openDialog("pwdInp");
+            
           });
-          else document.getElementById("text").value=res.data;
+          else document.getElementById("text").value=res.data.content;
         })
       }
       function onLoad() {
-        let match = document.URL.match("\\?edit=([0-9a-zA-Z_\\-]{1,30})$");
+        let match = (new URL(document.URL)).searchParams.get("edit");
         if (match) {
           document.getElementById("h2").innerText= "PasteIt! Editor"
           openDialog("pwdInp");
@@ -47,18 +48,19 @@
             <div class="anim"></div>`;
           btn.onclick=update;
           let loc = document.getElementById("loc");
-          loc.value=match[1];
+          loc.value=match;
           document.getElementById("form").action="javascript:update()";
           loc.disabled=true;
-          document.getElementById("inp").placeholder="(Unchanged)"
+          loc.classList.add("disabled");
+          // document.getElementById("inp").placeholder="(Unchanged)"
         }
         else document.getElementById('pwdInp').style.display="none";
       }
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
@@ -92,7 +94,15 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload(()=>{onLoad()});">
+  <body onload = "globalOnload(()=>{onLoad()});
+    var transitionEnd = whichTransitionEvent();
+    byId('pwdInp').addEventListener(transitionEnd, theFunctionToInvoke, false);
+
+    function theFunctionToInvoke(ev){
+      let target = ev.target.querySelector('.internal form .inpContainer #inp_pwd.noMin');
+      console.log(target);
+      if (target) target.focus();
+    }">
     <div class="main_content">
       <header>
         <h2 id="h2">PasteIt!</h2>

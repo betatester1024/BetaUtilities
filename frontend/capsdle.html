@@ -1,5 +1,5 @@
 <!DOCTYPE html> 
-<html>
+<html class="{{mainClass}}">
   <head>
     <script src='./utils.js'></script>
     <title>Capsdle | BetaOS Systems</title>
@@ -77,7 +77,7 @@
             PD = true;
             alertDialog(`Congratulations! You have won in ${CURRROW+1} move${CURRROW==0?"":"s"}! 
             Press ENTER to share your score.`, 
-            ()=>{ navigator.clipboard.writeText(copyText.join("\n")+"\n"+(CURRROW+1)+" move"+(CURRROW==0?"":"s")+"\nCapsdle by BetaOS: "+location.href);}, 2);
+            ()=>{ navigator.clipboard.writeText(copyText.join("\n")+"\n"+(CURRROW+1)+" move"+(CURRROW==0?"":"s")+"\nCapsdle by BetaOS: "+location.href);}, true);
             document.body.removeEventListener("keydown", keyDown_Capsdle);
             return PD;
           }
@@ -142,11 +142,11 @@
         let prevWord = nowWord;
         nowWord = "";
         let now = new Date(Date.now());
-        let nowMins = Math.floor(now.getMinutes() / 5)*5; // floors to interval of 5 minutes.
+        let nowMins = Math.floor(now.getMinutes() / 30)*30; // floors to interval of 5 minutes.
         let nowHrs = now.getHours();
         let nowDay = now.toDateString();
         let nowHash = hashIt(nowDay+"/"+nowHrs+"/"+nowMins);
-        let nextExpiry = 5*60*1000 - (Date.now())%(5*60*1000)
+        let nextExpiry = 30*60*1000 - (Date.now())%(30*60*1000)
         for (let i=0; i<5; i++) {
           let currLetterIdx =Math.floor((nowHash%Math.pow(62, 5)) / Math.pow(62, i)) % 62;
           if (currLetterIdx < 26) nowWord += letters[currLetterIdx % 26];
@@ -226,9 +226,9 @@
       }
     </script>
     <meta name="viewport" content="width=device-width">
-     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100;400;700&display=swap" rel="stylesheet">
+     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
@@ -237,12 +237,13 @@
         background-color: var(--system-grey);
         outline: 1px solid var(--system-overlay);
         border-radius: 5px;
-        width: 60px;
-        font-size: 50px;
+        width: 50px;
+        font-size: 40px;
         height: calc(60px * 1.5);
         display: inline-block;
         vertical-align: top;
         transition: all 0.5s ease;
+        color: var(--system-black);
         font-family: "Noto Sans Mono", monospace;
       }
       .activeRow > .letter {

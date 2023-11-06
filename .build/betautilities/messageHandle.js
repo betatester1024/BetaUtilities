@@ -32,9 +32,37 @@ var import_supportRooms = require("../supportRooms");
 const fs = require("fs");
 const serviceKey = process.env["serviceKey"];
 const serviceResponse = process.env["serviceResponse"];
+function betaLocalTime(STARTTIME2 = Date.now()) {
+  let date = new Date(STARTTIME2);
+  return date.toLocaleString("en-US", { timeZone: "America/New_York" });
+}
+function toTime(ms, inclMs = false) {
+  let day = Math.floor(ms / 1e3 / 60 / 60 / 24);
+  ms = ms % (1e3 * 60 * 60 * 24);
+  let hr = Math.floor(ms / 1e3 / 60 / 60);
+  ms = ms % (1e3 * 60 * 60);
+  let min = Math.floor(ms / 1e3 / 60);
+  ms = ms % (1e3 * 60);
+  let sec = Math.floor(ms / 1e3);
+  if (ms < 0)
+    return "00:00:00";
+  return (day > 0 ? day + "d " : "") + padWithZero(hr) + ":" + padWithZero(min) + ":" + padWithZero(sec) + (inclMs ? "." + padWithThreeZeroes(ms % 1e3) : "");
+}
+function padWithThreeZeroes(n) {
+  if (n < 10)
+    return "00" + n;
+  if (n < 100)
+    return "0" + n;
+  return n;
+}
+function padWithZero(n) {
+  return n < 10 ? "0" + n : n;
+}
 let DATE = new Date();
-let VERSION = "ServiceVersion BETA 2.5671 | Build-time: " + DATE.toUTCString();
-const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! Press :three: to toggle ANTISPAM.\\n\\n Press :zero: to exit support at any time.`;
+let VERSION = "ServiceVersion BETA 2.5671 \n Build-time: " + betaLocalTime();
+const HELPTEXT2 = `Press :one: to reboot services. Press :two: to play wordle! Press :three: to toggle ANTISPAM.
+
+ Press :zero: to exit support at any time.`;
 let workingUsers = [];
 let leetlentCt = 1;
 let wordleCt = 1;
@@ -48,6 +76,12 @@ function replyMessage(hnd, msg, sender, data) {
   if (msg == "!debugwordle") {
     (0, import_logging.systemLog)(import_wordler.validWords[import_wordler.todayWordID] + " " + import_wordler.todayLeetCODE.join(""));
     return "> See console <";
+  }
+  if (msg == "/me rolls by" && Math.random() < 0.5) {
+    return "/me rolls " + prepos[Math.floor(Math.random() * prepos.length)];
+  }
+  if (msg == "!branch") {
+    return process.env["branch"];
   }
   if (msg == "!acquirecake") {
     return ":cake:";
@@ -78,7 +112,12 @@ function replyMessage(hnd, msg, sender, data) {
     return "https://betatester1024.repl.co/paste";
   if (msg.match("^!uptime @" + hnd.nick.toLowerCase() + "$")) {
     hnd.clearCallReset();
-    return getUptimeStr(STARTTIME) + " (Total uptime: " + getUptimeStr() + ")";
+    getUptimeStr(STARTTIME).then((value) => {
+      getUptimeStr().then((value2) => {
+        hnd.delaySendMsg(value + " (Total uptime: " + value2 + ")", data, 0);
+      });
+    });
+    return "";
   }
   let match_r = msg.match(/preview\.redd\.it\/(.*\.(jpg|png|jpeg|gif|bmp))/igmu);
   if (match_r) {
@@ -86,6 +125,19 @@ function replyMessage(hnd, msg, sender, data) {
   }
   if (msg == "!issue" || msg == "!bug" || msg == "!feature") {
     return "https://github.com/betatester1024/BetaUtilities/issues/new/choose";
+  }
+  if (msg == "!pendingreminders" && sender.match("beta")) {
+    let out = "";
+    (async () => {
+      let pendingReminders = await import_consts.uDB.find({ fieldName: "TIMER" }).toArray();
+      for (let i = 0; i < pendingReminders.length; i++) {
+        out += `Reminder to @${pendingReminders[i].notifyingUser} about ${pendingReminders[i].msg} in ${toTime(pendingReminders[i].expiry - Date.now())}`;
+        out += "\n";
+      }
+      console.log(out);
+      hnd.delaySendMsg(out, data, 0);
+    })();
+    return "";
   }
   if (msg.match(/(\W|^)ass(\W|$)/) && Math.random() < 0.2) {
     hnd.delaySendMsg("arse*", data, 0);
@@ -218,7 +270,7 @@ function replyMessage(hnd, msg, sender, data) {
     );
     return "Set information for @" + norm(sender);
   }
-  let match = msg.match("^!remind(me | +@[^ ]+ )(in )?()()([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?(.+)");
+  let match = msg.match("^!remind(me | +@[^ ]+ )(in )?()()([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?(?: of)? (.+)");
   if (match) {
     console.log(match);
     let remindUser = match[1];
@@ -243,7 +295,7 @@ function replyMessage(hnd, msg, sender, data) {
       msg: remindMsg,
       author: remindUser == "me " ? null : norm(sender)
     });
-    return "Will remind " + (remindUser == "me " ? "you" : remindUser.slice(2, remindUser.length - 1)) + " in " + ((exp4 - Date.now()) / 6e4).toFixed(2) + "min";
+    return "Will remind " + (remindUser == "me " ? "you" : remindUser.slice(2, remindUser.length - 1)) + " in " + toTime(exp4 - Date.now());
   } else if (msg.match(/^!remind/)) {
     return "Syntax: !remindme 1d2h3m4s message OR !remind @user 1d2h3m4s message";
   }
@@ -259,8 +311,31 @@ function replyMessage(hnd, msg, sender, data) {
     hnd.changeNick(hnd.nick);
     return "https://instant.leet.nu/room/" + hnd.roomName;
   }
+  let tellMatch = msg.match(/^!yell ((@[^ ]+|\*[^ ]+) .*)/);
+  if (tellMatch) {
+    hnd.changeNick(sender);
+    setTimeout(() => {
+      hnd.changeNick(hnd.nick);
+    }, 200);
+    return "!tell " + tellMatch[1].toUpperCase();
+  }
+  let tellMatch2 = msg.match(/^!whisper ((@[^ ]+|\*[^ ]+) .*)/);
+  if (tellMatch2) {
+    hnd.changeNick(sender);
+    setTimeout(() => {
+      hnd.changeNick(hnd.nick);
+    }, 200);
+    return "!tell " + tellMatch2[1].toLowerCase();
+  }
+  if (msg.match("^!dinbox$")) {
+    hnd.changeNick(sender);
+    setTimeout(() => {
+      hnd.changeNick(hnd.nick);
+    }, 200);
+    return "!inbox";
+  }
   if (msg.match("!version[ ]+@" + hnd.nick.toLowerCase())) {
-    return VERSION;
+    return VERSION + " \n Branch: " + process.env["branch"] + " | Notifying in: &" + import_wsHandler.WS.notifRoom.roomName;
   }
   let match2 = msg.match("@" + hnd.nick.toLowerCase() + " !mitoseto &([a-z0-9]+) as @(.+)");
   if (match2) {
@@ -331,7 +406,7 @@ function replyMessage(hnd, msg, sender, data) {
   }
   if (msg.match("(!help[ ]+@" + hnd.nick.toLowerCase() + "$|^[ ]+!help[ ]+$)|!contact @" + hnd.nick.toLowerCase()) != null) {
     if (hnd.transferOutQ)
-      return "Due to spamming concerns, please start your call in another room like &test or &bots! \\nThank you for your understanding.\\n Enter !help @" + hnd.nick + " -FORCE to enter the help-menu here.";
+      return "Due to spamming concerns, please start your call in another room like &test or &bots! \nThank you for your understanding.\n Enter !help @" + hnd.nick + " -FORCE to enter the help-menu here.";
     if (hnd.callStatus == 6)
       return "You're currently on hold! A moment, please.";
     hnd.callStatus = 0;
@@ -377,16 +452,16 @@ function replyMessage(hnd, msg, sender, data) {
     hnd.clearCallReset();
     if (msg.match(exp3))
       match = msg.match(exp3);
-    return "https://womginx.betatester1024.repl.co/main/https://" + match[1] + "\\n[NEW] The FIREFOX-ON-REPLIT may provide more reliable unblocking! > https://replit.com/@betatester1024/firefox#main.py";
+    return "https://womginx.betaos.repl.co/main/https://" + match[1];
   }
   if (hnd.callStatus == 0 && (msg == ":one:" || msg == "one" || msg == "1")) {
     hnd.bumpCallReset(data);
     hnd.callStatus = 1;
-    return "Welcome to BetaOS Services! Enter :one: to inquire about our services. Enter :two: to speak to a manager. Composez le :three: pour service en fran\xE7ais. Press :four: for direct access to the code. Press :five: to unblock a link manually. Press :six: for more information about the creator. Press :seven: to enter your access code. Press :eight: to provide feedback on our calling services! Press :nine: for more options. \\n\\nPress :zero: to end call at any time.";
+    return "Welcome to BetaOS Services! Enter :one: to inquire about our services. Enter :two: to speak to a manager. Composez le :three: pour service en fran\xE7ais. Press :four: for direct access to the code. Press :five: to unblock a link manually. Press :six: for more information about the creator. Press :seven: to enter your access code. Press :eight: to provide feedback on our calling services! Press :nine: for more options. \n\nPress :zero: to end call at any time.";
   }
   if (hnd.callStatus == 1 && (msg == ":one:" || msg == "one" || msg == "1")) {
     hnd.clearCallReset();
-    return "Important commands: !ping, !help, !pause, !restore, !kill, !pong, !uptime, !uuid. \\n Bot-specific commands: see https://betatester1024.repl.co/commands?nick=BetaUtilities";
+    return "Important commands: !ping, !help, !pause, !restore, !kill, !pong, !uptime, !uuid. \n Bot-specific commands: see https://betatester1024.repl.co/commands?nick=BetaUtilities";
   }
   if (hnd.callStatus == 1 && (msg == ":two:" || msg == "two" || msg == "2")) {
     hnd.delaySendMsg("/me crashes", data, 3e3);
@@ -419,7 +494,7 @@ function replyMessage(hnd, msg, sender, data) {
   if (msg == "!creatorinfo" || hnd.callStatus == 1 && (msg == ":six:" || msg == "six" || msg == "6")) {
     hnd.clearCallReset();
     hnd.callStatus = -1;
-    return "BetaUtilities, created by @betatester1024.\\nVersion: " + VERSION + "\\nHosted on repl.it free hosting; Only online when the creator is. \\nUnblockers forked by @betatester1024 and should be able to automatically come online.\\n:white_check_mark: BetaOS services ONLINE";
+    return "BetaUtilities, created by @betatester1024.\nVersion: " + VERSION + "\nUnblockers forked by @betatester1024 and should be able to automatically come online.\n:white_check_mark: BetaOS services ONLINE";
   }
   if (hnd.callStatus == 1 && (msg == ":seven:" || msg == "seven" || msg == "7")) {
     hnd.bumpCallReset(data);
@@ -579,7 +654,7 @@ function replyMessage(hnd, msg, sender, data) {
     return "Enter any 5-letter word. Green tiles mean the letter is positionned in the correct location, yellow tiles mean the letter is positionned incorrectly but the letter exists in the word at least once, and red means that the letter does not exist in the word. You currently have infinite guesses.";
   }
   if (msg.match("@" + hnd.nick.toLowerCase() + "$")) {
-    return "Yes?";
+    return "hello!";
   } else
     return "";
 }
@@ -601,9 +676,9 @@ async function getUptimeStr(STARTTIME2 = -1) {
     return formatTime(time.uptime);
   }
   let timeElapsed = Date.now() - STARTTIME2;
-  let date = new Date(STARTTIME2);
-  var usaTime = date.toLocaleString("en-US", { timeZone: "America/New_York" });
+  let usaTime = betaLocalTime(STARTTIME2);
   console.log("USA time: " + usaTime);
+  let date = new Date();
   return `/me has been up since ${date.toUTCString()} / EST: ${usaTime} | Time elapsed: ${formatTime(timeElapsed)}`;
 }
 function formatTime(ms) {
@@ -620,6 +695,278 @@ function formatTime(ms) {
 function format(n) {
   return n < 10 ? "0" + n : n;
 }
+const prepos = [
+  "aboard",
+  "about",
+  "above",
+  "across",
+  "after",
+  "against",
+  "along",
+  "amid",
+  "among",
+  "anti",
+  "around",
+  "as",
+  "at",
+  "before",
+  "behind",
+  "below",
+  "beneath",
+  "beside",
+  "besides",
+  "between",
+  "beyond",
+  "but",
+  "by",
+  "concerning",
+  "considering",
+  "despite",
+  "down",
+  "during",
+  "except",
+  "excepting",
+  "excluding",
+  "following",
+  "for",
+  "from",
+  "in",
+  "inside",
+  "into",
+  "like",
+  "minus",
+  "near",
+  "of",
+  "off",
+  "on",
+  "onto",
+  "opposite",
+  "outside",
+  "over",
+  "past",
+  "per",
+  "plus",
+  "regarding",
+  "round",
+  "save",
+  "since",
+  "than",
+  "through",
+  "to",
+  "toward",
+  "towards",
+  "under",
+  "underneath",
+  "unlike",
+  "until",
+  "up",
+  "upon",
+  "versus",
+  "via",
+  "with",
+  "within",
+  "without",
+  "abaft",
+  "abating",
+  "abeam",
+  "ablow",
+  "aboon",
+  "abouts",
+  "acrost",
+  "adown",
+  "a-eastell",
+  "afore",
+  "afornent",
+  "afront",
+  "afterhand",
+  "again",
+  "ahind",
+  "ajax",
+  "alength",
+  "alongst",
+  "aloof",
+  "alow",
+  "amell",
+  "amidmost",
+  "anear",
+  "aneath",
+  "anent",
+  "anewst",
+  "anunder",
+  "askant",
+  "asklent",
+  "astern",
+  "athwart",
+  "atour",
+  "atter",
+  "atween",
+  "atwixt",
+  "a-weather",
+  "a-west",
+  "awestell",
+  "ayond",
+  "ayont",
+  "bating",
+  "bedown",
+  "be-east",
+  "beforrow",
+  "behither",
+  "ben",
+  "benorth",
+  "besouth",
+  "betwixt",
+  "'twixt",
+  "bewest",
+  "bongre",
+  "bout",
+  "bove",
+  "'cept",
+  "contrair",
+  "contrary",
+  "cross",
+  "dehors",
+  "dot",
+  "durante",
+  "effore",
+  "emong",
+  "endlong",
+  "enduring",
+  "ensuing",
+  "even-forth",
+  "ex",
+  "excepted",
+  "extra",
+  "fae",
+  "forby",
+  "fore",
+  "fornent",
+  "foregain",
+  "forne",
+  "forout",
+  "forrow",
+  "forth",
+  "fro",
+  "fromward",
+  "froward",
+  "furth",
+  "gain",
+  "gainst",
+  "gainward",
+  "gin",
+  "half-way",
+  "hent",
+  "inboard",
+  "incontrair",
+  "indurand",
+  "inmid",
+  "inter",
+  "inthrough",
+  "intil",
+  "inwith",
+  "i'th'",
+  "'long",
+  "longs",
+  "longst",
+  "longways",
+  "malgrado",
+  "mang",
+  "maugre",
+  "midmost",
+  "mids",
+  "midward",
+  "midway",
+  "'mong",
+  "'mongst",
+  "more",
+  "moreover",
+  "moyening",
+  "natheless",
+  "nearabout",
+  "nearby",
+  "nearhand",
+  "'neath",
+  "nigh",
+  "nigh-hand",
+  "nobbut",
+  "non-obstant",
+  "notwithstand",
+  "noughtwithstanding",
+  "offa",
+  "offen",
+  "only",
+  "or",
+  "otherside",
+  "outcept",
+  "outen",
+  "out-over",
+  "outta",
+  "out-taken",
+  "out-taking",
+  "out-through",
+  "outwith",
+  "overcross",
+  "over-right",
+  "overthorter",
+  "overthwart",
+  "overtop",
+  "pan",
+  "pass",
+  "pon",
+  "quoad",
+  "reserved",
+  "reserving",
+  "sauf",
+  "seen",
+  "sen",
+  "senza",
+  "side",
+  "sidelings",
+  "sidelong",
+  "sides",
+  "sin",
+  "sineth",
+  "sith",
+  "sithen",
+  "sithence",
+  "ter",
+  "thorough",
+  "thorter",
+  "thwart",
+  "thwart-over",
+  "tiv",
+  "touchant",
+  "transverse",
+  "traverse",
+  "ultra",
+  "umbe",
+  "unneath",
+  "upside",
+  "upsy",
+  "utouth",
+  "wid",
+  "withinside",
+  "withoutside",
+  "wiv",
+  "ymong",
+  "yond",
+  "yonside",
+  "aground",
+  "bush",
+  "hereat",
+  "herefrom",
+  "hereon",
+  "hither",
+  "thereat",
+  "therefrom",
+  "thereon",
+  "thither",
+  "whereat",
+  "wherefrom",
+  "whereof",
+  "whereon",
+  "whither",
+  "yonder"
+];
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   replyMessage,

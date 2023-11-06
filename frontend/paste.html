@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="{{mainClass}}">
   <head>
     <script src='/utils.js'></script>
     <title>PasteIt | BetaOS Systems</title></title>
@@ -7,13 +7,27 @@
       function validate() {
         closeDialog(()=>{}, 'pwdInp');;
         let pwd = document.getElementById("inp").value;
-        send(JSON.stringify({action:"findPaste", data:{pwd:pwd, name:document.URL.match(/\/paste\/(.*)$/)[1]}}), (res)=>{
+        send(JSON.stringify({action:"findPaste", data:{pwd:pwd, name:(new URL(document.URL)).pathname.match(/\/paste\/(.*)$/)[1]}}), (res)=>{
           document.getElementById("inp").value="";
-          if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{openDialog('pwdInp');});
+          if (res.status != "SUCCESS") {
+            openDialog('pwdInp');
+            ephemeralDialog("Error: "+res.data.error);
+          }
           else {
-            document.getElementById("text").value=res.data;
+            handleIncomingPaste(res);
           }
         })
+      }
+      function handleIncomingPaste(res) {
+        closeDialog(()=>{}, 'pwdInp');
+        document.getElementById('text').value=res.data.content;
+        let secEle = byId('security');
+        secEle.innerText = res.data.security;
+        if (res.data.security == 'none') {
+          secEle.classList.remove('grn'); 
+          secEle.classList.add('red');
+          secEle.classList.add('nooutline');
+        }
       }
       // function closeDialog('pwdInp'); {
       //   let div = document.getElementById("pwdInp");
@@ -29,13 +43,13 @@
       //   // setTimeout(()=>{document.getElementById("inp").focus()}, 200);
       // }
       function editthis() {
-        location.href=document.URL.replaceAll("/paste/", "/paste?edit=");
+        location.href=(new URL(document.URL).pathname).replaceAll("/paste/", "/paste?edit=");
       }
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100;400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
@@ -69,12 +83,30 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload(()=>{openDialog('pwdInp');;});">
+  <body onload = "globalOnload(()=>{
+    // send(JSON.stringify({action:'findPaste', 
+    // data:{pwd:'', name:(new URL(document.URL)).pathname.match(/\/paste\/(.*)$/)[1]}}), (res)=>{
+    //   if (res.status == 'SUCCESS') { // passwordless paste / is author
+    //     handleIncomingPaste(res)
+    //   }
+    // })
+    openDialog('pwdInp');
+    var transitionEnd = whichTransitionEvent();
+    byId('pwdInp').addEventListener(transitionEnd, theFunctionToInvoke, false);
+    
+    function theFunctionToInvoke(ev){
+      let target = ev.target.querySelector('.internal form .inpContainer #inp.noMin');
+      // console.log(target);
+      if (target) target.focus();
+    }
+  });">
     <div class="main_content">
       <header>
         <h2>PasteIt!</h2>
         <hr class="rounded">
       </header>
+      <div class="blu nohover fssml nobreak" >Paste security: </div>
+      <div class="grn nohover fssml nobreak" id="security"></div>
       <textarea id="text" readonly></textarea>
       <a class="btn szHalf grn" href="/paste">
         <span class="material-symbols-outlined">add</span>

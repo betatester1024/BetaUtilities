@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="{{mainClass}}">
   <head>
     <script src='./utils.js'></script>
     <title>Administrative panel | BetaOS Systems</title>
@@ -59,12 +59,23 @@
             case "updateDefaultLoad": data={new:dat.split(",")}; break;
             case "hidRoom": data = {name:dat}; break;
             case "purge": data= {name:dat}; break;
+            case "suspend": 
+              cmd = "adminAction"; 
+              data = {action: "suspendPage", options:{suspendedQ:true, page:dat}}; 
+              break;
+            case "restore": 
+              cmd = "adminAction"; 
+              data = {action: "suspendPage", options:{suspendedQ:false, page:dat}}; 
+              break;
             case "help":
+            default: 
               alertDialog(`Command syntax: \ndelMsg [MESSAGE] [ROOM] 
               updateDefaultLoad [ROOM1],[ROOM2],[ROOM3],...
               hidRoom [ROOMNAME]
-              purge [ROOMNAME]`, ()=>{});
-            default: return;
+              purge [ROOMNAME]
+              help
+              suspend [PAGE]
+              restore [PAGE]`, ()=>{return;});
           }
           
           send(JSON.stringify({action:cmd, data:data}), (res)=>{
@@ -82,7 +93,7 @@
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
@@ -125,20 +136,23 @@
             </select>
             <div class="anim inp"></div>
           </div>
+          <div class="flex addMargin">
           <button type=submit class="btn szHalf grn">
             <span class="material-symbols-outlined">update</span>
             Create or update this account<div class="anim"></div></button>
-          <button type="button" class="btn szHalf red" onclick="alertDialog('Confirm account deletion?', del, 2)">
+          <button type="button" class="btn szHalf red" onclick="alertDialog('Confirm account deletion?', del, true)">
             <span class="material-symbols-outlined">delete_forever</span>
             Delete this account<div class="anim"></div></button>
+          </div>
         </form>
-          
+        <div class="flex addMargin"> 
           <a class="btn szTwoThirds override" href="/account">
             <span class="material-symbols-outlined">arrow_back_ios</span>
             Return to your account<div class="anim"></div></a>
           <a class="btn szThird ylw" href="/syslog">
           <span class="material-symbols-outlined">inventory</span>
           SysLog<div class="anim"></div></a>
+        </flex>
           <div class="red" id="superadmin">
             <h2 class="fsmed">Super-administrative command area</h2>
             <form action="javascript:runCmd()">

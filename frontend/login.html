@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="{{mainClass}}">
   <head>
     <script src='./utils.js'></script>
     <title>Login | BetaOS Systems</title>
@@ -9,12 +9,13 @@
         let usr = document.getElementById("userInp");
         let pwd = document.getElementById("pwdInp");
         let ck = document.getElementById("ckInp");
-        let redirect = document.URL.match("redirect=(.*)$")
+        let redirect = document.URL.match("redirect=(.*)$");
+        console.log(redirect);
         send(JSON.stringify({action:"login", data:{user:usr.value, pass:pwd.value, persistQ:ck.checked}}), (res)=>{
           if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{});
           else {
             alertDialog("Welcome, "+usr.value +" ("+accessLevels[res.data.perms]+")", ()=>{
-              if (redirect) window.open(redirect[1], '_self');
+              if (redirect) window.open(decodeURIComponent(redirect[1]), '_self');
               else window.open("/", '_self');
             });
           }
@@ -25,7 +26,7 @@
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">

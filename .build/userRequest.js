@@ -19,6 +19,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var userRequest_exports = {};
 __export(userRequest_exports, {
   extendSession: () => extendSession,
+  userListing: () => userListing,
   userRequest: () => userRequest
 });
 module.exports = __toCommonJS(userRequest_exports);
@@ -50,9 +51,12 @@ async function extendSession(token) {
   await import_consts.authDB.updateOne({ fieldName: "Token", token }, { $set: { expiry: newExpiry } });
   return { status: "SUCCESS", data: { expiry: newExpiry }, token };
 }
+async function userListing(token) {
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   extendSession,
+  userListing,
   userRequest
 });
 //# sourceMappingURL=userRequest.js.map

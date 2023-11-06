@@ -15,45 +15,46 @@ const localEuphRooms = [
 ]
 const { exec } = require("child_process");
 
+let timedOutQ = false;
 export let UPSINCESTR = "";
 try {
   // mail();
   // let fs = 
   if (connectionSuccess)
-  connectDB().then((thing:any)=>{
-    console.log(thing)
+  connectDB().then((err:any)=>{
+    // console.log(thing)
     if (!connectionSuccess) return;
-    initServer();
-    DBMaintenance();
-    serverUpdate();
-    let now = new Date(Date.now());
-    UPSINCESTR = "----------------------Systems restarted at "+now.toLocaleString("en-US", {timeZone: "America/New_York"})+"-------------------";
-    log(UPSINCESTR);
-    uDB.findOne({fieldName:"ROOMS"}).then((obj:{euphRooms:string[], rooms:string[], hidRooms:string[]})=>{
-      console.log(obj);
-      for (let i=0; i<obj.euphRooms.length; i++) {
-        supportHandler.addRoom(new Room("EUPH_ROOM", obj.euphRooms[i]));
-        new WS("wss://euphoria.io/room/" + obj.euphRooms[i] +"/ws", "BetaUtilities", obj.euphRooms[i], !(obj.euphRooms[i]=="test" || obj.euphRooms[i]=="bots"))
-        log("Connected euph_room")+obj.euphRooms[i];
-        console.log("Connected euph_room", obj.euphRooms[i]);
-      }
-      for (let i=0; i<localEuphRooms.length; i++) {
-        supportHandler.addRoom(new Room("EUPH_ROOM", localEuphRooms[i]));
-        new WS("wss://euphoria.io/room/" + localEuphRooms[i] +"/ws", "BetaUtilities", localEuphRooms[i], false)
-        log("Connected euph_room")+localEuphRooms[i];
-        console.log("Connected euph_room", localEuphRooms[i]);
-      }
-      for (let i=0; i<obj.rooms.length; i++) {
-        new WebH(obj.rooms[i], false);
-        //supportHandler.addRoom(new Room("ONLINE_SUPPORT", obj.rooms[i]));
-        console.log("Loaded support room", obj.rooms[i]);
-      }
-      for (let i=0; i<obj.hidRooms.length; i++) {
-        new WebH(obj.hidRooms[i], true);
-        // supportHandler.addRoom(new Room("HIDDEN_SUPPORT", obj.hidRooms[i]));
-        console.log("Loaded hidden support room", obj.hidRooms[i]);
-      }
-    })
+    // uDB.findOne({fieldName:"lastActive"}).then((document:{time:number})=>{
+    if (process.env["branch"] == "unstable" && 
+        (!process.env["promptInstances"] || process.env["promptInstances"]!="0")) {
+      let readline = require('readline');
+
+      let rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      
+      });
+      let timeout;
+      rl.question("Confirm start extra instance? ", (answer:string)=>{
+        clearTimeout(timeout);
+        rl.close();
+        answer = answer.trim().toLowerCase();
+        if (timedOutQ) return;
+        if (answer != "y" && answer != "yes") init(false);
+        else {
+          init(true)
+        } // extra instances approved
+      });
+      timeout = setTimeout(()=>{init(false)}, 30000);
+    }
+    else init(process.env["branch"]!= "unstable");
+    
+    //   if (Date.now - time < 10000)  // <10sec since last report, assume it is active
+    //   {
+    //     
+    //   else init();
+    // })
+    // init();
   });
   DBConnectFailure = setTimeout(()=>{
     connectionSuccess=false; 
@@ -65,4 +66,41 @@ try {
   }, 29000);
 } catch (e:any) {
   console.log(e);
+}
+
+async function init(startBots:boolean) 
+{
+  if (startBots) console.log("Starting EuphBots...");
+  initServer();
+  DBMaintenance();
+  serverUpdate();
+  let now = new Date(Date.now());
+  UPSINCESTR = "----------------------Systems restarted at "+now.toLocaleString("en-US", {timeZone: "America/New_York"})+"-------------------";
+  log(UPSINCESTR);
+  uDB.findOne({fieldName:"ROOMS"}).then((obj:{euphRooms:string[], rooms:string[], hidRooms:string[]})=>{
+    console.log(obj);
+    if (startBots)
+    for (let i=0; i<obj.euphRooms.length; i++) {
+      supportHandler.addRoom(new Room("EUPH_ROOM", obj.euphRooms[i]));
+      new WS("wss://euphoria.io/room/" + obj.euphRooms[i] +"/ws", "BetaUtilities"+(process.env['branch']=="unstable"?"-U":""), obj.euphRooms[i], !(obj.euphRooms[i]=="test" || obj.euphRooms[i]=="bots"))
+      log("Connected euph_room")+obj.euphRooms[i];
+      console.log("Connected euph_room", obj.euphRooms[i]);
+    }
+    // for (let i=0; i<localEuphRooms.length; i++) {
+    //   supportHandler.addRoom(new Room("EUPH_ROOM", localEuphRooms[i]));
+    //   new WS("wss://euphoria.io/room/" + localEuphRooms[i] +"/ws", "BetaUtilities", localEuphRooms[i], false)
+    //   log("Connected euph_room")+localEuphRooms[i];
+    //   console.log("Connected euph_room", localEuphRooms[i]);
+    // }
+    for (let i=0; i<obj.rooms.length; i++) {
+      new WebH(obj.rooms[i], false);
+      //supportHandler.addRoom(new Room("ONLINE_SUPPORT", obj.rooms[i]));
+      console.log("Loaded support room", obj.rooms[i]);
+    }
+    for (let i=0; i<obj.hidRooms.length; i++) {
+      new WebH(obj.hidRooms[i], true);
+      // supportHandler.addRoom(new Room("HIDDEN_SUPPORT", obj.hidRooms[i]));
+      console.log("Loaded hidden support room", obj.hidRooms[i]);
+    }
+  })
 }

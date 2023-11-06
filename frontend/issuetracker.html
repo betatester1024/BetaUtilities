@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html class="{{mainClass}}">
+  <head>
+    <script src='./utils.js'></script>
+    <title>IssueTracker | BetaOS Systems</title>
+    <script>
+      function newIssue() 
+      {
+        let title = byId("title").value;
+        let body = byId("body").value;
+        send(JSON.stringify({action:"newIssue", data:{
+          title:title, body:body, 
+          priority:byId("priority").value, 
+          tags:[] // to be implemented later.
+        }}),(res)=>{
+          if (res.status != "SUCCESS") alertDialog("Failed to post: "+res.data.error, ()=>{});
+          else {
+            byId("body").value="";
+            byId("title").value="";
+            byId("priority").value="";
+            alertDialog("Successfully posted issue #"+res.data.id, ()=>{
+              location.href="?from="+(res.data.id)+"&ct="+ISSUECT+"&completedOnly="+COMPLETEDONLY
+            });
+          }
+        })
+        loadIssues();
+      }
+      let FROM=0, ISSUECT = 0;
+      let MINID, MAXID;
+      let COMPLETEDONLY = false;
+      let TOTALMINID = 0;
+      function onLoad() 
+      {
+        let u = new URL(document.URL);
+        FROM = Number(u.searchParams.get("from")??1);
+        ISSUECT = Number(u.searchParams.get("ct")??20);
+        console.log(u.searchParams);
+        COMPLETEDONLY = u.searchParams.get("completedOnly")=="true";
+        byId("ckInp").checked=COMPLETEDONLY
+        if (FROM < 0) FROM = 1;
+        if (ISSUECT<0) ISSUECT = 20;
+        byId("showing").innerHTML = `Showing 
+        <div class="inpContainer" style="width: unset; display: inline-block; margin: 5px;">
+          <select id="sel" onchange="" style="width: 90px;">
+          <option disabled selected value='${ISSUECT}'>${ISSUECT}</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          </select> 
+          <div class="anim inp"></div>
+        </div>
+        issues from #
+          <input id="fromInp" type="number" min='0' value="${FROM}" style="width: unset;" placeholder="From ID" class="szThird" size="2">`;
+        if (!userData.error && userData.perms >= 2) byId("priority").disabled=false;
+        else byId("priority").className = "disabled";
+        loadIssues();
+      }
+
+      function updateRanges() 
+      {
+        location.href="?from="+Number(byId("fromInp").value)+"&ct="+Number(byId("sel").value)+"&completedOnly="+byId("ckInp").checked;
+      }
+
+      function goForward() 
+      {
+        location.href="?from="+(MAXID+1)+"&ct="+ISSUECT+"&completedOnly="+COMPLETEDONLY
+      }
+
+      function goBack() 
+      {
+        location.href="?from="+(MINID-ISSUECT-1)+"&ct="+ISSUECT+"&completedOnly="+COMPLETEDONLY;
+      }
+      const colours = ["", "low", "low", "low", "med", "med", "med", "high", "high", "max", "max"];
+      function loadIssues() 
+      {
+        send(JSON.stringify({action:"loadIssues", data:{from:FROM, ct:ISSUECT, completedOnly:COMPLETEDONLY}}), (res)=>{
+          if (res.status != "SUCCESS") alertDialog("Failed to load issues: "+res.data.error, ()=>{});
+          else {
+            byId("issueArea").innerHTML = "";
+            for (let i=0; i<res.data.issues.length; i++) 
+            {
+              let issueCtn = document.createElement("div");
+              issueCtn.className = "issueCtn "+colours[res.data.issues[i].prio??1];
+              issueCtn.id=res.data.issues[i].id;
+              byId("issueArea").appendChild(issueCtn);
+              let p = document.createElement("p");
+              p.className = "header";
+              issueCtn.appendChild(p);
+              let b = document.createElement("b");
+              b.innerText = "#"+res.data.issues[i].id+" (Priority "+(res.data.issues[i].prio??1)+")";
+              p.appendChild(b);
+              let kbd = document.createElement("kbd");
+              kbd.class="title";
+              kbd.innerText = res.data.issues[i].title;
+              p.appendChild(kbd);
+              let node = document.createTextNode("| Submitted by ");
+              p.appendChild(node);
+              kbd = document.createElement("kbd");
+              kbd.innerText = res.data.issues[i].author;
+              p.appendChild(kbd);
+              // p.appendChild(document.createTextNode(")"));
+              p = document.createElement("p");
+              p.className = "issueBody";
+              p.innerText = res.data.issues[i].body;
+              issueCtn.appendChild(p);
+              if (userData.perms >=2) {
+                issueCtn.innerHTML += `
+                  <div class="controls">
+                    <span class="material-symbols-outlined red nooutline" onclick="deleteissue(this)">delete</span>
+                    <span class="material-symbols-outlined ylw" onclick="editissue(this)">edit</span>
+                    <span class="material-symbols-outlined grn" onclick="complete(this)">check_circle</span>
+                  </div>
+                `;
+              }
+              // <div id=${res.data[i].id} class="issueCtn">
+              //   <p class="header"><b>#${res.data[i].id} </b> <kbd class="title"> ${res.data[i].title}</kbd> 
+              //   (Submitted by <kbd>${res.data[i].author}</kbd>)</p>
+              //   <p class="issueBody">${res.data[i].body}</p>
+              // </div>
+              // `
+            }
+            if (res.data.issues.length ==0) {
+              byId("hr").className = "redrounded";
+              byId("issueArea").innerHTML = `<b class="red nohover nooutline fsmed">
+              <span class="material-symbols-outlined">error</span>
+              No issues found</b>`;
+              MINID = FROM;
+              MAXID = FROM+ISSUECT;
+            }
+            else {
+              MINID = res.data.issues[0].id;
+              MAXID = res.data.issues[res.data.issues.length-1].id;
+            }
+            if (res.data.issues.length < ISSUECT) { // did not have enough issues to fill the page
+              byId("next").className += " disabled";
+              byId("next").disabled=true;
+            }
+            TOTALMINID = res.data.minID;
+            if (MINID < res.data.minID || 
+                res.data.issues[0].id <= res.data.minID) {
+              byId("prev").className += " disabled";
+              byId("prev").disabled=true;
+            }
+            
+          }
+        })
+      }
+      function deleteissue(ele) 
+      {
+        alertDialog("Confirm deletion?", ()=>{
+          let issueele = ele.parentElement.parentElement;
+          send(JSON.stringify({action:"deleteissue", data:{id:issueele.id}}), (res)=>{
+            if (res.status != "SUCCESS") {alertDialog("Error: "+res.data.error, ()=>{}); return;}
+            issueele.remove();
+            ephemeralDialog("Issue deleted!");
+          });
+        }, true);
+        
+      }
+
+      function complete(ele) 
+      {
+        let issueele = ele.parentElement.parentElement;
+        send(JSON.stringify({action:"completeissue", data:{id:issueele.id}}), (res)=>{
+          if (res.status != "SUCCESS") {alertDialog("Error: "+res.data.error, ()=>{}); return;}
+          issueele.remove();
+          alertDialog("Issue completed!", ()=>{loadIssues()});
+        });
+      }
+      function editissue(ele) {
+        let issueele = ele.parentElement.parentElement;
+        nonBlockingDialog(`
+        <div style="font-family:'Noto Sans Display';" id="E${issueele.id}">
+          <p class="nobreak fsmed">Update issue #${issueele.id}</p>
+          <div class="inpContainer szFull" style="margin: 0px;">
+          <p class="nobreak fssml" style="margin: 0px;">Update title:</p>
+          <input id="title" class="sml" placeholder="Enter a title..."
+          value="${issueele.querySelector(".header").querySelector("kbd").innerHTML.replaceAll('\"', '&#34;')}">
+          <div class="inp anim"></div>
+          </div>
+          <p class="nobreak fssml" style="margin: 0px;" >Update description:</p> 
+          <textarea id="body" placeholder="Detailed description (optional) ...">${issueele.querySelector(".issueBody").innerHTML}</textarea>
+          <p class="blu fsmed nohover rounded" style="margin: 0px;">Additional information</p>
+          <p class="blu fssml nohover szFull" style=" margin: 10px; text-align: left">Priority level (Administrator config)</p>
+          <div class="inpContainer" style="margin: 0px;">
+            <input id="priority" type="number" min=1 max=10 step=1 id="priority" value=1 placeholder="(1-10)"/>
+            <div class="anim inp"></div>
+          </div>
+        </div>
+        `, (ele2)=>{sendEdits(ele2, issueele.id)});
+      }
+      function sendEdits(ele, id) 
+      {
+        // console.log(ele);
+        let newTitle = ele.querySelector("div").querySelector("input#title");
+        let newContainer = ele.querySelector("div").querySelector("textarea#body");
+        let newPrio = ele.querySelector("div").querySelector("input#priority");
+        send(JSON.stringify({action:"editissue", data:{newTitle:newTitle.value, newBody:newContainer.value, newPriority:newPrio.value, id:newTitle.parentElement.id}}), (res)=>{
+          if (res.status != "SUCCESS") {alertDialog("Error: "+res.data.error, ()=>{}); return;}
+          alertDialog("Issue edited!", ()=>{
+            loadIssues();
+          })
+        })
+        console.log(newTitle.value,"|", newContainer.value, "|", newPrio.value);
+      }
+    </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="/globalformat.css">
+    <style>
+      .header {
+        border-radius: 5px;
+        background-color:var(--system-grey2);
+        padding: 5px;
+        margin: 2px 0px;
+        text-align: left;
+      }
+      .controls {
+        text-align: right;
+        padding: 15px;
+      }
+      .controls > span.material-symbols-outlined {
+        top: 0px;
+        font-size: 35px !important;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .header b, .header kbd.title {
+        margin-right: 10px;
+      }
+      .issueBody {
+        width: calc(100% - 20px); /* fix the thing with padding */
+        min-height: 50px;
+        margin: 5px 0px;
+        color: var(--system-black);
+        padding: 0px 10px;
+        text-align: left;
+      }
+      .issueCtn {
+        width: 80%;
+        outline: 2px var(--system-grey);
+        background-color: var(--system-grey2);
+        margin: 20px auto;
+        border-radius: 7px;
+      }
+      .med > .header
+      {
+        background-color: var(--system-yellow2);
+      }
+      .med
+      {
+        background-color: var(--system-yellow2)
+      }
+      .high > .header, .high {
+        background-color: var(--system-orange2);
+        outline: 2px solid var(--system-orange);
+        color: var(--system-orange);
+      }
+      .high > .header > kbd 
+      {
+        background-color: var(--system-orange2);
+      }
+      .high > .issueBody {
+        color: var(--system-black);
+        font-weight: 500;
+      }
+      .max > .header, .max {
+        background-color: var(--system-red2);
+        outline: 2px solid var(--system-red);
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--system-red);
+      }
+      .max > .header > kbd 
+      {
+        background-color: var(--system-red2);
+      }
+      .max > .issueBody {
+        color: var(--system-red);
+        font-weight: 600;
+      }
+
+      form
+      {
+        width: 80%;
+        margin: 0px auto;
+        /* margin:  */
+      }
+      form > div.inpContainer 
+      {
+        margin-left: 0px;
+        margin-right: 0px;
+      }
+    </style>
+  </head>
+  <body onload = "globalOnload(()=>{onLoad()}); ">
+    <div class="main_content">
+      <header class="redrounded">
+        <h2>IssueTracker</h2>
+        <hr class="rounded">
+      </header>
+      <details>
+        <summary><p class="nobreak">New issue</p></summary><br>
+        <div class="inpContainer">
+          <input id="title" class="sml" placeholder="Enter a title...">
+          <div class="inp anim"></div>
+        </div>
+        <textarea id="body" placeholder="Detailed description (optional)..."></textarea>
+        <p class="blu fsmed nohover rounded">Additional information</p>
+        <p class="blu fssml nohover szFull" style=" margin: 10px; text-align: left">Priority level (Administrator config)</p>
+        <div class="inpContainer">
+          <input id="priority" disabled type="number" min=1 max=10 step=1 id="priority" value=1 placeholder="(1-10)"/>
+          <div class="anim inp"></div>
+        </div>
+        <button class="btn blu fssml sz100" onclick="newIssue()">
+          <span class="material-symbols-outlined">add_circle</span>
+          Post issue
+        <div class="anim"></div></button>
+      </details>
+      <button class="btn fssml" onclick="loadIssues()">
+         <span class="material-symbols-outlined">refresh</span>
+          Refresh listing
+        <div class="anim"></div></button><br>
+      <form action="javascript:updateRanges()" style="text-align: left;">
+        <b id="showing" class="blu nohover fsmed">Loading...</b>
+        <div class="inpContainer">
+        <label class="inpContainer">
+          <input id="ckInp" type="checkbox">
+          <span class="blu nohover fsmed">Only show completed issues</span>
+          <div class="anim inp"></div>
+        </label>
+        </div>
+        <button class="btn fssml">
+          Go
+          <span class="material-symbols-outlined">arrow_forward</span>
+          <div class="anim"></div></button>
+        
+      </form>
+     
+      <hr class="rounded" id="hr">
+      <div id="issueArea">
+      </div>
+      <nav class="flex addMargin">
+        <button class="btn fssml szHalf" id="prev" onclick="goBack()">
+         <span class="material-symbols-outlined">arrow_back</span>
+          Previous page
+        <div class="anim"></div></button>
+        <button class="btn fssml szHalf" id="next" onclick="goForward()">
+         <span class="material-symbols-outlined">arrow_forward</span>
+          Next page
+        <div class="anim"></div></button>
+      </nav>
+      <a class="btn szFull override" href="/">
+        <span class="material-symbols-outlined">arrow_back_ios</span>
+        Return to home<div class="anim"></div></a>
+        
+      </div>
+    </div>
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

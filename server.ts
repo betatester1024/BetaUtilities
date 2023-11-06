@@ -1,8 +1,11 @@
 const express = require('express')
+const enableWs = require('express-ws');
 const app = express()
 const crypto = require("crypto");
 const parse = require("co-body");
+const cors = require("cors");
 const fs = require('fs');
+import Handlebars from "handlebars";
  // for generating secure random #'s
 import {connectionSuccess} from './index';
 import {port, msgDB, authDB, frontendDir, roomRegex, rootDir, jsDir, uDB} from './consts';
@@ -17,37 +20,105 @@ import {getLogs, log, purgeLogs, visitCt, incrRequests} from './logging';
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser')
 import {clickIt, getLeaderboard} from './button';
+import { WebSocketServer } from 'ws';
+import {newIssue, loadIssues, deleteIssue, completeIssue, editIssue} from './issuetracker'
 import {uptime} from './betautilities/messageHandle'
 import {supportHandler, roomRequest, sendMsg, 
         createRoom, deleteRoom, WHOIS, loadLogs, 
         delMsg, updateDefaultLoad, hidRoom, purge,
-       updateAbout} from './supportRooms'
+       updateAbout} from './supportRooms';
+import {adminAction} from './adminAction';
 const urlencodedParser = bodyParser.urlencoded({ extended: false }) 
 var RateLimit = require('express-rate-limit');
 
+async function getMainClass(token:string) 
+{
+  let res = await userRequest(token); 
+  if (res.status != "SUCCESS") return "";
+  else return res.data.darkQ?"dark":"";
+}
+
+function getToken(req:any) 
+{
+  return req.cookies.accountID;
+}
+
+async function sendFile(res:any, token:string, filePath:string) 
+{
+  console.log(filePath.replace(/(^(.+)\/|\.html)/g, ""));
+  let suspensionFile = await uDB.findOne({fieldName:"suspendedPages", 
+                                      page:filePath.replaceAll(/(^(.+)\/|\.html)/g, "")});
+  let user = await userRequest(token);
+  if (user.status != "SUCCESS") user = {data:{perms:0}};
+  if (suspensionFile && 
+      suspensionFile.suspended && user.data.perms < 2) 
+  {
+    res.sendFile(frontendDir+"/403.html");
+    return;
+  }
+  if (!filePath.match(/\.html$/)) {
+    // console.log(filePath);
+    res.sendFile(filePath); 
+    return;
+  }
+  else {
+    fs.readFile(filePath, 'utf8', async (err:any, fileContents:string) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      const template = Handlebars.compile(fileContents);
+      // console.log("is html");
+      res.set('Content-Type', 'text/html')
+      res.send(Buffer.from(template({mainClass: await getMainClass(token)})));
+      // console.log(data);
+    });
+  }
+} // sendFile
+
 export async function initServer() {
+
+
+  // const wss = new WebSocketServer({server:app, path: "/ws"});
+  
+  // wss.on('connection', (ws:any)=>{
+  //   ws.on('error', console.log);
+  //   ws.on('message', (data:any)=>{
+  //     console.log('received: %s', data);
+  //   });
+  //   console.log("connected!");
+  //   ws.send('something');
+  // });
+  enableWs(app);
   var limiter = RateLimit({
-    windowMs: 10*1000, // 10 seconds
+    windowMs: 10*1000, // 10 second
     max: 50,
     message: tooManyRequests(),
     statusCode: 429, // 429 status = Too Many Requests (RFC 6585)
   });
   app.use(limiter);
+  let corsOptions = {
+    credentials: true, 
+    origin: true,
+    // allowedHeaders: true
+  };
+  app.use(cors(corsOptions));
   app.use(new cookieParser());
+  // app.enable('trust proxy');
   
   app.get('/', (req:Request, res:any) => {
-    res.sendFile(frontendDir+'/index.html');
+    sendFile(res, getToken(req), frontendDir+'/index.html');
     incrRequests();
   })
   
   app.get('/register', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/signup.html');
+    sendFile(res, getToken(req), frontendDir+'/signup.html');
     incrRequests();
   });
 
 
   app.get('/account', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/config.html');
+    sendFile(res, getToken(req), frontendDir+'/config.html');
     incrRequests();
   });
   
@@ -60,44 +131,56 @@ export async function initServer() {
     incrRequests();
   });
 
-  
+  app.ws('/', (ws:any, req:any) => {
+    ws.on('message', (msg:any) => {
+      ws.send("reply:"+msg);
+    });
+    console.log("WebSocket was opened")
+    ws.send(JSON.stringify({action:"OPEN", data:null}));
+    supportHandler.addConnection(ws, req.query.room, req.cookies.accountID);
+    ws.on("close", () => {
+      // clear the connection
+      supportHandler.removeConnection(ws, req.query.room, req.cookies.accountID);
+      console.log("Removed stream");
+    });
+  });
 
   app.get('/support', (req:any, res:any) => {
     let match = req.url.match('\\?room=('+roomRegex+")");
     if (match) {
       if (!supportHandler.checkFoundQ(match[1])) {
         console.log("Room not found")
-        res.sendFile(frontendDir+"/room404.html");
+        sendFile(res, getToken(req), frontendDir+"/room404.html");
         return;
       }
-      else res.sendFile(frontendDir+'/support.html');
+      else sendFile(res, getToken(req), frontendDir+'/support.html');
     }
-    else res.sendFile(frontendDir+'/supportIndex.html');
+    else sendFile(res, getToken(req), frontendDir+'/supportIndex.html');
     incrRequests();
   });
 
   app.get('/accountDel', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/delAcc.html');
+    sendFile(res, getToken(req), frontendDir+'/delAcc.html');
     incrRequests();
   });
 
    app.get('/whois', (req:any, res:any) => {
-    res.sendFile(frontendDir+'/aboutme.html');
+    sendFile(res, getToken(req), frontendDir+'/aboutme.html');
     incrRequests();
   });
 
   app.get("/cmd", urlencodedParser, async (req:any, res:any) => {
-    makeRequest(req.query.action, req.cookies.sessionID, null, (s:string, d:any, token:string)=>{
+    makeRequest(req.query.action, req.cookies.accountID, null, (s:string, d:any, token:string)=>{
       console.log(d);
-      if (s == "SUCCESS") res.sendFile(frontendDir+'/actionComplete.html');
-      else {res.sendFile(frontendDir+'/error.html')}
+      if (s == "SUCCESS") sendFile(res, getToken(req), frontendDir+'/actionComplete.html');
+      else {sendFile(res, getToken(req), frontendDir+'/error.html')}
     })
     incrRequests();
   })
 
   app.get("*/nodemodules/*", (req:any, res:any) => {
-    // fuck off with your long requests
-    if (req.url.length > 500) res.sendFile(frontendDir+"/404.html");
+    // no long requests!
+    if (req.url.length > 500) sendFile(res, getToken(req), frontendDir+"/404.html");
     else res.sendFile(rootDir+"node_modules"+req.url.replace(/.*nodemodules/, ""));
     incrRequests();
   })
@@ -105,38 +188,47 @@ export async function initServer() {
 
 
   app.get("/paste", (req:any, res:any) => {
-    res.sendFile(frontendDir+"/newpaste.html");
+    sendFile(res, getToken(req), frontendDir+"newpaste.html");
     incrRequests();
   })
   
   // app.get("/paste/", (req:any, res:any) => {
-  //   res.sendFile(frontendDir+"/newpaste.html");
+  //   sendFile(res, getToken(req), frontendDir+"/newpaste.html");
   //   incrRequests();
   // })
   
   app.get("/paste/*", (req:any, res:any) => {
-    res.sendFile(frontendDir+"/paste.html");
+    sendFile(res, getToken(req), frontendDir+"paste.html");
     incrRequests();
   })
 
   
   app.get('*/favicon.ico', (req:Request, res:any)=> {
-    res.sendFile(rootDir+'/favicon.ico')
+    sendFile(res, getToken(req), rootDir+'favicon.ico')
     incrRequests();
   })
 
   app.get('*/icon.png', (req:Request, res:any)=> {
-    res.sendFile(rootDir+'/temp.png')
+    sendFile(res, getToken(req), rootDir+'temp.png')
     incrRequests();
   })
 
   app.get('*/notif.wav', (req:Request, res:any)=> {
-    res.sendFile(rootDir+'notif.wav')
+    sendFile(res, getToken(req), rootDir+'notif.wav')
     incrRequests();
   })
   
   app.get('/support.js', (req:any, res:any) => {
-    res.sendFile(frontendDir+"support.js");
+    sendFile(res, getToken(req), frontendDir+"support.js");
+    incrRequests();
+  })
+
+  app.get('*.svg', (req:any, res:any) => {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() + 1);
+    res.setHeader("expires", date.toUTCString());
+    res.setHeader("cache-control", "public, max-age=31536000, immutable");
+    res.sendFile(frontendDir+req.url);
     incrRequests();
   })
   
@@ -165,17 +257,17 @@ export async function initServer() {
     res.flushHeaders();
     res.write("retry:500\n\n");
     // add the connection
-    supportHandler.addConnection(res, req.query.room, req.cookies.sessionID);
+    supportHandler.addConnection(res, req.query.room, req.cookies.accountID);
     res.on("close", () => {
       // clear the connection
-      supportHandler.removeConnection(res, req.query.room, req.cookies.sessionID);
+      supportHandler.removeConnection(res, req.query.room, req.cookies.accountID);
       res.end();
       // console.log("Removed stream");
     });
   });
 
   app.get('/redirector', (req:any, res:any)=>{
-    res.sendFile(rootDir+"/.github/pages/index.html");
+    sendFile(res, getToken(req), rootDir+"/.github/pages/index.html");
     incrRequests();
   });
   
@@ -185,17 +277,18 @@ export async function initServer() {
   })
 
   app.get('/*', (req:any, res:any) => {
-    let requrl = req.url.match("([^?]*)\\??.*")[1]
+    let requrl = req.url.match("([^?]*)\\??.*")[1]; // do not care about the stuff after the ?
     let idx = validPages.findIndex((obj)=>obj.toLowerCase()==requrl.toLowerCase());
-    if (idx>=0) res.sendFile(frontendDir+validPages[idx]+".html");
+    if (idx>=0) sendFile(res, getToken(req), frontendDir+validPages[idx]+".html");
     else {
       res.status(404);
-      res.sendFile(frontendDir+"404.html");
+      sendFile(res, getToken(req), frontendDir+"404.html");
     }
     incrRequests();
   })
   
-  
+
+  // const banList= ["172.31.196.1"];
   app.post('/server', urlencodedParser, async (req:any, res:any) => {
     incrRequests();
     if (req.headers['content-length'] > 60000) {
@@ -203,21 +296,43 @@ export async function initServer() {
       res.status(413).end();
       return;
     }
+    // let addr = req.headers['x-forwarded-for'].match(":([^:]*)$")[1]; 
+    // console.log(addr);
+    // if (banList.indexOf(addr) >= 0) 
+    // {
+    //   res.end(JSON.stringify({status:"ERROR", data:{error: "IP banned, contact BetaOS if this was done in error."}}));
+    //   return;
+    // }
     var body = await parse.json(req);
     if (!body) res.end(JSON.stringify({status:"ERROR", data:{error:"No command string"}}));
-    // let cookiematch = req.cookies.match("sessionID=[0-9a-zA-Z\\-]");
+    // let cookiematch = req.cookies.match("accountID=[0-9a-zA-Z\\-]");
     // COOKIE ACCEPTANCE DIALOG 
     if (body.action == "cookieRequest") {
       res.end(JSON.stringify({data:req.cookies.acceptedQ??false}))
       return;
     }
     if (body.action == "acceptCookies") {
-      res.cookie('acceptedQ', true, {httpOnly: true, secure:true, sameSite:"Strict"})
+      res.cookie('acceptedQ', true, {httpOnly: true, secure:true, sameSite:"None"})
       res.end(JSON.stringify(""));
       return;
     }
+    if (body.action == "accountID") {
+      if (req.cookies.accountID) 
+        res.end(JSON.stringify({status:"SUCCESS", data:{id:req.cookies.accountID}}));
+      else 
+        res.end(JSON.stringify({status:"ERROR", data:{error:"Not logged in"}}));
+      return;
+    }
+    if (body.action == "setAccountID") {
+      res.cookie('accountID', body.data.id, {httpOnly: true, secure:true, sameSite:"None"})
+      res.end(JSON.stringify({status:"SUCCESS", data:null}));
+      return;
+    }
+
+    if (!req.cookies.sessionID) res.cookie('sessionID', crypto.randomUUID(), {httpOnly:true, secure:true, sameSite:"None"});
     //////////////////////////
-    makeRequest(body.action, req.cookies.sessionID, body.data, (s:string, d:any, token:string)=>{
+
+    makeRequest(body.action, req.cookies.accountID, body.data, req.cookies.sessionID, (s:string, d:any, token:string)=>{
       /*if(body.action=="login"||body.action == "logout" ||
         body.action == "delAcc" || body.action == "signup")*/
       if (ignoreLog.indexOf(body.action)>=0){}
@@ -225,7 +340,7 @@ export async function initServer() {
         log("Action performed:"+body.action+", response:"+JSON.stringify(d));
       }
       else log("Action performed, error on "+body.action+", error:"+d.error);
-      res.cookie('sessionID', token?token:"", {httpOnly: true, secure:true, sameSite:"Strict", maxAge:9e12});
+      res.cookie('accountID', token?token:"", {httpOnly: true, secure:true, sameSite:"None", maxAge:9e12});
       res.end(JSON.stringify({status:s, data:d}));
     })
   });
@@ -235,11 +350,12 @@ export async function initServer() {
   })
 }
 
-function makeRequest(action:string|null, token:string, data:any|null, callback: (status:string, dat:any, token:string)=>any) {
+function makeRequest(action:string|null, token:string, data:any|null, sessID:string, callback: (status:string, dat:any, token:string)=>any) {
   if (!connectionSuccess) {
     callback("ERROR", {error:"Database connection failure"}, token);
     return;
   }
+  
   try {
     switch (action) {
       case 'test':
@@ -263,7 +379,10 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
       case 'userRequest': 
         userRequest(token)
           .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+            {
+              obj.data.branch = process.env['branch'];
+              callback(obj.status, obj.data, obj.token)
+            });
         break;
       case 'extendSession': 
         extendSession(token)
@@ -326,11 +445,11 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
         break;
       case 'sendMsg':
         if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        data = data as {msg:string, room:string};
+        data = data as {msg:string, room:string, parent:string};
         if (data.msg.length == 0) {
           callback("SUCCESS", null, token); break;
         }
-        sendMsg(data.msg.slice(0, 1024), data.room, token, callback);
+        sendMsg(data.msg.slice(0, 1024), data.room, data.parent, token, callback);
         break;
       case 'lookup':
         if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
@@ -462,6 +581,38 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
         .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
         break;
+      case "newIssue":
+        newIssue(data.title, data.body, data.priority, data.tags??[], token, sessID)
+          .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case "loadIssues":
+        // console.log(sessID);
+        loadIssues(data.from, data.ct, data.completedOnly, token)
+          .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case "deleteissue":
+        deleteIssue(data.id, token)
+          .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+     case "completeissue":
+        // console.log(sessID);
+        completeIssue(data.id, token)
+          .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case "editissue":
+        editIssue(data.id, data.newTitle, data.newBody, data.newPriority, data.tags??[], token)
+          .then((obj:{status:string, data:any, token:string})=>
+            {callback(obj.status, obj.data, obj.token)});
+        break;
+      case "adminAction":
+        adminAction(data.action, data.options, token)
+        .then((obj:{status:string, data:any, token:string})=>
+          {callback(obj.status, obj.data, obj.token)});
+        break;
       default:
         callback("ERROR", {error: "Unknown command string!"}, token);
     }
@@ -473,9 +624,9 @@ function makeRequest(action:string|null, token:string, data:any|null, callback: 
 }
 
 
-function eeFormat(data:string) {
+function eeFormat(data:string, mainClass:string) {
   return `<!DOCTYPE html>
-<html>
+<html class="${mainClass}">
   <head>
     <script src='./utils.js'></script>
     <title>Everyone Edits | BetaOS Systems</title>
@@ -483,7 +634,7 @@ function eeFormat(data:string) {
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
@@ -524,15 +675,15 @@ function eeFormat(data:string) {
 
 function tooManyRequests() {
   return `<!DOCTYPE html>
-<html>
+<html class="{{mainClass}}">
   <head>
     <title>Error 429 | BetaOS Systems</title>
     <script>
-    ${fs.readFileSync(jsDir+"/utils.js")}
+    ${fs.readFileSync(jsDir+"utils.js")}
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <style>
@@ -567,7 +718,11 @@ function tooManyRequests() {
 
 const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/logout', '/signup', 
                     '/config', '/admin', '/docs', '/login', '/syslog', '/aboutme', '/mailertest',
-                    "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle'];
+                    "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle', '/sweepthatmine',
+                   "/stopwatch", "/testbed", '/credits', '/atomicmoose', '/issuetracker', '/graphIt', 
+                    '/betterselect', '/redirect', '/betterselect.js', "/minimalLogin", "/minimalSignup",
+                    "/8192", "/imgedit", "/leaderboard", "/eval"];
+
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',
                   'paste', 'findPaste'];

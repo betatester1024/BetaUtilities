@@ -61,11 +61,11 @@
             case "purge": data= {name:dat}; break;
             case "suspend": 
               cmd = "adminAction"; 
-              data = {action: "suspend", options:{suspendedQ:true, page:dat}}; 
+              data = {action: "suspendPage", options:{suspendedQ:true, page:dat}}; 
               break;
             case "restore": 
               cmd = "adminAction"; 
-              data = {action: "restore", options:{suspendedQ:false, page:dat}}; 
+              data = {action: "suspendPage", options:{suspendedQ:false, page:dat}}; 
               break;
             case "help":
             default: 

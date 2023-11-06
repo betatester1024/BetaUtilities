@@ -45,13 +45,13 @@ function getToken(req:any)
 
 async function sendFile(res:any, token:string, filePath:string) 
 {
-  console.log(filePath.replace(/^(.+)\//, ""));
+  console.log(filePath.replace(/(^(.+)\/|\.html)/g, ""));
   let suspensionFile = await uDB.findOne({fieldName:"suspendedPages", 
                                       page:filePath.replaceAll(/(^(.+)\/|\.html)/g, "")});
   let user = await userRequest(token);
   if (user.status != "SUCCESS") user = {data:{perms:0}};
   if (suspensionFile && 
-      suspensionFile.suspendedQ && user.data.perms < 2) 
+      suspensionFile.suspended && user.data.perms < 2) 
   {
     res.sendFile(frontendDir+"/403.html");
     return;
@@ -721,7 +721,7 @@ const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/log
                     "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle', '/sweepthatmine',
                    "/stopwatch", "/testbed", '/credits', '/atomicmoose', '/issuetracker', '/graphIt', 
                     '/betterselect', '/redirect', '/betterselect.js', "/minimalLogin", "/minimalSignup",
-                    "/8192", "/imgedit", "/leaderboard"];
+                    "/8192", "/imgedit", "/leaderboard", "/eval"];
 
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',

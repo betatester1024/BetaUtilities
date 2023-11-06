@@ -142,11 +142,11 @@
         let prevWord = nowWord;
         nowWord = "";
         let now = new Date(Date.now());
-        let nowMins = Math.floor(now.getMinutes() / 5)*5; // floors to interval of 5 minutes.
+        let nowMins = Math.floor(now.getMinutes() / 30)*30; // floors to interval of 5 minutes.
         let nowHrs = now.getHours();
         let nowDay = now.toDateString();
         let nowHash = hashIt(nowDay+"/"+nowHrs+"/"+nowMins);
-        let nextExpiry = 5*60*1000 - (Date.now())%(5*60*1000)
+        let nextExpiry = 30*60*1000 - (Date.now())%(30*60*1000)
         for (let i=0; i<5; i++) {
           let currLetterIdx =Math.floor((nowHash%Math.pow(62, 5)) / Math.pow(62, i)) % 62;
           if (currLetterIdx < 26) nowWord += letters[currLetterIdx % 26];

@@ -1,18 +1,21 @@
 "use strict";
 function onLoad() {
-  document.getElementById("header").innerText = "Support: #" + new URL(document.URL).searchParams.get("room");
+  document.getElementById("header").innerText = "Support: " + (ISBRIDGE ? "&" : "#") + new URL(document.URL).searchParams.get("room");
   ROOMNAME = new URL(document.URL).searchParams.get("room");
 }
 let ACTIVEREPLY = -1;
 let awaitingParent = [];
+function byMsgId(id) {
+  return byId("msgArea").querySelector("[data-id='" + id + "']");
+}
 function toggleActiveReply(id) {
   if (ACTIVEREPLY == id) {
-    byId(id).className = byId(id).className.replace("activeReply", "");
+    byMsgId(id).classList.remove("activeReply");
     ACTIVEREPLY = -1;
   } else {
-    if (ACTIVEREPLY >= 0)
+    if (ACTIVEREPLY != -1)
       toggleActiveReply(ACTIVEREPLY);
-    byId(id).className += " activeReply ";
+    byMsgId(id).classList.add("activeReply");
     ACTIVEREPLY = id;
   }
 }
@@ -37,9 +40,13 @@ function sendMsg() {
           initClient();
         });
     }, true);
-  } else
-    send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME, parent: ACTIVEREPLY } }), () => {
-    }, true);
+  } else {
+    if (ISBRIDGE)
+      source.send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME, parent: ACTIVEREPLY } }));
+    else
+      send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME, parent: ACTIVEREPLY } }), () => {
+      }, true);
+  }
   inp.value = "";
 }
 const rmvReg = /(>|^)\-(.+)\([0-9]\)>/gm;
@@ -50,7 +57,11 @@ let CONNECTIONID = -1;
 async function initClient() {
   try {
     console.log("Starting client.");
-    source = new WebSocket("wss://" + new URL(document.URL).host + "?room=" + new URL(document.URL).searchParams.get("room"));
+    let isBridge = new URL(document.URL).searchParams.get("bridge");
+    if (isBridge && isBridge == "true")
+      source = new WebSocket("wss://" + new URL(document.URL).host + "/bridge?room=" + new URL(document.URL).searchParams.get("room"));
+    else
+      source = new WebSocket("wss://" + new URL(document.URL).host + "?room=" + new URL(document.URL).searchParams.get("room"));
     source.onclose = () => {
       console.log("connection failed");
       setTimeout(initClient, 500);
@@ -84,7 +95,7 @@ async function initClient() {
           source.close();
       }
       if (message.action == "delMsg") {
-        let ele2 = byId(message.data.id);
+        let ele2 = byMsgId(message.data.id);
         if (ele2)
           ele2.remove();
       }
@@ -108,18 +119,36 @@ async function initClient() {
         thing.scrollTop = thing.scrollTop + 1;
       }
       if (message.action == "removeUser") {
-        ele.innerHTML = ele.innerHTML.replace(message.data.user + "<br>", "");
+        let ele2 = byId((message.data.isBot ? "zbot" : "usr") + message.data.user);
+        if (ele2)
+          ele2.remove();
       }
       if (message.action == "addUser") {
-        ele.innerHTML += message.data.user + "<br>";
+        let span = document.createElement("p");
+        span.innerText = message.data.user;
+        span.id = (message.data.isBot ? "zbot" : "usr") + message.data.user;
+        span.title = message.data.user;
+        if (message.data.isBot)
+          span.classList.add("bot");
+        ele.appendChild(span);
+      }
+      if (message.action == "addUser" || message.action == "removeUser") {
+        let children = ele.childNodes;
+        let outArr = [];
+        for (let i2 = 0; i2 < children.length; i2++)
+          outArr.push(children[i2]);
+        outArr.sort(function(a, b) {
+          return a.id == b.id ? 0 : a.id > b.id ? 1 : -1;
+        });
+        ele.innerHTML = "";
+        for (i = 0; i < outArr.length; i++) {
+          ele.appendChild(outArr[i]);
+        }
       }
       let modif = "";
       let area = document.getElementById("msgArea");
       ele = document.createElement("p");
-      if (message && message.data && message.data.id && byId(Math.abs(message.data.id)))
-        return;
       let scrDistOKQ = area.scrollTop >= area.scrollHeight - area.offsetHeight - 100;
-      let msgs = modif.split(">");
       if (message.action == "msg") {
         matches = ["ERROR", message.data.id, message.data.sender, message.data.perms, message.data.content];
         if (!matches)
@@ -131,19 +160,27 @@ async function initClient() {
         }
         if (matches[1][0] == "-") {
           PREPENDFLAG = true;
-          matches[1] = -matches[1];
+          matches[1] = matches[1].toString().slice(1);
           if (loadStatus == 0)
             loadStatus = 1;
+        }
+        if (message && message.data && message.data.id && byMsgId(matches[1]))
+          return;
+        if (message.data.time) {
+          if (message.data.time < earliestMessageTime) {
+            earliestMessageTime = message.data.time;
+            earliestMessageID = matches[1];
+          }
         }
         let newMsgSender = document.createElement("b");
         newMsgSender.innerText = matches[2];
         newMsgSender.className = classStr[matches[3]];
         let ctn = document.createElement("div");
-        ctn.id = matches[1];
+        ctn.dataset.id = matches[1];
         ctn.className = "msgContainer";
         let msg = " " + matches[4].replaceAll("&gt;", ";gt;").replaceAll(">", ";gt;");
-        for (let i = 0; i < replacements.length; i++) {
-          msg = msg.replaceAll(`:${replacements[i].from}:`, ">EMOJI" + replacements[i].to + ">");
+        for (let i2 = 0; i2 < replacements.length; i2++) {
+          msg = msg.replaceAll(`:${replacements[i2].from}:`, ">EMOJI" + replacements[i2].to + ">");
         }
         let slashMe = false;
         msg = msg.replaceAll(/(&[a-zA-Z0-9]{1,20})([^;]|$)/gm, ">ROOM$1>$2");
@@ -159,14 +196,14 @@ async function initClient() {
           ele.className = classStr[matches[3]];
         let split = msg.split(">");
         let out = "";
-        for (let i = 0; i < split.length; i++) {
-          if (i % 2 == 0) {
-            let fragment = document.createTextNode(split[i].replaceAll(";gt;", ">"));
+        for (let i2 = 0; i2 < split.length; i2++) {
+          if (i2 % 2 == 0) {
+            let fragment = document.createTextNode(split[i2].replaceAll(";gt;", ">"));
             fragment.className = classStr[matches[3]];
             ele.appendChild(fragment);
           } else {
-            let pref = split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)")[1];
-            let post = pref != "BR" ? split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)(.+)")[2] : "";
+            let pref = split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)")[1];
+            let post = pref != "BR" ? split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)(.+)")[2] : "";
             if (pref == "EMOJI") {
               let replaced = document.createElement("span");
               replaced.title = ":" + findReplacement(post) + ":";
@@ -207,6 +244,7 @@ async function initClient() {
         ctn_inner.className = "msgContents";
         ctn_inner.appendChild(newMsgSender);
         ctn_inner.appendChild(ele);
+        ctn_inner.innerHTML += `<div class="time">${toTime(Date.now() - message.data.time * 1e3)}</div>`;
         let optn = document.createElement("div");
         optn.className = "options";
         optn.innerHTML = `
@@ -215,22 +253,25 @@ async function initClient() {
       </button>`;
         ctn_inner.appendChild(optn);
         ctn.appendChild(ctn_inner);
+        let bar = document.createElement("div");
+        bar.className = "bar";
+        ctn.appendChild(bar);
         ctn_inner.onclick = (ev) => {
-          toggleActiveReply(ctn.id);
+          toggleActiveReply(ctn.dataset.id);
         };
         if (message.data.perms == 3 && message.data.sender == "[SYSTEM]")
-          ctn.id = "-1";
-        if (message.data.parent >= 0) {
-          if (byId(message.data.parent)) {
-            byId(message.data.parent).appendChild(ctn);
-            for (let i = 0; i < awaitingParent.length; i++) {
-              if (awaitingParent[i].ele.id == ctn.id) {
-                awaitingParent.splice(i, 1);
+          ctn.dataset.id = "-1";
+        if (message.data.parent != void 0 && (isNaN(message.data.parent) || message.data.parent >= 0)) {
+          if (byMsgId(message.data.parent)) {
+            byMsgId(message.data.parent).appendChild(ctn);
+            for (let i2 = 0; i2 < awaitingParent.length; i2++) {
+              if (awaitingParent[i2].ele.dataset.id == ctn.dataset.id) {
+                awaitingParent.splice(i2, 1);
                 break;
               }
             }
           } else {
-            awaitingParent.push({ parent: message.data.parent, ele: ctn });
+            awaitingParent.push({ parent: message.data.parent, ele: ctn, prependQ: ISBRIDGE && PREPENDFLAG });
             console.log("awaiting parent", message.data.parent, ctn);
           }
         } else {
@@ -280,9 +321,9 @@ const replacements = [
   { from: "mask", to: "medical_mask" }
 ];
 function findReplacement(thing) {
-  for (let i = 0; i < replacements.length; i++) {
-    if (replacements[i].to == thing)
-      return replacements[i].from;
+  for (let i2 = 0; i2 < replacements.length; i2++) {
+    if (replacements[i2].to == thing)
+      return replacements[i2].from;
   }
 }
 window.addEventListener("blur", () => {
@@ -299,29 +340,35 @@ let FOCUSSED = true;
 let STARTID = -1;
 let LOADEDQ2 = false;
 let STARTIDVALID = false;
+let earliestMessageTime = 9e99;
+let earliestMessageID = "";
+let ISBRIDGE = new URL(document.URL).searchParams.get("bridge") == "true";
 function onScroll() {
   if (document.getElementById("msgArea").scrollTop < 30 && STARTIDVALID && loadStatus < 0) {
     loadStatus = 0;
     console.log("loading messages from" + STARTID);
-    send(JSON.stringify({ action: "loadLogs", data: { room: ROOMNAME, id: CONNECTIONID, from: STARTID } }), () => {
-    });
+    if (ISBRIDGE)
+      source.send(JSON.stringify({ action: "loadLogs", data: { before: earliestMessageID } }));
+    else
+      send(JSON.stringify({ action: "loadLogs", data: { room: ROOMNAME, id: CONNECTIONID, from: STARTID } }), () => {
+      });
   } else if (document.getElementById("msgArea").scrollTop < 30)
     console.log("loadStatus" + loadStatus);
 }
 let loadStatus = -1;
 function fixAwaitingParent() {
   console.log(awaitingParent);
-  for (let i = 0; i < awaitingParent.length; i++) {
-    if (byId(awaitingParent[i].parent)) {
-      let ctner = byId(awaitingParent[i].parent);
-      if (!byId(awaitingParent[i].ele.id)) {
-        ctner.appendChild(awaitingParent[i].ele);
-        console.log("actually added", awaitingParent[i].ele);
-      } else
-        console.log("didnt'actually add");
-      awaitingParent.splice(i, 1);
-      console.log(awaitingParent);
-      i = -1;
+  for (let i2 = 0; i2 < awaitingParent.length; i2++) {
+    if (byMsgId(awaitingParent[i2].parent)) {
+      let ctner = byMsgId(awaitingParent[i2].parent);
+      if (!byMsgId(awaitingParent[i2].ele.dataset.id)) {
+        if (awaitingParent[i2].prependQ)
+          ctner.insertBefore(awaitingParent[i2].ele, ctner.children[1]);
+        else
+          ctner.appendChild(awaitingParent[i2].ele);
+      }
+      awaitingParent.splice(i2, 1);
+      i2 = -1;
     }
   }
 }

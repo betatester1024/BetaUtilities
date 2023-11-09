@@ -89,7 +89,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
   }
   let imgMatch = msg.match(/!unblockimg (.*)/);
   if (imgMatch) {
-    return "https://external-content.duckduckgo.com/iu/?u="+encodeURIComponent(imgMatch[1]);
+    return "https://external-content.duckduckgo.com/iu/?u="+imgMatch[1];
   }
   if (msg.match(/!pasteit!?/gimu)) return "https://betatester1024.repl.co/paste";
   if (msg.match("^!uptime @" + hnd.nick.toLowerCase() + "$")) {
@@ -268,7 +268,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
       .then((obj:{about:string}) => {
       if (obj && obj.about) 
         hnd.delaySendMsg("About @"+norm(match4[1])+": "+
-          obj.about.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, "\\\""), data, 0);
+          obj.about, data, 0);
       else hnd.delaySendMsg("No information about @"+norm(match4[1]), data, 0);
     });
     return "";
@@ -345,7 +345,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
   if (msg.match("!version[ ]+@"+hnd.nick.toLowerCase())) {return VERSION+" \n Branch: "+process.env["branch"]+" | Notifying in: &"+WS.notifRoom.roomName;}
   let match2  = msg.match("@"+hnd.nick.toLowerCase()+" !mitoseto &([a-z0-9]+) as @(.+)");
   if (match2) {
-    systemLog(match2);
+    // systemLog(match2);
     let newNick = match2[2]==null?"BetaUtilities":match2[2];
     if (supportHandler.mitoseable(match2[1])) return "We're already in this room!";
     try  {new WS("wss://euphoria.io/room/" + match2[1] + "/ws", newNick, match2[1], false);}

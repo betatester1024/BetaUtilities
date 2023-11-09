@@ -120,7 +120,6 @@ class WebH {
     this.incrRunCt();
   }
   onOpen() {
-    (0, import_logging.systemLog)("BetaUtilities open");
     WebH.resetTime = 1e3;
   }
   initNick() {

@@ -1,21 +1,27 @@
 #msgArea {
-  width: calc(85% - 20px);
-  height: 77vh;
-  float: left;
+  /* width: calc(85% - 20px); */
+  /* height: 77vh; */
+  /* flex-shrink: 1; */
+  /* flex-grow: 2; */
+  /* height: 77vh; */
+  /* float: left; */
   border: 2px solid var(--system-blue);
   text-align: left;
   padding: 10px;
   word-wrap: break-word;
   overflow-y: auto;
+  overflow-x: clip;
   white-space: normal;
   border-radius: 10px;
 }
 
 #userList {
+  flex-grow: 1;
   border-radius: 10px;
-  width: calc(12% - 20px);
-  height: calc(77vh - 12px - 2em);
-  float: right;
+  /* width: calc(12% - 20px); */
+  /* height: 77vh; */
+  /* height: calc(77vh - 12px - 2em); */
+  /* float: right; */
   border: 2px solid var(--system-blue);
   text-align: left;
   word-wrap: break-word;
@@ -25,6 +31,8 @@
 }
 #containingDiv {
   white-space: nowrap;
+  flex-wrap: nowrap;
+  gap: 15px;
   width: 95%;
   margin: 0 auto;
   height: 79vh;
@@ -39,6 +47,7 @@ hr.rounded {
 form {
   width: 95%;
   display: flex;
+  /* gap: 30 */
   margin: 20px auto;
   text-align: left;
 }
@@ -48,13 +57,35 @@ form {
 input {
   border: none !important;
 }
+
+#right {
+  /* flex-shrink: 2; */
+  width: 100px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+  flex-direction: column;
+}
+/* #right > h2 { */
+  /* flex- */
+/* } */
 #inpContainment {
    width: calc(100% - 6.5em);
 }
-#inpContainment > input {
-  width: 99%;
-  margin: 0px 20px 0px 0px;
+
+.time {
+  display:inline-block;
+  color: var(--system-grey);
+  /* margin-left: 20px; */
 }
+
+#inpContainer {
+  flex-grow: 6;
+}
+/* #inpContainment > input { */
+  /* width: 99%; */
+  /* margin: 0px 20px 0px 0px; */
+/* } */
 button#sendBtn {
   /* position: relative; */
   /* top: -34px; */
@@ -83,6 +114,7 @@ b {
 }
 p {
   margin-left: 5px;
+  margin-right: 10px;
 }
 .slashMe {
   margin-left: 0px;
@@ -103,8 +135,25 @@ h2 > span, .supportMsg {
 div.msgContainer > div.msgContainer {
   margin-left: 10px;  
 }
-.activeReply > div.msgContents{
+
+.msgContainer {
+  position:relative;
+  border-radius: 5px;
+}
+.bar {
+  border: 2px solid var(--system-green);
+  height: calc(100% - 3px);
+  width: 0px;
+  left: -6px;
+  border-radius: 2px;
+  position: absolute;
+  top: 0px;
+}
+.activeReply {
   background-color: var(--system-blue2);
+}
+.msgContainer:hover {
+  outline: 2px solid var(--system-grey);
 }
 .msgContents {
   width: calc(100% - 40px);
@@ -192,8 +241,20 @@ b.superadmin, .superadmin.slashMe {
   font-variant-caps: normal;
 }
 
-#userlist {
+#userList {
   color: var(--system-blue);
+}
+
+#userList > p {
+  display: block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.bot {
+  color: var(--system-green);
 }
 
 @font-face {

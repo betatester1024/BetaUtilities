@@ -106,7 +106,7 @@ function replyMessage(hnd, msg, sender, data) {
   }
   let imgMatch = msg.match(/!unblockimg (.*)/);
   if (imgMatch) {
-    return "https://external-content.duckduckgo.com/iu/?u=" + encodeURIComponent(imgMatch[1]);
+    return "https://external-content.duckduckgo.com/iu/?u=" + imgMatch[1];
   }
   if (msg.match(/!pasteit!?/gimu))
     return "https://betatester1024.repl.co/paste";
@@ -252,7 +252,7 @@ function replyMessage(hnd, msg, sender, data) {
   if (match4 && match4[1]) {
     import_consts.authDB.findOne({ fieldName: "AboutData", user: { $eq: norm(match4[1]).toLowerCase() } }).then((obj) => {
       if (obj && obj.about)
-        hnd.delaySendMsg("About @" + norm(match4[1]) + ": " + obj.about.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, '\\"'), data, 0);
+        hnd.delaySendMsg("About @" + norm(match4[1]) + ": " + obj.about, data, 0);
       else
         hnd.delaySendMsg("No information about @" + norm(match4[1]), data, 0);
     });
@@ -339,7 +339,6 @@ function replyMessage(hnd, msg, sender, data) {
   }
   let match2 = msg.match("@" + hnd.nick.toLowerCase() + " !mitoseto &([a-z0-9]+) as @(.+)");
   if (match2) {
-    (0, import_logging.systemLog)(match2);
     let newNick = match2[2] == null ? "BetaUtilities" : match2[2];
     if (import_supportRooms.supportHandler.mitoseable(match2[1]))
       return "We're already in this room!";

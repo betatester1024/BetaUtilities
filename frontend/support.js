@@ -3,7 +3,7 @@ function onLoad() {
   // });
   // send(JSON.stringify({action:"refresh_users"}), (res)=>{
   // });
-  document.getElementById("header").innerText = "Support: #"+
+  document.getElementById("header").innerText = "Support: "+(ISBRIDGE?"&":"#")+
     new URL(document.URL).searchParams.get("room");
   ROOMNAME = new URL(document.URL).searchParams.get("room");
   
@@ -11,15 +11,20 @@ function onLoad() {
 // system refresh auto!
 let ACTIVEREPLY = -1;
 let awaitingParent = [];
+
+function byMsgId(id) 
+{
+  return byId("msgArea").querySelector("[data-id='"+id+"']")
+}
 function toggleActiveReply(id) 
 {
   if (ACTIVEREPLY == id) {
-    byId(id).className=byId(id).className.replace("activeReply", "");
+    byMsgId(id).classList.remove("activeReply");
     ACTIVEREPLY = -1;
   }
   else {
-    if (ACTIVEREPLY>=0) toggleActiveReply(ACTIVEREPLY);
-    byId(id).className += " activeReply ";
+    if (ACTIVEREPLY!=-1) toggleActiveReply(ACTIVEREPLY);
+    byMsgId(id).classList.add("activeReply");
     ACTIVEREPLY = id;
   }
 }
@@ -44,7 +49,10 @@ function sendMsg() {
       });
     }, true);
   }
-  else send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME, parent:ACTIVEREPLY}}), ()=>{}, true);
+  else {
+    if (ISBRIDGE) source.send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME, parent:ACTIVEREPLY}}));
+    else send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME, parent:ACTIVEREPLY}}), ()=>{}, true);
+  }
   inp.value="";
 }
 
@@ -58,7 +66,11 @@ async function initClient()
   
   try {
   console.log("Starting client.")
-  source = new WebSocket('wss://'+new URL(document.URL).host+'?room='+
+  let isBridge = new URL(document.URL).searchParams.get("bridge");
+  if (isBridge && isBridge == "true")
+    source = new WebSocket('wss://'+new URL(document.URL).host+'/bridge?room='+
+       new URL(document.URL).searchParams.get("room"));
+  else source = new WebSocket('wss://'+new URL(document.URL).host+'?room='+
                                  new URL(document.URL).searchParams.get("room"));
   source.onclose = ()=>{console.log("connection failed"); setTimeout(initClient, 500)};
   source.onerror = ()=>{console.log("connection failed"); setTimeout(initClient, 500)};
@@ -88,12 +100,12 @@ async function initClient()
       if (message.action == "RESTART") source.close();
     }    
     if (message.action == "delMsg") {
-      let ele = byId(message.data.id);
+      let ele = byMsgId(message.data.id);
       if (ele) ele.remove();
     }
     if (message.action == "LOADCOMPLETE") {
       let thing = document.getElementById("msgArea")
-      if (message.data.id<0 ) {
+      if (message.data.id<0) {
         if (!byId("errorEle")) {
         let errorEle = document.createElement("b");
         errorEle.className = "red";
@@ -113,23 +125,44 @@ async function initClient()
       thing.scrollTop = thing.scrollTop+1;
     }    
     if (message.action == "removeUser") {
-        ele.innerHTML= ele.innerHTML.replace(message.data.user+"<br>", "");
-      }
+      let ele2 = byId((message.data.isBot?"zbot":"usr")+message.data.user);
+      if (ele2) ele2.remove();
+    }
     if (message.action=="addUser") {
-        ele.innerHTML+= message.data.user+"<br>";
+      let span = document.createElement("p");
+      span.innerText = message.data.user;
+      span.id = (message.data.isBot?"zbot":"usr")+message.data.user;
+      span.title = message.data.user;
+      if (message.data.isBot) span.classList.add("bot");
+      ele.appendChild(span);
+    }
+    if (message.action == "addUser" || message.action == "removeUser") {
+      // console.log("sorting");
+      let children = ele.childNodes;
+      let outArr = [];
+      for (let i=0; i<children.length; i++) 
+        outArr.push(children[i]);
+      outArr.sort(function(a, b) {
+        return a.id == b.id?0:(a.id > b.id?1:-1);
+      });
+      ele.innerHTML = "";
+      for (i=0; i<outArr.length; i++) {
+        ele.appendChild(outArr[i]);
+      }
     }
     let modif = "";
     // console.log(modif);
     let area = document.getElementById("msgArea");
     ele = document.createElement("p");
-    if (message && message.data && message.data.id && 
-        byId(Math.abs(message.data.id))) return;
+
     let scrDistOKQ =  (area.scrollTop) >= (area.scrollHeight-area.offsetHeight - 100)
-    let msgs = modif.split(">");
+    // let msgs = modif.split(">");
     if (message.action == "msg") {
+      // console.log(message.data.time);
       matches = ["ERROR", message.data.id, message.data.sender, message.data.perms, message.data.content];
       // let matches = msgs[i].match(/{(-?[0-9]+)}\[(.+)\]\(([0-9])\)(.*)/)
       if (!matches) return;
+      
       PREPENDFLAG = false;
       if (STARTID<0 || matches[1] == 0) {
         STARTID = Number(matches[1]);
@@ -139,16 +172,24 @@ async function initClient()
       if (matches[1][0] == "-") {
         // console.log("PREPENDING")p
         PREPENDFLAG = true;
-        matches[1] = -matches[1];
+        matches[1] = matches[1].toString().slice(1);
         if (loadStatus == 0) loadStatus = 1;
+      }
+      if (message && message.data && message.data.id && 
+        byMsgId(matches[1])) return;
+      if (message.data.time) 
+      if (message.data.time < earliestMessageTime) {
+        earliestMessageTime = message.data.time;
+        earliestMessageID = matches[1];
       }
       // let newMsgBody = document.createTextNode();
       let newMsgSender = document.createElement("b");
       // parse things
       newMsgSender.innerText = matches[2];
       newMsgSender.className = classStr[matches[3]];
+      
       let ctn = document.createElement("div");
-      ctn.id=matches[1];
+      ctn.dataset.id=matches[1];
       
       ctn.className='msgContainer';
       // if (!PREPENDFLAG) ctn.appendChild(newMsgSender);
@@ -231,6 +272,7 @@ async function initClient()
       ctn_inner.className = "msgContents";
       ctn_inner.appendChild(newMsgSender);
       ctn_inner.appendChild(ele);
+      ctn_inner.innerHTML += `<div class="time">${toTime(Date.now()-message.data.time*1000)}</div>`
       let optn = document.createElement("div");
       optn.className = "options";
       optn.innerHTML = `
@@ -239,26 +281,30 @@ async function initClient()
       </button>`
       ctn_inner.appendChild(optn);
       ctn.appendChild(ctn_inner);
+      let bar = document.createElement("div");
+      bar.className = "bar";
+      ctn.appendChild(bar);
       ctn_inner.onclick=
         (ev)=>{ 
-          toggleActiveReply(ctn.id);
+          toggleActiveReply(ctn.dataset.id);
         }
       // area.appendChild(document.createElement("br"));
-      if (message.data.perms == 3 && message.data.sender == "[SYSTEM]") ctn.id="-1";
+      if (message.data.perms == 3 && message.data.sender == "[SYSTEM]") ctn.dataset.id="-1";
       
-      if (message.data.parent >= 0) {
-        if (byId(message.data.parent)) {
+      if (message.data.parent != undefined && 
+          (isNaN(message.data.parent) || message.data.parent >= 0)) { // euph: parent is a NaN string
+        if (byMsgId(message.data.parent)) {
           // if (PREPENDFLAG) byId(message.data.parent).prepend(ctn);
-          byId(message.data.parent).appendChild(ctn);
+          byMsgId(message.data.parent).appendChild(ctn);
           for (let i=0; i<awaitingParent.length; i++) {
-            if (awaitingParent[i].ele.id == ctn.id) {
+            if (awaitingParent[i].ele.dataset.id == ctn.dataset.id) {
               awaitingParent.splice(i, 1);
               break;
             }
           } // remove already awaiting parent
         }
         else {
-          awaitingParent.push({parent:message.data.parent, ele:ctn});
+          awaitingParent.push({parent:message.data.parent, ele:ctn, prependQ:ISBRIDGE&&PREPENDFLAG});
           console.log("awaiting parent", message.data.parent, ctn);
         }
       }
@@ -360,13 +406,20 @@ let FOCUSSED = true;
 let STARTID = -1;
 let LOADEDQ2 = false;
 let STARTIDVALID = false;
+let earliestMessageTime = 9e99;
+let earliestMessageID = "";
+let ISBRIDGE = new URL(document.URL).searchParams.get("bridge")=="true";
 function onScroll() {
   
   if (document.getElementById("msgArea").scrollTop < 30 && STARTIDVALID && loadStatus<0) {
     loadStatus = 0;
     console.log("loading messages from" + STARTID)
-    send(JSON.stringify({action:"loadLogs", data:{room:ROOMNAME, id:CONNECTIONID, from:STARTID}}), ()=>{});
+    if (ISBRIDGE)
+      source.send(JSON.stringify({action:"loadLogs", data:{before:earliestMessageID}}));
+    else
+      send(JSON.stringify({action:"loadLogs", data:{room:ROOMNAME, id:CONNECTIONID, from:STARTID}}), ()=>{});
   }
+  
   else if (document.getElementById("msgArea").scrollTop < 30) console.log("loadStatus" + loadStatus)
 }
 let loadStatus = -1;
@@ -375,16 +428,19 @@ function fixAwaitingParent()
 {
   console.log(awaitingParent);
   for (let i=0; i<awaitingParent.length; i++) {
-    if (byId(awaitingParent[i].parent)) {
-      let ctner = byId(awaitingParent[i].parent);
-      if (!byId(awaitingParent[i].ele.id)) {// do not add if it has already been added
-        ctner.appendChild(awaitingParent[i].ele);
-        console.log("actually added", awaitingParent[i].ele);
+    if (byMsgId(awaitingParent[i].parent)) {
+      let ctner = byMsgId(awaitingParent[i].parent);
+      if (!byMsgId(awaitingParent[i].ele.dataset.id)) {// do not add if it has already been added
+        if (awaitingParent[i].prependQ) 
+          // referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+          ctner.insertBefore(awaitingParent[i].ele, ctner.children[1]);
+        else ctner.appendChild(awaitingParent[i].ele);
+        // console.log("actually added", awaitingParent[i].ele);
       }
-      else console.log("didnt'actually add")
+      // else console.log("didnt'actually add")
       // console.log("added");
       awaitingParent.splice(i, 1);
-      console.log(awaitingParent);
+      // console.log(awaitingParent);
       i=-1;
     }
   }

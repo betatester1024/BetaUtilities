@@ -65,7 +65,6 @@ function getToken(req) {
   return req.cookies.accountID;
 }
 async function sendFile(res, token, filePath) {
-  console.log(filePath.replace(/(^(.+)\/|\.html)/g, ""));
   let suspensionFile = await import_consts.uDB.findOne({
     fieldName: "suspendedPages",
     page: filePath.replaceAll(/(^(.+)\/|\.html)/g, "")
@@ -126,6 +125,24 @@ async function initServer() {
     }, "", "");
     (0, import_logging.incrRequests)();
   });
+  app.ws("/bridge", (ws, req) => {
+    ws.on("message", (msg) => {
+      let dat = JSON.parse(msg);
+      switch (dat.action) {
+        case "loadLogs":
+          bridgeH.loadLogs(dat.data.before);
+          break;
+        case "sendMsg":
+          bridgeH.sendMsg(dat.data.room, dat.data.parent, dat.data.msg);
+      }
+    });
+    console.log("Bridge was opened to room " + req.query.room);
+    let bridgeH = new import_supportRooms.BridgeSocket(req.query.room, ws, req.cookies.accountID);
+    ws.send(JSON.stringify({ action: "OPEN", data: null }));
+    ws.on("close", () => {
+      bridgeH.onClientClose();
+    });
+  });
   app.ws("/", (ws, req) => {
     ws.on("message", (msg) => {
       ws.send("reply:" + msg);
@@ -141,7 +158,7 @@ async function initServer() {
   app.get("/support", (req, res) => {
     let match = req.url.match("\\?room=(" + import_consts.roomRegex + ")");
     if (match) {
-      if (!import_supportRooms.supportHandler.checkFoundQ(match[1])) {
+      if (!import_supportRooms.supportHandler.checkFoundQ(match[1]) && req.query.bridge != "true") {
         console.log("Room not found");
         sendFile(res, getToken(req), import_consts.frontendDir + "/room404.html");
         return;
@@ -497,7 +514,7 @@ function makeRequest(action, token, data, sessID, callback) {
           callback("ERROR", { error: "No data provided" }, token);
           break;
         }
-        (0, import_supportRooms.loadLogs)(data.room, data.id, data.from, token).then((obj) => {
+        (0, import_supportRooms.loadLogs)(data.room, data.id, data.from, false, token).then((obj) => {
           callback(obj.status, obj.data, obj.token);
         });
         break;
@@ -768,7 +785,6 @@ const ignoreLog = [
   "sendMsg",
   "clickIt",
   "leaderboard",
-  "paste",
   "findPaste"
 ];
 // Annotate the CommonJS export names for ESM import in node:

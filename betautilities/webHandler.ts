@@ -104,7 +104,7 @@ export class WebH
   }
   
   onOpen() {
-    systemLog("BetaUtilities open");
+    // systemLog("BetaUtilities open");
     WebH.resetTime =1000;
   }
 

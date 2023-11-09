@@ -740,6 +740,7 @@ function logout_v2(event)
 {
   event.preventDefault()
   send(JSON.stringify({action: "logout"}), (res)=>{
-    ephemeralDialog("Successfully logged out!", ()=>{});
+    ephemeralDialog("Successfully logged out!");
+    location.reload(); // some things do not reset properly on logout.
   })
 }

@@ -1,6 +1,7 @@
 const express = require('express')
 const enableWs = require('express-ws');
 const app = express()
+// require("dialog-polyfill");
 const crypto = require("crypto");
 const parse = require("co-body");
 const cors = require("cors");
@@ -26,7 +27,7 @@ import {uptime} from './betautilities/messageHandle'
 import {supportHandler, roomRequest, sendMsg, 
         createRoom, deleteRoom, WHOIS, loadLogs, 
         delMsg, updateDefaultLoad, hidRoom, purge,
-       updateAbout} from './supportRooms';
+       updateAbout, BridgeSocket} from './supportRooms';
 import {adminAction} from './adminAction';
 const urlencodedParser = bodyParser.urlencoded({ extended: false }) 
 var RateLimit = require('express-rate-limit');
@@ -45,7 +46,7 @@ function getToken(req:any)
 
 async function sendFile(res:any, token:string, filePath:string) 
 {
-  console.log(filePath.replace(/(^(.+)\/|\.html)/g, ""));
+  // console.log(filePath.replace(/(^(.+)\/|\.html)/g, ""));
   let suspensionFile = await uDB.findOne({fieldName:"suspendedPages", 
                                       page:filePath.replaceAll(/(^(.+)\/|\.html)/g, "")});
   let user = await userRequest(token);
@@ -131,6 +132,34 @@ export async function initServer() {
     incrRequests();
   });
 
+  app.ws('/bridge', (ws:any, req:any)=> {
+    ws.on('message', (msg:any) => {
+      // console.log(msg);
+      let dat = JSON.parse(msg);
+      // console.log(ddat);
+      switch(dat.action) {
+        case "loadLogs":
+          bridgeH.loadLogs(dat.data.before);
+          break;
+        case "sendMsg":
+          bridgeH.sendMsg(dat.data.room, dat.data.parent, dat.data.msg);
+      }
+      // ws.send("reply:"+msg);
+    });
+    console.log("Bridge was opened to room "+req.query.room)
+    let bridgeH = new BridgeSocket(req.query.room, ws, req.cookies.accountID);
+    // console.log(bridgeH);
+    ws.send(JSON.stringify({action:"OPEN", data:null}));
+    // supportHandler.addConnection(ws, req.query.room, req.cookies.accountID);
+    ws.on("close", () => {
+      bridgeH.onClientClose();
+      // clear the connection
+      // bridgeH.close();
+      // supportHandler.removeConnection(ws, req.query.room, req.cookies.accountID);
+      // console.log("Removed stream");
+    });
+  })
+
   app.ws('/', (ws:any, req:any) => {
     ws.on('message', (msg:any) => {
       ws.send("reply:"+msg);
@@ -144,11 +173,11 @@ export async function initServer() {
       console.log("Removed stream");
     });
   });
-
+  
   app.get('/support', (req:any, res:any) => {
     let match = req.url.match('\\?room=('+roomRegex+")");
     if (match) {
-      if (!supportHandler.checkFoundQ(match[1])) {
+      if (!supportHandler.checkFoundQ(match[1]) && req.query.bridge!= "true") {
         console.log("Room not found")
         sendFile(res, getToken(req), frontendDir+"/room404.html");
         return;
@@ -508,7 +537,7 @@ function makeRequest(action:string|null, token:string, data:any|null, sessID:str
         break;
       case "loadLogs": // {"action":"loadLogs","room":"BetaOS","id":"11","from":24}
         if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        loadLogs(data.room, data.id, data.from, token)
+        loadLogs(data.room, data.id, data.from, /*don't touch it*/ false, token)
         .then((obj:{status:string, data:any, token:string})=>
           {callback(obj.status, obj.data, obj.token)});
         break;
@@ -725,4 +754,4 @@ const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/log
 
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',
-                  'paste', 'findPaste'];
+                  'findPaste'];

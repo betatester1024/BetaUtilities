@@ -25,12 +25,12 @@ var import_ws = require("ws");
 var import_consts = require("../consts");
 var import_messageHandle = require("./messageHandle");
 var import_supportRooms = require("../supportRooms");
-var import_logging = require("../logging");
 var import_decodegold = require("../decodegold");
 const fs = require("fs");
 class WS {
   static notifRoom;
   DATALOGGING = false;
+  bridgeRoomQ;
   static CALLTIMEOUT = 3e4;
   url;
   static sockets = [];
@@ -128,7 +128,6 @@ class WS {
     this.incrRunCt();
   }
   onOpen() {
-    (0, import_logging.systemLog)("BetaUtilities open in " + this.socket.url);
     WS.FAILSAFETIMEOUT = setTimeout(() => {
       WS.resetTime = 1e3;
     }, 1e4);
@@ -286,12 +285,13 @@ class WS {
       (0, import_supportRooms.updateActive)(WS.sockets[i].roomName, false);
     }
   }
-  constructor(url, nick, roomName, transferQ) {
+  constructor(url, nick, roomName, transferQ, isBridgeQ = false) {
     this.nick = nick;
     if (roomName == "test")
       WS.notifRoom = this;
     WS.sockets.push(this);
     this.url = url;
+    this.isBridgeQ = isBridgeQ;
     this.roomName = roomName;
     this.socket = new import_ws.WebSocket(url);
     this.transferOutQ = transferQ;

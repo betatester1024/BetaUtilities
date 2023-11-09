@@ -75,8 +75,8 @@ async function realias(newalias, token) {
   if (Date.now() > tokenData.expiry) {
     return { status: "ERROR", data: { error: "Cannot update user information: Your session has expired!" }, token: "" };
   }
-  if (!newalias.match(import_consts.userRegex))
-    return { status: "ERROR", data: { error: "Invalid alias" }, token };
+  if (newalias.length > 30)
+    return { status: "ERROR", data: { error: "Alias too long" }, token };
   await import_consts.authDB.updateOne({ fieldName: "UserData", user: tokenData.associatedUser }, {
     $set: { alias: newalias }
   });

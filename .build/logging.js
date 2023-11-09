@@ -35,7 +35,7 @@ function systemLog(thing) {
 ;
 function log(thing) {
   if (import_index.connectionSuccess)
-    import_consts.uDB.insertOne({ fieldName: "SysLogV2", data: thing + "\n" });
+    import_consts.uDB.insertOne({ fieldName: "SysLogV2", data: "[" + process.env["branch"] + "]: " + thing + "\n" });
 }
 async function incrRequests() {
   if (import_index.connectionSuccess)
@@ -46,7 +46,7 @@ async function visitCt(token) {
     let obj = await import_consts.uDB.findOne({ fieldName: "VISITS" });
     return { status: "SUCCESS", data: { data: obj.visitCt }, token };
   } else
-    return { status: "ERROR", data: { error: "Service database connection failed" }, token };
+    return { status: "ERROR", data: { error: "Database connection failed" }, token };
 }
 async function getLogs(token) {
   let userData = await (0, import_userRequest.userRequest)(token);

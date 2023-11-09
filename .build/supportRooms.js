@@ -18,6 +18,7 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var supportRooms_exports = {};
 __export(supportRooms_exports, {
+  BridgeSocket: () => BridgeSocket,
   Room: () => Room,
   WHOIS: () => WHOIS,
   createRoom: () => createRoom,
@@ -39,6 +40,7 @@ module.exports = __toCommonJS(supportRooms_exports);
 var import_userRequest = require("./userRequest");
 var import_consts = require("./consts");
 var import_logging = require("./logging");
+var import_ws = require("ws");
 var import_webHandler = require("./betautilities/webHandler");
 class Room {
   type;
@@ -48,6 +50,167 @@ class Room {
     this.type = type;
     this.name = name;
     this.handler = handler;
+  }
+}
+class BridgeSocket {
+  euphSocket;
+  client;
+  token;
+  roomName;
+  setNick = false;
+  onOpen() {
+    this.client.send(JSON.stringify({ action: "RELOAD" }));
+  }
+  loadLogs(before) {
+    this.euphSocket.send(JSON.stringify({ type: "log", data: { n: 100, before } }));
+  }
+  sendMsg(room, parent, content) {
+    this.euphSocket.send(JSON.stringify({ type: "send", data: { content, parent: parent == "-1" ? null : parent } }));
+  }
+  async onMessage(msg) {
+    let dat = JSON.parse(msg);
+    let usrData = await (0, import_userRequest.userRequest)(this.token);
+    if (usrData.status != "SUCCESS")
+      usrData = { data: { alias: "AnonymousBridgeUser", perms: 0 } };
+    switch (dat.type) {
+      case "ping-event":
+        if (!this.setNick) {
+          this.setNick = true;
+          this.euphSocket.send(JSON.stringify({
+            type: "nick",
+            data: { name: usrData.data.alias }
+          }));
+        }
+        this.euphSocket.send(JSON.stringify({ type: "ping-reply", data: { time: dat.data.time } }));
+        break;
+      case "snapshot-event":
+        for (let i = 0; i < dat.data.listing.length; i++) {
+          if (!dat.data.listing[i].name)
+            continue;
+          this.client.send(JSON.stringify({
+            action: "addUser",
+            data: {
+              user: dat.data.listing[i].name,
+              isBot: dat.data.listing[i].id.match(/^bot:/) != null
+            }
+          }));
+        }
+        for (let i = 0; i < dat.data.log.length; i++) {
+          this.client.send(JSON.stringify({
+            action: "msg",
+            data: {
+              id: dat.data.log[i].id,
+              parent: dat.data.log[i].parent,
+              sender: dat.data.log[i].sender.name,
+              time: dat.data.log[i].time,
+              perms: usrData.data.perms,
+              content: dat.data.log[i].content
+            }
+          }));
+        }
+        break;
+      case "log-reply":
+        dat.data.log.sort((a, b) => {
+          return b.time - a.time;
+        });
+        for (let i = 0; i < dat.data.log.length; i++) {
+          this.client.send(JSON.stringify({
+            action: "msg",
+            data: {
+              id: "-" + dat.data.log[i].id,
+              parent: dat.data.log[i].parent,
+              sender: dat.data.log[i].sender.name,
+              time: dat.data.log[i].time,
+              perms: usrData.data.perms,
+              content: dat.data.log[i].content
+            }
+          }));
+        }
+        this.client.send(JSON.stringify({
+          action: "LOADCOMPLETE",
+          data: {
+            id: dat.data.log.length < 100 ? "-1" : "randomthing"
+          }
+        }));
+        break;
+      case "send-event":
+      case "send-reply":
+        this.client.send(JSON.stringify({
+          action: "msg",
+          data: {
+            id: dat.data.id,
+            parent: dat.data.parent,
+            sender: dat.data.sender.name,
+            time: dat.data.time,
+            recentQ: Date.now() - dat.data.time < 6e4,
+            perms: usrData.data.perms,
+            content: dat.data.content
+          }
+        }));
+        break;
+      case "nick-event":
+        this.client.send(JSON.stringify({
+          action: "removeUser",
+          data: {
+            isBot: dat.data.id.match(/^bot:/) != null,
+            user: dat.data.from
+          }
+        }));
+        this.client.send(JSON.stringify({
+          action: "addUser",
+          data: {
+            user: dat.data.to,
+            isBot: dat.data.id.match(/^bot:/) != null
+          }
+        }));
+        break;
+      case "hello-event":
+        this.client.send(JSON.stringify({
+          action: "addUser",
+          data: {
+            user: usrData.data.alias,
+            isBot: dat.data.session.id.match(/^bot:/) != null
+          }
+        }));
+      case "join-event":
+        this.client.send(JSON.stringify({
+          action: "addUser",
+          data: {
+            user: dat.data.name,
+            isBot: dat.data.id.match(/^bot:/) != null
+          }
+        }));
+        break;
+      case "part-event":
+        this.client.send(JSON.stringify({
+          action: "removeUser",
+          data: {
+            user: dat.data.name,
+            isBot: dat.data.id.match(/^bot:/) != null
+          }
+        }));
+        break;
+      default:
+        console.log(dat.type);
+    }
+  }
+  onClientClose() {
+    console.log("clientClosed");
+    this.euphSocket.close(1e3, "");
+  }
+  constructor(roomName, socket, token) {
+    console.log(roomName);
+    this.roomName = roomName;
+    this.client = socket;
+    this.token = token;
+    let URL = "wss://euphoria.io/room/" + roomName + "/ws";
+    this.euphSocket = new import_ws.WebSocket(URL);
+    this.euphSocket.on("open", this.onOpen.bind(this));
+    this.euphSocket.on("message", this.onMessage.bind(this));
+    this.euphSocket.on("error", (e) => {
+      this.euphSocket.close(1e3, "");
+      updateActive(this.roomName, false);
+    });
   }
 }
 class pseudoConnection {
@@ -62,7 +225,6 @@ class supportHandler {
   static connectionCt = 0;
   static connections = [];
   static addRoom(rm) {
-    (0, import_logging.log)("Room created!" + rm);
     let idx = this.allRooms.findIndex((r) => {
       return r.type == rm.type && r.name == rm.name;
     });
@@ -89,7 +251,7 @@ class supportHandler {
       if (this.connections[i].roomName == rn)
         (0, import_userRequest.userRequest)(this.connections[i].tk, this.connections[i].isPseudoConnection).then((obj) => {
           if (obj.status == "SUCCESS") {
-            ev.send(JSON.stringify({ action: "addUser", data: { user: obj.data.alias, perms: obj.data.perms } }));
+            ev.send(JSON.stringify({ action: "addUser", data: { user: obj.data.alias, perms: obj.data.perms, isBot: this.connections[i].isPseudoConnection } }));
           } else {
             ev.send(JSON.stringify({ action: "addUser", data: { user: processAnon(this.connections[i].tk), perms: 1 } }));
           }
@@ -383,7 +545,11 @@ async function WHOIS(token, user) {
     token
   };
 }
-async function loadLogs(rn, id, from, token) {
+async function loadLogs(rn, id, from, isBridge, token) {
+  if (isBridge) {
+    await loadEuphLogs(rn, id, from);
+    return;
+  }
   try {
     let roomInfo = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
     let minThreadID = roomInfo.minThreadID ?? 0;
@@ -531,6 +697,7 @@ async function loadThread(room, parentID, isParentQ) {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  BridgeSocket,
   Room,
   WHOIS,
   createRoom,

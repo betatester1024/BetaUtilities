@@ -30,6 +30,20 @@
   padding: 10px;
   white-space: normal;
 }
+
+#msgInp:focus {
+  outline: none;
+}
+
+form#bottomInput:focus-within {
+  border-bottom: 3px solid var(--system-green);
+}
+#msgInp {
+  height: 100%;
+  font-size: 20px;
+  border-radius: 0px;
+  margin-right: 0px;
+}
 #containingDiv {
   white-space: nowrap;
   flex-wrap: nowrap;
@@ -45,12 +59,26 @@ hr.rounded {
   border: 2px solid var(--system-green);
   margin-top: 0px;
 }
-form {
+div#container > form#bottomInput {
+  margin: 7px auto !important;
+}
+div#container > form#bottomInput:before {
+  content:"";
+}
+form#bottomInput:before {
+  content:"↳";
+  color: var(--system-green);
+}
+form#bottomInput {
   width: 95%;
   display: flex;
+  height: 35px;
   /* gap: 30 */
-  margin: 20px auto;
+  margin: 0px;
+  margin-left: 5px;
   text-align: left;
+  border-bottom: 2px solid var(--system-transp);
+  transition: all 0.2s;
 }
 .anim.inp, #inpContainment, input {
   display: inline-block;
@@ -82,6 +110,7 @@ input {
 
 #inpContainer {
   flex-grow: 6;
+  height: 100%;
 }
 /* #inpContainment > input { */
   /* width: 99%; */
@@ -90,7 +119,19 @@ input {
 button#sendBtn {
   /* position: relative; */
   /* top: -34px; */
-  padding-top: 0px !important;
+  padding: 5px;
+  margin-top: 0px;
+  padding-top: 0px;
+  min-height: 0px;
+  padding-bottom: 0px;
+  height: 100%;
+  border-radius: 0px;
+  /* padding-top: 0px !important; */
+}
+
+#sendBtn > span.material-symbols-outlined {
+  top: unset;
+  font-size: 15px !important;
 }
 
 #sendBtn > div.anim {
@@ -141,8 +182,16 @@ div.msgContainer > div.msgContainer {
   position:relative;
   border-radius: 5px;
 }
+
+.msgContents.new {
+  animation: newMsg 60s;
+}
+@keyframes newMsg {
+  0% {background-color: var(--system-overlay);}
+  100% {background-color: var(--system-transp);}
+}
 .bar {
-  border: 2px solid var(--system-green);
+  border: 2px solid var(--system-grey);
   height: calc(100% - 3px);
   width: 0px;
   left: -6px;
@@ -155,6 +204,9 @@ div.msgContainer > div.msgContainer {
 }
 .msgContainer:hover {
   outline: 2px solid var(--system-grey);
+}
+.msgContainer:hover > .bar, .activeReply > .bar {
+  border: 2px solid var(--system-green);
 }
 .msgContents {
   width: calc(100% - 40px);

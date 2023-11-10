@@ -3,15 +3,34 @@ function onLoad() {
   // });
   // send(JSON.stringify({action:"refresh_users"}), (res)=>{
   // });
+  // BTTOMNPUT = document.createElement("input");
+  // REPLYINPUT.className = "inp";
+  BOTTOMINPUT = byId("bottomInput");
+  // REPLYINPUT.id = "rep"
+  setInterval(updateTime, 1000);
   document.getElementById("header").innerText = "Support: "+(ISBRIDGE?"&":"#")+
     new URL(document.URL).searchParams.get("room");
   ROOMNAME = new URL(document.URL).searchParams.get("room");
-  
+  document.addEventListener("keydown", onKeyPress);
+}
+function onKeyPress(e) {
+  console.log(e);
+  if (e.key == "b" && e.ctrlKey && !e.metaKey && !e.shiftKey) {
+    let ele = byId("right");
+    e.preventDefault();
+    ele.style.display = (ele.style.display=="flex")?"none":"flex";
+  }
+}
+function updateTime() {
+  let allElements = document.getElementsByClassName("time");
+  for (let ele of allElements) {
+    ele.innerText = toTime(Date.now()-ele.dataset.time*1000);
+  }
 }
 // system refresh auto!
 let ACTIVEREPLY = -1;
 let awaitingParent = [];
-
+let BOTTOMINPUT = null
 function byMsgId(id) 
 {
   return byId("msgArea").querySelector("[data-id='"+id+"']")
@@ -21,12 +40,26 @@ function toggleActiveReply(id)
   if (ACTIVEREPLY == id) {
     byMsgId(id).classList.remove("activeReply");
     ACTIVEREPLY = -1;
+    byId("container").appendChild(BOTTOMINPUT);
+    // BOTTOMINPUT.style.display="flex";
   }
   else {
     if (ACTIVEREPLY!=-1) toggleActiveReply(ACTIVEREPLY);
     byMsgId(id).classList.add("activeReply");
     ACTIVEREPLY = id;
   }
+  updateReplyBox();
+  // BOTTOMINPUT.style.display=(ACTIVEREPLY=="-1"?"flex":"none");
+}
+
+function updateReplyBox() 
+{
+  if (ACTIVEREPLY == "-1") {
+    BOTTOMINPUT.querySelector("input").focus();;
+    return;
+  }
+  byMsgId(ACTIVEREPLY).appendChild(BOTTOMINPUT);
+  BOTTOMINPUT.querySelector("input").focus();
 }
 
 function sendMsg() {
@@ -272,7 +305,9 @@ async function initClient()
       ctn_inner.className = "msgContents";
       ctn_inner.appendChild(newMsgSender);
       ctn_inner.appendChild(ele);
-      ctn_inner.innerHTML += `<div class="time">${toTime(Date.now()-message.data.time*1000)}</div>`
+      ctn_inner.innerHTML += `<div class="time" data-time="${message.data.time}">${toTime(Date.now()-message.data.time*1000)}</div>`
+      if (Date.now()/1000 - message.data.time < 60)
+        ctn_inner.style.animation = "newMsg "+(60-(Date.now()/1000-message.data.time))+"s";
       let optn = document.createElement("div");
       optn.className = "options";
       optn.innerHTML = `
@@ -317,6 +352,7 @@ async function initClient()
         UNREAD ++ 
         document.title = "("+UNREAD+") | Support | BetaOS Systems"
       }
+      updateReplyBox();
     } // received message element // 
     // alert("here")
     if (!LOADEDQ2 || scrDistOKQ)

@@ -22,28 +22,31 @@
   <body onload = "globalOnload(()=>{onLoad(); initClient()}); ">
     <div class="main_content">
       <header>
-        <h2 id="header">Salons d'assistance BétaOS</h2>
+        <h2 id="header">BetaOS Support</h2>
         <hr class="rounded">
       </header>
         <div id="containingDiv" class="flex">
           <div id="msgArea" onscroll="onScroll()">
-            <h2 id="placeholder"><span class="material-symbols-outlined">schedule</span> Chargement de la messagerie en cours ... </h2>
+            <h2 id="placeholder"><span class="material-symbols-outlined">schedule</span> Loading messages... </h2>
           </div>
           <div id="right">
             <h2>Users</h2>
+            <sup class="blu nohover" style="white-space: normal">Press CTRL+B to toggle</sup>
             <div id="userList" class="blu nohover"></div>
           </div>
         </div>
-        <form action="javascript:sendMsg()">
-          <div id="inpContainer">
-            <input id="msgInp" placeholder="Enter a message..." autocomplete="off" >
-            <div class="anim inp"></div>
-          </div>
-          <button class="btn szIco override" id="sendBtn">
-            <span class="material-symbols-outlined override">send</span>
-            <div class="anim"></div>
-          </button>
-        </form>
+        <div id="container">
+          <form action="javascript:sendMsg()" id="bottomInput">
+            <div id="inpContainer">
+              <input id="msgInp" class="fssml" placeholder="Enter a message..." autocomplete="off" >
+              <!-- <div class="anim inp"></div> -->
+            </div>
+            <button class="btn szIco override fssml" id="sendBtn">
+              <span class="material-symbols-outlined override">send</span>
+              <!-- <div class="anim"></div> -->
+            </button>
+          </form>
+        </div>
       <a class="btn override" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>
         Return to home<div class="anim"></div></a>

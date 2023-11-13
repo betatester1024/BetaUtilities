@@ -100,6 +100,8 @@ async function initServer() {
     statusCode: 429
   });
   app.use(limiter);
+  app.set("trust proxy", 1);
+  app.get("/ip", (request, response) => response.send(request.ip));
   let corsOptions = {
     credentials: true,
     origin: true
@@ -127,6 +129,7 @@ async function initServer() {
   });
   app.ws("/bridge", (ws, req) => {
     ws.on("message", (msg) => {
+      console.log(msg);
       let dat = JSON.parse(msg);
       switch (dat.action) {
         case "loadLogs":
@@ -134,6 +137,9 @@ async function initServer() {
           break;
         case "sendMsg":
           bridgeH.sendMsg(dat.data.room, dat.data.parent, dat.data.msg);
+          break;
+        case "updateAlias":
+          bridgeH.updateAlias(dat.data.alias, req.cookies.accountID);
       }
     });
     console.log("Bridge was opened to room " + req.query.room);
@@ -177,7 +183,7 @@ async function initServer() {
     (0, import_logging.incrRequests)();
   });
   app.get("/cmd", urlencodedParser, async (req, res) => {
-    makeRequest(req.query.action, req.cookies.accountID, null, (s, d, token) => {
+    makeRequest(req.query.action, req.cookies.accountID, req.query.data, null, (s, d, token) => {
       console.log(d);
       if (s == "SUCCESS")
         sendFile(res, getToken(req), import_consts.frontendDir + "/actionComplete.html");
@@ -269,11 +275,18 @@ async function initServer() {
     }
     (0, import_logging.incrRequests)();
   });
+  const banList = [""];
   app.post("/server", urlencodedParser, async (req, res) => {
     (0, import_logging.incrRequests)();
     if (req.headers["content-length"] > 6e4) {
       res.set("Connection", "close");
       res.status(413).end();
+      return;
+    }
+    let addr = req.ip;
+    console.log(addr);
+    if (banList.indexOf(addr) >= 0) {
+      res.end(JSON.stringify({ status: "ERROR", data: { error: "IP banned, contact BetaOS if this was done in error." } }));
       return;
     }
     var body = await parse.json(req);

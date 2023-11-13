@@ -9,8 +9,8 @@ function onLoad() {
   // REPLYINPUT.id = "rep"
   setInterval(updateTime, 1000);
   document.getElementById("header").innerText = "Support: "+(ISBRIDGE?"&":"#")+
-    new URL(document.URL).searchParams.get("room");
-  ROOMNAME = new URL(document.URL).searchParams.get("room");
+    docURL.searchParams.get("room");
+  ROOMNAME = docURL.searchParams.get("room");
   document.addEventListener("keydown", onKeyPress);
 }
 function onKeyPress(e) {
@@ -55,21 +55,29 @@ function toggleActiveReply(id)
 function updateReplyBox() 
 {
   if (ACTIVEREPLY == "-1") {
-    BOTTOMINPUT.querySelector("input").focus();;
+    byId("msgInp").focus();
     return;
   }
   byMsgId(ACTIVEREPLY).appendChild(BOTTOMINPUT);
-  BOTTOMINPUT.querySelector("input").focus();
+  byId("msgInp").focus();
 }
 
-function sendMsg() {
-  let inp = document.getElementById("msgInp");
-  let match = inp.value.match("^!alias @(.+)");
-  if (match) {
+function updateAlias(newAlias) {
+  // source.close();
+
+
+  if (ISBRIDGE) {
+    // console.log("here");
+
+    source.send(JSON.stringify({
+      action:"updateAlias", 
+      data:{alias:newAlias}
+    }));
+  }
+  else {
     source.close();
-    
     document.getElementById("userList").innerHTML = ``;
-    send(JSON.stringify({action:"realias", data:{alias:match[1]}}), (res)=>{
+    send(JSON.stringify({action:"realias", data:{alias:newAliass}}), (res)=>{
       if (res.status != "SUCCESS") alertDialog("ERROR: "+res.data.error, ()=>{});
       else alertDialog("Updated alias!", ()=>{
         STARTID = -1;
@@ -80,7 +88,16 @@ function sendMsg() {
         Reloading your messages, a moment please...</h2>`;
         initClient();
       });
-    }, true);
+    });
+  }
+}
+
+function sendMsg() {
+  let inp = document.getElementById("msgInp");
+  let match = inp.value.match("^!alias @(.+)");
+  if (match) {
+    updateAlias(match[1])
+    // } // not bridge
   }
   else {
     if (ISBRIDGE) source.send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME, parent:ACTIVEREPLY}}));
@@ -99,14 +116,14 @@ async function initClient()
   
   try {
   console.log("Starting client.")
-  let isBridge = new URL(document.URL).searchParams.get("bridge");
-  if (isBridge && isBridge == "true")
-    source = new WebSocket('wss://'+new URL(document.URL).host+'/bridge?room='+
-       new URL(document.URL).searchParams.get("room"));
-  else source = new WebSocket('wss://'+new URL(document.URL).host+'?room='+
-                                 new URL(document.URL).searchParams.get("room"));
-  source.onclose = ()=>{console.log("connection failed"); setTimeout(initClient, 500)};
-  source.onerror = ()=>{console.log("connection failed"); setTimeout(initClient, 500)};
+  // let isBridge = docURL.searchParams.get("bridge");
+  if (ISBRIDGE)
+    source = new WebSocket('wss://'+docURL.host+'/bridge?room='+
+       docURL.searchParams.get("room"));
+  else source = new WebSocket('wss://'+docURL.host+'?room='+
+                                 docURL.searchParams.get("room"));
+  source.onclose = ()=>{console.log("Connection closed by server."); setTimeout(initClient, 500)};
+  source.onerror = ()=>{console.log("Connection ERROR"); setTimeout(initClient, 500)};
   source.onmessage = (message) => {
     console.log('Got', message);
     message = JSON.parse(message.data);
@@ -126,6 +143,7 @@ async function initClient()
       STARTID=-1;
       ACTIVEREPLY = -1;
       STARTIDVALID = false;
+      byId("container").appendChild(BOTTOMINPUT);
       UNREAD = 0;
       loadStatus = -1;
       CONNECTIONID = -1;
@@ -168,6 +186,10 @@ async function initClient()
       span.title = message.data.user;
       if (message.data.isBot) span.classList.add("bot");
       ele.appendChild(span);
+    }
+    if (message.action== "yourAlias") {
+      byId("alias").value = message.data.alias;
+      byId("msgInp").focus();
     }
     if (message.action == "addUser" || message.action == "removeUser") {
       // console.log("sorting");
@@ -444,7 +466,7 @@ let LOADEDQ2 = false;
 let STARTIDVALID = false;
 let earliestMessageTime = 9e99;
 let earliestMessageID = "";
-let ISBRIDGE = new URL(document.URL).searchParams.get("bridge")=="true";
+let ISBRIDGE = docURL.searchParams.get("bridge")=="true";
 function onScroll() {
   
   if (document.getElementById("msgArea").scrollTop < 30 && STARTIDVALID && loadStatus<0) {

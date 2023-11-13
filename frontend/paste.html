@@ -7,7 +7,7 @@
       function validate() {
         closeDialog(()=>{}, 'pwdInp');;
         let pwd = document.getElementById("inp").value;
-        send(JSON.stringify({action:"findPaste", data:{pwd:pwd, name:(new URL(document.URL)).pathname.match(/\/paste\/(.*)$/)[1]}}), (res)=>{
+        send(JSON.stringify({action:"findPaste", data:{pwd:pwd, name:(docURL).pathname.match(/\/paste\/(.*)$/)[1]}}), (res)=>{
           document.getElementById("inp").value="";
           if (res.status != "SUCCESS") {
             openDialog('pwdInp');
@@ -43,7 +43,7 @@
       //   // setTimeout(()=>{document.getElementById("inp").focus()}, 200);
       // }
       function editthis() {
-        location.href=(new URL(document.URL).pathname).replaceAll("/paste/", "/paste?edit=");
+        location.href=(docURL.pathname).replaceAll("/paste/", "/paste?edit=");
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -85,7 +85,7 @@
   </head>
   <body onload = "globalOnload(()=>{
     // send(JSON.stringify({action:'findPaste', 
-    // data:{pwd:'', name:(new URL(document.URL)).pathname.match(/\/paste\/(.*)$/)[1]}}), (res)=>{
+    // data:{pwd:'', name:(docURL).pathname.match(/\/paste\/(.*)$/)[1]}}), (res)=>{
     //   if (res.status == 'SUCCESS') { // passwordless paste / is author
     //     handleIncomingPaste(res)
     //   }

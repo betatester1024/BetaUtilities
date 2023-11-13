@@ -16,6 +16,22 @@
   border-radius: 10px;
 }
 
+
+#alias {
+  height: unset;
+  font-size: 15px;
+  width: unset;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 5px;
+  background-color: var(--system-grey2);
+  padding: 3px;
+}
+
+#alias:focus {
+  outline: none;
+}
+
 #userList {
   flex-grow: 1;
   border-radius: 10px;
@@ -40,7 +56,7 @@ form#bottomInput:focus-within {
 }
 #msgInp {
   height: 100%;
-  font-size: 20px;
+  font-size: 18px;
   border-radius: 0px;
   margin-right: 0px;
 }
@@ -66,14 +82,14 @@ div#container > form#bottomInput:before {
   content:"";
 }
 form#bottomInput:before {
-  content:"↳";
+  content:"→";
   color: var(--system-green);
 }
 form#bottomInput {
   width: 95%;
   display: flex;
   height: 35px;
-  /* gap: 30 */
+  gap: 5px;
   margin: 0px;
   margin-left: 5px;
   text-align: left;
@@ -143,6 +159,7 @@ button#sendBtn {
 #msgArea > span {
   white-space: pre-wrap;
   display: inline-block;
+  font-size: 18px;
 }
 b {
 /*   font-family: "SupportText", "Noto Sans Display"; */
@@ -187,11 +204,11 @@ div.msgContainer > div.msgContainer {
   animation: newMsg 60s;
 }
 @keyframes newMsg {
-  0% {background-color: var(--system-overlay);}
+  0% {background-color: var(--system-green2);}
   100% {background-color: var(--system-transp);}
 }
 .bar {
-  border: 2px solid var(--system-grey);
+  border: 1px solid var(--system-overlay);
   height: calc(100% - 3px);
   width: 0px;
   left: -6px;
@@ -203,10 +220,13 @@ div.msgContainer > div.msgContainer {
   background-color: var(--system-blue2);
 }
 .msgContainer:hover {
-  outline: 2px solid var(--system-grey);
+  outline: 1px solid var(--system-overlay);
 }
-.msgContainer:hover > .bar, .activeReply > .bar {
-  border: 2px solid var(--system-green);
+.msgContainer:hover > .bar {
+  border: 1px solid var(--system-grey);
+}
+.activeReply > .bar  {
+  border: 2px solid var(--system-green) !important;
 }
 .msgContents {
   width: calc(100% - 40px);

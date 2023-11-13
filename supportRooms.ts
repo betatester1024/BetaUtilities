@@ -3,6 +3,7 @@ import { msgDB, authDB, uDB, roomRegex } from './consts';
 import { log } from './logging'
 // import { minID } from './database';
 import {WebSocket} from 'ws';
+import {realias} from './updateUser';
 import { WebH } from './betautilities/webHandler';
 export class Room {
   type: string;
@@ -27,10 +28,23 @@ export class BridgeSocket
   onOpen() {
     // console.log("bridgeSocket was opened")
     this.client.send(JSON.stringify({action:"RELOAD"}));
+    this.euphSocket.send(JSON.stringify({
+      type:"login",
+      data:{
+        namespace:"email",
+        id:process.env["euphEmail"],
+        password:process.env["euphPassword"]
+      }
+    }))
   }
 
   loadLogs(before:string) {
+    // let usrData = await userRequeest(token);
     this.euphSocket.send(JSON.stringify({type:"log", data:{n:100, before:before}}))
+    // this.client.send(JSON.stringify({
+      // action:"yourAlias",
+      // data:{alias:usrData.data.alias}
+    // }))
   }
 
   sendMsg(room:string, parent:string, content:string) {
@@ -135,8 +149,13 @@ export class BridgeSocket
             isBot:dat.data.id.match(/^bot:/)!=null
           }
         }))
+        this.client.send(JSON.stringify({
+          action:"yourAlias",
+          data:{alias:usrData.data.alias}
+        }))
         break;
       case "hello-event":
+        console.log(dat);
         this.client.send(JSON.stringify({
           action:"addUser",
           data:{
@@ -144,6 +163,20 @@ export class BridgeSocket
             isBot:dat.data.session.id.match(/^bot:/)!=null
           }
         }))
+        this.client.send(JSON.stringify({
+          action:"yourAlias",
+          data:{alias:usrData.data.alias}
+        }))
+        break;
+      case "disconnect-event":
+        this.euphSocket= new WebSocket("wss://euphoria.io/room/"+this.roomName+"/ws");
+        this.euphSocket.on('open', this.onOpen.bind(this));
+        this.euphSocket.on('message', this.onMessage.bind(this));
+        // this.client.on('close', this.onClientClose.bind(this));
+        this.euphSocket.on('error', (e:any)=>{this.euphSocket.close(1000, "");})
+      case "login-reply":
+        console.log(dat);
+        break;
       case "join-event":
         this.client.send(JSON.stringify({
           action:"addUser",
@@ -153,6 +186,7 @@ export class BridgeSocket
           }
         }))
         break;
+      case "nick-reply": break;
       case "part-event":
         this.client.send(JSON.stringify({
           action:"removeUser",
@@ -165,7 +199,41 @@ export class BridgeSocket
       default: 
         console.log(dat.type)
         // scream.
+        // console.log(dat);
     }
+  }
+
+  async updateAlias(alias:string, token) {
+    let usrData = await userRequest(token);
+    let updateAliasRes = await realias(alias, token);
+    this.euphSocket.send(JSON.stringify({
+      type:"nick",
+      data:{name:alias}
+    }));
+  
+    // console.log("here we are");
+    if (updateAliasRes.status != "SUCCESS") {
+      return;
+    }
+    // console.log("alias update was a success");
+    this.client.send(JSON.stringify({
+      action:"removeUser",
+      data:{
+        user:usrData.data.alias
+      }
+    }));
+    this.client.send(JSON.stringify({
+      action:"addUser",
+      data:{
+        user:alias,
+        isBot:true
+      }
+    }))
+    this.client.send(JSON.stringify({
+      action:"yourAlias",
+      data:{alias:alias}
+    }))
+    // return {status:"SUCCESS", data:null, token:token};
   }
 
   onClientClose() {
@@ -183,11 +251,7 @@ export class BridgeSocket
     this.euphSocket.on('open', this.onOpen.bind(this));
     this.euphSocket.on('message', this.onMessage.bind(this));
     // this.client.on('close', this.onClientClose.bind(this));
-    this.euphSocket.on('error', (e:any)=>{
-      this.euphSocket.close(1000, "");
-      // systemLog(("ERROR for room-ID: "+this.roomName)
-      updateActive(this.roomName, false);
-    })
+    this.euphSocket.on('error', (e:any)=>{this.euphSocket.close(1000, "");})
   }
 }
 

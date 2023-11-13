@@ -98,6 +98,9 @@ export async function initServer() {
     statusCode: 429, // 429 status = Too Many Requests (RFC 6585)
   });
   app.use(limiter);
+  app.set('trust proxy', 1)
+  app.get('/ip', (request:any, response:any) => response.send(request.ip))
+  
   let corsOptions = {
     credentials: true, 
     origin: true,
@@ -134,15 +137,19 @@ export async function initServer() {
 
   app.ws('/bridge', (ws:any, req:any)=> {
     ws.on('message', (msg:any) => {
-      // console.log(msg);
+      console.log(msg);
       let dat = JSON.parse(msg);
-      // console.log(ddat);
+      // console.log(dat);
       switch(dat.action) {
         case "loadLogs":
           bridgeH.loadLogs(dat.data.before);
           break;
         case "sendMsg":
           bridgeH.sendMsg(dat.data.room, dat.data.parent, dat.data.msg);
+          break;
+        case "updateAlias":
+          // console.log("here");
+          bridgeH.updateAlias(dat.data.alias, req.cookies.accountID);
       }
       // ws.send("reply:"+msg);
     });
@@ -199,7 +206,7 @@ export async function initServer() {
   });
 
   app.get("/cmd", urlencodedParser, async (req:any, res:any) => {
-    makeRequest(req.query.action, req.cookies.accountID, null, (s:string, d:any, token:string)=>{
+    makeRequest(req.query.action, req.cookies.accountID, req.query.data, null, (s:string, d:any, token:string)=>{
       console.log(d);
       if (s == "SUCCESS") sendFile(res, getToken(req), frontendDir+'/actionComplete.html');
       else {sendFile(res, getToken(req), frontendDir+'/error.html')}
@@ -317,7 +324,7 @@ export async function initServer() {
   })
   
 
-  // const banList= ["172.31.196.1"];
+  const banList= [""];
   app.post('/server', urlencodedParser, async (req:any, res:any) => {
     incrRequests();
     if (req.headers['content-length'] > 60000) {
@@ -325,13 +332,13 @@ export async function initServer() {
       res.status(413).end();
       return;
     }
-    // let addr = req.headers['x-forwarded-for'].match(":([^:]*)$")[1]; 
-    // console.log(addr);
-    // if (banList.indexOf(addr) >= 0) 
-    // {
-    //   res.end(JSON.stringify({status:"ERROR", data:{error: "IP banned, contact BetaOS if this was done in error."}}));
-    //   return;
-    // }
+    let addr = req.ip; 
+    console.log(addr);
+    if (banList.indexOf(addr) >= 0) 
+    {
+      res.end(JSON.stringify({status:"ERROR", data:{error: "IP banned, contact BetaOS if this was done in error."}}));
+      return;
+    }
     var body = await parse.json(req);
     if (!body) res.end(JSON.stringify({status:"ERROR", data:{error:"No command string"}}));
     // let cookiematch = req.cookies.match("accountID=[0-9a-zA-Z\\-]");

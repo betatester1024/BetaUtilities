@@ -1,10 +1,28 @@
 "use strict";
 function onLoad() {
-  document.getElementById("header").innerText = "Support: " + (ISBRIDGE ? "&" : "#") + new URL(document.URL).searchParams.get("room");
-  ROOMNAME = new URL(document.URL).searchParams.get("room");
+  BOTTOMINPUT = byId("bottomInput");
+  setInterval(updateTime, 1e3);
+  document.getElementById("header").innerText = "Support: " + (ISBRIDGE ? "&" : "#") + docURL.searchParams.get("room");
+  ROOMNAME = docURL.searchParams.get("room");
+  document.addEventListener("keydown", onKeyPress);
+}
+function onKeyPress(e) {
+  console.log(e);
+  if (e.key == "b" && e.ctrlKey && !e.metaKey && !e.shiftKey) {
+    let ele2 = byId("right");
+    e.preventDefault();
+    ele2.style.display = ele2.style.display == "flex" ? "none" : "flex";
+  }
+}
+function updateTime() {
+  let allElements = document.getElementsByClassName("time");
+  for (let ele2 of allElements) {
+    ele2.innerText = toTime(Date.now() - ele2.dataset.time * 1e3);
+  }
 }
 let ACTIVEREPLY = -1;
 let awaitingParent = [];
+let BOTTOMINPUT = null;
 function byMsgId(id) {
   return byId("msgArea").querySelector("[data-id='" + id + "']");
 }
@@ -12,20 +30,33 @@ function toggleActiveReply(id) {
   if (ACTIVEREPLY == id) {
     byMsgId(id).classList.remove("activeReply");
     ACTIVEREPLY = -1;
+    byId("container").appendChild(BOTTOMINPUT);
   } else {
     if (ACTIVEREPLY != -1)
       toggleActiveReply(ACTIVEREPLY);
     byMsgId(id).classList.add("activeReply");
     ACTIVEREPLY = id;
   }
+  updateReplyBox();
 }
-function sendMsg() {
-  let inp = document.getElementById("msgInp");
-  let match = inp.value.match("^!alias @(.+)");
-  if (match) {
+function updateReplyBox() {
+  if (ACTIVEREPLY == "-1") {
+    byId("msgInp").focus();
+    return;
+  }
+  byMsgId(ACTIVEREPLY).appendChild(BOTTOMINPUT);
+  byId("msgInp").focus();
+}
+function updateAlias(newAlias) {
+  if (ISBRIDGE) {
+    source.send(JSON.stringify({
+      action: "updateAlias",
+      data: { alias: newAlias }
+    }));
+  } else {
     source.close();
     document.getElementById("userList").innerHTML = ``;
-    send(JSON.stringify({ action: "realias", data: { alias: match[1] } }), (res) => {
+    send(JSON.stringify({ action: "realias", data: { alias: newAliass } }), (res) => {
       if (res.status != "SUCCESS")
         alertDialog("ERROR: " + res.data.error, () => {
         });
@@ -39,7 +70,14 @@ function sendMsg() {
         Reloading your messages, a moment please...</h2>`;
           initClient();
         });
-    }, true);
+    });
+  }
+}
+function sendMsg() {
+  let inp = document.getElementById("msgInp");
+  let match = inp.value.match("^!alias @(.+)");
+  if (match) {
+    updateAlias(match[1]);
   } else {
     if (ISBRIDGE)
       source.send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME, parent: ACTIVEREPLY } }));
@@ -57,17 +95,16 @@ let CONNECTIONID = -1;
 async function initClient() {
   try {
     console.log("Starting client.");
-    let isBridge = new URL(document.URL).searchParams.get("bridge");
-    if (isBridge && isBridge == "true")
-      source = new WebSocket("wss://" + new URL(document.URL).host + "/bridge?room=" + new URL(document.URL).searchParams.get("room"));
+    if (ISBRIDGE)
+      source = new WebSocket("wss://" + docURL.host + "/bridge?room=" + docURL.searchParams.get("room"));
     else
-      source = new WebSocket("wss://" + new URL(document.URL).host + "?room=" + new URL(document.URL).searchParams.get("room"));
+      source = new WebSocket("wss://" + docURL.host + "?room=" + docURL.searchParams.get("room"));
     source.onclose = () => {
-      console.log("connection failed");
+      console.log("Connection closed by server.");
       setTimeout(initClient, 500);
     };
     source.onerror = () => {
-      console.log("connection failed");
+      console.log("Connection ERROR");
       setTimeout(initClient, 500);
     };
     source.onmessage = (message) => {
@@ -87,6 +124,7 @@ async function initClient() {
         STARTID = -1;
         ACTIVEREPLY = -1;
         STARTIDVALID = false;
+        byId("container").appendChild(BOTTOMINPUT);
         UNREAD = 0;
         loadStatus = -1;
         CONNECTIONID = -1;
@@ -131,6 +169,10 @@ async function initClient() {
         if (message.data.isBot)
           span.classList.add("bot");
         ele.appendChild(span);
+      }
+      if (message.action == "yourAlias") {
+        byId("alias").value = message.data.alias;
+        byId("msgInp").focus();
       }
       if (message.action == "addUser" || message.action == "removeUser") {
         let children = ele.childNodes;
@@ -244,7 +286,9 @@ async function initClient() {
         ctn_inner.className = "msgContents";
         ctn_inner.appendChild(newMsgSender);
         ctn_inner.appendChild(ele);
-        ctn_inner.innerHTML += `<div class="time">${toTime(Date.now() - message.data.time * 1e3)}</div>`;
+        ctn_inner.innerHTML += `<div class="time" data-time="${message.data.time}">${toTime(Date.now() - message.data.time * 1e3)}</div>`;
+        if (Date.now() / 1e3 - message.data.time < 60)
+          ctn_inner.style.animation = "newMsg " + (60 - (Date.now() / 1e3 - message.data.time)) + "s";
         let optn = document.createElement("div");
         optn.className = "options";
         optn.innerHTML = `
@@ -285,6 +329,7 @@ async function initClient() {
           UNREAD++;
           document.title = "(" + UNREAD + ") | Support | BetaOS Systems";
         }
+        updateReplyBox();
       }
       if (!LOADEDQ2 || scrDistOKQ) {
         area.scrollTop = area.scrollHeight;
@@ -342,7 +387,7 @@ let LOADEDQ2 = false;
 let STARTIDVALID = false;
 let earliestMessageTime = 9e99;
 let earliestMessageID = "";
-let ISBRIDGE = new URL(document.URL).searchParams.get("bridge") == "true";
+let ISBRIDGE = docURL.searchParams.get("bridge") == "true";
 function onScroll() {
   if (document.getElementById("msgArea").scrollTop < 30 && STARTIDVALID && loadStatus < 0) {
     loadStatus = 0;

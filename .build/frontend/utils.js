@@ -7,6 +7,7 @@ function byId(name) {
 function byClass(name, ct = 0) {
   return document.getElementsByClassName(name).item(ct);
 }
+const docURL = new URL(document.URL);
 let HASNETWORK = false;
 let branch = "STABLE";
 let userData = null;

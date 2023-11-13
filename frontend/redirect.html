@@ -6,7 +6,7 @@
     <script>
       function onLoad() 
       {
-        let URLObj = new URL(document.URL);
+        let URLObj = docURL;
         byId("h2").innerText += " "+URLObj.searchParams.get("to")+"...";
         send(JSON.stringify({action:"accountID"}), (res)=>{
           if (res.status == "SUCCESS") {

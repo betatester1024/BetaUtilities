@@ -9,7 +9,7 @@ function byId(name:string) {
 function byClass(name:string, ct:number=0) {
   return document.getElementsByClassName(name).item(ct);
 }
-
+const docURL = new URL(document.URL);
 let HASNETWORK = false;
 let branch = "STABLE";
 let userData = null;

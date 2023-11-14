@@ -36,17 +36,17 @@
           </div>
         </div>
         <div id="container">
-          <form action="javascript:sendMsg()" id="bottomInput">
+          <div id="bottomInput">
             <input id="alias" onchange = "updateAlias(this.value)"/>
-            <div id="inpContainer">
+            <form id="inpContainer" action="javascript:sendMsg()">
               <input id="msgInp" class="fssml" placeholder="Enter a message..." autocomplete="off" >
               <!-- <div class="anim inp"></div> -->
-            </div>
-            <button class="btn szIco override fssml" id="sendBtn">
+            </form>
+            <button class="btn szIco override fssml" id="sendBtn" onclick="sendMsg()">
               <span class="material-symbols-outlined override">send</span>
               <!-- <div class="anim"></div> -->
             </button>
-          </form>
+          </div>
         </div>
       <a class="btn override" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>

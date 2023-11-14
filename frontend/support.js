@@ -92,8 +92,10 @@ function updateAlias(newAlias) {
   }
 }
 
-function sendMsg() {
+function sendMsg(ev) {
+  if (ev && ev.target.id != "msgInp") return;
   let inp = document.getElementById("msgInp");
+  if (inp.value.length == 0) return;
   let match = inp.value.match("^!alias @(.+)");
   if (match) {
     updateAlias(match[1])

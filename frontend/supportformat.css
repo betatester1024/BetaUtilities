@@ -51,7 +51,7 @@
   outline: none;
 }
 
-form#bottomInput:focus-within {
+#bottomInput:focus-within {
   border-bottom: 3px solid var(--system-green);
 }
 #msgInp {
@@ -75,17 +75,17 @@ hr.rounded {
   border: 2px solid var(--system-green);
   margin-top: 0px;
 }
-div#container > form#bottomInput {
+div#container > #bottomInput {
   margin: 7px auto !important;
 }
-div#container > form#bottomInput:before {
+div#container > #bottomInput:before {
   content:"";
 }
-form#bottomInput:before {
+#bottomInput:before {
   content:"→";
   color: var(--system-green);
 }
-form#bottomInput {
+#bottomInput {
   width: 95%;
   display: flex;
   height: 35px;

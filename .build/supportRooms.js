@@ -43,6 +43,7 @@ var import_logging = require("./logging");
 var import_ws = require("ws");
 var import_updateUser = require("./updateUser");
 var import_webHandler = require("./betautilities/webHandler");
+const cookie = require("cookie");
 class Room {
   type;
   name;
@@ -61,14 +62,7 @@ class BridgeSocket {
   setNick = false;
   onOpen() {
     this.client.send(JSON.stringify({ action: "RELOAD" }));
-    this.euphSocket.send(JSON.stringify({
-      type: "login",
-      data: {
-        namespace: "email",
-        id: process.env["euphEmail"],
-        password: process.env["euphPassword"]
-      }
-    }));
+    this.setNick = false;
   }
   loadLogs(before) {
     this.euphSocket.send(JSON.stringify({ type: "log", data: { n: 100, before } }));
@@ -81,15 +75,15 @@ class BridgeSocket {
     let usrData = await (0, import_userRequest.userRequest)(this.token);
     if (usrData.status != "SUCCESS")
       usrData = { data: { alias: "AnonymousBridgeUser", perms: 0 } };
+    if (!this.setNick) {
+      this.setNick = true;
+      this.euphSocket.send(JSON.stringify({
+        type: "nick",
+        data: { name: usrData.data.alias }
+      }));
+    }
     switch (dat.type) {
       case "ping-event":
-        if (!this.setNick) {
-          this.setNick = true;
-          this.euphSocket.send(JSON.stringify({
-            type: "nick",
-            data: { name: usrData.data.alias }
-          }));
-        }
         this.euphSocket.send(JSON.stringify({ type: "ping-reply", data: { time: dat.data.time } }));
         break;
       case "snapshot-event":
@@ -144,6 +138,7 @@ class BridgeSocket {
         break;
       case "send-event":
       case "send-reply":
+        console.log(dat);
         this.client.send(JSON.stringify({
           action: "msg",
           data: {
@@ -172,13 +167,18 @@ class BridgeSocket {
             isBot: dat.data.id.match(/^bot:/) != null
           }
         }));
-        this.client.send(JSON.stringify({
-          action: "yourAlias",
-          data: { alias: usrData.data.alias }
-        }));
         break;
       case "hello-event":
-        console.log(dat);
+        if (dat.data.session.id.match(/^bot:/)) {
+          this.euphSocket.send(JSON.stringify({
+            type: "login",
+            data: {
+              namespace: "email",
+              id: process.env["euphEmail"],
+              password: process.env["euphPassword"]
+            }
+          }));
+        }
         this.client.send(JSON.stringify({
           action: "addUser",
           data: {
@@ -192,7 +192,19 @@ class BridgeSocket {
         }));
         break;
       case "disconnect-event":
-        this.euphSocket = new import_ws.WebSocket("wss://euphoria.io/room/" + this.roomName + "/ws");
+        break;
+        this.euphSocket = new import_ws.WebSocket(
+          "wss://euphoria.io/room/" + this.roomName + "/ws",
+          [],
+          {
+            finishRequest: (request) => {
+              request.addEventListener("response", (res) => {
+                console.log(res);
+              });
+              request.end();
+            }
+          }
+        );
         this.euphSocket.on("open", this.onOpen.bind(this));
         this.euphSocket.on("message", this.onMessage.bind(this));
         this.euphSocket.on("error", (e) => {
@@ -210,8 +222,6 @@ class BridgeSocket {
           }
         }));
         break;
-      case "nick-reply":
-        break;
       case "part-event":
         this.client.send(JSON.stringify({
           action: "removeUser",
@@ -223,9 +233,12 @@ class BridgeSocket {
         break;
       default:
         console.log(dat.type);
+        console.log(dat);
     }
   }
   async updateAlias(alias, token) {
+    if (alias.length == 0 || alias.length > 36)
+      return;
     let usrData = await (0, import_userRequest.userRequest)(token);
     let updateAliasRes = await (0, import_updateUser.realias)(alias, token);
     this.euphSocket.send(JSON.stringify({

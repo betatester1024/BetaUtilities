@@ -37,7 +37,10 @@
         </div>
         <div id="container">
           <div id="bottomInput">
-            <input id="alias" onchange = "updateAlias(this.value)"/>
+            <div id="fit-box">
+              <input id="alias" oninput="fitSize()" onchange = "updateAlias(this.value)"/>
+              <span id="alias-text"></span>
+            </div>
             <form id="inpContainer" action="javascript:sendMsg()">
               <input id="msgInp" class="fssml" placeholder="Enter a message..." autocomplete="off" >
               <!-- <div class="anim inp"></div> -->

@@ -124,6 +124,31 @@ input {
   /* margin-left: 20px; */
 }
 
+#fit-box {
+  width: fit-content;
+  padding-right: 5px;
+  /* padding- */
+  position: relative;
+  margin-right: 10px;
+}
+#fit-box > input {
+  position: absolute;
+  /* margin-top: -100px; */
+  /* margin-left: -100px; */
+  /* z-index: 1; */
+  font-size: 18px;
+  height: 25px;
+  padding: 5px;
+  width: 100%;
+}
+#fit-box > span {
+  opacity: 0;
+  /* position: absolute; */
+  /* z-index: ; */
+  /* left: 0px; */
+}
+
+
 #inpContainer {
   flex-grow: 6;
   height: 100%;
@@ -154,9 +179,10 @@ button#sendBtn {
   margin-bottom: 0px;
 }
 
-#msgArea > a, 
-#msgArea > p, 
-#msgArea > span {
+#msgArea  a, 
+#msgArea  p, 
+#msgArea  span,
+span {
   white-space: pre-wrap;
   display: inline-block;
   font-size: 18px;

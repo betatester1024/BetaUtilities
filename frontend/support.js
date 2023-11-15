@@ -14,11 +14,11 @@ function onLoad() {
   document.addEventListener("keydown", onKeyPress);
 }
 function onKeyPress(e) {
-  console.log(e);
   if (e.key == "b" && e.ctrlKey && !e.metaKey && !e.shiftKey) {
     let ele = byId("right");
-    e.preventDefault();
+    console.log(e);
     ele.style.display = (ele.style.display=="flex")?"none":"flex";
+    e.preventDefault();
   }
 }
 function updateTime() {
@@ -106,8 +106,14 @@ function sendMsg(ev) {
     else send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME, parent:ACTIVEREPLY}}), ()=>{}, true);
   }
   inp.value="";
+  // byId("alias-text").value=""
 }
 
+function fitSize() {
+  byId("alias-text").innerText = byId("alias").value;
+  byId("alias").focus();
+}
+  
 const rmvReg = /(>|^)\-(.+)\([0-9]\)>/gm;
 const addReg = /(>|^)\+(.+)\([0-9]\)>/gm;
 const classStr = ["error", "user", "admin", "superadmin"]
@@ -191,6 +197,7 @@ async function initClient()
     }
     if (message.action== "yourAlias") {
       byId("alias").value = message.data.alias;
+      byId("alias-text").innerText = message.data.alias
       byId("msgInp").focus();
     }
     if (message.action == "addUser" || message.action == "removeUser") {

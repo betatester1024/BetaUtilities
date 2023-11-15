@@ -7,11 +7,11 @@ function onLoad() {
   document.addEventListener("keydown", onKeyPress);
 }
 function onKeyPress(e) {
-  console.log(e);
   if (e.key == "b" && e.ctrlKey && !e.metaKey && !e.shiftKey) {
     let ele2 = byId("right");
-    e.preventDefault();
+    console.log(e);
     ele2.style.display = ele2.style.display == "flex" ? "none" : "flex";
+    e.preventDefault();
   }
 }
 function updateTime() {
@@ -73,8 +73,12 @@ function updateAlias(newAlias) {
     });
   }
 }
-function sendMsg() {
+function sendMsg(ev) {
+  if (ev && ev.target.id != "msgInp")
+    return;
   let inp = document.getElementById("msgInp");
+  if (inp.value.length == 0)
+    return;
   let match = inp.value.match("^!alias @(.+)");
   if (match) {
     updateAlias(match[1]);
@@ -86,6 +90,10 @@ function sendMsg() {
       }, true);
   }
   inp.value = "";
+}
+function fitSize() {
+  byId("alias-text").innerText = byId("alias").value;
+  byId("alias").focus();
 }
 const rmvReg = /(>|^)\-(.+)\([0-9]\)>/gm;
 const addReg = /(>|^)\+(.+)\([0-9]\)>/gm;
@@ -172,6 +180,7 @@ async function initClient() {
       }
       if (message.action == "yourAlias") {
         byId("alias").value = message.data.alias;
+        byId("alias-text").innerText = message.data.alias;
         byId("msgInp").focus();
       }
       if (message.action == "addUser" || message.action == "removeUser") {

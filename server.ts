@@ -10,7 +10,7 @@ import Handlebars from "handlebars";
  // for generating secure random #'s
 import {connectionSuccess} from './index';
 import {port, msgDB, authDB, frontendDir, roomRegex, rootDir, jsDir, uDB} from './consts';
-import {signup, validateLogin, logout} from './validateLogin';
+import {signup, validateLogin, slogout} from './validateLogin';
 import { deleteAccount } from './delacc';
 import {updateUser, realias, toggleTheme} from './updateUser'
 import {userRequest, extendSession} from './userRequest';

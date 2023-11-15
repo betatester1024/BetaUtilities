@@ -431,12 +431,12 @@ function makeRequest(action, token, data, sessID, callback) {
         });
         break;
       case "logout":
-        (0, import_validateLogin.logout)(token).then((obj) => {
+        logout(token).then((obj) => {
           callback(obj.status, obj.data, obj.token);
         });
         break;
       case "logout_all":
-        (0, import_validateLogin.logout)(token, true).then((obj) => {
+        logout(token, true).then((obj) => {
           callback(obj.status, obj.data, obj.token);
         });
         break;

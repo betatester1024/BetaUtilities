@@ -29,13 +29,31 @@ function byMsgId(id) {
 function toggleActiveReply(id) {
   if (ACTIVEREPLY == id) {
     byMsgId(id).classList.remove("activeReply");
-    ACTIVEREPLY = -1;
+    let parent = byMsgId(id).parentElement;
+    if (parent.dataset.id) {
+      ACTIVEREPLY = parent.dataset.id;
+      parent.classList.add("activeReply");
+    } else
+      ACTIVEREPLY = -1;
     byId("container").appendChild(BOTTOMINPUT);
   } else {
-    if (ACTIVEREPLY != -1)
-      toggleActiveReply(ACTIVEREPLY);
-    byMsgId(id).classList.add("activeReply");
-    ACTIVEREPLY = id;
+    if (byMsgId(id).parentElement.dataset.id == ACTIVEREPLY) {
+      if (ACTIVEREPLY != -1)
+        byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+      ACTIVEREPLY = id;
+      byMsgId(id).classList.add("activeReply");
+    } else if (!byMsgId(id).parentElement.dataset.id) {
+      if (ACTIVEREPLY != -1)
+        byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+      ACTIVEREPLY = id;
+      byMsgId(id).classList.add("activeReply");
+    } else {
+      let parent = byMsgId(id).parentElement;
+      if (ACTIVEREPLY != -1)
+        byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+      ACTIVEREPLY = parent.dataset.id;
+      parent.classList.add("activeReply");
+    }
   }
   updateReplyBox();
 }
@@ -53,6 +71,7 @@ function updateAlias(newAlias) {
       action: "updateAlias",
       data: { alias: newAlias }
     }));
+    byId("msgInp").focus();
   } else {
     source.close();
     document.getElementById("userList").innerHTML = ``;
@@ -144,6 +163,9 @@ async function initClient() {
         let ele2 = byMsgId(message.data.id);
         if (ele2)
           ele2.remove();
+      }
+      if (message.action == "autoThreading") {
+        toggleActiveReply(message.data.id);
       }
       if (message.action == "LOADCOMPLETE") {
         let thing = document.getElementById("msgArea");

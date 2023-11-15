@@ -37,16 +37,46 @@ function byMsgId(id)
 }
 function toggleActiveReply(id) 
 {
-  if (ACTIVEREPLY == id) {
+  if (ACTIVEREPLY == id) { // clicking again: activereply parent or clear activereply
     byMsgId(id).classList.remove("activeReply");
-    ACTIVEREPLY = -1;
+    let parent = byMsgId(id).parentElement;
+    if (parent.dataset.id) {
+      ACTIVEREPLY = parent.dataset.id;
+      parent.classList.add("activeReply");
+    }
+    else ACTIVEREPLY = -1;
     byId("container").appendChild(BOTTOMINPUT);
     // BOTTOMINPUT.style.display="flex";
   }
-  else {
-    if (ACTIVEREPLY!=-1) toggleActiveReply(ACTIVEREPLY);
-    byMsgId(id).classList.add("activeReply");
-    ACTIVEREPLY = id;
+  else { // okay, not clicking again
+    // are you clicking on the direct child?
+    if (byMsgId(id).parentElement.dataset.id == ACTIVEREPLY) {
+      // that's right!
+      // okay so now activereply is the one you clicked
+      if (ACTIVEREPLY != -1)
+        byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+      ACTIVEREPLY = id;
+      byMsgId(id).classList.add("activeReply");
+
+    }
+    // are you clicking on something else?
+    // at this point you definitely are
+    // does it even have a parent?
+    else if (!byMsgId(id).parentElement.dataset.id) {
+      if (ACTIVEREPLY != -1)
+        byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+      ACTIVEREPLY = id;
+      byMsgId(id).classList.add("activeReply");
+    }
+    // okay, it does
+    else {
+      let parent = byMsgId(id).parentElement;
+      if (ACTIVEREPLY != -1) 
+        byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+      ACTIVEREPLY = parent.dataset.id;
+      parent.classList.add("activeReply");
+      
+    }
   }
   updateReplyBox();
   // BOTTOMINPUT.style.display=(ACTIVEREPLY=="-1"?"flex":"none");
@@ -73,6 +103,7 @@ function updateAlias(newAlias) {
       action:"updateAlias", 
       data:{alias:newAlias}
     }));
+    byId("msgInp").focus();
   }
   else {
     source.close();
@@ -104,6 +135,7 @@ function sendMsg(ev) {
   else {
     if (ISBRIDGE) source.send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME, parent:ACTIVEREPLY}}));
     else send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME, parent:ACTIVEREPLY}}), ()=>{}, true);
+    // toggleActiveReply()
   }
   inp.value="";
   // byId("alias-text").value=""
@@ -161,6 +193,9 @@ async function initClient()
     if (message.action == "delMsg") {
       let ele = byMsgId(message.data.id);
       if (ele) ele.remove();
+    }
+    if (message.action == "autoThreading") {
+      toggleActiveReply(message.data.id);
     }
     if (message.action == "LOADCOMPLETE") {
       let thing = document.getElementById("msgArea")
@@ -307,7 +342,7 @@ async function initClient()
           else if (pref == "ROOM") {
             let replaced = document.createElement("a");
             replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
-            replaced.href = "https://euphoria.io/room/"+post.slice(1);
+            replaced.href = "support?room="+post.slice(1)+"&bridge=true";
             replaced.innerText = post;
             ele.appendChild(replaced);
           }

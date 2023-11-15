@@ -68,7 +68,14 @@ class BridgeSocket {
     this.euphSocket.send(JSON.stringify({ type: "log", data: { n: 100, before } }));
   }
   sendMsg(room, parent, content) {
-    this.euphSocket.send(JSON.stringify({ type: "send", data: { content, parent: parent == "-1" ? null : parent } }));
+    this.euphSocket.send(JSON.stringify({
+      type: "send",
+      id: parent == "-1" ? "requiresAutoThreading" : null,
+      data: {
+        content,
+        parent: parent == "-1" ? null : parent
+      }
+    }));
   }
   async onMessage(msg) {
     let dat = JSON.parse(msg);
@@ -138,7 +145,6 @@ class BridgeSocket {
         break;
       case "send-event":
       case "send-reply":
-        console.log(dat);
         this.client.send(JSON.stringify({
           action: "msg",
           data: {
@@ -151,6 +157,13 @@ class BridgeSocket {
             content: dat.data.content
           }
         }));
+        console.log(dat.id);
+        if (dat.id == "requiresAutoThreading") {
+          this.client.send(JSON.stringify({
+            action: "autoThreading",
+            data: { id: dat.data.id }
+          }));
+        }
         break;
       case "nick-event":
         this.client.send(JSON.stringify({
@@ -245,9 +258,6 @@ class BridgeSocket {
       type: "nick",
       data: { name: alias }
     }));
-    if (updateAliasRes.status != "SUCCESS") {
-      return;
-    }
     this.client.send(JSON.stringify({
       action: "removeUser",
       data: {
@@ -617,10 +627,6 @@ async function WHOIS(token, user) {
   };
 }
 async function loadLogs(rn, id, from, isBridge, token) {
-  if (isBridge) {
-    await loadEuphLogs(rn, id, from);
-    return;
-  }
   try {
     let roomInfo = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
     let minThreadID = roomInfo.minThreadID ?? 0;

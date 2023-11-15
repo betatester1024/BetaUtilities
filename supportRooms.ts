@@ -42,10 +42,14 @@ export class BridgeSocket
   }
 
   sendMsg(room:string, parent:string, content:string) {
-    this.euphSocket.send(JSON.stringify({type:"send", data:{content:content, parent:(parent=="-1"?null:parent)}}))
-    // this.client.send(JSON.stringify({
-      // action:"msg",
-    // }))
+    this.euphSocket.send(JSON.stringify({
+      type:"send", 
+      id:parent=="-1"?"requiresAutoThreading":null, 
+      data:{
+        content:content, 
+        parent:(parent=="-1"?null:parent)
+      }
+    }))
   }
   
   async onMessage(msg:string) {
@@ -114,7 +118,6 @@ export class BridgeSocket
         break;
       case "send-event":
       case "send-reply":
-        console.log(dat);
         this.client.send(JSON.stringify({
           action:"msg",
           data:{
@@ -127,6 +130,13 @@ export class BridgeSocket
             content:dat.data.content,
           }
         }));
+        console.log(dat.id);
+        if (dat.id == "requiresAutoThreading") {
+          this.client.send(JSON.stringify({
+            action:"autoThreading",
+            data:{id:dat.data.id}
+          }));
+        }
         break;
       case "nick-event":
         this.client.send(JSON.stringify({
@@ -232,9 +242,10 @@ export class BridgeSocket
     }));
   
     // console.log("here we are");
-    if (updateAliasRes.status != "SUCCESS") {
-      return;
-    }
+    // if (updateAliasRes.status != "SUCCESS") {
+      // return;
+    // }
+    // screw it, we realias it anyways!
     // console.log("alias update was a success");
     this.client.send(JSON.stringify({
       action:"removeUser",
@@ -645,7 +656,7 @@ export async function WHOIS(token: string, user: string) {
 // };
 //loadLogs(data.room, data.id, data.from token)
 export async function loadLogs(rn: string, id: number, from: number, isBridge:boolean, token: string) {
-  if (isBridge) {await loadEuphLogs(rn, id, from); return;}
+  // if (isBridge) {await loadEuphLogs(rn, id, from); return;}
   try {
     // let j = -1;
     // let thiscn;

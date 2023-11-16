@@ -416,7 +416,7 @@ async function initClient()
       document.getElementById("placeholder").style.display="none";
       if (!FOCUSSED) {
         UNREAD ++ 
-        document.title = "("+UNREAD+") | Support | BetaOS Systems"
+        document.title = "("+UNREAD+") | Support"
       }
       updateReplyBox();
     } // received message element // 
@@ -498,7 +498,7 @@ window.addEventListener("blur", () => {
 
 // when the user's focus is back to your tab (website) again
 window.addEventListener("focus", () => {
-  document.title = "Support | BetaOS Systems";
+  document.title = "Support";
   FOCUSSED = true;
   UNREAD = 0;
 });

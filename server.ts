@@ -680,7 +680,7 @@ function eeFormat(data:string, mainClass:string) {
 <html class="${mainClass}">
   <head>
     <script src='./utils.js'></script>
-    <title>Everyone Edits | BetaOS Systems</title>
+    <title>Everyone Edits</title>
     <script>
     </script>
     <meta name="viewport" content="width=device-width">
@@ -728,7 +728,7 @@ function tooManyRequests() {
   return `<!DOCTYPE html>
 <html class="{{mainClass}}">
   <head>
-    <title>Error 429 | BetaOS Systems</title>
+    <title>Error 429</title>
     <script>
     ${fs.readFileSync(jsDir+"utils.js")}
     </script>

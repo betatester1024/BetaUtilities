@@ -5,7 +5,7 @@
       <source src="notif.wav" type="audio/wav">
     </audio>
     <script src='./utils.js'></script>
-    <title>Timer | BetaOS Systems</title></title>
+    <title>Timer</title></title>
     <script>
       let STARTTIME = 0;
       let TOTALTIME = 0;
@@ -70,7 +70,7 @@
           aud.currentTime = 0;
           aud.loop = true;
           aud.play();
-          alertDialog("Timer complete!", ()=>{aud.pause();document.title="Timer | BetaOS Systems"; resetUI(); resetTimer();});
+          alertDialog("Timer complete!", ()=>{aud.pause();document.title="Timer"; resetUI(); resetTimer();});
           document.title="(1) Timer complete";
           clearInterval(TIMERID);
           TIMERID = -1;

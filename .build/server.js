@@ -161,19 +161,26 @@ async function initServer() {
       console.log("Removed stream");
     });
   });
+  app.get("/room/*", supportReply);
+  app.get("/bridge/*", supportReply);
   app.get("/support", (req, res) => {
-    let match = req.url.match("\\?room=(" + import_consts.roomRegex + ")");
-    if (match) {
-      if (!import_supportRooms.supportHandler.checkFoundQ(match[1]) && req.query.bridge != "true") {
-        console.log("Room not found");
-        sendFile(res, getToken(req), import_consts.frontendDir + "/room404.html");
-        return;
-      } else
-        sendFile(res, getToken(req), import_consts.frontendDir + "/support.html");
-    } else
-      sendFile(res, getToken(req), import_consts.frontendDir + "/supportIndex.html");
+    if (req.query.room) {
+      sendFile(res, getToken(req), import_consts.frontendDir + "/supportRedirect.html");
+      return;
+    }
+    sendFile(res, getToken(req), import_consts.frontendDir + "/supportIndex.html");
     (0, import_logging.incrRequests)();
   });
+  function supportReply(req, res) {
+    let room = req.url.match("(?:bridge|room)\\/(" + import_consts.roomRegex + ")")[1];
+    if (!import_supportRooms.supportHandler.checkFoundQ(room) && (req.query.bridge != "true" || req.url == "bridge")) {
+      console.log("Room", room, "not found");
+      sendFile(res, getToken(req), import_consts.frontendDir + "/room404.html");
+      return;
+    } else
+      sendFile(res, getToken(req), import_consts.frontendDir + "/support.html");
+    (0, import_logging.incrRequests)();
+  }
   app.get("/accountDel", (req, res) => {
     sendFile(res, getToken(req), import_consts.frontendDir + "/delAcc.html");
     (0, import_logging.incrRequests)();
@@ -284,7 +291,6 @@ async function initServer() {
       return;
     }
     let addr = req.ip;
-    console.log(addr);
     if (banList.indexOf(addr) >= 0) {
       res.end(JSON.stringify({ status: "ERROR", data: { error: "IP banned, contact BetaOS if this was done in error." } }));
       return;

@@ -29,7 +29,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string=
       console.log("Font loaded!")
     }
     script = document.createElement('script');
-    script.src = "./nodemodules/dialog-polyfill/dist/dialog-polyfill.js";
+    script.src = "/nodemodules/dialog-polyfill/dist/dialog-polyfill.js";
     document.head.appendChild(script);
   }
   // else byId("overlayL").remove();

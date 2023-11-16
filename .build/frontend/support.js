@@ -2,8 +2,8 @@
 function onLoad() {
   BOTTOMINPUT = byId("bottomInput");
   setInterval(updateTime, 1e3);
-  document.getElementById("header").innerText = "Support: " + (ISBRIDGE ? "&" : "#") + docURL.searchParams.get("room");
-  ROOMNAME = docURL.searchParams.get("room");
+  document.getElementById("header").innerText = "Support: " + (ISBRIDGE ? "&" : "#") + docURL.pathname.match("^\\/(room|bridge)\\/(.+)")[2];
+  ROOMNAME = docURL.pathname.match("^\\/(room|bridge)\\/(.+)")[2];
   document.addEventListener("keydown", onKeyPress);
 }
 function onKeyPress(e) {
@@ -65,7 +65,8 @@ function updateReplyBox() {
   byMsgId(ACTIVEREPLY).appendChild(BOTTOMINPUT);
   byId("msgInp").focus();
 }
-function updateAlias(newAlias) {
+function updateAlias() {
+  let newAlias = byId("alias").value;
   if (ISBRIDGE) {
     source.send(JSON.stringify({
       action: "updateAlias",
@@ -123,9 +124,9 @@ async function initClient() {
   try {
     console.log("Starting client.");
     if (ISBRIDGE)
-      source = new WebSocket("wss://" + docURL.host + "/bridge?room=" + docURL.searchParams.get("room"));
+      source = new WebSocket("wss://" + docURL.host + "/bridge?room=" + docURL.pathname.match("^/(room|bridge)/(.+)")[2]);
     else
-      source = new WebSocket("wss://" + docURL.host + "?room=" + docURL.searchParams.get("room"));
+      source = new WebSocket("wss://" + docURL.host + "?room=" + docURL.pathname.match("^/(room|bridge)/(.+)")[2]);
     source.onclose = () => {
       console.log("Connection closed by server.");
       setTimeout(initClient, 500);
@@ -293,13 +294,13 @@ async function initClient() {
             } else if (pref == "ROOM") {
               let replaced = document.createElement("a");
               replaced.className = "supportMsg " + classStr[matches[3]];
-              replaced.href = "https://euphoria.io/room/" + post.slice(1);
+              replaced.href = "/bridge/" + post.slice(1);
               replaced.innerText = post;
               ele.appendChild(replaced);
             } else if (pref == "SUPPORT") {
               let replaced = document.createElement("a");
               replaced.className = "supportMsg " + classStr[matches[3]];
-              replaced.href = "/support?room=" + post.slice(1);
+              replaced.href = "/room/" + post.slice(1);
               replaced.innerText = post;
               ele.appendChild(replaced);
             } else if (pref == "INTERNALLINK") {
@@ -418,7 +419,7 @@ let LOADEDQ2 = false;
 let STARTIDVALID = false;
 let earliestMessageTime = 9e99;
 let earliestMessageID = "";
-let ISBRIDGE = docURL.searchParams.get("bridge") == "true";
+let ISBRIDGE = docURL.pathname.match("^\\/bridge") != null;
 function onScroll() {
   if (document.getElementById("msgArea").scrollTop < 30 && STARTIDVALID && loadStatus < 0) {
     loadStatus = 0;

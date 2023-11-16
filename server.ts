@@ -125,6 +125,8 @@ export async function initServer() {
     sendFile(res, getToken(req), frontendDir+'/config.html');
     incrRequests();
   });
+
+  // else sendFile(res, getToken(req), frontendDir+'/supportIndex.html');
   
   app.get('/EE', (req:any, res:any) => {
     EE(true, (_status:string, data:any, _token:string)=>{
@@ -181,19 +183,32 @@ export async function initServer() {
     });
   });
   
+  app.get('/room/*', supportReply);
+  app.get('/bridge/*', supportReply);
   app.get('/support', (req:any, res:any) => {
-    let match = req.url.match('\\?room=('+roomRegex+")");
-    if (match) {
-      if (!supportHandler.checkFoundQ(match[1]) && req.query.bridge!= "true") {
-        console.log("Room not found")
-        sendFile(res, getToken(req), frontendDir+"/room404.html");
-        return;
-      }
-      else sendFile(res, getToken(req), frontendDir+'/support.html');
+    if (req.query.room) {
+      sendFile(res, getToken(req), frontendDir+'/supportRedirect.html');
+      return;
     }
-    else sendFile(res, getToken(req), frontendDir+'/supportIndex.html');
+    sendFile(res, getToken(req), frontendDir+'/supportIndex.html');
     incrRequests();
   });
+  function supportReply(req:any, res:any) {
+    // console.log(req.url);
+    // let url = new URL(req.href);
+    // let match = req.url.match('(?:.*)room=('+roomRegex+")");
+    // if (req.url.match(/^\/(bridge|room)/)) {
+    let room = req.url.match('(?:bridge|room)\\/('+roomRegex+')')[1];
+    if (!supportHandler.checkFoundQ(room) && 
+        (req.query.bridge!= "true" || req.url == "bridge")) {
+      console.log("Room", room, "not found")
+      sendFile(res, getToken(req), frontendDir+"/room404.html");
+      return;
+    }
+    else sendFile(res, getToken(req), frontendDir+'/support.html');
+    // }
+    incrRequests();
+  }
 
   app.get('/accountDel', (req:any, res:any) => {
     sendFile(res, getToken(req), frontendDir+'/delAcc.html');
@@ -333,7 +348,7 @@ export async function initServer() {
       return;
     }
     let addr = req.ip; 
-    console.log(addr);
+    // console.log(addr);
     if (banList.indexOf(addr) >= 0) 
     {
       res.end(JSON.stringify({status:"ERROR", data:{error: "IP banned, contact BetaOS if this was done in error."}}));

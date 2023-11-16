@@ -183,14 +183,6 @@ class BridgeSocket {
         break;
       case "hello-event":
         if (dat.data.session.id.match(/^bot:/)) {
-          this.euphSocket.send(JSON.stringify({
-            type: "login",
-            data: {
-              namespace: "email",
-              id: process.env["euphEmail"],
-              password: process.env["euphPassword"]
-            }
-          }));
         }
         this.client.send(JSON.stringify({
           action: "addUser",

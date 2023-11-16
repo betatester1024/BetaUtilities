@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html class="{{mainClass}}">
   <head>
-    <script src='./utils.js'></script>
+    <script src='/utils.js'></script>
     <title>Support | BetaOS Systems</title>
-    <script src = '/support.js'>
+    <script src ='/support.js'>
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -37,10 +37,10 @@
         </div>
         <div id="container">
           <div id="bottomInput">
-            <div id="fit-box">
-              <input id="alias" oninput="fitSize()" onchange = "updateAlias(this.value)"/>
-              <span id="alias-text"></span>
-            </div>
+            <form id="fit-box" action="javascript:updateAlias()">
+              <input id="alias" oninput="fitSize()" value="Loading alias"/>
+              <span id="alias-text">Loading alias</span>
+            </form>
             <form id="inpContainer" action="javascript:sendMsg()">
               <input id="msgInp" class="fssml" placeholder="Enter a message..." autocomplete="off" >
               <!-- <div class="anim inp"></div> -->

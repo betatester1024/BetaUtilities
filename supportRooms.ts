@@ -161,14 +161,15 @@ export class BridgeSocket
       case "hello-event":
         // console.log(req);
         if (dat.data.session.id.match(/^bot:/)) {
-          this.euphSocket.send(JSON.stringify({
-            type:"login",
-            data:{
-              namespace:"email",
-              id:process.env["euphEmail"],
-              password:process.env["euphPassword"]
-            }
-          }));
+          // don't do this perhaps
+          // this.euphSocket.send(JSON.stringify({
+          //   type:"login",
+          //   data:{
+          //     namespace:"email",
+          //     id:process.env["euphEmail"],
+          //     password:process.env["euphPassword"]
+          //   }
+          // }));
         }
         this.client.send(JSON.stringify({
           action:"addUser",

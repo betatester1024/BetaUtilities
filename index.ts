@@ -14,7 +14,7 @@ const localEuphRooms = [
   // "bots", "room", "memes", "music", "srs"
 ]
 const { exec } = require("child_process");
-
+require('dotenv').config();
 const localtunnel = require('localtunnel');
 
 (async () => {

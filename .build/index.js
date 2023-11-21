@@ -36,6 +36,7 @@ let connectionSuccess = true;
 let DBConnectFailure = null;
 const localEuphRooms = [];
 const { exec } = require("child_process");
+require("dotenv").config();
 const localtunnel = require("localtunnel");
 (async () => {
   const tunnel = await localtunnel({ port: 3e3, subdomain: "betaos" });

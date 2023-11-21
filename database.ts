@@ -9,10 +9,13 @@ const uri =
   // "mongodb+srv://SystemLogin:"+process.env['dbPwd']+"@betaos-datacluster00.d8o7x8n.mongodb.net/?retryWrites=true&w=majority";
 
 import {DBConnectFailure} from './index';
-export const client = new MongoClient(uri)//, { useNewUrlParser: true, useUnifiedTopology: true });
+export let database:any;
+export let client:any;
 // const client = cli.connect();
 export async function connectDB() {
   try {
+    client = new MongoClient(uri)//, { useNewUrlParser: true, useUnifiedTopology: true });
+    database = client.db('BetaOS-Database01')
     await client.connect();  
     clearTimeout(DBConnectFailure)
     return null;
@@ -24,7 +27,7 @@ export async function connectDB() {
   }
 }
 // export let minID = -1;
-export const database = client.db('BetaOS-Database01');
+
 // export const DB = database.collection('BetaUtilities');
 
 export async function DBMaintenance() {

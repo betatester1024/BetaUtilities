@@ -3,7 +3,9 @@ function onLoad() {
   BOTTOMINPUT = byId("bottomInput");
   setInterval(updateTime, 1e3);
   document.getElementById("header").innerText = "Support: " + (ISBRIDGE ? "&" : "#") + docURL.pathname.match("^\\/(room|bridge)\\/(.+)")[2];
-  ROOMNAME = docURL.pathname.match("^\\/(room|bridge)\\/(.+)")[2];
+  let match = docURL.pathname.match("^\\/(room|bridge)\\/(.+)");
+  ROOMNAME = match[2];
+  document.title = "Support | " + (match[1] == "room" ? "#" : "&") + ROOMNAME;
   document.addEventListener("keydown", onKeyPress);
 }
 function onKeyPress(e) {
@@ -359,7 +361,7 @@ async function initClient() {
         document.getElementById("placeholder").style.display = "none";
         if (!FOCUSSED) {
           UNREAD++;
-          document.title = "(" + UNREAD + ") | Support | BetaOS Systems";
+          document.title = "(" + UNREAD + ") | Support";
         }
         updateReplyBox();
       }
@@ -408,7 +410,7 @@ window.addEventListener("blur", () => {
   FOCUSSED = false;
 });
 window.addEventListener("focus", () => {
-  document.title = "Support | BetaOS Systems";
+  document.title = "Support";
   FOCUSSED = true;
   UNREAD = 0;
 });

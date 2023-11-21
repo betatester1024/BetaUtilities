@@ -22,15 +22,15 @@ __export(EEHandler_exports, {
 });
 module.exports = __toCommonJS(EEHandler_exports);
 var import_consts = require("./consts");
-async function EE(getQ, callback, token, newStr) {
+async function EE(getQ, token, newStr) {
   let obj = await import_consts.uDB.findOne({ fieldName: "EE" });
   if (getQ)
-    callback("SUCCESS", { data: obj ? obj.data : "" }, token);
+    return { status: "SUCCESS", data: { data: obj ? obj.data : "" }, token };
   else {
     await import_consts.uDB.updateOne({ fieldName: "EE" }, {
       $set: { data: newStr }
     }, { upsert: true });
-    callback("SUCCESS", null, token);
+    return { status: "SUCCESS", data: null, token };
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

@@ -36,6 +36,14 @@ let connectionSuccess = true;
 let DBConnectFailure = null;
 const localEuphRooms = [];
 const { exec } = require("child_process");
+const localtunnel = require("localtunnel");
+(async () => {
+  const tunnel = await localtunnel({ port: 3e3, subdomain: "betaos" });
+  console.log("Tunnelling at", tunnel.url);
+  tunnel.on("close", () => {
+    console.log("WARNING: Tunnel is closed!");
+  });
+})();
 let timedOutQ = false;
 let UPSINCESTR = "";
 try {

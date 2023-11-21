@@ -10,7 +10,9 @@ function onLoad() {
   setInterval(updateTime, 1000);
   document.getElementById("header").innerText = "Support: "+(ISBRIDGE?"&":"#")+
     docURL.pathname.match("^\\/(room|bridge)\\/(.+)")[2];
-  ROOMNAME = docURL.pathname.match("^\\/(room|bridge)\\/(.+)")[2];
+  let match = docURL.pathname.match("^\\/(room|bridge)\\/(.+)");
+  ROOMNAME = match[2]
+  document.title = "Support | "+(match[1] == "room"?"#":"&")+ROOMNAME;
   document.addEventListener("keydown", onKeyPress);
 }
 function onKeyPress(e) {

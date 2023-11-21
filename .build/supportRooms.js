@@ -157,7 +157,6 @@ class BridgeSocket {
             content: dat.data.content
           }
         }));
-        console.log(dat.id);
         if (dat.id == "requiresAutoThreading") {
           this.client.send(JSON.stringify({
             action: "autoThreading",
@@ -216,7 +215,6 @@ class BridgeSocket {
           this.euphSocket.close(1e3, "");
         });
       case "login-reply":
-        console.log(dat);
         break;
       case "join-event":
         this.client.send(JSON.stringify({
@@ -237,8 +235,7 @@ class BridgeSocket {
         }));
         break;
       default:
-        console.log(dat.type);
-        console.log(dat);
+        console.log("unknown event", dat.type);
     }
   }
   async updateAlias(alias, token) {
@@ -269,11 +266,11 @@ class BridgeSocket {
     }));
   }
   onClientClose() {
-    console.log("clientClosed");
+    console.log("Client in room " + this.roomName + " was closed");
     this.euphSocket.close(1e3, "");
   }
   constructor(roomName, socket, token) {
-    console.log(roomName);
+    console.log("Client in room", roomName, "was opened");
     this.roomName = roomName;
     this.client = socket;
     this.token = token;
@@ -282,6 +279,7 @@ class BridgeSocket {
     this.euphSocket.on("open", this.onOpen.bind(this));
     this.euphSocket.on("message", this.onMessage.bind(this));
     this.euphSocket.on("error", (e) => {
+      console.log("Error in euphSocket in room", roomName, ":", e);
       this.euphSocket.close(1e3, "");
     });
   }
@@ -449,7 +447,10 @@ class supportHandler {
     }
   }
 }
-function sendMsg(msg, room, parent, token, callback) {
+function sendMsg(msg, room, parent, token) {
+  if (msg.length == 0)
+    return { status: "SUCCESS", data: null, token };
+  msg = msg.slice(0, 1024);
   (0, import_userRequest.userRequest)(token).then(async (obj) => {
     let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room });
     let msgCt = roomData ? roomData.msgCt : 0;
@@ -475,12 +476,11 @@ function sendMsg(msg, room, parent, token, callback) {
     } else {
       supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, parent, content: msg } }));
     }
-    for (let i = 0; i < supportHandler.allRooms.length; i++) {
+    for (let i = 0; i < supportHandler.allRooms.length; i++)
       if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
         supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token));
       }
-    }
-    callback("SUCCESS", null, token);
+    return { status: "SUCCESS", data: null, token };
   });
 }
 async function sendMsg_B(msg, room) {

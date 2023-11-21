@@ -36,7 +36,16 @@ async function userRequest(token, internalFlag = false) {
   if (Date.now() > tokenData.expiry) {
     return { status: "ERROR", data: { errorCode: 0, error: "Your session has expired!" }, token: "" };
   }
-  return { status: "SUCCESS", data: { user: tokenData.associatedUser, alias: userData.alias ?? userData.user, perms: userData.permLevel, expiry: tokenData.expiry, tasks: userData.tasks, darkQ: userData.darkTheme ?? false, lastCl: userData.lastClicked }, token };
+  return { status: "SUCCESS", data: {
+    user: tokenData.associatedUser,
+    alias: userData.alias ?? userData.user,
+    perms: userData.permLevel,
+    expiry: tokenData.expiry,
+    tasks: userData.tasks,
+    darkQ: userData.darkTheme ?? false,
+    lastCl: userData.lastClicked,
+    branch: process.env.branch
+  }, token };
 }
 async function extendSession(token) {
   let tokenData = await import_consts.authDB.findOne({ fieldName: "Token", token });

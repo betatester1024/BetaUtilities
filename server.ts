@@ -10,7 +10,7 @@ import Handlebars from "handlebars";
  // for generating secure random #'s
 import {connectionSuccess} from './index';
 import {port, msgDB, authDB, frontendDir, roomRegex, rootDir, jsDir, uDB} from './consts';
-import {signup, validateLogin, slogout} from './validateLogin';
+import {signup, validateLogin, logout} from './validateLogin';
 import { deleteAccount } from './delacc';
 import {updateUser, realias, toggleTheme} from './updateUser'
 import {userRequest, extendSession} from './userRequest';
@@ -139,7 +139,7 @@ export async function initServer() {
 
   app.ws('/bridge', (ws:any, req:any)=> {
     ws.on('message', (msg:any) => {
-      console.log(msg);
+      // console.log(msg);
       let dat = JSON.parse(msg);
       // console.log(dat);
       switch(dat.action) {
@@ -155,7 +155,7 @@ export async function initServer() {
       }
       // ws.send("reply:"+msg);
     });
-    console.log("Bridge was opened to room "+req.query.room)
+    // console.log("Bridge was opened to room "+req.query.room)
     let bridgeH = new BridgeSocket(req.query.room, ws, req.cookies.accountID);
     // console.log(bridgeH);
     ws.send(JSON.stringify({action:"OPEN", data:null}));
@@ -173,13 +173,13 @@ export async function initServer() {
     ws.on('message', (msg:any) => {
       ws.send("reply:"+msg);
     });
-    console.log("WebSocket was opened")
+    // console.log("WebSocket was opened")
     ws.send(JSON.stringify({action:"OPEN", data:null}));
     supportHandler.addConnection(ws, req.query.room, req.cookies.accountID);
     ws.on("close", () => {
       // clear the connection
       supportHandler.removeConnection(ws, req.query.room, req.cookies.accountID);
-      console.log("Removed stream");
+      // console.log("Removed stream");
     });
   });
   
@@ -221,11 +221,12 @@ export async function initServer() {
   });
 
   app.get("/cmd", urlencodedParser, async (req:any, res:any) => {
-    makeRequest(req.query.action, req.cookies.accountID, req.query.data, null, (s:string, d:any, token:string)=>{
-      console.log(d);
-      if (s == "SUCCESS") sendFile(res, getToken(req), frontendDir+'/actionComplete.html');
-      else {sendFile(res, getToken(req), frontendDir+'/error.html')}
-    })
+    // makeRequest(req.query.action, req.cookies.accountID, req.query.data, "", (s:string, d:any, token:string)=>{
+    //   // console.log(d);
+    //   if (s == "SUCCESS") sendFile(res, getToken(req), frontendDir+'/actionComplete.html');
+    //   else {sendFile(res, getToken(req), frontendDir+'/error.html')}
+    // })
+    sendFile(res, getToken(req), frontendDir+'/403.html')
     incrRequests();
   })
 
@@ -383,295 +384,178 @@ export async function initServer() {
     if (!req.cookies.sessionID) res.cookie('sessionID', crypto.randomUUID(), {httpOnly:true, secure:true, sameSite:"None"});
     //////////////////////////
 
-    makeRequest(body.action, req.cookies.accountID, body.data, req.cookies.sessionID, (s:string, d:any, token:string)=>{
+    makeRequest(body.action, req.cookies.accountID, body.data, req.cookies.sessionID)
+    .then((ret:{status:string, data:any, token:string})=>{
       /*if(body.action=="login"||body.action == "logout" ||
         body.action == "delAcc" || body.action == "signup")*/
       if (ignoreLog.indexOf(body.action)>=0){}
-      else if (s=="SUCCESS") {
-        log("Action performed:"+body.action+", response:"+JSON.stringify(d));
+      else if (ret.status=="SUCCESS") {
+        log("Action performed: "+body.action+", response:"+JSON.stringify(ret.data));
       }
-      else log("Action performed, error on "+body.action+", error:"+d.error);
-      res.cookie('accountID', token?token:"", {httpOnly: true, secure:true, sameSite:"None", maxAge:9e12});
-      res.end(JSON.stringify({status:s, data:d}));
-    })
+      else log("Action performed: "+body.action+", error:"+ret.data.error);
+      res.cookie('accountID', ret.token??"", {httpOnly: true, secure:true, sameSite:"None", maxAge:9e12});
+      res.end(JSON.stringify({status:ret.status, data:ret.data}));
+    });
   });
   
-  app.listen(port, () => {
-    console.log(`BetaUtilities V2 listening on port ${port}`)
-  })
+  app.listen(port, 'localhost', function() {
+    console.log("Listening");
+  });
 }
 
-function makeRequest(action:string|null, token:string, data:any|null, sessID:string, callback: (status:string, dat:any, token:string)=>any) {
+async function makeRequest(action:string|null, token:string, data:any|null, sessID:string) {
   if (!connectionSuccess) {
-    callback("ERROR", {error:"Database connection failure"}, token);
-    return;
+    return {status:"ERROR", data:{error:"Database connection failure"}, token:token};
   }
   
   try {
+    let obj:{status:string, data:any, token:string};
     switch (action) {
       case 'test':
-        callback("SUCCESS", {abc:"def", def:5}, token);
+        return {status:"SUCCESS", data:{abc:"def", def:5}, token:token};
         break;
       case 'login': 
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        // validate login-data before sending to server
-        data = data as {user:string, pass:string, persistQ:boolean};
-        validateLogin(data.user, data.pass, data.persistQ, token).
-          then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+        obj = await validateLogin(data.user, data.pass, data.persistQ, token);
         break;
       case 'signup':
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        data = data as {user:string, pass:string};
-        signup(data.user, data.pass, token)
-          .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});;
+        obj = await signup(data.user, data.pass, token);
         break;
       case 'userRequest': 
-        userRequest(token)
-          .then((obj:{status:string, data:any, token:string})=>
-            {
-              obj.data.branch = process.env['branch'];
-              callback(obj.status, obj.data, obj.token)
-            });
+        obj = await userRequest(token)
         break;
       case 'extendSession': 
-        extendSession(token)
-          .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+        obj = await extendSession(token)
         break;
       case 'roomRequest':
-        let obj2 = roomRequest(token); // this one is synchronous
-        callback(obj2.status, obj2.data, obj2.token);
+        obj = roomRequest(token); // this one is synchronous
         break;
       case 'createRoom':
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        data = data as {name:string}
-        createRoom(data.name, token)
-          .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+        obj = await createRoom(data.name, token)
         break;
       case 'deleteRoom':
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        data = data as {name:string}
-        deleteRoom(data.name, token)
-          .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+        obj = await deleteRoom(data.name, token)
         break;
       case 'statusRequest':
-        let obj3 = roomRequest(token, true);
-        callback(obj3.status, obj3.data, obj3.token);
+        obj = roomRequest(token, true); // synchronous
         break;
       case 'getEE':
-        EE(true, callback, token, "");
+        obj = await EE(true, token, ""); // synchronous
         break;
       case 'setEE':
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        data = data as {data:string}
-        EE(false, callback, token, data.data);
+        obj = await EE(false, token, data.data); // synchronous
         break;
       case 'updateuser': 
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        data = data as {user:string, oldPass: string, pass:string, newPermLevel:string};
-        updateUser(data.user, data.oldPass, data.pass, data.newPermLevel, token)
-        .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+        obj = await updateUser(data.user, data.oldPass, data.pass, data.newPermLevel, token)
         break;
       case 'delAcc':
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        data = data as {user:string, pass:string};
-        deleteAccount(data.user, data.pass, token)
-        .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+        obj = await deleteAccount(data.user, data.pass, token)
         break;
       case 'logout':
-        logout(token)
-        .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+        obj = await logout(token)
         break;
       case 'logout_all':
-        logout(token, true)
-        .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+        obj = await logout(token, true)
         break;
       case 'sendMsg':
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        data = data as {msg:string, room:string, parent:string};
-        if (data.msg.length == 0) {
-          callback("SUCCESS", null, token); break;
-        }
-        sendMsg(data.msg.slice(0, 1024), data.room, data.parent, token, callback);
+        obj = await sendMsg(data.msg, data.room, data.parent, token);
         break;
       case 'lookup':
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        WHOIS(token, data.user)
-        .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+        obj = await WHOIS(token, data.user)
         break;
       case "getLogs":
-        getLogs(token)
-        .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+        obj = await getLogs(token)
         break;
       case "purgeLogs":
-        purgeLogs(token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await purgeLogs(token)
         break;
       case "realias":
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        realias(data.alias, token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await realias(data.alias, token)
         break;
       case "visits":
-        visitCt(token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await visitCt(token)
         break;
       case "addTODO":
-        addTask(token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await addTask(token)
         break;
       case "getTodo":
-        getTasks(token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await getTasks(token)
         break;
       case "updateTODO":
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        updateTask(token, data.id, data.updated)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await updateTask(token, data.id, data.updated)
         break;
       case "deleteTODO":
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        deleteTask(token, data.id)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await deleteTask(token, data.id)
         break;
       case "completeTODO":
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        deleteTask(token, data.id, true)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await deleteTask(token, data.id, true)
         break;
       case "loadLogs": // {"action":"loadLogs","room":"BetaOS","id":"11","from":24}
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        loadLogs(data.room, data.id, data.from, /*don't touch it*/ false, token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await loadLogs(data.room, data.id, data.from, /*don't touch it*/ false, token)
         break;
       case "delMsg":
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        delMsg(data.id, data.room, token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await delMsg(data.id, data.room, token)
         break
       case "updateDefaultLoad":
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        updateDefaultLoad(data.new, token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await updateDefaultLoad(data.new, token)
         break;
       case "hidRoom":
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        hidRoom(data.name, token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await hidRoom(data.name, token)
         break;
       case "purge":
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        purge(data.name, token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await purge(data.name, token)
         break;
       case "uptime":
-        uptime(token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await uptime(token)
         break;
       case 'toggleTheme':
-        toggleTheme(token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await toggleTheme(token)
         break;
       case "updateAboutMe":
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        updateAbout(data.new, token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await updateAbout(data.new, token)
         break;
       case "paste":
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        paste(data.content, data.name, data.pwd, token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await paste(data.content, data.name, data.pwd, token)
         break;
       case "findPaste":
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        findPaste(data.name, data.pwd, token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
-        break;
+        obj = await findPaste(data.name, data.pwd, token)
       case "editPaste":
-        if (!data) {callback("ERROR", {error:"No data provided"}, token); break;}
-        editPaste(data.content, data.name, data.pwd, token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await editPaste(data.content, data.name, data.pwd, token)
         break;
       case "clickIt":
-        clickIt(token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await clickIt(token)
         break;
       case "leaderboard":
-        // console.log("leaderboard requested");
-        getLeaderboard(token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await getLeaderboard(token)
         break;
       case "newIssue":
-        newIssue(data.title, data.body, data.priority, data.tags??[], token, sessID)
-          .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+        obj = await newIssue(data.title, data.body, data.priority, data.tags??[], token, sessID)
         break;
       case "loadIssues":
         // console.log(sessID);
-        loadIssues(data.from, data.ct, data.completedOnly, token)
-          .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+        obj = await loadIssues(data.from, data.ct, data.completedOnly, token)
         break;
       case "deleteissue":
-        deleteIssue(data.id, token)
-          .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+        obj = await deleteIssue(data.id, token)
         break;
      case "completeissue":
-        // console.log(sessID);
-        completeIssue(data.id, token)
-          .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+        obj = await completeIssue(data.id, token)
         break;
       case "editissue":
-        editIssue(data.id, data.newTitle, data.newBody, data.newPriority, data.tags??[], token)
-          .then((obj:{status:string, data:any, token:string})=>
-            {callback(obj.status, obj.data, obj.token)});
+        obj = await editIssue(data.id, data.newTitle, data.newBody, data.newPriority, data.tags??[], token)
         break;
       case "adminAction":
-        adminAction(data.action, data.options, token)
-        .then((obj:{status:string, data:any, token:string})=>
-          {callback(obj.status, obj.data, obj.token)});
+        obj = await adminAction(data.action, data.options, token)
         break;
       default:
-        callback("ERROR", {error: "Unknown command string!"}, token);
+        obj = {status:"ERROR", data:{error: "Unknown command string!"}, token:token};
     }
+    return obj;
   } catch (e:any) {
     console.log("Error:", e);
+    return {status:"ERROR", data:{error:"Error, see console"}, token:token};
   }
   // console.log("request made")
-  return; 
+  ; 
 }
 
 
@@ -709,17 +593,6 @@ function eeFormat(data:string, mainClass:string) {
     
     Return to home<div class="anim"></div></a>
     </div>
-    
-    <div class="overlay" id="overlay">
-      <div class="internal">
-        <p class="fsmed" id="alerttext">Hey, some text here</p>
-        <button class="btn szTwoThirds" onclick="closeAlert()">
-          Continue
-          <span class="material-symbols-outlined">arrow_forward_ios</span>
-          <div class="anim"></div>
-        </button>
-      </div>
-    </div>
   </body>
 </html>`;
 }
@@ -751,17 +624,6 @@ function tooManyRequests() {
     Try <button class="btn fssml" onclick="location.reload()">
     <span class="material-symbols-outlined">refresh</span>
     refreshing.<div class="anim"></div></button></p>
-    </div>
-    
-    <div class="overlay" id="overlay">
-      <div class="internal">
-        <p class="fsmed" id="alerttext">Hey, some text here</p>
-        <button class="btn szTwoThirds" onclick="closeAlert()">
-          Continue
-          <span class="material-symbols-outlined">arrow_forward_ios</span>
-          <div class="anim"></div>
-        </button>
-      </div>
     </div>
   </body>
 </html>`;

@@ -129,7 +129,6 @@ async function initServer() {
   });
   app.ws("/bridge", (ws, req) => {
     ws.on("message", (msg) => {
-      console.log(msg);
       let dat = JSON.parse(msg);
       switch (dat.action) {
         case "loadLogs":
@@ -142,7 +141,6 @@ async function initServer() {
           bridgeH.updateAlias(dat.data.alias, req.cookies.accountID);
       }
     });
-    console.log("Bridge was opened to room " + req.query.room);
     let bridgeH = new import_supportRooms.BridgeSocket(req.query.room, ws, req.cookies.accountID);
     ws.send(JSON.stringify({ action: "OPEN", data: null }));
     ws.on("close", () => {
@@ -153,12 +151,10 @@ async function initServer() {
     ws.on("message", (msg) => {
       ws.send("reply:" + msg);
     });
-    console.log("WebSocket was opened");
     ws.send(JSON.stringify({ action: "OPEN", data: null }));
     import_supportRooms.supportHandler.addConnection(ws, req.query.room, req.cookies.accountID);
     ws.on("close", () => {
       import_supportRooms.supportHandler.removeConnection(ws, req.query.room, req.cookies.accountID);
-      console.log("Removed stream");
     });
   });
   app.get("/room/*", supportReply);
@@ -190,14 +186,7 @@ async function initServer() {
     (0, import_logging.incrRequests)();
   });
   app.get("/cmd", urlencodedParser, async (req, res) => {
-    makeRequest(req.query.action, req.cookies.accountID, req.query.data, null, (s, d, token) => {
-      console.log(d);
-      if (s == "SUCCESS")
-        sendFile(res, getToken(req), import_consts.frontendDir + "/actionComplete.html");
-      else {
-        sendFile(res, getToken(req), import_consts.frontendDir + "/error.html");
-      }
-    });
+    sendFile(res, getToken(req), import_consts.frontendDir + "/403.html");
     (0, import_logging.incrRequests)();
   });
   app.get("*/nodemodules/*", (req, res) => {
@@ -321,358 +310,177 @@ async function initServer() {
     }
     if (!req.cookies.sessionID)
       res.cookie("sessionID", crypto.randomUUID(), { httpOnly: true, secure: true, sameSite: "None" });
-    makeRequest(body.action, req.cookies.accountID, body.data, req.cookies.sessionID, (s, d, token) => {
+    makeRequest(body.action, req.cookies.accountID, body.data, req.cookies.sessionID).then((ret) => {
       if (ignoreLog.indexOf(body.action) >= 0) {
-      } else if (s == "SUCCESS") {
-        (0, import_logging.log)("Action performed:" + body.action + ", response:" + JSON.stringify(d));
+      } else if (ret.status == "SUCCESS") {
+        (0, import_logging.log)("Action performed: " + body.action + ", response:" + JSON.stringify(ret.data));
       } else
-        (0, import_logging.log)("Action performed, error on " + body.action + ", error:" + d.error);
-      res.cookie("accountID", token ? token : "", { httpOnly: true, secure: true, sameSite: "None", maxAge: 9e12 });
-      res.end(JSON.stringify({ status: s, data: d }));
+        (0, import_logging.log)("Action performed: " + body.action + ", error:" + ret.data.error);
+      res.cookie("accountID", ret.token ?? "", { httpOnly: true, secure: true, sameSite: "None", maxAge: 9e12 });
+      res.end(JSON.stringify({ status: ret.status, data: ret.data }));
     });
   });
-  app.listen(import_consts.port, () => {
-    console.log(`BetaUtilities V2 listening on port ${import_consts.port}`);
+  app.listen(import_consts.port, "localhost", function() {
+    console.log("Listening");
   });
 }
-function makeRequest(action, token, data, sessID, callback) {
+async function makeRequest(action, token, data, sessID) {
   if (!import_index.connectionSuccess) {
-    callback("ERROR", { error: "Database connection failure" }, token);
-    return;
+    return { status: "ERROR", data: { error: "Database connection failure" }, token };
   }
   try {
+    let obj;
     switch (action) {
       case "test":
-        callback("SUCCESS", { abc: "def", def: 5 }, token);
+        return { status: "SUCCESS", data: { abc: "def", def: 5 }, token };
         break;
       case "login":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        data = data;
-        (0, import_validateLogin.validateLogin)(data.user, data.pass, data.persistQ, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_validateLogin.validateLogin)(data.user, data.pass, data.persistQ, token);
         break;
       case "signup":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        data = data;
-        (0, import_validateLogin.signup)(data.user, data.pass, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
-        ;
+        obj = await (0, import_validateLogin.signup)(data.user, data.pass, token);
         break;
       case "userRequest":
-        (0, import_userRequest.userRequest)(token).then((obj) => {
-          obj.data.branch = process.env["branch"];
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_userRequest.userRequest)(token);
         break;
       case "extendSession":
-        (0, import_userRequest.extendSession)(token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_userRequest.extendSession)(token);
         break;
       case "roomRequest":
-        let obj2 = (0, import_supportRooms.roomRequest)(token);
-        callback(obj2.status, obj2.data, obj2.token);
+        obj = (0, import_supportRooms.roomRequest)(token);
         break;
       case "createRoom":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        data = data;
-        (0, import_supportRooms.createRoom)(data.name, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_supportRooms.createRoom)(data.name, token);
         break;
       case "deleteRoom":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        data = data;
-        (0, import_supportRooms.deleteRoom)(data.name, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_supportRooms.deleteRoom)(data.name, token);
         break;
       case "statusRequest":
-        let obj3 = (0, import_supportRooms.roomRequest)(token, true);
-        callback(obj3.status, obj3.data, obj3.token);
+        obj = (0, import_supportRooms.roomRequest)(token, true);
         break;
       case "getEE":
-        (0, import_EEHandler.EE)(true, callback, token, "");
+        obj = await (0, import_EEHandler.EE)(true, token, "");
         break;
       case "setEE":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        data = data;
-        (0, import_EEHandler.EE)(false, callback, token, data.data);
+        obj = await (0, import_EEHandler.EE)(false, token, data.data);
         break;
       case "updateuser":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        data = data;
-        (0, import_updateUser.updateUser)(data.user, data.oldPass, data.pass, data.newPermLevel, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_updateUser.updateUser)(data.user, data.oldPass, data.pass, data.newPermLevel, token);
         break;
       case "delAcc":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        data = data;
-        (0, import_delacc.deleteAccount)(data.user, data.pass, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_delacc.deleteAccount)(data.user, data.pass, token);
         break;
       case "logout":
-        logout(token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_validateLogin.logout)(token);
         break;
       case "logout_all":
-        logout(token, true).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_validateLogin.logout)(token, true);
         break;
       case "sendMsg":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        data = data;
-        if (data.msg.length == 0) {
-          callback("SUCCESS", null, token);
-          break;
-        }
-        (0, import_supportRooms.sendMsg)(data.msg.slice(0, 1024), data.room, data.parent, token, callback);
+        obj = await (0, import_supportRooms.sendMsg)(data.msg, data.room, data.parent, token);
         break;
       case "lookup":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        (0, import_supportRooms.WHOIS)(token, data.user).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_supportRooms.WHOIS)(token, data.user);
         break;
       case "getLogs":
-        (0, import_logging.getLogs)(token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_logging.getLogs)(token);
         break;
       case "purgeLogs":
-        (0, import_logging.purgeLogs)(token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_logging.purgeLogs)(token);
         break;
       case "realias":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        (0, import_updateUser.realias)(data.alias, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_updateUser.realias)(data.alias, token);
         break;
       case "visits":
-        (0, import_logging.visitCt)(token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_logging.visitCt)(token);
         break;
       case "addTODO":
-        (0, import_tasks.addTask)(token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_tasks.addTask)(token);
         break;
       case "getTodo":
-        (0, import_tasks.getTasks)(token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_tasks.getTasks)(token);
         break;
       case "updateTODO":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        (0, import_tasks.updateTask)(token, data.id, data.updated).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_tasks.updateTask)(token, data.id, data.updated);
         break;
       case "deleteTODO":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        (0, import_tasks.deleteTask)(token, data.id).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_tasks.deleteTask)(token, data.id);
         break;
       case "completeTODO":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        (0, import_tasks.deleteTask)(token, data.id, true).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_tasks.deleteTask)(token, data.id, true);
         break;
       case "loadLogs":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        (0, import_supportRooms.loadLogs)(data.room, data.id, data.from, false, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_supportRooms.loadLogs)(data.room, data.id, data.from, false, token);
         break;
       case "delMsg":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        (0, import_supportRooms.delMsg)(data.id, data.room, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_supportRooms.delMsg)(data.id, data.room, token);
         break;
       case "updateDefaultLoad":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        (0, import_supportRooms.updateDefaultLoad)(data.new, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_supportRooms.updateDefaultLoad)(data.new, token);
         break;
       case "hidRoom":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        (0, import_supportRooms.hidRoom)(data.name, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_supportRooms.hidRoom)(data.name, token);
         break;
       case "purge":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        (0, import_supportRooms.purge)(data.name, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_supportRooms.purge)(data.name, token);
         break;
       case "uptime":
-        (0, import_messageHandle.uptime)(token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_messageHandle.uptime)(token);
         break;
       case "toggleTheme":
-        (0, import_updateUser.toggleTheme)(token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_updateUser.toggleTheme)(token);
         break;
       case "updateAboutMe":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        (0, import_supportRooms.updateAbout)(data.new, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_supportRooms.updateAbout)(data.new, token);
         break;
       case "paste":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        (0, import_paste.paste)(data.content, data.name, data.pwd, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_paste.paste)(data.content, data.name, data.pwd, token);
         break;
       case "findPaste":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        (0, import_paste.findPaste)(data.name, data.pwd, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
-        break;
+        obj = await (0, import_paste.findPaste)(data.name, data.pwd, token);
       case "editPaste":
-        if (!data) {
-          callback("ERROR", { error: "No data provided" }, token);
-          break;
-        }
-        (0, import_paste.editPaste)(data.content, data.name, data.pwd, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_paste.editPaste)(data.content, data.name, data.pwd, token);
         break;
       case "clickIt":
-        (0, import_button.clickIt)(token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_button.clickIt)(token);
         break;
       case "leaderboard":
-        (0, import_button.getLeaderboard)(token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_button.getLeaderboard)(token);
         break;
       case "newIssue":
-        (0, import_issuetracker.newIssue)(data.title, data.body, data.priority, data.tags ?? [], token, sessID).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_issuetracker.newIssue)(data.title, data.body, data.priority, data.tags ?? [], token, sessID);
         break;
       case "loadIssues":
-        (0, import_issuetracker.loadIssues)(data.from, data.ct, data.completedOnly, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_issuetracker.loadIssues)(data.from, data.ct, data.completedOnly, token);
         break;
       case "deleteissue":
-        (0, import_issuetracker.deleteIssue)(data.id, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_issuetracker.deleteIssue)(data.id, token);
         break;
       case "completeissue":
-        (0, import_issuetracker.completeIssue)(data.id, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_issuetracker.completeIssue)(data.id, token);
         break;
       case "editissue":
-        (0, import_issuetracker.editIssue)(data.id, data.newTitle, data.newBody, data.newPriority, data.tags ?? [], token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_issuetracker.editIssue)(data.id, data.newTitle, data.newBody, data.newPriority, data.tags ?? [], token);
         break;
       case "adminAction":
-        (0, import_adminAction.adminAction)(data.action, data.options, token).then((obj) => {
-          callback(obj.status, obj.data, obj.token);
-        });
+        obj = await (0, import_adminAction.adminAction)(data.action, data.options, token);
         break;
       default:
-        callback("ERROR", { error: "Unknown command string!" }, token);
+        obj = { status: "ERROR", data: { error: "Unknown command string!" }, token };
     }
+    return obj;
   } catch (e) {
     console.log("Error:", e);
+    return { status: "ERROR", data: { error: "Error, see console" }, token };
   }
-  return;
+  ;
 }
 function eeFormat(data, mainClass) {
   return `<!DOCTYPE html>
 <html class="${mainClass}">
   <head>
     <script src='./utils.js'><\/script>
-    <title>Everyone Edits | BetaOS Systems</title>
+    <title>Everyone Edits</title>
     <script>
     <\/script>
     <meta name="viewport" content="width=device-width">
@@ -701,17 +509,6 @@ function eeFormat(data, mainClass) {
     
     Return to home<div class="anim"></div></a>
     </div>
-    
-    <div class="overlay" id="overlay">
-      <div class="internal">
-        <p class="fsmed" id="alerttext">Hey, some text here</p>
-        <button class="btn szTwoThirds" onclick="closeAlert()">
-          Continue
-          <span class="material-symbols-outlined">arrow_forward_ios</span>
-          <div class="anim"></div>
-        </button>
-      </div>
-    </div>
   </body>
 </html>`;
 }
@@ -719,7 +516,7 @@ function tooManyRequests() {
   return `<!DOCTYPE html>
 <html class="{{mainClass}}">
   <head>
-    <title>Error 429 | BetaOS Systems</title>
+    <title>Error 429</title>
     <script>
     ${fs.readFileSync(import_consts.jsDir + "utils.js")}
     <\/script>
@@ -742,17 +539,6 @@ function tooManyRequests() {
     Try <button class="btn fssml" onclick="location.reload()">
     <span class="material-symbols-outlined">refresh</span>
     refreshing.<div class="anim"></div></button></p>
-    </div>
-    
-    <div class="overlay" id="overlay">
-      <div class="internal">
-        <p class="fsmed" id="alerttext">Hey, some text here</p>
-        <button class="btn szTwoThirds" onclick="closeAlert()">
-          Continue
-          <span class="material-symbols-outlined">arrow_forward_ios</span>
-          <div class="anim"></div>
-        </button>
-      </div>
     </div>
   </body>
 </html>`;

@@ -130,7 +130,6 @@ export class BridgeSocket
             content:dat.data.content,
           }
         }));
-        console.log(dat.id);
         if (dat.id == "requiresAutoThreading") {
           this.client.send(JSON.stringify({
             action:"autoThreading",
@@ -206,7 +205,7 @@ export class BridgeSocket
         // this.client.on('close', this.onClientClose.bind(this));
         this.euphSocket.on('error', (e:any)=>{this.euphSocket.close(1000, "");})
       case "login-reply":
-        console.log(dat);
+        // console.log(dat);
         break;
       case "join-event":
         this.client.send(JSON.stringify({
@@ -227,9 +226,9 @@ export class BridgeSocket
         }));
         break;
       default: 
-        console.log(dat.type)
+        console.log("unknown event", dat.type)
         // scream.
-        console.log(dat);
+        // console.log(dat);
     }
   }
 
@@ -269,12 +268,12 @@ export class BridgeSocket
   }
 
   onClientClose() {
-    console.log("clientClosed");
+    console.log("Client in room "+this.roomName+" was closed");
     this.euphSocket.close(1000, "");
   }
   constructor(roomName:string, socket:WebSocket, token:string) 
   {
-    console.log(roomName);
+    console.log("Client in room",roomName,"was opened");
     this.roomName = roomName;
     this.client = socket;
     this.token=token;
@@ -283,7 +282,10 @@ export class BridgeSocket
     this.euphSocket.on('open', this.onOpen.bind(this));
     this.euphSocket.on('message', this.onMessage.bind(this));
     // this.client.on('close', this.onClientClose.bind(this));
-    this.euphSocket.on('error', (e:any)=>{this.euphSocket.close(1000, "");})
+    this.euphSocket.on('error', (e:any)=>{
+      console.log("Error in euphSocket in room",roomName,":",e)
+      this.euphSocket.close(1000, "");
+    });
   }
 }
 
@@ -485,7 +487,9 @@ export class supportHandler {
   }
 }
 
-export function sendMsg(msg: string, room: string, parent: number, token: string, callback: (status: string, data: any, token: string) => any) {
+export function sendMsg(msg: string, room: string, parent: number, token: string) {
+  if (msg.length == 0) return {status:"SUCCESS", data:null, token:token};
+  msg = msg.slice(0, 1024);
   userRequest(token).then(async (obj: { status: string, data: any, token: string }) => {
     let roomData = await msgDB.findOne({ fieldName: "RoomInfo", room: room });
     let msgCt = roomData ? roomData.msgCt : 0;
@@ -506,19 +510,13 @@ export function sendMsg(msg: string, room: string, parent: number, token: string
       supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: obj.data.alias, perms: obj.data.perms, parent: parent, content: msg } }));
     }
     else {
-      //console.log("sending")
       supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, parent: parent, content: msg } }));
     }
-    //console.log(supportHandler.allRooms);
-    // console.log(supportHandler.allRooms);
-    for (let i = 0; i < supportHandler.allRooms.length; i++) {
+    for (let i = 0; i < supportHandler.allRooms.length; i++) 
       if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
-        // console.log(supportHandler.allRooms[i].handler)
         supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token))
       }
-
-    }
-    callback("SUCCESS", null, token);
+    return {status:"SUCCESS", data:null, token:token};
   });
 }
 
@@ -560,7 +558,7 @@ export function roomRequest(token: string, all: boolean = false) {
 
 export async function createRoom(name: string, token: string) {
   if (supportHandler.checkFoundQ(name)) return { status: "ERROR", data: { error: "Room already exists" }, token: token };
-  let usrData = await userRequest(token) as { status: string, data: { perms: number } };
+  let usrData = await userRequest(token);
   if (!name.match("^" + roomRegex + "$")) return { status: "ERROR", data: { error: "Invalid roomname!" }, token: token };
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
@@ -584,7 +582,7 @@ export async function createRoom(name: string, token: string) {
 
 export async function deleteRoom(name: string, token: string) {
   if (!supportHandler.checkFoundQ(name)) return { status: "ERROR", data: { error: "Room does not exist" }, token: token };
-  let usrData = await userRequest(token) as { status: string, data: { perms: number } };
+  let usrData = await userRequest(token);
   if (!name.match("^" + roomRegex + "$")) return { status: "ERROR", data: { error: "Invalid roomname!" }, token: token };
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {

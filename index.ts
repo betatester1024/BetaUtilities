@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 import {initServer} from './server';
 import {DBMaintenance, connectDB, client} from './database';
 import {supportHandler, Room, BridgeHandler} from './supportRooms'
@@ -14,7 +16,7 @@ const localEuphRooms = [
   // "bots", "room", "memes", "music", "srs"
 ]
 const { exec } = require("child_process");
-require('dotenv').config();
+
 const localtunnel = require('localtunnel');
 
 (async () => {

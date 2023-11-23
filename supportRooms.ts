@@ -487,37 +487,36 @@ export class supportHandler {
   }
 }
 
-export function sendMsg(msg: string, room: string, parent: number, token: string) {
+export async function sendMsg(msg: string, room: string, parent: number, token: string) {
   if (msg.length == 0) return {status:"SUCCESS", data:null, token:token};
   msg = msg.slice(0, 1024);
-  userRequest(token).then(async (obj: { status: string, data: any, token: string }) => {
-    let roomData = await msgDB.findOne({ fieldName: "RoomInfo", room: room });
-    let msgCt = roomData ? roomData.msgCt : 0;
-    let threadCt = roomData ? (roomData.threadCt??0) : 0;
-    msg = msg.replaceAll("\\n", "\n");
-    let parentDoc = await msgDB.findOne({fieldName:"MSG", msgID:Number(parent)});
-    // if (parentDoc) console.log(threadCt);
-    await msgDB.insertOne({
-      fieldName: "MSG", data: msg.replaceAll(">", "&gt;"), permLevel: obj.data.perms ?? 1,
-      sender: obj.data.alias ?? "" + processAnon(token), expiry: Date.now() + 3600 * 1000 * 24 * 30,
-      room: room, msgID: msgCt, parent:parent, threadID: parentDoc?(parentDoc.threadID??threadCt):threadCt
-    });
-
-    await msgDB.updateOne({ room: room, fieldName: "RoomInfo" }, {
-      $inc: { msgCt: 1, threadCt:parentDoc?0:1}
-    }, { upsert: true });
-    if (obj.status == "SUCCESS") {
-      supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: obj.data.alias, perms: obj.data.perms, parent: parent, content: msg } }));
-    }
-    else {
-      supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, parent: parent, content: msg } }));
-    }
-    for (let i = 0; i < supportHandler.allRooms.length; i++) 
-      if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
-        supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token))
-      }
-    return {status:"SUCCESS", data:null, token:token};
+  let obj = await userRequest(token);
+  let roomData = await msgDB.findOne({ fieldName: "RoomInfo", room: room });
+  let msgCt = roomData ? roomData.msgCt : 0;
+  let threadCt = roomData ? (roomData.threadCt??0) : 0;
+  msg = msg.replaceAll("\\n", "\n");
+  let parentDoc = await msgDB.findOne({fieldName:"MSG", msgID:Number(parent)});
+  // if (parentDoc) console.log(threadCt);
+  await msgDB.insertOne({
+    fieldName: "MSG", data: msg.replaceAll(">", "&gt;"), permLevel: obj.data.perms ?? 1,
+    sender: obj.data.alias ?? "" + processAnon(token), expiry: Date.now() + 3600 * 1000 * 24 * 30,
+    room: room, msgID: msgCt, parent:parent, threadID: parentDoc?(parentDoc.threadID??threadCt):threadCt
   });
+
+  await msgDB.updateOne({ room: room, fieldName: "RoomInfo" }, {
+    $inc: { msgCt: 1, threadCt:parentDoc?0:1}
+  }, { upsert: true });
+  if (obj.status == "SUCCESS") {
+    supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: obj.data.alias, perms: obj.data.perms, parent: parent, content: msg } }));
+  }
+  else {
+    supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, parent: parent, content: msg } }));
+  }
+  for (let i = 0; i < supportHandler.allRooms.length; i++) 
+    if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
+      supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token))
+    }
+  return {status:"SUCCESS", data:null, token:token};
 }
 
 export async function sendMsg_B(msg: string, room: string) {

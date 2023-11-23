@@ -331,11 +331,12 @@ async function makeRequest(action, token, data, sessID) {
   if (!import_index.connectionSuccess) {
     return { status: "ERROR", data: { error: "Database connection failure" }, token };
   }
+  console.log("request made");
   try {
     let obj;
     switch (action) {
       case "test":
-        return { status: "SUCCESS", data: { abc: "def", def: 5 }, token };
+        obj = { status: "SUCCESS", data: { abc: "def", def: 5 }, token };
         break;
       case "login":
         obj = await (0, import_validateLogin.validateLogin)(data.user, data.pass, data.persistQ, token);
@@ -471,12 +472,12 @@ async function makeRequest(action, token, data, sessID) {
       default:
         obj = { status: "ERROR", data: { error: "Unknown command string!" }, token };
     }
+    console.log(obj);
     return obj;
   } catch (e) {
     console.log("Error:", e);
     return { status: "ERROR", data: { error: "Error, see console" }, token };
   }
-  ;
 }
 function eeFormat(data, mainClass) {
   return `<!DOCTYPE html>

@@ -1,0 +1,16 @@
+HOW TO USE SCREEN
+
+Starting a screen:
+screen -S "name"
+
+Listing active screens:
+screen -ls
+
+Going back to a screen:
+screen -r screenid
+
+IN A SCREEN:
+Ctrl+A D: detach the screen (return to the console)
+Ctrl+A ": screen listing
+Ctrl+A C: add new window
+Ctrl+A K: kill the screen

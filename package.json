@@ -4,7 +4,7 @@
   "description": "BetaOS Systems home-page and BetaUtilities on Euphoria.io",
   "main": ".build/index.js",
   "scripts": {
-    "start":"bash build.sh; mv env .env; node .build/index.js"
+    "start":"bash build.sh; node .build/index.js"
   },
   "keywords": [],
   "author": "",

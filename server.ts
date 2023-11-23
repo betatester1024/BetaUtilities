@@ -409,12 +409,12 @@ async function makeRequest(action:string|null, token:string, data:any|null, sess
   if (!connectionSuccess) {
     return {status:"ERROR", data:{error:"Database connection failure"}, token:token};
   }
-  
+  // console.log("request made");
   try {
     let obj:{status:string, data:any, token:string};
     switch (action) {
       case 'test':
-        return {status:"SUCCESS", data:{abc:"def", def:5}, token:token};
+        obj = {status:"SUCCESS", data:{abc:"def", def:5}, token:token};
         break;
       case 'login': 
         obj = await validateLogin(data.user, data.pass, data.persistQ, token);
@@ -551,13 +551,12 @@ async function makeRequest(action:string|null, token:string, data:any|null, sess
       default:
         obj = {status:"ERROR", data:{error: "Unknown command string!"}, token:token};
     }
+    // console.log(obj);
     return obj;
   } catch (e:any) {
     console.log("Error:", e);
     return {status:"ERROR", data:{error:"Error, see console"}, token:token};
   }
-  // console.log("request made")
-  ; 
 }
 
 

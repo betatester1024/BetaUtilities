@@ -447,41 +447,40 @@ class supportHandler {
     }
   }
 }
-function sendMsg(msg, room, parent, token) {
+async function sendMsg(msg, room, parent, token) {
   if (msg.length == 0)
     return { status: "SUCCESS", data: null, token };
   msg = msg.slice(0, 1024);
-  (0, import_userRequest.userRequest)(token).then(async (obj) => {
-    let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room });
-    let msgCt = roomData ? roomData.msgCt : 0;
-    let threadCt = roomData ? roomData.threadCt ?? 0 : 0;
-    msg = msg.replaceAll("\\n", "\n");
-    let parentDoc = await import_consts.msgDB.findOne({ fieldName: "MSG", msgID: Number(parent) });
-    await import_consts.msgDB.insertOne({
-      fieldName: "MSG",
-      data: msg.replaceAll(">", "&gt;"),
-      permLevel: obj.data.perms ?? 1,
-      sender: obj.data.alias ?? "" + processAnon(token),
-      expiry: Date.now() + 3600 * 1e3 * 24 * 30,
-      room,
-      msgID: msgCt,
-      parent,
-      threadID: parentDoc ? parentDoc.threadID ?? threadCt : threadCt
-    });
-    await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
-      $inc: { msgCt: 1, threadCt: parentDoc ? 0 : 1 }
-    }, { upsert: true });
-    if (obj.status == "SUCCESS") {
-      supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: obj.data.alias, perms: obj.data.perms, parent, content: msg } }));
-    } else {
-      supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, parent, content: msg } }));
-    }
-    for (let i = 0; i < supportHandler.allRooms.length; i++)
-      if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
-        supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token));
-      }
-    return { status: "SUCCESS", data: null, token };
+  let obj = await (0, import_userRequest.userRequest)(token);
+  let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room });
+  let msgCt = roomData ? roomData.msgCt : 0;
+  let threadCt = roomData ? roomData.threadCt ?? 0 : 0;
+  msg = msg.replaceAll("\\n", "\n");
+  let parentDoc = await import_consts.msgDB.findOne({ fieldName: "MSG", msgID: Number(parent) });
+  await import_consts.msgDB.insertOne({
+    fieldName: "MSG",
+    data: msg.replaceAll(">", "&gt;"),
+    permLevel: obj.data.perms ?? 1,
+    sender: obj.data.alias ?? "" + processAnon(token),
+    expiry: Date.now() + 3600 * 1e3 * 24 * 30,
+    room,
+    msgID: msgCt,
+    parent,
+    threadID: parentDoc ? parentDoc.threadID ?? threadCt : threadCt
   });
+  await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
+    $inc: { msgCt: 1, threadCt: parentDoc ? 0 : 1 }
+  }, { upsert: true });
+  if (obj.status == "SUCCESS") {
+    supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: obj.data.alias, perms: obj.data.perms, parent, content: msg } }));
+  } else {
+    supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, parent, content: msg } }));
+  }
+  for (let i = 0; i < supportHandler.allRooms.length; i++)
+    if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
+      supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token));
+    }
+  return { status: "SUCCESS", data: null, token };
 }
 async function sendMsg_B(msg, room) {
   let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room });

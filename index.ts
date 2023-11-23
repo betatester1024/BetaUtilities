@@ -1,4 +1,4 @@
-require('dotenv').config();
+// require('dotenv').config();
 
 import {initServer} from './server';
 import {DBMaintenance, connectDB, client} from './database';
@@ -17,17 +17,17 @@ const localEuphRooms = [
 ]
 const { exec } = require("child_process");
 
-const localtunnel = require('localtunnel');
+// const localtunnel = require('localtunnel');
 
-(async () => {
-  const tunnel = await localtunnel({ port: 3000, subdomain:"betaos" });
-  console.log("Tunnelling at", tunnel.url);
+// (async () => {
+//   const tunnel = await localtunnel({ port: 3000, subdomain:"betaos" });
+//   console.log("Tunnelling at", tunnel.url);
 
-  tunnel.on('close', () => {
-    console.log("WARNING: Tunnel is closed!");
-    // tunnels are closed
-  });
-})();
+//   tunnel.on('close', () => {
+//     console.log("WARNING: Tunnel is closed!");
+//     // tunnels are closed
+//   });
+// })();
 
 let timedOutQ = false;
 export let UPSINCESTR = "";

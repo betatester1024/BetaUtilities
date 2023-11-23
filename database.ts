@@ -7,15 +7,12 @@ const uri =
   `mongodb+srv://SystemLogin:${process.env['dbPwd']}@betaos-datacluster00.d8o7x8n.mongodb.net/?retryWrites=true&w=majority`
   // "mongodb://SystemLogin:"+process.env['dbPwd']+"@ac-rz8jdrl-shard-00-00.d8o7x8n.mongodb.net:27017,ac-rz8jdrl-shard-00-01.d8o7x8n.mongodb.net:27017,ac-rz8jdrl-shard-00-02.d8o7x8n.mongodb.net:27017/?ssl=true&replicaSet=atlas-3yyxq8-shard-0&authSource=admin&retryWrites=true&w=majority";
   // "mongodb+srv://SystemLogin:"+process.env['dbPwd']+"@betaos-datacluster00.d8o7x8n.mongodb.net/?retryWrites=true&w=majority";
-
+// console.log("YOUR URI IS:", uri);
 import {DBConnectFailure} from './index';
-export let database:any;
-export let client:any;
+export const client = new MongoClient(uri)//, { useNewUrlParser: true, useUnifiedTopology: true });
 // const client = cli.connect();
 export async function connectDB() {
   try {
-    client = new MongoClient(uri)//, { useNewUrlParser: true, useUnifiedTopology: true });
-    database = client.db('BetaOS-Database01')
     await client.connect();  
     clearTimeout(DBConnectFailure)
     return null;
@@ -27,7 +24,7 @@ export async function connectDB() {
   }
 }
 // export let minID = -1;
-
+export const database = client.db('BetaOS-Database01');
 // export const DB = database.collection('BetaUtilities');
 
 export async function DBMaintenance() {

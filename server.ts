@@ -398,9 +398,11 @@ export async function initServer() {
     });
   });
   
-  app.listen(port, 'localhost', function() {
-    console.log("Listening");
-  });
+  if (process.env.localhost) 
+    app.listen(port, 'localhost', function() {
+      console.log("Listening");
+    });
+  else app.listen(port);
 }
 
 async function makeRequest(action:string|null, token:string, data:any|null, sessID:string) {

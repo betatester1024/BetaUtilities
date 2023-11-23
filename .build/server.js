@@ -320,9 +320,12 @@ async function initServer() {
       res.end(JSON.stringify({ status: ret.status, data: ret.data }));
     });
   });
-  app.listen(import_consts.port, "localhost", function() {
-    console.log("Listening");
-  });
+  if (process.env.localhost)
+    app.listen(import_consts.port, "localhost", function() {
+      console.log("Listening");
+    });
+  else
+    app.listen(import_consts.port);
 }
 async function makeRequest(action, token, data, sessID) {
   if (!import_index.connectionSuccess) {

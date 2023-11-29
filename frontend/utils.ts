@@ -70,7 +70,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string=
         box.className = "sidebar-unstable";
         box.innerHTML = `<span class="material-symbols-outlined">warning</span>\
         Unstable version. Features may be unfinished or broken. 
-        <a class="grn" href="https://betatester1024.repl.co">Switch to stable branch</a>`;
+        <a class="grn" href="${process.env.domain}">Switch to stable branch</a>`;
         document.body.appendChild(box);
       }
       // document.documentElement.className = res.data.darkQ?"dark":"";
@@ -89,8 +89,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string=
       let urlEle = new URL(location.href);
       let redirector = urlEle.pathname + "?"+urlEle.searchParams.toString();
       if (link !="/server" && res.status != "SUCCESS") 
-        ele.innerHTML = `<a href="//betatester1024.repl.co">BetaOS Services site</a> | 
-                         <a href="//unstable.betatester1024.repl.co/login?redirect=/redirect?to=${encodeURI("https://keepalive.betatester1024.repl.co/callback?return="+encodeURIComponent(redirector))}">Login</a> | 
+        ele.innerHTML = `<a href="${process.env.domain}">BetaOS Services site</a> | 
                       <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
                         <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                         <div class="anim"></div>
@@ -100,7 +99,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string=
         ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}" onclick="login_v2(event)">Login</a> | 
                       <a href='/signup?redirect=${encodeURIComponent(redirector)}' onclick="login_v2(event, true)">Sign-up</a> | 
                       <a href='/status'>Status</a> | 
-                      <a href='https://${branch=="unstable"?"betatester1024.repl.co":"unstable.betatester1024.repl.co"}'>
+                      <a href='https://${branch=="unstable"?process.env.domain:process.env.unstableDomain}'>
                       Switch to ${branch=="unstable"?"stable":"unstable"} branch</a> | 
                       <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
                         <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
@@ -114,7 +113,7 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string=
                       <a href='/logout' onclick='logout_v2(event)'>Logout</a> | 
                       <a href='/config'>Account</a> | 
                       <a href='/status'>Status</a> | 
-                      <a href='https://${branch=="unstable"?"betatester1024.repl.co":"unstable.betatester1024.repl.co"}'>
+                      <a href='https://${branch=="unstable"?process.env.domain:process.env.unstableDomain}'>
                       Switch to ${branch=="unstable"?"stable":"unstable"} branch</a> | 
                       <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
                       <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
@@ -126,8 +125,8 @@ async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string=
       else 
       {
         ele.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
-                      <a href='//betatester1024.repl.co/logout'>Logout</a> | 
-                      <a href="//betatester1024.repl.co">BetaOS Services site</a> | 
+                      <a href='${process.env.domain}/logout'>Logout</a> | 
+                      <a href="${process.env.domain}">BetaOS Services site</a> | 
                       <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
                         <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                         <div class="anim"></div>

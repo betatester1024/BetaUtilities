@@ -4,7 +4,7 @@
   "description": "BetaOS Systems home-page and BetaUtilities on Euphoria.io",
   "main": ".build/index.js",
   "scripts": {
-    "start":"bash build.sh; node .build/index.js"
+    "start":"bash build.sh; pm2 start /betaos/.build/index.js --watch --restart-delay 3000"
   },
   "keywords": [],
   "author": "",

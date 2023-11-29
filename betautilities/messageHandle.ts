@@ -91,7 +91,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
   if (imgMatch) {
     return "https://external-content.duckduckgo.com/iu/?u="+imgMatch[1];
   }
-  if (msg.match(/!pasteit!?/gimu)) return "https://betatester1024.repl.co/paste";
+  if (msg.match(/!pasteit!?/gimu)) return process.env.domain+"/paste";
   if (msg.match("^!uptime @" + hnd.nick.toLowerCase() + "$")) {
     hnd.clearCallReset();
     getUptimeStr(STARTTIME).then((value:string)=>{
@@ -358,7 +358,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     return "Loading..."
   }
   if (msg == "!docs @"+hnd.nick.toLowerCase()) {
-    return "https://betatester1024.repl.co/commands?nick=BetaUtilities";
+    return process.env.domain+"/commands?nick=BetaUtilities";
   }
   if (msg.match(/^!potato$/)) return "potato.io";
   if (msg == "!rating @" + hnd.nick.toLowerCase()) {
@@ -378,13 +378,13 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     return "Disabled message logging.";
   }
   if (msg == "!status" || msg == "!status @"+hnd.nick.toLowerCase()) {
-    return "Status-tracker: https://betatester1024.repl.co/status";
+    return "Status-tracker: "+process.env.domain;
   }
   if (msg == "!systemhome" || msg == "!systemhome @"+hnd.nick.toLowerCase()) {
-    return "https://betatester1024.repl.co";
+    return process.env.domain;
   }
   if (msg == "!syslog" || msg == "!syslog @"+hnd.nick.toLowerCase()) {
-    return "https://betatester1024.repl.co/syslog";
+    return process.env.domain+"/syslog";
   }
   if (msg.match("^!die$")) {
     if (hnd.socket) setTimeout(()=>{hnd.socket.close()}, 120);
@@ -471,7 +471,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     hnd.clearCallReset();
     return (
       "Important commands: !ping, !help, !pause, !restore, !kill, !pong, !uptime, !uuid. \n " +
-      "Bot-specific commands: see https://betatester1024.repl.co/commands?nick=BetaUtilities"
+      "Bot-specific commands: see "+process.env.domain+"/commands?nick=BetaUtilities"
     );
   }
   if (hnd.callStatus == 1 && (msg == ":two:" || msg == "two" || msg == "2")) {

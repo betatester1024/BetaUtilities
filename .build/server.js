@@ -331,7 +331,6 @@ async function makeRequest(action, token, data, sessID) {
   if (!import_index.connectionSuccess) {
     return { status: "ERROR", data: { error: "Database connection failure" }, token };
   }
-  console.log("request made");
   try {
     let obj;
     switch (action) {
@@ -472,7 +471,6 @@ async function makeRequest(action, token, data, sessID) {
       default:
         obj = { status: "ERROR", data: { error: "Unknown command string!" }, token };
     }
-    console.log(obj);
     return obj;
   } catch (e) {
     console.log("Error:", e);

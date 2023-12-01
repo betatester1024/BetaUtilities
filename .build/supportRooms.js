@@ -527,7 +527,10 @@ async function sendMsg(msg, room, parent, token) {
     if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
       supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token));
     }
-  return { status: "SUCCESS", data: null, token };
+  if (parent == -1) {
+    return { status: "SUCCESS", data: { autoThread: msgCt }, token };
+  }
+  return { status: "SUCCESS", data: { autoThread: null }, token };
 }
 async function sendMsg_B(msg, room) {
   let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room });

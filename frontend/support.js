@@ -136,7 +136,10 @@ function sendMsg(ev) {
   // }
   // else {
     if (ISBRIDGE) source.send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME, parent:ACTIVEREPLY}}));
-    else send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME, parent:ACTIVEREPLY}}), ()=>{}, true);
+    else send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME, parent:ACTIVEREPLY}}), (res)=>{
+      if (res.data.autoThread) 
+        toggleActiveReply(res.data.autoThread);
+    }, true);
     // toggleActiveReply()
   // }
   inp.value="";

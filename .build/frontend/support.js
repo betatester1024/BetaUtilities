@@ -104,7 +104,9 @@ function sendMsg(ev) {
   if (ISBRIDGE)
     source.send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME, parent: ACTIVEREPLY } }));
   else
-    send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME, parent: ACTIVEREPLY } }), () => {
+    send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME, parent: ACTIVEREPLY } }), (res) => {
+      if (res.data.autoThread)
+        toggleActiveReply(res.data.autoThread);
     }, true);
   inp.value = "";
 }

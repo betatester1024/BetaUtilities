@@ -568,10 +568,10 @@ export async function sendMsg(msg: string, room: string, parent: number, token: 
     if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
       supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token))
     }
-  if (parent == null) {
-    return {status:"SUCCESS", data:{autoThread:true}, token};
+  if (parent == -1) {
+    return {status:"SUCCESS", data:{autoThread:msgCt}, token};
   }
-  return {status:"SUCCESS", data:{autoThread:false}, token:token};
+  return {status:"SUCCESS", data:{autoThread:null}, token:token};
 }
 
 export async function sendMsg_B(msg: string, room: string) {

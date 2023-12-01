@@ -149,12 +149,26 @@ async function initServer() {
   });
   app.ws("/", (ws, req) => {
     ws.on("message", (msg) => {
-      ws.send("reply:" + msg);
+      let dat = JSON.parse(msg);
+      switch (dat.action) {
+        case "updateAlias":
+          import_supportRooms.supportHandler.updateAlias(dat.data.alias, token).catch((e) => {
+            console.log(e);
+          }).then((obj) => {
+            if (obj.status != "SUCCESS")
+              ws.send(JSON.stringify({
+                action: "yourAlias",
+                data: { alias: obj.data.alias }
+              }));
+          });
+      }
     });
+    let room = req.query.room;
+    let token = req.cookies.accountID || req.cookies.sessionID;
     ws.send(JSON.stringify({ action: "OPEN", data: null }));
-    import_supportRooms.supportHandler.addConnection(ws, req.query.room, req.cookies.accountID);
+    import_supportRooms.supportHandler.addConnection(ws, req.query.room, token);
     ws.on("close", () => {
-      import_supportRooms.supportHandler.removeConnection(ws, req.query.room, req.cookies.accountID);
+      import_supportRooms.supportHandler.removeConnection(ws, req.query.room, token);
     });
   });
   app.get("/room/*", supportReply);
@@ -380,7 +394,7 @@ async function makeRequest(action, token, data, sessID) {
         obj = await (0, import_validateLogin.logout)(token, true);
         break;
       case "sendMsg":
-        obj = await (0, import_supportRooms.sendMsg)(data.msg, data.room, data.parent, token);
+        obj = await (0, import_supportRooms.sendMsg)(data.msg, data.room, data.parent, token || sessID);
         break;
       case "lookup":
         obj = await (0, import_supportRooms.WHOIS)(token, data.user);
@@ -392,7 +406,7 @@ async function makeRequest(action, token, data, sessID) {
         obj = await (0, import_logging.purgeLogs)(token);
         break;
       case "realias":
-        obj = await (0, import_updateUser.realias)(data.alias, token);
+        obk = { status: "SUCCESS", data: null, token };
         break;
       case "visits":
         obj = await (0, import_logging.visitCt)(token);

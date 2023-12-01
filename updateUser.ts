@@ -54,6 +54,7 @@ export async function realias(newalias:string, token:string) {
   await authDB.updateOne({fieldName:"UserData", user:tokenData.associatedUser}, {
     $set:{alias:newalias}
   });
+  
   return {status:"SUCCESS", data:null, token:token};
 }
 

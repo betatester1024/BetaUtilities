@@ -313,6 +313,8 @@ class supportHandler {
       this.allRooms.splice(idx, 1);
   }
   static async addConnection(ev, rn, token, internalFlag = false) {
+    if (!internalFlag)
+      console.log("added new connection", rn);
     this.connectionCt++;
     if (internalFlag) {
       token = "[SYSINTERNAL]";
@@ -328,13 +330,30 @@ class supportHandler {
           }
         });
     }
-    let thiscn = { id: this.connectionCt, event: ev, roomName: rn, tk: token, readyQ: false, isPseudoConnection: internalFlag };
+    let usrData = await (0, import_userRequest.userRequest)(token, internalFlag);
+    if (usrData.status != "SUCCESS")
+      usrData = { data: { user: "" } };
+    ev.send(JSON.stringify({
+      action: "yourAlias",
+      data: {
+        alias: usrData.status == "SUCCESS" ? usrData.data.alias : processAnon(token)
+      }
+    }));
+    let thiscn = {
+      id: this.connectionCt,
+      event: ev,
+      roomName: rn,
+      tk: token,
+      readyQ: false,
+      isPseudoConnection: internalFlag,
+      userID: usrData.data.user ?? ""
+    };
     this.connections.push(thiscn);
     (0, import_userRequest.userRequest)(token, internalFlag).then((obj) => {
       if (obj.status == "SUCCESS")
         this.sendMsgTo(rn, JSON.stringify({ action: "addUser", data: { user: obj.data.alias, perms: obj.data.perms } }));
       else
-        this.sendMsgTo(rn, JSON.stringify({ action: "addUser", data: { user: processAnon(obj.token), perms: 1 } }));
+        this.sendMsgTo(rn, JSON.stringify({ action: "addUser", data: { user: processAnon(token), perms: 1 } }));
     });
     let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
     let msgCt = roomData ? roomData.msgCt : 0;
@@ -363,7 +382,7 @@ class supportHandler {
       if (obj.status == "SUCCESS")
         this.sendMsgTo(rn, JSON.stringify({ action: "removeUser", data: { user: obj.data.alias, perms: obj.data.perms } }));
       else
-        this.sendMsgTo(rn, JSON.stringify({ action: "removeUser", data: { user: processAnon(obj.token), perms: 1 } }));
+        this.sendMsgTo(rn, JSON.stringify({ action: "removeUser", data: { user: processAnon(token), perms: 1 } }));
     });
   }
   static listRooms(euphOnlyQ, onlineOnlyQ) {
@@ -383,6 +402,34 @@ class supportHandler {
       out.push(this.getPrefix(this.allRooms[i].type) + this.allRooms[i].name);
     }
     return out;
+  }
+  static async updateAlias(newAlias, token) {
+    let usrData = await (0, import_userRequest.userRequest)(token);
+    if (usrData.status != "SUCCESS") {
+      usr.data = { alias: processAnon(token) };
+      return resp;
+    }
+    let oldAlias = usrData.data.alias;
+    let resp = await (0, import_updateUser.realias)(newAlias, token);
+    for (let i = 0; i < this.connections.length; i++)
+      if (this.connections[i].userID == usrData.data.user) {
+        for (let j = 0; j < this.connections.length; j++) {
+          this.connections[j].event.send(JSON.stringify({
+            action: "removeUser",
+            data: {
+              user: oldAlias
+            }
+          }));
+          this.connections[j].event.send(JSON.stringify({
+            action: "addUser",
+            data: {
+              user: newAlias
+            }
+          }));
+        }
+        this.connections[i].event.send(JSON.stringify({ action: "yourAlias", data: { alias: newAlias } }));
+      }
+    return { status: "SUCCESS", data: null, token };
   }
   static listEuphRooms() {
     let out = [];
@@ -514,7 +561,8 @@ async function sendMsg_B(msg, room) {
   supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: betaNick, perms: 3, content: msg.replaceAll("\\n\\n", "\n") } }));
 }
 function processAnon(token) {
-  return "Anonymous user";
+  console.log(token.slice(0, 4));
+  return "Anonymous|" + token.slice(0, 4);
 }
 function roomRequest(token, all = false) {
   if (all)

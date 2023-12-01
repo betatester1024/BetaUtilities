@@ -44,7 +44,9 @@ async function userRequest(token, internalFlag = false) {
     tasks: userData.tasks,
     darkQ: userData.darkTheme ?? false,
     lastCl: userData.lastClicked,
-    branch: process.env.branch
+    branch: process.env.branch,
+    domain: process.env.domain,
+    unstableDomain: process.env.unstableDomain
   }, token };
 }
 async function extendSession(token) {

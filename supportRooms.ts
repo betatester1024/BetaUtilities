@@ -232,7 +232,7 @@ export class BridgeSocket
     }
   }
 
-  async updateAlias(alias:string, token) {
+  async updateAlias(alias:string, token:string) {
     if (alias.length == 0 || alias.length > 36) return;
     let usrData = await userRequest(token);
     let updateAliasRes = await realias(alias, token);
@@ -311,6 +311,7 @@ export class supportHandler {
   }
   static async addConnection(ev: any, rn: string, token: string, internalFlag: boolean = false) {
     // send existing connections to THIS EVENT ONLY
+    if (!internalFlag) console.log("added new connection", rn);
     this.connectionCt++;
     if (internalFlag) {
       token = "[SYSINTERNAL]";
@@ -327,13 +328,29 @@ export class supportHandler {
           }
         });
     }
+    let usrData = await userRequest(token, internalFlag);
+    if (usrData.status != "SUCCESS") usrData = {data:{user:""}}
+    ev.send(JSON.stringify({
+      action:"yourAlias", 
+      data:{
+        alias:(usrData.status=="SUCCESS"?usrData.data.alias:processAnon(token))
+      }
+    }))
     // add NEW CONNECTION
-    let thiscn = { id: this.connectionCt, event: ev, roomName: rn, tk: token, readyQ: false, isPseudoConnection: internalFlag };
+    let thiscn = { 
+      id: this.connectionCt, 
+      event: ev, 
+      roomName: rn, 
+      tk: token, 
+      readyQ: false, 
+      isPseudoConnection: internalFlag,
+      userID:usrData.data.user??""
+    };
     this.connections.push(thiscn);
     // TELL EVERYONE ELSE ABOUT THE NEW CONNECTION
     userRequest(token, internalFlag).then((obj: { status: string, data: any, token: string }) => {
       if (obj.status == "SUCCESS") this.sendMsgTo(rn, JSON.stringify({ action: "addUser", data: { user: obj.data.alias, perms: obj.data.perms } }));
-      else this.sendMsgTo(rn, JSON.stringify({ action: "addUser", data: { user: processAnon(obj.token), perms: 1 } }));
+      else this.sendMsgTo(rn, JSON.stringify({ action: "addUser", data: { user: processAnon(token), perms: 1 } }));
     });
     // console.log("added connection in "+rn);
     let roomData = await msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
@@ -393,7 +410,7 @@ export class supportHandler {
 
     userRequest(token).then((obj: { status: string, data: any, token: string }) => {
       if (obj.status == "SUCCESS") this.sendMsgTo(rn, JSON.stringify({ action: "removeUser", data: { user: obj.data.alias, perms: obj.data.perms } }));
-      else this.sendMsgTo(rn, JSON.stringify({ action: "removeUser", data: { user: processAnon(obj.token), perms: 1 } }));
+      else this.sendMsgTo(rn, JSON.stringify({ action: "removeUser", data: { user: processAnon(token), perms: 1 } }));
       // console.log("removed connection in "+rn); 
     });
   }
@@ -417,6 +434,41 @@ export class supportHandler {
       out.push(this.getPrefix(this.allRooms[i].type) + this.allRooms[i].name);
     }
     return out;
+  }
+
+  static async updateAlias(newAlias:string, token:string) {
+    
+    let usrData = await userRequest(token);
+    if (usrData.status != "SUCCESS") {
+      usr.data = {alias:processAnon(token)};
+      return resp;
+    }
+    let oldAlias = usrData.data.alias;
+    let resp = await realias(newAlias, token);
+    // find what rooms this user is in
+    for (let i=0; i<this.connections.length; i++)
+      if (this.connections[i].userID == usrData.data.user) {
+        // console.log("found connection", this.connections[i].userID);
+        // must broadcast to everyone for how many renames there are...
+        for (let j=0; j<this.connections.length; j++) {
+          this.connections[j].event.send(JSON.stringify({
+            action:"removeUser", 
+            data:{
+              user:oldAlias
+            }
+          }));
+          this.connections[j].event.send(JSON.stringify({
+            action:"addUser",
+            data:{
+              user:newAlias
+            }
+          }))
+        } 
+        // then tell this user what their alias is
+        this.connections[i].event.send(JSON.stringify({action:"yourAlias", data:{alias:newAlias}}));
+      }
+    return {status:"SUCCESS", data:null, token:token};
+    // else console.log(this.connections[i].userID);
   }
 
   static listEuphRooms() {
@@ -516,7 +568,10 @@ export async function sendMsg(msg: string, room: string, parent: number, token: 
     if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
       supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token))
     }
-  return {status:"SUCCESS", data:null, token:token};
+  if (parent == null) {
+    return {status:"SUCCESS", data:{autoThread:true}, token};
+  }
+  return {status:"SUCCESS", data:{autoThread:false}, token:token};
 }
 
 export async function sendMsg_B(msg: string, room: string) {
@@ -547,7 +602,8 @@ export async function sendMsg_B(msg: string, room: string) {
 }
 
 function processAnon(token: string) {
-  return "Anonymous user";
+  console.log(token.slice(0,4));
+  return "Anonymous|"+token.slice(0,4);
 }
 
 export function roomRequest(token: string, all: boolean = false) {

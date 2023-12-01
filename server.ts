@@ -171,14 +171,36 @@ export async function initServer() {
 
   app.ws('/', (ws:any, req:any) => {
     ws.on('message', (msg:any) => {
-      ws.send("reply:"+msg);
+      let dat = JSON.parse(msg);
+      // console.log(dat);
+      switch(dat.action) {
+        // case "loadLogs":
+          // supportHandler.loadLogs(dat.data.before);
+          // break;
+        // case "sendMsg":
+          // supportHandler.sendMsg(dat.data.room, dat.data.parent, dat.data.msg);
+          // break;
+        case "updateAlias":
+          // console.log("here");
+          supportHandler.updateAlias(dat.data.alias, token)
+            .catch((e)=>{console.log(e);})
+            .then((obj:any)=>{
+              if (obj.status != "SUCCESS") ws.send(JSON.stringify({
+                action:"yourAlias",
+                data:{alias:obj.data.alias}
+              }));
+            });
+      }
+      // ws.send("reply:"+msg);
     });
     // console.log("WebSocket was opened")
+    let room = req.query.room;
+    let token = req.cookies.accountID||req.cookies.sessionID;
     ws.send(JSON.stringify({action:"OPEN", data:null}));
-    supportHandler.addConnection(ws, req.query.room, req.cookies.accountID);
+    supportHandler.addConnection(ws, req.query.room, token);
     ws.on("close", () => {
       // clear the connection
-      supportHandler.removeConnection(ws, req.query.room, req.cookies.accountID);
+      supportHandler.removeConnection(ws, req.query.room, token);
       // console.log("Removed stream");
     });
   });
@@ -459,7 +481,7 @@ async function makeRequest(action:string|null, token:string, data:any|null, sess
         obj = await logout(token, true)
         break;
       case 'sendMsg':
-        obj = await sendMsg(data.msg, data.room, data.parent, token);
+        obj = await sendMsg(data.msg, data.room, data.parent, token||sessID);
         break;
       case 'lookup':
         obj = await WHOIS(token, data.user)
@@ -471,7 +493,8 @@ async function makeRequest(action:string|null, token:string, data:any|null, sess
         obj = await purgeLogs(token)
         break;
       case "realias":
-        obj = await realias(data.alias, token)
+        obk = {status:"SUCCESS", data:null, token:token};
+        // obj = await realias(data.alias, token)
         break;
       case "visits":
         obj = await visitCt(token)

@@ -69,7 +69,7 @@ function updateReplyBox() {
 }
 function updateAlias() {
   let newAlias = byId("alias").value;
-  if (ISBRIDGE) {
+  if (true) {
     source.send(JSON.stringify({
       action: "updateAlias",
       data: { alias: newAlias }
@@ -101,16 +101,11 @@ function sendMsg(ev) {
   let inp = document.getElementById("msgInp");
   if (inp.value.length == 0)
     return;
-  let match = inp.value.match("^!alias @(.+)");
-  if (match) {
-    updateAlias(match[1]);
-  } else {
-    if (ISBRIDGE)
-      source.send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME, parent: ACTIVEREPLY } }));
-    else
-      send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME, parent: ACTIVEREPLY } }), () => {
-      }, true);
-  }
+  if (ISBRIDGE)
+    source.send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME, parent: ACTIVEREPLY } }));
+  else
+    send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME, parent: ACTIVEREPLY } }), () => {
+    }, true);
   inp.value = "";
 }
 function fitSize() {

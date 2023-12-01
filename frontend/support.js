@@ -98,7 +98,7 @@ function updateAlias() {
   // source.close();
   let newAlias = byId("alias").value;
 
-  if (ISBRIDGE) {
+  if (true) {
     // console.log("here");
 
     source.send(JSON.stringify({
@@ -129,16 +129,16 @@ function sendMsg(ev) {
   if (ev && ev.target.id != "msgInp") return;
   let inp = document.getElementById("msgInp");
   if (inp.value.length == 0) return;
-  let match = inp.value.match("^!alias @(.+)");
-  if (match) {
-    updateAlias(match[1])
-    // } // not bridge
-  }
-  else {
+  // let match = inp.value.match("^!alias @(.+)");
+  // if (match) {
+  //   updateAlias(match[1])
+  //   // } // not bridge
+  // }
+  // else {
     if (ISBRIDGE) source.send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME, parent:ACTIVEREPLY}}));
     else send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME, parent:ACTIVEREPLY}}), ()=>{}, true);
     // toggleActiveReply()
-  }
+  // }
   inp.value="";
   // byId("alias-text").value=""
 }

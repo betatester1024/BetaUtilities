@@ -441,6 +441,13 @@ async function makeRequest(action:string|null, token:string, data:any|null, sess
       case 'login': 
         obj = await validateLogin(data.user, data.pass, data.persistQ, token);
         break;
+      case 'startupData':
+        obj = {status:"SUCCESS", data:{
+          branch: process.env.branch,
+          domain:process.env.domain,
+          unstableDomain:process.env.unstableDomain,
+        }, token:token};
+        break;
       case 'signup':
         obj = await signup(data.user, data.pass, token);
         break;

@@ -41,109 +41,112 @@ async function globalOnload(cbk, networkLess = false, link = "/server") {
     document.body.appendChild(ovr);
   }
   if (!networkLess) {
-    send(
-      JSON.stringify({ action: "userRequest" }),
-      (res) => {
-        userData = res.data;
-        if (res.data.branch)
-          branch = res.data.branch;
-        if (branch == "unstable" && link == "/server") {
-          let mainContent = byClass("main_content");
-          mainContent.style.width = "calc(100% - 30px)";
-          mainContent.style.margin = "0px";
-          let box = document.createElement("p");
-          box.className = "sidebar-unstable";
-          box.innerHTML = `<span class="material-symbols-outlined">warning</span>        Unstable version. Features may be unfinished or broken. 
-        <a class="grn" href="${userData.domain}">Switch to stable branch</a>`;
-          document.body.appendChild(box);
-        }
-        let maincontent = document.getElementsByClassName("main_content").item(0);
-        let ftr = byId("ftrOverride") ?? document.createElement("footer");
-        if (!byId("ftrOverride"))
-          maincontent.appendChild(ftr);
-        let ele = document.createElement("p");
-        ele.id = "footer";
-        let urlEle = new URL(location.href);
-        let redirector = urlEle.pathname + "?" + urlEle.searchParams.toString();
-        if (link != "/server" && res.status != "SUCCESS")
-          ele.innerHTML = `<a href="${userData.domain}">BetaOS Services site</a> | 
-                      <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
-                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
-                        <div class="anim"></div>
-                      </form> |
-        BetaOS Systems V3, 2023`;
-        else if (res.status != "SUCCESS") {
-          ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}" onclick="login_v2(event)">Login</a> | 
-                      <a href='/signup?redirect=${encodeURIComponent(redirector)}' onclick="login_v2(event, true)">Sign-up</a> | 
-                      <a href='/status'>Status</a> | 
-                      <a href='https://${branch == "unstable" ? userData.domain : userData.unstableDomain}'>
-                      Switch to ${branch == "unstable" ? "stable" : "unstable"} branch</a> | 
-                      <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
-                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
-                        <div class="anim"></div>
-                      </form> |
-                      BetaOS Systems V3, 2023`;
-        } else if (res.status == "SUCCESS" && link == "/server") {
-          resetExpiry(res);
-          ele.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
-                      <a href='/logout' onclick='logout_v2(event)'>Logout</a> | 
-                      <a href='/config'>Account</a> | 
-                      <a href='/status'>Status</a> | 
-                      <a href='https://${branch == "unstable" ? userData.domain : userData.unstableDomain}'>
-                      Switch to ${branch == "unstable" ? "stable" : "unstable"} branch</a> | 
-                      <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
-                      <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
-                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
-                        <div class="anim"></div>
-                      </form> |
-                      BetaOS Systems V3, 2023`;
-        } else {
-          ele.innerHTML = `Logged in as <kbd>${res.data.user}</kbd> |
-                      <a href='${userData.domain}/logout'>Logout</a> | 
-                      <a href="${userData.domain}">BetaOS Services site</a> | 
-                      <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
-                        <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
-                        <div class="anim"></div>
-                      </form> |
-                      BetaOS Systems V3, 2023`;
-        }
-        ftr.appendChild(ele);
-        let ephDiv = byId("ephemerals") ?? document.createElement("div");
-        if (!ephDiv.id) {
-          ephDiv.id = "ephemerals";
-          document.body.appendChild(ephDiv);
-        }
-        send(
-          JSON.stringify({ action: "visits" }),
-          (res2) => {
-            if (res2.status != "SUCCESS") {
-              alertDialog("Database connection failure. Please contact BetaOS. Error: " + res2.data.error, () => {
-              });
-              ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`;
-            } else
-              document.getElementById("footer").innerHTML += " | <kbd>Total requests made: " + res2.data.data + "</kbd>";
-            send(JSON.stringify({ action: "cookieRequest" }), (res3) => {
-              if (res3.data.toString() == "false") {
-                let cpl = document.getElementById("compliance");
-                cpl.style.opacity = "1";
-                cpl.style.height = "auto";
-                cpl.style.pointerEvents = "auto";
-              } else {
-                let cpl = document.getElementById("compliance");
-                cpl.style.opacity = "0";
-                cpl.style.pointerEvents = "none";
-              }
-              if (cbk)
-                cbk();
-            }, true, link);
-          },
-          true,
-          link
-        );
-      },
-      true,
-      link
-    );
+    send(JSON.stringify({ action: "startupData" }), (res) => {
+      if (res.data.branch)
+        branch = res.data.branch;
+      let startupData = res.data;
+      send(
+        JSON.stringify({ action: "userRequest" }),
+        (res2) => {
+          userData = res2.data;
+          if (branch == "unstable" && link == "/server") {
+            let mainContent = byClass("main_content");
+            mainContent.style.width = "calc(100% - 30px)";
+            mainContent.style.margin = "0px";
+            let box = document.createElement("p");
+            box.className = "sidebar-unstable";
+            box.innerHTML = `<span class="material-symbols-outlined">warning</span>            Unstable version. Features may be unfinished or broken. 
+            <a class="grn" href="${startupData.domain}">Switch to stable branch</a>`;
+            document.body.appendChild(box);
+          }
+          let maincontent = document.getElementsByClassName("main_content").item(0);
+          let ftr = byId("ftrOverride") ?? document.createElement("footer");
+          if (!byId("ftrOverride"))
+            maincontent.appendChild(ftr);
+          let ele = document.createElement("p");
+          ele.id = "footer";
+          let urlEle = new URL(location.href);
+          let redirector = urlEle.pathname + "?" + urlEle.searchParams.toString();
+          if (link != "/server" && res2.status != "SUCCESS")
+            ele.innerHTML = `<a href="${startupData.domain}">BetaOS Services site</a> | 
+                          <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
+                            <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
+                            <div class="anim"></div>
+                          </form> |
+            BetaOS Systems V3, 2023`;
+          else if (res2.status != "SUCCESS") {
+            ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}" onclick="login_v2(event)">Login</a> | 
+                          <a href='/signup?redirect=${encodeURIComponent(redirector)}' onclick="login_v2(event, true)">Sign-up</a> | 
+                          <a href='/status'>Status</a> | 
+                          <a href='https://${branch == "unstable" ? startupData.domain : startupData.unstableDomain}'>
+                          Switch to ${branch == "unstable" ? "stable" : "unstable"} branch</a> | 
+                          <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
+                            <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
+                            <div class="anim"></div>
+                          </form> |
+                          BetaOS Systems V3, 2023`;
+          } else if (res2.status == "SUCCESS" && link == "/server") {
+            resetExpiry(res2);
+            ele.innerHTML = `Logged in as <kbd>${res2.data.user}</kbd> |
+                          <a href='/logout' onclick='logout_v2(event)'>Logout</a> | 
+                          <a href='/config'>Account</a> | 
+                          <a href='/status'>Status</a> | 
+                          <a href='https://${branch == "unstable" ? startupData.domain : startupData.unstableDomain}'>
+                          Switch to ${branch == "unstable" ? "stable" : "unstable"} branch</a> | 
+                          <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
+                          <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
+                            <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
+                            <div class="anim"></div>
+                          </form> |
+                          BetaOS Systems V3, 2023`;
+          } else {
+            ele.innerHTML = `Logged in as <kbd>${res2.data.user}</kbd> |
+                          <a href='${startupData.domain}/logout'>Logout</a> | 
+                          <a href="${startupData.domain}">BetaOS Services site</a> | 
+                          <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
+                            <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
+                            <div class="anim"></div>
+                          </form> |
+                          BetaOS Systems V3, 2023`;
+          }
+          ftr.appendChild(ele);
+          let ephDiv = byId("ephemerals") ?? document.createElement("div");
+          if (!ephDiv.id) {
+            ephDiv.id = "ephemerals";
+            document.body.appendChild(ephDiv);
+          }
+          send(
+            JSON.stringify({ action: "visits" }),
+            (res3) => {
+              if (res3.status != "SUCCESS") {
+                alertDialog("Database connection failure. Please contact BetaOS. Error: " + res3.data.error, () => {
+                });
+                ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`;
+              } else
+                document.getElementById("footer").innerHTML += " | <kbd>Total requests made: " + res3.data.data + "</kbd>";
+              send(JSON.stringify({ action: "cookieRequest" }), (res4) => {
+                if (res4.data.toString() == "false") {
+                  let cpl = document.getElementById("compliance");
+                  cpl.style.opacity = "1";
+                  cpl.style.height = "auto";
+                  cpl.style.pointerEvents = "auto";
+                } else {
+                  let cpl = document.getElementById("compliance");
+                  cpl.style.opacity = "0";
+                  cpl.style.pointerEvents = "none";
+                }
+                if (cbk)
+                  cbk();
+              }, true, link);
+            },
+            true,
+            link
+          );
+        },
+        true,
+        link
+      );
+    }, true, link);
   }
   let ele2 = document.getElementById("overlay");
   if (ele2)
@@ -460,6 +463,19 @@ function toTime(ms, inclMs = false) {
   if (ms < 0)
     return "00:00:00";
   return (day > 0 ? day + "d " : "") + padWithZero(hr) + ":" + padWithZero(min) + ":" + padWithZero(sec) + (inclMs ? "." + padWithThreeZeroes(ms % 1e3) : "");
+}
+function minimalTime(ms, inFuture = false) {
+  if (isNaN(ms))
+    return "unknown time";
+  if (ms < 6e4)
+    return inFuture ? "shortly" : "just now";
+  let day = Math.floor(ms / 1e3 / 60 / 60 / 24);
+  ms = ms % (1e3 * 60 * 60 * 24);
+  let hr = Math.floor(ms / 1e3 / 60 / 60);
+  ms = ms % (1e3 * 60 * 60);
+  let min = Math.floor(ms / 1e3 / 60);
+  ms = ms % (1e3 * 60);
+  return (day > 0 ? day + "d " : "") + (hr > 0 ? hr + "h" : "") + min + "m";
 }
 function padWithThreeZeroes(n) {
   if (n < 10)

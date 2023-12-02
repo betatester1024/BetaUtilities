@@ -43,10 +43,7 @@ async function userRequest(token, internalFlag = false) {
     expiry: tokenData.expiry,
     tasks: userData.tasks,
     darkQ: userData.darkTheme ?? false,
-    lastCl: userData.lastClicked,
-    branch: process.env.branch,
-    domain: process.env.domain,
-    unstableDomain: process.env.unstableDomain
+    lastCl: userData.lastClicked
   }, token };
 }
 async function extendSession(token) {

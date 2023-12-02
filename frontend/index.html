@@ -6,6 +6,14 @@
     <script>
       const accessLevels = ["error-level", "user", "admin", "super-admin"];
       function onLoad() {
+        function updateTimer(userInfo, res) 
+        {
+          userInfo.innerHTML = ""+accessLevels[res.data.perms]+" account | "+
+            (res.data.expiry<Date.now()?"session expired":
+             (res.data.expiry>100*365*24*60*60*1000?`session expiring in 
+             <span class="material-symbols-outlined">all_inclusive</span> days`:
+              " session expiring in "+minimalTime(res.data.expiry-Date.now(), true)+""));
+        }
         send(JSON.stringify({action:"userRequest"}), 
         (res)=>{
           if (res.status == "ERROR") {
@@ -18,12 +26,8 @@
           let ele = document.getElementById("welcomeHdr");
           ele.innerText = "Welcome "+res.data.user+"!"; 
           let userInfo = document.createElement("h2");
-          setInterval(()=>{userInfo.innerHTML = "logged in as "+accessLevels[res.data.perms]+
-            (res.data.expiry<Date.now()?" (session expired)":
-             (res.data.expiry>100*365*24*60*60*1000?` (session expiring in 
-             <span class="material-symbols-outlined">all_inclusive</span> days)`:
-              " (session expiring in "+toTime(res.data.expiry-Date.now())+")"));
-           }, 100);
+          setInterval(()=>{updateTimer(userInfo, res)}, 10000);
+          updateTimer(userInfo, res);
           ele.append(userInfo);
           userInfo.style.fontSize = "30px";
           let loginBtn = document.getElementById("loginBtn")

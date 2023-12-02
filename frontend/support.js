@@ -1,3 +1,4 @@
+
 function onLoad() {
   // send(JSON.stringify({action:"refresh"}), (res)=>{
   // });
@@ -7,7 +8,7 @@ function onLoad() {
   // REPLYINPUT.className = "inp";
   BOTTOMINPUT = byId("bottomInput");
   // REPLYINPUT.id = "rep"
-  setInterval(updateTime, 1000);
+  setInterval(updateTime, 5000);
   document.getElementById("header").innerText = "Support: "+(ISBRIDGE?"&":"#")+
     docURL.pathname.match("^\\/(room|bridge)\\/(.+)")[2];
   let match = docURL.pathname.match("^\\/(room|bridge)\\/(.+)");
@@ -26,7 +27,7 @@ function onKeyPress(e) {
 function updateTime() {
   let allElements = document.getElementsByClassName("time");
   for (let ele of allElements) {
-    ele.innerText = toTime(Date.now()-ele.dataset.time*1000);
+    ele.innerText = minimalTime(Date.now()-ele.dataset.time*1000);
   }
 }
 // system refresh auto!
@@ -376,7 +377,7 @@ async function initClient()
       ctn_inner.className = "msgContents";
       ctn_inner.appendChild(newMsgSender);
       ctn_inner.appendChild(ele);
-      ctn_inner.innerHTML += `<div class="time" data-time="${message.data.time}">${toTime(Date.now()-message.data.time*1000)}</div>`
+      ctn_inner.innerHTML += `<div class="time" data-time="${message.data.time}">${minimalTime(Date.now()-message.data.time*1000)}</div>`
       if (Date.now()/1000 - message.data.time < 60)
         ctn_inner.style.animation = "newMsg "+(60-(Date.now()/1000-message.data.time))+"s";
       let optn = document.createElement("div");

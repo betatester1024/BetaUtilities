@@ -1,7 +1,7 @@
 "use strict";
 function onLoad() {
   BOTTOMINPUT = byId("bottomInput");
-  setInterval(updateTime, 1e3);
+  setInterval(updateTime, 5e3);
   document.getElementById("header").innerText = "Support: " + (ISBRIDGE ? "&" : "#") + docURL.pathname.match("^\\/(room|bridge)\\/(.+)")[2];
   let match = docURL.pathname.match("^\\/(room|bridge)\\/(.+)");
   ROOMNAME = match[2];
@@ -19,7 +19,7 @@ function onKeyPress(e) {
 function updateTime() {
   let allElements = document.getElementsByClassName("time");
   for (let ele2 of allElements) {
-    ele2.innerText = toTime(Date.now() - ele2.dataset.time * 1e3);
+    ele2.innerText = minimalTime(Date.now() - ele2.dataset.time * 1e3);
   }
 }
 let ACTIVEREPLY = -1;
@@ -317,7 +317,7 @@ async function initClient() {
         ctn_inner.className = "msgContents";
         ctn_inner.appendChild(newMsgSender);
         ctn_inner.appendChild(ele);
-        ctn_inner.innerHTML += `<div class="time" data-time="${message.data.time}">${toTime(Date.now() - message.data.time * 1e3)}</div>`;
+        ctn_inner.innerHTML += `<div class="time" data-time="${message.data.time}">${minimalTime(Date.now() - message.data.time * 1e3)}</div>`;
         if (Date.now() / 1e3 - message.data.time < 60)
           ctn_inner.style.animation = "newMsg " + (60 - (Date.now() / 1e3 - message.data.time)) + "s";
         let optn = document.createElement("div");

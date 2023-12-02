@@ -21,9 +21,6 @@ export async function userRequest(token:string, internalFlag:boolean=false) {
     tasks:userData.tasks, 
     darkQ:userData.darkTheme??false, 
     lastCl:userData.lastClicked,
-    branch: process.env.branch,
-    domain:process.env.domain,
-    unstableDomain:process.env.unstableDomain,
   }, token:token};
 }
 

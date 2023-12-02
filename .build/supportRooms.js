@@ -313,8 +313,6 @@ class supportHandler {
       this.allRooms.splice(idx, 1);
   }
   static async addConnection(ev, rn, token, internalFlag = false) {
-    if (!internalFlag)
-      console.log("added new connection", rn);
     this.connectionCt++;
     if (internalFlag) {
       token = "[SYSINTERNAL]";
@@ -547,7 +545,6 @@ async function sendMsg_B(msg, room) {
   await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
     $inc: { msgCt: 1, threadCt: 1 }
   }, { upsert: true });
-  console.log(msg);
   await import_consts.msgDB.insertOne({
     fieldName: "MSG",
     data: msg.replaceAll("\\n\\n", "\n").replaceAll(">", "&gt;"),
@@ -565,7 +562,6 @@ async function sendMsg_B(msg, room) {
   supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: betaNick, perms: 3, content: msg.replaceAll("\\n\\n", "\n"), time: Date.now() / 1e3 } }));
 }
 function processAnon(token) {
-  console.log(token.slice(0, 4));
   return "Anonymous|" + token.slice(0, 4);
 }
 function roomRequest(token, all = false) {

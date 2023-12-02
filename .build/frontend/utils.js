@@ -78,7 +78,7 @@ async function globalOnload(cbk, networkLess = false, link = "/server") {
             ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}" onclick="login_v2(event)">Login</a> | 
                           <a href='/signup?redirect=${encodeURIComponent(redirector)}' onclick="login_v2(event, true)">Sign-up</a> | 
                           <a href='/status'>Status</a> | 
-                          <a href='https://${branch == "unstable" ? startupData.domain : startupData.unstableDomain}'>
+                          <a href='${branch == "unstable" ? startupData.domain : startupData.unstableDomain}'>
                           Switch to ${branch == "unstable" ? "stable" : "unstable"} branch</a> | 
                           <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
                             <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
@@ -91,7 +91,7 @@ async function globalOnload(cbk, networkLess = false, link = "/server") {
                           <a href='/logout' onclick='logout_v2(event)'>Logout</a> | 
                           <a href='/config'>Account</a> | 
                           <a href='/status'>Status</a> | 
-                          <a href='https://${branch == "unstable" ? startupData.domain : startupData.unstableDomain}'>
+                          <a href='${branch == "unstable" ? startupData.domain : startupData.unstableDomain}'>
                           Switch to ${branch == "unstable" ? "stable" : "unstable"} branch</a> | 
                           <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
                           <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">

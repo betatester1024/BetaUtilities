@@ -311,7 +311,7 @@ export class supportHandler {
   }
   static async addConnection(ev: any, rn: string, token: string, internalFlag: boolean = false) {
     // send existing connections to THIS EVENT ONLY
-    if (!internalFlag) console.log("added new connection", rn);
+    // if (!internalFlag) console.log("added new connection", rn);
     this.connectionCt++;
     if (internalFlag) {
       token = "[SYSINTERNAL]";
@@ -590,7 +590,7 @@ export async function sendMsg_B(msg: string, room: string) {
   await msgDB.updateOne({ room: room, fieldName: "RoomInfo" }, {
     $inc: { msgCt: 1, threadCt:1}
   }, { upsert: true });
-  console.log(msg);
+  // console.log(msg);
   await msgDB.insertOne({
     fieldName: "MSG", data: msg.replaceAll("\\n\\n", "\n").replaceAll(">", "&gt;"), permLevel: 3,
     sender: betaNick, expiry: /*Date.now() + 3600 * 1000 * 24 * 30*/ 9e99,
@@ -603,7 +603,7 @@ export async function sendMsg_B(msg: string, room: string) {
 }
 
 function processAnon(token: string) {
-  console.log(token.slice(0,4));
+  // console.log(token.slice(0,4));
   return "Anonymous|"+token.slice(0,4);
 }
 

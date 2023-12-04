@@ -440,8 +440,8 @@ export class supportHandler {
     
     let usrData = await userRequest(token);
     if (usrData.status != "SUCCESS") {
-      usr.data = {alias:processAnon(token)};
-      return resp;
+      usrData.data = {alias:processAnon(token)};
+      return usrData;
     }
     let oldAlias = usrData.data.alias;
     let resp = await realias(newAlias, token);
@@ -560,7 +560,11 @@ export async function sendMsg(msg: string, room: string, parent: number, token: 
     $inc: { msgCt: 1, threadCt:parentDoc?0:1}
   }, { upsert: true });
   if (obj.status == "SUCCESS") {
-    supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: obj.data.alias, perms: obj.data.perms, parent: parent, content: msg, time:Date.now()/1000 } }));
+    supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: {
+      id: msgCt, sender: obj.data.alias, 
+      perms: obj.data.perms, parent: parent, 
+      content: msg, time:Date.now()/1000,
+    autoThread:parent==null} }));
   }
   else {
     supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, parent: parent, content: msg, time:Date.now()/1000 } }));
@@ -604,7 +608,7 @@ export async function sendMsg_B(msg: string, room: string) {
 
 function processAnon(token: string) {
   // console.log(token.slice(0,4));
-  return "Anonymous|"+token.slice(0,4);
+  return "Anon"+token.slice(0,4);
 }
 
 export function roomRequest(token: string, all: boolean = false) {

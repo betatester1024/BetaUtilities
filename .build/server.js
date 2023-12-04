@@ -158,7 +158,7 @@ async function initServer() {
             if (obj.status != "SUCCESS")
               ws.send(JSON.stringify({
                 action: "yourAlias",
-                data: { alias: obj.data.alias }
+                data: { alias: obj.data.alias, error: true }
               }));
           });
       }
@@ -613,7 +613,8 @@ const ignoreLog = [
   "sendMsg",
   "clickIt",
   "leaderboard",
-  "findPaste"
+  "findPaste",
+  "startupData"
 ];
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

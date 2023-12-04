@@ -23,6 +23,85 @@ function onKeyPress(e) {
     ele.style.display = (ele.style.display=="flex")?"none":"flex";
     e.preventDefault();
   }
+  if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+  if (e.key == 'Escape' || e.key == "ArrowRight") {
+    byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+    ACTIVEREPLY = -1;
+    toggleActiveReply(ACTIVEREPLY);
+  }
+  if (e.key == "ArrowLeft") {
+    toggleActiveReply(ACTIVEREPLY);
+  }
+  if (e.key == "ArrowDown") 
+  {
+    if (ACTIVEREPLY == -1) return;
+    let leaving = byMsgId(ACTIVEREPLY);
+    if (!leaving.nextElementSibling) // falling off the edge to the parent
+      toggleActiveReply(leaving.dataset.id);
+    else if (leaving.nextElementSibling.children.length == 2) { // the bar and the message content
+      // happy days.
+      let desiredReplyID = leaving.nextElementSibling.dataset.id
+      toggleActiveReply(desiredReplyID, true);
+    }
+    else if (leaving.nextElementSibling.id == "placeholder") // probably at the end
+      toggleActiveReply(-1, true)
+    else if (leaving.nextElementSibling.children.length > 2) { // next has children
+      // go to deepest and closest child
+      leaving = leaving.nextElementSibling;
+      while (leaving.children.length > 2) {
+        leaving = leaving.children[2]; // #1 is content, #2 is bar, #3 is child messages
+      }
+      toggleActiveReply(leaving.dataset.id, true)
+    }
+  } // going down!
+  if (e.key == "ArrowUp") {
+    let leaving = byMsgId(ACTIVEREPLY);
+    if (ACTIVEREPLY == -1) {
+      leaving = byId("placeholder").previousElementSibling;
+      // while (leaving.children.length > 2) {
+        // leaving = leaving.children[leaving.children.length-1]; // #1 is content, #2 is bar, #3 is child messages
+      // }
+      toggleActiveReply(leaving.dataset.id, true);
+    }
+    else if (!leaving.previousElementSibling) return;
+    else if (leaving.children.length > 3) { // can go to child
+      // falling off the edge to the parent
+      leaving = leaving.children[leaving.children.length-2];
+      // while (leaving.children.length > 3) {
+        // leaving = leaving.children[2]; // #1 is content, #2 is bar, #3 is child messages, last is text box
+      // }
+      // toggleActiveReply(leaving.dataset.id, true)
+      toggleActiveReply(leaving.dataset.id, true);
+    }
+    else if (leaving.previousElementSibling.className != "bar") 
+    {
+      // console.log("prevelement");
+      toggleActiveReply(leaving.previousElementSibling.dataset.id, true);
+    }
+    else {
+      // if there are no children and there are no siblings:
+      leaving = byMsgId(ACTIVEREPLY).parentElement;
+      while ((leaving.previousElementSibling.className == "bar")) {
+        leaving = leaving.parentElement;
+      }
+      toggleActiveReply(leaving.previousElementSibling.dataset.id, true);
+    }
+    // else if (leaving.nextElementSibling.children.length == 2) { // the bar and the message content
+    //   // happy days.
+    //   let desiredReplyID = leaving.nextElementSibling.dataset.id
+    //   toggleActiveReply(desiredReplyID, true);
+    // }
+    // else if (leaving.nextElementSibling.id == "placeholder") // probably at the end
+    //   toggleActiveReply(-1, true)
+    // else if (leaving.nextElementSibling.children.length > 2) { // next has children
+    //   // go to deepest and closest child
+    //   leaving = leaving.nextElementSibling;
+    //   while (leaving.children.length > 2) {
+    //     leaving = leaving.children[2]; // #1 is content, #2 is bar, #3 is child messages
+    //   }
+    //   toggleActiveReply(leaving.dataset.id, true)
+    // }
+  }
 }
 function updateTime() {
   let allElements = document.getElementsByClassName("time");
@@ -38,8 +117,16 @@ function byMsgId(id)
 {
   return byId("msgArea").querySelector("[data-id='"+id+"']")
 }
-function toggleActiveReply(id) 
+function toggleActiveReply(id, forceQ = false) // force to set reply to ID ALWAYS 
 {
+  if (forceQ) {
+    byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+    if (id != "-1") byMsgId(id).classList.add("activeReply");
+    else byId("container").appendChild(BOTTOMINPUT);
+    ACTIVEREPLY = id;
+    updateReplyBox();
+    return;
+  }
   if (ACTIVEREPLY == id) { // clicking again: activereply parent or clear activereply
     byMsgId(id).classList.remove("activeReply");
     let parent = byMsgId(id).parentElement;
@@ -138,8 +225,7 @@ function sendMsg(ev) {
   // else {
     if (ISBRIDGE) source.send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME, parent:ACTIVEREPLY}}));
     else send(JSON.stringify({action:"sendMsg", data:{msg:inp.value, room:ROOMNAME, parent:ACTIVEREPLY}}), (res)=>{
-      if (res.data.autoThread) 
-        toggleActiveReply(res.data.autoThread);
+      
     }, true);
     // toggleActiveReply()
   // }
@@ -239,6 +325,7 @@ async function initClient()
     if (message.action== "yourAlias") {
       byId("alias").value = message.data.alias;
       byId("alias-text").innerText = message.data.alias
+      if (message.data.error) ephemeralDialog("Error: You are not logged in and cannot update your alias.")
       byId("msgInp").focus();
     }
     if (message.action == "addUser" || message.action == "removeUser") {
@@ -263,6 +350,7 @@ async function initClient()
     let scrDistOKQ =  (area.scrollTop) >= (area.scrollHeight-area.offsetHeight - 100)
     // let msgs = modif.split(">");
     if (message.action == "msg") {
+      // first fix things for arrow navigation
       // console.log(message.data.time);
       matches = ["ERROR", message.data.id, message.data.sender, message.data.perms, message.data.content];
       // let matches = msgs[i].match(/{(-?[0-9]+)}\[(.+)\]\(([0-9])\)(.*)/)
@@ -425,6 +513,11 @@ async function initClient()
         document.title = "("+UNREAD+") | Support"
       }
       updateReplyBox();
+      if (res.data.autoThread) 
+        toggleActiveReply(res.data.autoThread);
+      if (byMsgId(-1)) byId("msgArea").appendChild(byMsgId(-1));
+      byId("msgArea").insertBefore(byId("placeholder"), byMsgId(-1))
+      // byMsgId(-1).style.display = "none";
     } // received message element // 
     // alert("here")
     if (!LOADEDQ2 || scrDistOKQ)

@@ -15,6 +15,16 @@ function onKeyPress(e) {
     ele2.style.display = ele2.style.display == "flex" ? "none" : "flex";
     e.preventDefault();
   }
+  if (e.ctrlKey || e.metaKey || e.shiftKey)
+    return;
+  if (e.key == "Escape" || e.key == "ArrowRight") {
+    byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+    ACTIVEREPLY = -1;
+    toggleActiveReply(ACTIVEREPLY);
+  }
+  if (e.key == "ArrowLeft") {
+    toggleActiveReply(ACTIVEREPLY);
+  }
 }
 function updateTime() {
   let allElements = document.getElementsByClassName("time");
@@ -203,6 +213,8 @@ async function initClient() {
       if (message.action == "yourAlias") {
         byId("alias").value = message.data.alias;
         byId("alias-text").innerText = message.data.alias;
+        if (message.data.error)
+          ephemeralDialog("Error: You are not logged in and cannot update your alias.");
         byId("msgInp").focus();
       }
       if (message.action == "addUser" || message.action == "removeUser") {

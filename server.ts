@@ -187,7 +187,7 @@ export async function initServer() {
             .then((obj:any)=>{
               if (obj.status != "SUCCESS") ws.send(JSON.stringify({
                 action:"yourAlias",
-                data:{alias:obj.data.alias}
+                data:{alias:obj.data.alias, error: true}
               }));
             });
       }
@@ -669,4 +669,4 @@ const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/log
 
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',
-                  'findPaste'];
+                  'findPaste', 'startupData'];

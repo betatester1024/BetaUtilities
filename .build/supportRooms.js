@@ -404,8 +404,8 @@ class supportHandler {
   static async updateAlias(newAlias, token) {
     let usrData = await (0, import_userRequest.userRequest)(token);
     if (usrData.status != "SUCCESS") {
-      usr.data = { alias: processAnon(token) };
-      return resp;
+      usrData.data = { alias: processAnon(token) };
+      return usrData;
     }
     let oldAlias = usrData.data.alias;
     let resp = await (0, import_updateUser.realias)(newAlias, token);
@@ -562,7 +562,7 @@ async function sendMsg_B(msg, room) {
   supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: betaNick, perms: 3, content: msg.replaceAll("\\n\\n", "\n"), time: Date.now() / 1e3 } }));
 }
 function processAnon(token) {
-  return "Anonymous|" + token.slice(0, 4);
+  return "Anon" + token.slice(0, 4);
 }
 function roomRequest(token, all = false) {
   if (all)

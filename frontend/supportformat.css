@@ -77,21 +77,22 @@ hr.rounded {
 }
 div#container > #bottomInput {
   margin: 7px auto !important;
+  width: 95%;
 }
 div#container > #bottomInput:before {
   content:"";
 }
-#bottomInput:before {
-  content:"→";
-  color: var(--system-green);
-}
+/* #bottomInput:before { */
+  /* content:"→"; */
+  /* color: var(--system-green); */
+/* } */
 #bottomInput {
-  width: 95%;
+  /* width: 95%; */
   display: flex;
   height: 35px;
   gap: 5px;
   margin: 0px;
-  margin-left: 5px;
+  /* margin-left: -10px; */
   text-align: left;
   border-bottom: 2px solid var(--system-transp);
   transition: all 0.2s;

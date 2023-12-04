@@ -489,19 +489,13 @@ function padWithZero(n) {
 }
 let overlay;
 const tips = [
-  "Press <kbd>/</kbd> to access the navigation menu.",
+  "Press <kbd>/</kbd> to jump to a page",
   "\u{1F9C0}",
   "Have you tried turning it off and on again?",
-  "Use <kbd>space</kbd> to start/stop timer/stopwatch.",
-  "Press <kbd>E</kbd> to edit the timer.",
-  "Press <kbd>R</kbd> to reset the timer/stopwatch.",
   "Try <a href='/clickit'>ClickIt</a> today!",
   "Your insanity will pay off. Eventually.",
-  "Don't be a not-water-needer. You won't last a week.",
-  "<i>Don't</i> eat the void orb.",
   "Don't worry! It's fine... We can fix it!",
-  "Have you tried placebo-ing yourself?",
-  "If you fall down and can't get up, fall upwards.",
+  "Help! I've fallen and can't get back up again!",
   "Tofu is solidified bean water. On that note, try Humanity(r) Bean Water today!",
   "The void orb watches over you."
 ];
@@ -609,7 +603,7 @@ function ephemeralDialog(text) {
   let dialog = document.createElement("div");
   dialog.classList.add("ephemeral");
   dialog.innerHTML = text;
-  dialog.style.animation = "appear 0.7s forwards";
+  dialog.style.animation = "appear 1s forwards";
   byId("ephemerals").prepend(dialog);
   setTimeout(() => {
     closeEphemeral(dialog);
@@ -619,11 +613,12 @@ function ephemeralDialog(text) {
   };
 }
 function closeEphemeral(dialog) {
-  dialog.style.animation = "disappear 0.5s forwards";
+  dialog.style.animation = "disappear 0.6s forwards";
 }
 let loginDialog = null;
 function login_v2(ev, signup = false) {
-  ev.preventDefault();
+  if (ev)
+    ev.preventDefault();
   if (loginDialog && loginDialog.isOpen)
     return;
   loginDialog = nonBlockingDialog(`<iframe class="loginiframe" src="/minimal${signup ? "Signup" : "Login"}"></iframe>`, () => {
@@ -634,14 +629,7 @@ function closeLogin() {
   closeNBD(loginDialog);
 }
 function globalReload() {
-  byId("overlay").remove();
-  byId("compliance").remove();
-  byId("footer").remove();
-  let uSidebar = byClass("sidebar-unstable");
-  if (uSidebar)
-    uSidebar.remove();
-  byId("ephemerals").remove();
-  globalOnload(onloadCallback);
+  location.reload();
 }
 function logout_v2(event) {
   event.preventDefault();

@@ -273,8 +273,8 @@ async function initClient()
     console.log("Connection ERROR"); setTimeout(initClient, 2000)
   };
   source.onmessage = (message) => {
-    console.log('Got', message);
     message = JSON.parse(message.data);
+    if (message.action != "ping") console.log('RECV', message);
     ele = document.getElementById("userList");
     // let modif = message.data;
     let action = message.action;
@@ -417,7 +417,7 @@ async function initClient()
       let slashMe = false;
       msg = msg.replaceAll(/(&[a-zA-Z0-9]{1,20})([^;]|$)/gm,">ROOM$1>$2")
       msg = msg.replaceAll(/(#[a-zA-Z0-9_\-]{1,20})([^;]|$)/gm,">SUPPORT$1>$2")
-      msg = msg.replaceAll(/(;gt;;gt;[^ ]{0,90})/gm,">INTERNALLINK$1>");
+      msg = msg.replaceAll(/(;gt;;gt;[a-zA-Z0-9\-/]{1,90})/g,">INTERNALLINK$1>");
       msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu,">LINK$<test>>")
       msg = msg.replaceAll(/\n/gmiu,">BR>")
       // console.log(msg);
@@ -538,6 +538,7 @@ async function initClient()
       updateReplyBox();
       if (message.data.autoThread) 
         toggleActiveReply(message.data.id);
+      if (byMsgId(-1)) byMsgId(-1).querySelector(".msgContents").style.animation = "";
       if (byMsgId(-1)) byId("msgArea").appendChild(byMsgId(-1));
       byId("msgArea").insertBefore(byId("placeholder"), byMsgId(-1))
       // byMsgId(-1).style.display = "none";

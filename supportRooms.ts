@@ -399,10 +399,10 @@ export class supportHandler {
       //   ev.send(JSON.stringify({action:"msg", data:{id:msgs[i].msgID??-1, sender:msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent??-1, content:msgs[i].data}}));
       // }
       text += "Welcome to BetaOS Services support! Enter any message in the box below. " +
-        "Automated response services and utilities are provided by BetaOS System. " +
+        "Automated response services and utilities are provided by @BetaOS_System. " +
         "Commands are available here: &gt;&gt;commands \n" +
-        "Logged-in users: click on your username to update it. Thank you for using BetaOS Systems!\n\n"+
-        "Click this message to dismiss it."
+        "Logged-in users: click on your username to update it.\n"+
+        "Click this message to dismiss it >>"
       ev.send(JSON.stringify({ action: "msg", data: { id: +msgCt + 1, sender: "[SYSTEM]", time:Date.now()/1000, perms: 3, content: text } }));
 
     }

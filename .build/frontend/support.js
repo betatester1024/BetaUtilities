@@ -180,8 +180,9 @@ async function initClient() {
       setTimeout(initClient, 2e3);
     };
     source.onmessage = (message) => {
-      console.log("Got", message);
       message = JSON.parse(message.data);
+      if (message.action != "ping")
+        console.log("RECV", message);
       ele = document.getElementById("userList");
       let action = message.action;
       if (message.action == "CONNECTIONID") {
@@ -418,6 +419,8 @@ async function initClient() {
         updateReplyBox();
         if (message.data.autoThread)
           toggleActiveReply(message.data.id);
+        if (byMsgId(-1))
+          byMsgId(-1).querySelector(".msgContents").style.animation = "";
         if (byMsgId(-1))
           byId("msgArea").appendChild(byMsgId(-1));
         byId("msgArea").insertBefore(byId("placeholder"), byMsgId(-1));

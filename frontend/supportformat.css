@@ -66,7 +66,7 @@
   gap: 15px;
   width: 95%;
   margin: 0 auto;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 105px);
 }
 h2 {
   font-size: 2em;
@@ -253,7 +253,7 @@ div.msgContainer > div.msgContainer {
   top: 0px;
 }
 .activeReply {
-  background-color: var(--system-blue2);
+  /* background-color: var(--system-blue2); */
 }
 .msgContainer:hover {
   outline: 1px solid var(--system-overlay);

@@ -161,13 +161,32 @@ async function initServer() {
                 data: { alias: obj.data.alias, error: true }
               }));
           });
+          break;
+        case "pong":
+          console.log("ping received");
+          clearTimeout(connectionTerminator);
+          setTimeout(() => {
+            console.log("ping sent");
+            ws.send(JSON.stringify({ action: "ping", data: null }));
+            connectionTerminator = setTimeout(() => {
+              ws.close();
+              console.log("connection terminated");
+            }, 1e3);
+          }, 1e4);
       }
     });
+    ws.send(JSON.stringify({ action: "ping", data: null }));
+    console.log("ping sent");
+    let connectionTerminator = setTimeout(() => {
+      ws.close();
+      console.log("connection terminated");
+    }, 1e3);
     let room = req.query.room;
     let token = req.cookies.accountID || req.cookies.sessionID;
     ws.send(JSON.stringify({ action: "OPEN", data: null }));
     import_supportRooms.supportHandler.addConnection(ws, req.query.room, token);
     ws.on("close", () => {
+      clearTimeout(connectionTerminator);
       import_supportRooms.supportHandler.removeConnection(ws, req.query.room, token);
     });
   });

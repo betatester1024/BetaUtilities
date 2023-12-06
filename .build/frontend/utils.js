@@ -93,7 +93,15 @@ async function globalOnload(cbk, networkLess = false, link = "/server") {
                           <a href='/status'>Status</a> | 
                           <a href='${branch == "unstable" ? startupData.domain : startupData.unstableDomain}'>
                           Switch to ${branch == "unstable" ? "stable" : "unstable"} branch</a> | 
-                          <a href='javascript:send(JSON.stringify({action:"toggleTheme"}), (res)=>{if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{});else {alertDialog("Theme updated!", ()=>{location.reload()}); }})'>Theme</a> |
+                          <a onclick='event.preventDefault();
+                          send(JSON.stringify({action:"toggleTheme"}), (res)=>{
+                            if (res.status != "SUCCESS") 
+                            ephemeralDialog("Error: "+res.data.error);
+                            else {
+                              ephemeralDialog("Theme updated!");
+                              location.reload();
+                            }
+                          })' href="javascript:void;">Theme</a> |
                           <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
                             <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                             <div class="anim"></div>

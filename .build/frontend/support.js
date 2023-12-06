@@ -17,13 +17,54 @@ function onKeyPress(e) {
   }
   if (e.ctrlKey || e.metaKey || e.shiftKey)
     return;
-  if (e.key == "Escape" || e.key == "ArrowRight") {
+  if (e.key == "Escape" || e.key == "ArrowRight" && byId("msgInp").value == "") {
     byMsgId(ACTIVEREPLY).classList.remove("activeReply");
     ACTIVEREPLY = -1;
+    toggleActiveReply(-1, true);
+  }
+  if (e.key == "ArrowLeft" && byId("msgInp").value == "") {
+    if (ACTIVEREPLY == -1)
+      return;
     toggleActiveReply(ACTIVEREPLY);
   }
-  if (e.key == "ArrowLeft") {
-    toggleActiveReply(ACTIVEREPLY);
+  if (e.key == "ArrowDown") {
+    if (ACTIVEREPLY == -1)
+      return;
+    let leaving = byMsgId(ACTIVEREPLY);
+    if (!leaving.nextElementSibling)
+      toggleActiveReply(leaving.dataset.id);
+    else if (leaving.nextElementSibling.children.length == 2) {
+      let desiredReplyID = leaving.nextElementSibling.dataset.id;
+      toggleActiveReply(desiredReplyID, true);
+    } else if (leaving.nextElementSibling.id == "placeholder")
+      toggleActiveReply(-1, true);
+    else if (leaving.nextElementSibling.children.length > 2) {
+      leaving = leaving.nextElementSibling;
+      while (leaving.children.length > 2) {
+        leaving = leaving.children[2];
+      }
+      toggleActiveReply(leaving.dataset.id, true);
+    }
+  }
+  if (e.key == "ArrowUp") {
+    let leaving = byMsgId(ACTIVEREPLY);
+    if (ACTIVEREPLY == -1) {
+      leaving = byId("placeholder").previousElementSibling;
+      toggleActiveReply(leaving.dataset.id, true);
+    } else if (!leaving.previousElementSibling)
+      return;
+    else if (leaving.children.length > 3) {
+      leaving = leaving.children[leaving.children.length - 2];
+      toggleActiveReply(leaving.dataset.id, true);
+    } else if (leaving.previousElementSibling.className != "bar") {
+      toggleActiveReply(leaving.previousElementSibling.dataset.id, true);
+    } else {
+      leaving = byMsgId(ACTIVEREPLY).parentElement;
+      while (leaving.previousElementSibling.className == "bar") {
+        leaving = leaving.parentElement;
+      }
+      toggleActiveReply(leaving.previousElementSibling.dataset.id, true);
+    }
   }
 }
 function updateTime() {
@@ -38,7 +79,21 @@ let BOTTOMINPUT = null;
 function byMsgId(id) {
   return byId("msgArea").querySelector("[data-id='" + id + "']");
 }
-function toggleActiveReply(id) {
+function toggleActiveReply(id, forceQ = false) {
+  if (forceQ) {
+    byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+    if (id != "-1")
+      byMsgId(id).classList.add("activeReply");
+    else
+      byId("container").appendChild(BOTTOMINPUT);
+    ACTIVEREPLY = id;
+    updateReplyBox();
+    return;
+  }
+  if (id == -1) {
+    byMsgId(-1).style.display = "none";
+    return;
+  }
   if (ACTIVEREPLY == id) {
     byMsgId(id).classList.remove("activeReply");
     let parent = byMsgId(id).parentElement;
@@ -79,31 +134,11 @@ function updateReplyBox() {
 }
 function updateAlias() {
   let newAlias = byId("alias").value;
-  if (true) {
-    source.send(JSON.stringify({
-      action: "updateAlias",
-      data: { alias: newAlias }
-    }));
-    byId("msgInp").focus();
-  } else {
-    source.close();
-    document.getElementById("userList").innerHTML = ``;
-    send(JSON.stringify({ action: "realias", data: { alias: newAliass } }), (res) => {
-      if (res.status != "SUCCESS")
-        alertDialog("ERROR: " + res.data.error, () => {
-        });
-      else
-        alertDialog("Updated alias!", () => {
-          STARTID = -1;
-          STARTIDVALID = false;
-          loadStatus = -1;
-          document.getElementById("msgArea").innerHTML = `<h2 id="placeholder">
-        <span class="material-symbols-outlined">update</span> 
-        Reloading your messages, a moment please...</h2>`;
-          initClient();
-        });
-    });
-  }
+  source.send(JSON.stringify({
+    action: "updateAlias",
+    data: { alias: newAlias }
+  }));
+  byId("msgInp").focus();
 }
 function sendMsg(ev) {
   if (ev && ev.target.id != "msgInp")
@@ -115,8 +150,6 @@ function sendMsg(ev) {
     source.send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME, parent: ACTIVEREPLY } }));
   else
     send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME, parent: ACTIVEREPLY } }), (res) => {
-      if (res.data.autoThread)
-        toggleActiveReply(res.data.autoThread);
     }, true);
   inp.value = "";
 }
@@ -137,12 +170,14 @@ async function initClient() {
     else
       source = new WebSocket("wss://" + docURL.host + "?room=" + docURL.pathname.match("^/(room|bridge)/(.+)")[2]);
     source.onclose = () => {
+      ephemeralDialog("Connection failed, reconnecting...");
       console.log("Connection closed by server.");
-      setTimeout(initClient, 500);
+      setTimeout(initClient, 2e3);
     };
     source.onerror = () => {
+      ephemeralDialog("Connection error, reconnecting...");
       console.log("Connection ERROR");
-      setTimeout(initClient, 500);
+      setTimeout(initClient, 2e3);
     };
     source.onmessage = (message) => {
       console.log("Got", message);
@@ -151,6 +186,12 @@ async function initClient() {
       let action = message.action;
       if (message.action == "CONNECTIONID") {
         CONNECTIONID = message.data.id;
+      }
+      if (message.action == "forceReload")
+        location.reload();
+      if (message.action == "ping") {
+        console.log("pong sent");
+        source.send(JSON.stringify({ action: "pong" }));
       }
       if (message.action == "RELOAD" || message.action == "RESTART") {
         document.getElementById("msgArea").innerHTML = `<h2 id="placeholder">
@@ -163,9 +204,11 @@ async function initClient() {
         STARTIDVALID = false;
         byId("container").appendChild(BOTTOMINPUT);
         UNREAD = 0;
+        document.title = "BetaThreader";
         loadStatus = -1;
         CONNECTIONID = -1;
         awaitingParent = [];
+        ephemeralDialog("Connected!");
         if (message.action == "RESTART")
           source.close();
       }
@@ -263,7 +306,7 @@ async function initClient() {
         let ctn = document.createElement("div");
         ctn.dataset.id = matches[1];
         ctn.className = "msgContainer";
-        let msg = " " + matches[4].replaceAll("&gt;", ";gt;").replaceAll(">", ";gt;");
+        let msg = "" + matches[4].replaceAll("&gt;", ";gt;").replaceAll(">", ";gt;");
         for (let i2 = 0; i2 < replacements.length; i2++) {
           msg = msg.replaceAll(`:${replacements[i2].from}:`, ">EMOJI" + replacements[i2].to + ">");
         }
@@ -317,7 +360,7 @@ async function initClient() {
             } else if (pref == "INTERNALLINK") {
               let replaced = document.createElement("a");
               replaced.className = "supportMsg " + classStr[matches[3]];
-              replaced.href = post.slice(8).replaceAll(";gt;", ">");
+              replaced.href = "/" + post.slice(8).replaceAll(";gt;", ">");
               replaced.innerText = ">>" + post.slice(8).replaceAll(";gt;", ">");
               ele.appendChild(replaced);
             } else if (pref == "BR") {
@@ -373,6 +416,11 @@ async function initClient() {
           document.title = "(" + UNREAD + ") | Support";
         }
         updateReplyBox();
+        if (message.data.autoThread)
+          toggleActiveReply(message.data.id);
+        if (byMsgId(-1))
+          byId("msgArea").appendChild(byMsgId(-1));
+        byId("msgArea").insertBefore(byId("placeholder"), byMsgId(-1));
       }
       if (!LOADEDQ2 || scrDistOKQ) {
         area.scrollTop = area.scrollHeight;

@@ -66,7 +66,7 @@
   gap: 15px;
   width: 95%;
   margin: 0 auto;
-  height: 79vh;
+  height: calc(100vh - 100px);
 }
 h2 {
   font-size: 2em;
@@ -81,18 +81,24 @@ div#container > #bottomInput {
 }
 div#container > #bottomInput:before {
   content:"";
+  width: 0px;
 }
-/* #bottomInput:before { */
-  /* content:"→"; */
-  /* color: var(--system-green); */
-/* } */
+#bottomInput:before {
+  content: "|";
+  font-size: 30px;
+  color: var(--system-overlay);
+  width: 5px;
+  top: -10px;
+  position: relative;
+  left: -5px;
+}
 #bottomInput {
   /* width: 95%; */
   display: flex;
   height: 35px;
   gap: 5px;
   margin: 0px;
-  /* margin-left: -10px; */
+  margin-left: 2px;
   text-align: left;
   border-bottom: 2px solid var(--system-transp);
   transition: all 0.2s;
@@ -259,7 +265,7 @@ div.msgContainer > div.msgContainer {
   border: 2px solid var(--system-green) !important;
 }
 .msgContents {
-  width: calc(100% - 40px);
+  width: calc(100%);
   cursor:pointer;
 }
 .msgContainer {

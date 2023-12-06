@@ -311,7 +311,7 @@ export class supportHandler {
   }
   static async addConnection(ev: any, rn: string, token: string, internalFlag: boolean = false) {
     // send existing connections to THIS EVENT ONLY
-    // if (!internalFlag) console.log("added new connection", rn);
+    if (!internalFlag) console.log("added new connection", rn);
     this.connectionCt++;
     if (internalFlag) {
       token = "[SYSINTERNAL]";
@@ -320,12 +320,15 @@ export class supportHandler {
     for (let i = 0; i < this.connections.length; i++) {
       if (this.connections[i].roomName == rn)
         userRequest(this.connections[i].tk, this.connections[i].isPseudoConnection).then((obj: { status: string, data: any, token: string }) => {
-          if (obj.status == "SUCCESS") {
-            ev.send(JSON.stringify({ action: "addUser", data: { user: obj.data.alias, perms: obj.data.perms, isBot:this.connections[i].isPseudoConnection } }));
-          }
-          else {
-            ev.send(JSON.stringify({ action: "addUser", data: { user: processAnon(this.connections[i].tk), perms: 1 } }));
-          }
+          try {
+              if (obj.status == "SUCCESS") {
+              if (!this.connections[i]) return;
+              ev.send(JSON.stringify({ action: "addUser", data: { user: obj.data.alias, perms: obj.data.perms, isBot:this.connections[i].isPseudoConnection } }));
+            }
+            else {
+              ev.send(JSON.stringify({ action: "addUser", data: { user: processAnon(this.connections[i].tk), perms: 1 } }));
+            }
+          } catch(e) {}
         });
     }
     let usrData = await userRequest(token, internalFlag);
@@ -398,7 +401,8 @@ export class supportHandler {
       text += "Welcome to BetaOS Services support! Enter any message in the box below. " +
         "Automated response services and utilities are provided by BetaOS System. " +
         "Commands are available here: &gt;&gt;commands \n" +
-        "Logged-in users: click on your username to update it. Thank you for using BetaOS Systems!"
+        "Logged-in users: click on your username to update it. Thank you for using BetaOS Systems!\n\n"+
+        "Click this message to dismiss it."
       ev.send(JSON.stringify({ action: "msg", data: { id: +msgCt + 1, sender: "[SYSTEM]", time:Date.now()/1000, perms: 3, content: text } }));
 
     }
@@ -564,10 +568,14 @@ export async function sendMsg(msg: string, room: string, parent: number, token: 
       id: msgCt, sender: obj.data.alias, 
       perms: obj.data.perms, parent: parent, 
       content: msg, time:Date.now()/1000,
-    autoThread:parent==null} }));
+      autoThread:parent==-1
+    } }));
   }
   else {
-    supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, parent: parent, content: msg, time:Date.now()/1000 } }));
+    supportHandler.sendMsgTo(room, JSON.stringify(
+      { action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, 
+                              parent: parent, content: msg, time:Date.now()/1000,
+                             autoThread:parent==-1} }));
   }
   for (let i = 0; i < supportHandler.allRooms.length; i++) 
     if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {

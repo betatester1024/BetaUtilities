@@ -190,16 +190,37 @@ export async function initServer() {
                 data:{alias:obj.data.alias, error: true}
               }));
             });
+          break;
+        case "pong":
+          console.log("ping received")
+          
+          clearTimeout(connectionTerminator)
+          
+          setTimeout(()=>{
+            console.log("ping sent");
+            ws.send(JSON.stringify({action:"ping", data:null}));
+            connectionTerminator = setTimeout(()=>{
+              ws.close(); 
+              console.log("connection terminated")
+            }, 1000)
+          }, 10000);
       }
       // ws.send("reply:"+msg);
     });
     // console.log("WebSocket was opened")
+    ws.send(JSON.stringify({action:"ping", data:null}))
+    console.log("ping sent")
+    let connectionTerminator = setTimeout(()=>{
+      ws.close(); 
+      console.log("connection terminated")
+    }, 1000)
     let room = req.query.room;
     let token = req.cookies.accountID||req.cookies.sessionID;
     ws.send(JSON.stringify({action:"OPEN", data:null}));
     supportHandler.addConnection(ws, req.query.room, token);
     ws.on("close", () => {
       // clear the connection
+      clearTimeout(connectionTerminator);
       supportHandler.removeConnection(ws, req.query.room, token);
       // console.log("Removed stream");
     });

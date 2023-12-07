@@ -1,3 +1,8 @@
+
+
+#msgArea a, #msgArea p, #msgArea b, #msgArea span {
+  color: var(--system-black);
+}
 #msgArea {
   /* width: calc(85% - 20px); */
   /* height: 77vh; */
@@ -127,7 +132,7 @@ input {
 
 .time {
   display:inline-block;
-  color: var(--system-grey);
+  color: var(--system-grey) !important;
   /* margin-left: 20px; */
 }
 
@@ -197,6 +202,8 @@ span {
   display: inline-block;
   font-size: 18px;
 }
+
+
 b {
 /*   font-family: "SupportText", "Noto Sans Display"; */
   border-radius: 2px;
@@ -207,7 +214,15 @@ b {
   margin-bottom: 10px;
   vertical-align: top;
 }
-p {
+
+md-span {
+  font-size: 18px;
+  font-family: 'Noto Sans Display';
+}
+md-span > code {
+  font-family: 'Noto Sans Mono';
+}
+p, md-span {
   margin-left: 5px;
   margin-right: 10px;
 }
@@ -215,7 +230,7 @@ p {
   margin-left: 0px;
 }
 
-p {
+p, md-span {
   margin-top: 0px;
   margin-bottom: 0px;
   max-width: 100%;
@@ -223,7 +238,7 @@ p {
 }
 h2 > span, .supportMsg {
   top: 5px;
-  color: var(--system-blue);
+  color: var(--system-blue) !important;
 }
 
 
@@ -297,7 +312,7 @@ div.msgContainer > div.msgContainer {
   font-size: 18px !important;
 }
 
-p.slashMe {
+md-span.slashMe {
   padding-right: 5px; 
   border-radius: 0px 3px 3px 0px;
   background-color: var(--system-grey2);
@@ -319,31 +334,38 @@ p.slashMe {
   top: -1px;
 }
 
-p.admin, p.user, p.error, 
+md-span.admin, md-span.user, md-span.error, 
 span.admin, span.user, span.error,
 a.admin, a.user, a.error {
   display: inline-block;
-  color: var(--system-blue);
+  color: var(--system-blue) !important;
 } 
 
-p {
+p, md-span {
   display: inline-block;
 }
 
 b.admin{
-  color: var(--system-blue);  
+  color: var(--system-blue) !important;  
 }
 
 .admin.slashMe, b.admin {
   background-color: var(--system-blue2);
 }
-p.superadmin, b.superadmin, span.superadmin, a.superadmin {
-  color: #00e500;
-  font-variant-caps: small-caps;
-  font-size: large;
+md-span.superadmin, b.superadmin, span.superadmin, a.superadmin {
+  /* color: #00df00 !important; */
+  color: var(--system-blue) !important;
+  /* font-variant-caps: small-caps; */
+  font-size: 20px;
+  /* font-size: large; */
 }
+
 b.superadmin, .superadmin.slashMe {
   background-color: var(--system-green2);
+}
+
+b.superadmin {
+  color: var(--system-green) !important;
 }
 
 .superadmin.material-symbols-outlined {
@@ -351,7 +373,7 @@ b.superadmin, .superadmin.slashMe {
 }
 
 #userList {
-  color: var(--system-blue);
+  color: var(--system-blue) !important;
 }
 
 #userList > p {
@@ -363,7 +385,7 @@ b.superadmin, .superadmin.slashMe {
 }
 
 .bot {
-  color: var(--system-green);
+  color: var(--system-green) !important;
 }
 
 @font-face {

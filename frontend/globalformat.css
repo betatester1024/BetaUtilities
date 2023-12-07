@@ -407,7 +407,7 @@ span.material-symbols-outlined {
   font-variant-caps: normal !important;
 }
 
-kbd {
+kbd, md-span > code {
   font-family: "Noto Sans Mono", monospace;
   border-radius: 5px;
   padding-left: 2px;

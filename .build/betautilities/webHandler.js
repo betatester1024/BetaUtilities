@@ -113,10 +113,10 @@ class WebH {
     }
     this.incrRunCt();
   }
-  sendMsg(msg, user) {
+  sendMsg(msg, data) {
     if (msg.length == 0)
       return;
-    (0, import_supportRooms.sendMsg_B)(msg, this.roomName);
+    (0, import_supportRooms.sendMsg_B)(msg, this.roomName, data.parent);
     this.incrRunCt();
   }
   onOpen() {
@@ -129,11 +129,11 @@ class WebH {
     console.log("nick changed to", nick);
   }
   onMessage(msg, snd) {
-    let data = "";
+    let data = { parent: msg.data.id };
     if (DATALOGGING)
       fs.writeFileSync("betautilities/msgLog.txt", fs.readFileSync("betautilities/msgLog.txt").toString() + `(${this.roomName})[${snd}] ${msg}
 `);
-    msg = msg.toLowerCase().replaceAll(/(\s|^)((@betaos)|(@betautilities)|(@system))(\s|$)/gimu, " @" + this.nick.toLowerCase() + " ").trim();
+    msg = msg.data.content.toLowerCase().replaceAll(/(\s|^)((@betaos)|(@betautilities)|(@system))(\s|$)/gimu, " @" + this.nick.toLowerCase() + " ").trim();
     if (msg == "!kill @" + this.nick.toLowerCase()) {
       this.sendMsg("/me crashes", data);
       this.delaySendMsg("/me restarts", data, 200);

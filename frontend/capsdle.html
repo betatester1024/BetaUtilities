@@ -101,7 +101,8 @@
           } else {
             PD = true;
             document.body.removeEventListener("keydown", keyDown_Capsdle);
-            alertDialog("You have lost.", ()=>{})
+            alertDialog("You have lost.", ()=>{});
+            return true;
           }
           updateHighlight();
         }

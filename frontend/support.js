@@ -151,7 +151,7 @@ function toggleActiveReply(id, forceQ = false) // force to set reply to ID ALWAY
     // are you clicking on the direct child?
     if (byMsgId(id).parentElement.dataset.id == ACTIVEREPLY) {
       // that's right!
-      // okay so now activereply is the one you clicked
+      // okay so now activereply is the one you clickedre
       if (ACTIVEREPLY != -1)
         byMsgId(ACTIVEREPLY).classList.remove("activeReply");
       ACTIVEREPLY = id;
@@ -190,7 +190,7 @@ function updateReplyBox()
   byMsgId(ACTIVEREPLY).appendChild(BOTTOMINPUT);
   byId("msgInp").focus();
 }
-
+let failCt = 0;
 function updateAlias() {
   // source.close();
   let newAlias = byId("alias").value;
@@ -265,15 +265,20 @@ async function initClient()
                                  docURL.pathname.match("^\/(room|bridge)\/(.+)")[2]);
   source.onclose = ()=>{
     ephemeralDialog("Connection failed, reconnecting...");
+    failCt++;
+    if (failCt>5) location.reload();
     console.log("Connection closed by server."); setTimeout(initClient, 2000);
   };
   source.onerror = ()=>{
     ephemeralDialog("Connection error, reconnecting...")
     // source.close();
+    failCt++;
+    if (failCt>5) location.reload();
     console.log("Connection ERROR"); setTimeout(initClient, 2000)
   };
   source.onmessage = (message) => {
     message = JSON.parse(message.data);
+    
     if (message.action != "ping") console.log('RECV', message);
     ele = document.getElementById("userList");
     // let modif = message.data;
@@ -281,7 +286,13 @@ async function initClient()
     if (message.action == "CONNECTIONID") {
       
       CONNECTIONID = message.data.id;
-    }    
+    }   
+    let area = document.getElementById("msgArea");
+    let scrDistOKQ =  (area.scrollTop) >= (area.scrollHeight-area.offsetHeight - 100)
+    if (message.action == "logs") {
+      for (let i=0; i<message.data.logs.length; i++) 
+        handleMessageEvent(message.data.logs[i], area);
+    }
     if (message.action == "forceReload") location.reload();
     if (message.action == "ping") {
       console.log("pong sent");
@@ -329,6 +340,9 @@ async function initClient()
         STARTID=message.data.id;
         // alert("lcMatchId updated"+ STARTID);
       }
+      if (byId("msgArea").scrollHeight <= byId("msgArea").clientHeight) {
+        onScroll();
+      }
       console.log("Fixing awaitingParent.")
       fixAwaitingParent();
       thing.scrollTop = thing.scrollTop+1;
@@ -367,181 +381,11 @@ async function initClient()
     }
     let modif = "";
     // console.log(modif);
-    let area = document.getElementById("msgArea");
-    ele = document.createElement("p");
-
-    let scrDistOKQ =  (area.scrollTop) >= (area.scrollHeight-area.offsetHeight - 100)
     // let msgs = modif.split(">");
     if (message.action == "msg") {
       // first fix things for arrow navigation
       // console.log(message.data.time);
-      matches = ["ERROR", message.data.id, message.data.sender, message.data.perms, message.data.content];
-      // let matches = msgs[i].match(/{(-?[0-9]+)}\[(.+)\]\(([0-9])\)(.*)/)
-      if (!matches) return;
-      
-      PREPENDFLAG = false;
-      if (STARTID<0 || matches[1] == 0) {
-        STARTID = Number(matches[1]);
-        STARTIDVALID = true;
-        // alert(STARTID);
-      }
-      if (matches[1][0] == "-") {
-        // console.log("PREPENDING")p
-        PREPENDFLAG = true;
-        matches[1] = matches[1].toString().slice(1);
-        if (loadStatus == 0) loadStatus = 1;
-      }
-      if (message && message.data && message.data.id && 
-        byMsgId(matches[1])) return;
-      if (message.data.time) 
-      if (message.data.time < earliestMessageTime) {
-        earliestMessageTime = message.data.time;
-        earliestMessageID = matches[1];
-      }
-      // let newMsgBody = document.createTextNode();
-      let newMsgSender = document.createElement("b");
-      // parse things
-      newMsgSender.innerText = matches[2];
-      newMsgSender.className = classStr[matches[3]];
-      
-      let ctn = document.createElement("div");
-      ctn.dataset.id=matches[1];
-      
-      ctn.className='msgContainer';
-      // if (!PREPENDFLAG) ctn.appendChild(newMsgSender);
-      // newMsgBody.className = classStr[matches[3]];
-      let msg = ""+matches[4].replaceAll("&gt;", ";gt;").replaceAll(">", ";gt;");
-      for (let i=0; i<replacements.length; i++) {
-        msg = msg.replaceAll(`:${replacements[i].from}:`, ">EMOJI"+replacements[i].to+">");
-      }
-      let slashMe = false;
-      msg = msg.replaceAll(/(&[a-zA-Z0-9]{1,20})([^;]|$)/gm,">ROOM$1>$2")
-      msg = msg.replaceAll(/(#[a-zA-Z0-9_\-]{1,20})([^;]|$)/gm,">SUPPORT$1>$2")
-      msg = msg.replaceAll(/(;gt;;gt;[a-zA-Z0-9\-/]{1,90})/g,">INTERNALLINK$1>");
-      msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu,">LINK$<test>>")
-      msg = msg.replaceAll(/\n/gmiu,">BR>")
-      // console.log(msg);
-      if (msg.match("^[ \n]*/me(.*)")) {
-        msg = msg.match("^[ \n]*/me(.*)")[1];
-        slashMe = true;
-        ele.className += " slashMe " + classStr[matches[3]];
-      }
-      else ele.className = classStr[matches[3]];
-      
-      let split = msg.split(">");
-      // console.log("message fragments:", split.length, split);
-      let out= "";
-      for (let i=0; i<split.length; i++) {
-        if (i%2 == 0) {
-          let fragment = document.createTextNode(split[i].replaceAll(";gt;", ">"));
-          fragment.className = classStr[matches[3]] //+ (slashMe?" slashMe ":"");
-          // fragment.innerText = split[i].replaceAll(";gt;", ">");
-          ele.appendChild(fragment);
-        }
-        else {
-          let pref = split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)")[1];
-          let post = pref!="BR"?(split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)(.+)")[2]):"";
-          if (pref == "EMOJI") {
-            let replaced = document.createElement("span");
-            replaced.title = ":"+findReplacement(post)+":";
-            replaced.className="material-symbols-outlined supportMsg "+classStr[matches[3]] + (slashMe?" slashMe ":"");
-            replaced.innerText = post;
-            ele.appendChild(replaced);
-          }
-          else if (pref == "LINK") {
-            let replaced = document.createElement("a");
-            replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
-            replaced.href = "https://"+post.replaceAll(";gt;", ">");
-            replaced.innerText = post.replaceAll(";gt;", ">");
-            replaced.setAttribute("target", "_blank");
-            ele.appendChild(replaced);
-          }
-          else if (pref == "ROOM") {
-            let replaced = document.createElement("a");
-            replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
-            replaced.href = "/bridge/"+post.slice(1);
-            replaced.innerText = post;
-            ele.appendChild(replaced);
-          }
-          else if (pref == "SUPPORT") {
-            let replaced = document.createElement("a");
-            replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
-            replaced.href = "/room/"+post.slice(1);
-            replaced.innerText = post;
-            ele.appendChild(replaced);
-          }
-          else if (pref == "INTERNALLINK") {
-            let replaced = document.createElement("a");
-            replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
-            replaced.href = "/"+post.slice(8).replaceAll(";gt;", ">");
-            // replaced.setAttribute("target", "_blank");
-            replaced.innerText = ">>"+post.slice(8).replaceAll(";gt;", ">");
-            ele.appendChild(replaced);
-          }
-          else if (pref == "BR") {
-            ele.appendChild(document.createElement("br"));
-          }
-        }
-      }
-      
-      let ctn_inner = document.createElement("div");
-      ctn_inner.className = "msgContents";
-      ctn_inner.appendChild(newMsgSender);
-      ctn_inner.appendChild(ele);
-      ctn_inner.innerHTML += `<div class="time" data-time="${message.data.time}">${minimalTime(Date.now()-message.data.time*1000)}</div>`
-      if (Date.now()/1000 - message.data.time < 60)
-        ctn_inner.style.animation = "newMsg "+(60-(Date.now()/1000-message.data.time))+"s";
-      let optn = document.createElement("div");
-      optn.className = "options";
-      optn.innerHTML = `
-      <button class="btn">
-        <span class="material-symbols-outlined">reply</span>
-      </button>`
-      ctn_inner.appendChild(optn);
-      ctn.appendChild(ctn_inner);
-      let bar = document.createElement("div");
-      bar.className = "bar";
-      ctn.appendChild(bar);
-      ctn_inner.onclick=
-        (ev)=>{ 
-          toggleActiveReply(ctn.dataset.id);
-        }
-      // area.appendChild(document.createElement("br"));
-      if (message.data.perms == 3 && message.data.sender == "[SYSTEM]") ctn.dataset.id="-1";
-      
-      if (message.data.parent != undefined && 
-          (isNaN(message.data.parent) || message.data.parent >= 0)) { // euph: parent is a NaN string
-        if (byMsgId(message.data.parent)) {
-          // if (PREPENDFLAG) byId(message.data.parent).prepend(ctn);
-          byMsgId(message.data.parent).appendChild(ctn);
-          for (let i=0; i<awaitingParent.length; i++) {
-            if (awaitingParent[i].ele.dataset.id == ctn.dataset.id) {
-              awaitingParent.splice(i, 1);
-              break;
-            }
-          } // remove already awaiting parent
-        }
-        else {
-          awaitingParent.push({parent:message.data.parent, ele:ctn, prependQ:ISBRIDGE&&PREPENDFLAG});
-          console.log("awaiting parent", message.data.parent, ctn);
-        }
-      }
-      else {
-        if (PREPENDFLAG) area.prepend(ctn);
-        else area.appendChild(ctn);
-      }
-      document.getElementById("placeholder").style.display="none";
-      if (!FOCUSSED) {
-        UNREAD ++ 
-        document.title = "("+UNREAD+") | Support"
-      }
-      updateReplyBox();
-      if (message.data.autoThread) 
-        toggleActiveReply(message.data.id);
-      if (byMsgId(-1)) byMsgId(-1).querySelector(".msgContents").style.animation = "";
-      if (byMsgId(-1)) byId("msgArea").appendChild(byMsgId(-1));
-      byId("msgArea").insertBefore(byId("placeholder"), byMsgId(-1))
-      // byMsgId(-1).style.display = "none";
+      handleMessageEvent(message.data, area);
     } // received message element // 
     // alert("here")
     if (!LOADEDQ2 || scrDistOKQ)
@@ -669,4 +513,175 @@ function fixAwaitingParent()
       i=-1;
     }
   }
+}
+
+function handleMessageEvent(data, area) {
+  ele = document.createElement("md-span");
+  matches = ["ERROR", data.id, data.sender, data.perms, data.content];
+  // let matches = msgs[i].match(/{(-?[0-9]+)}\[(.+)\]\(([0-9])\)(.*)/)
+  if (!matches) return;
+
+  PREPENDFLAG = false;
+  if (STARTID<0 || matches[1] == 0) {
+    STARTID = Number(matches[1]);
+    STARTIDVALID = true;
+    // alert(STARTID);
+  }
+  if (matches[1][0] == "-") {
+    // console.log("PREPENDING")p
+    PREPENDFLAG = true;
+    matches[1] = matches[1].toString().slice(1);
+    if (loadStatus == 0) loadStatus = 1;
+  }
+  if (data && data.id && 
+    byMsgId(matches[1])) return;
+  if (data.time) 
+  if (data.time < earliestMessageTime) {
+    earliestMessageTime = data.time;
+    earliestMessageID = matches[1];
+  }
+  // let newMsgBody = document.createTextNode();
+  let newMsgSender = document.createElement("b");
+  // parse things
+  newMsgSender.innerText = matches[2];
+  newMsgSender.className = classStr[matches[3]];
+
+  let ctn = document.createElement("div");
+  ctn.dataset.id=matches[1];
+
+  ctn.className='msgContainer';
+  // if (!PREPENDFLAG) ctn.appendChild(newMsgSender);
+  // newMsgBody.className = classStr[matches[3]];
+  let msg = ""+matches[4].replaceAll("&gt;", ";gt;").replaceAll(">", ";gt;");
+  for (let i=0; i<replacements.length; i++) {
+    msg = msg.replaceAll(`:${replacements[i].from}:`, ">EMOJI"+replacements[i].to+">");
+  }
+  let slashMe = false;
+  msg = msg.replaceAll(/(&[a-zA-Z0-9]{1,20})([^;]|$)/gm,">ROOM$1>$2")
+  msg = msg.replaceAll(/(#[a-zA-Z0-9_\-]{1,20})([^;]|$)/gm,">SUPPORT$1>$2")
+  msg = msg.replaceAll(/(;gt;;gt;[a-zA-Z0-9\-/]{1,90})/g,">INTERNALLINK$1>");
+  msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu,">LINK$<test>>")
+  msg = msg.replaceAll(/\n/gmiu,">BR>")
+  // console.log(msg);
+  if (msg.match("^[ \n]*/me(.*)")) {
+    msg = msg.match("^[ \n]*/me(.*)")[1];
+    slashMe = true;
+    ele.className += " slashMe " + classStr[matches[3]];
+  }
+  else ele.className = classStr[matches[3]];
+
+  let split = msg.split(">");
+  // console.log("message fragments:", split.length, split);
+  let out= "";
+  for (let i=0; i<split.length; i++) {
+    if (i%2 == 0) {
+      let fragment = document.createTextNode(split[i].replaceAll(";gt;", ">"));
+      fragment.className = classStr[matches[3]] //+ (slashMe?" slashMe ":"");
+      // fragment.innerText = split[i].replaceAll(";gt;", ">");
+      ele.appendChild(fragment);
+    }
+    else {
+      let pref = split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)")[1];
+      let post = pref!="BR"?(split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)(.+)")[2]):"";
+      if (pref == "EMOJI") {
+        let replaced = document.createElement("span");
+        replaced.title = ":"+findReplacement(post)+":";
+        replaced.className="material-symbols-outlined supportMsg "+classStr[matches[3]] + (slashMe?" slashMe ":"");
+        replaced.innerText = post;
+        ele.appendChild(replaced);
+      }
+      else if (pref == "LINK") {
+        let replaced = document.createElement("a");
+        replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
+        replaced.href = "https://"+post.replaceAll(";gt;", ">");
+        replaced.innerText = post.replaceAll(";gt;", ">");
+        replaced.setAttribute("target", "_blank");
+        ele.appendChild(replaced);
+      }
+      else if (pref == "ROOM") {
+        let replaced = document.createElement("a");
+        replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
+        replaced.href = "/bridge/"+post.slice(1);
+        replaced.innerText = post;
+        ele.appendChild(replaced);
+      }
+      else if (pref == "SUPPORT") {
+        let replaced = document.createElement("a");
+        replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
+        replaced.href = "/room/"+post.slice(1);
+        replaced.innerText = post;
+        ele.appendChild(replaced);
+      }
+      else if (pref == "INTERNALLINK") {
+        let replaced = document.createElement("a");
+        replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
+        replaced.href = "/"+post.slice(8).replaceAll(";gt;", ">");
+        // replaced.setAttribute("target", "_blank");
+        replaced.innerText = ">>"+post.slice(8).replaceAll(";gt;", ">");
+        ele.appendChild(replaced);
+      }
+      else if (pref == "BR") {
+        ele.appendChild(document.createElement("br"));
+      }
+    }
+  }
+
+  let ctn_inner = document.createElement("div");
+  ctn_inner.className = "msgContents";
+  ctn_inner.appendChild(newMsgSender);
+  ctn_inner.appendChild(ele);
+  ctn_inner.innerHTML += `<div class="time" data-time="${data.time}">${minimalTime(Date.now()-data.time*1000)}</div>`
+  if (Date.now()/1000 - data.time < 60)
+    ctn_inner.style.animation = "newMsg "+(60-(Date.now()/1000-data.time))+"s";
+  let optn = document.createElement("div");
+  optn.className = "options";
+  optn.innerHTML = `
+  <button class="btn">
+    <span class="material-symbols-outlined">reply</span>
+  </button>`
+  ctn_inner.appendChild(optn);
+  ctn.appendChild(ctn_inner);
+  let bar = document.createElement("div");
+  bar.className = "bar";
+  ctn.appendChild(bar);
+  ctn_inner.onclick=
+    (ev)=>{ 
+      toggleActiveReply(ctn.dataset.id);
+    }
+  // area.appendChild(document.createElement("br"));
+  if (data.perms == 3 && data.sender == "[SYSTEM]") ctn.dataset.id="-1";
+
+  if (data.parent != undefined && 
+      (isNaN(data.parent) || data.parent >= 0)) { // euph: parent is a NaN string
+    if (byMsgId(data.parent)) {
+      // if (PREPENDFLAG) byId(data.parent).prepend(ctn);
+      byMsgId(data.parent).appendChild(ctn);
+      for (let i=0; i<awaitingParent.length; i++) {
+        if (awaitingParent[i].ele.dataset.id == ctn.dataset.id) {
+          awaitingParent.splice(i, 1);
+          break;
+        }
+      } // remove already awaiting parent
+    }
+    else {
+      awaitingParent.push({parent:data.parent, ele:ctn, prependQ:ISBRIDGE&&PREPENDFLAG});
+      console.log("awaiting parent", data.parent, ctn);
+    }
+  }
+  else {
+    if (PREPENDFLAG) area.prepend(ctn);
+    else area.appendChild(ctn);
+  }
+  document.getElementById("placeholder").style.display="none";
+  if (!FOCUSSED) {
+    UNREAD ++ 
+    document.title = "("+UNREAD+") | Support"
+  }
+  updateReplyBox();
+  if (data.autoThread) 
+    toggleActiveReply(data.id);
+  if (byMsgId(-1)) byMsgId(-1).querySelector(".msgContents").style.animation = "";
+  if (byMsgId(-1)) byId("msgArea").appendChild(byMsgId(-1));
+  byId("msgArea").insertBefore(byId("placeholder"), byMsgId(-1))
+  // byMsgId(-1).style.display = "none";
 }

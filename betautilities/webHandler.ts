@@ -97,9 +97,9 @@ export class WebH
     this.incrRunCt();
   }
 
-  sendMsg(msg:string, user:string) {
+  sendMsg(msg:string, data:any) {
     if (msg.length==0) return;
-    sendMsg_B(msg, this.roomName);
+    sendMsg_B(msg, this.roomName, data.parent);
     this.incrRunCt();
   }
   
@@ -120,9 +120,9 @@ export class WebH
   }
 
   onMessage(msg:string, snd:string) {
-      let data = ""
+      let data = {parent:msg.data.id};
       if (DATALOGGING) fs.writeFileSync('betautilities/msgLog.txt', fs.readFileSync('betautilities/msgLog.txt').toString()+((`(${this.roomName})[${snd}] ${msg}\n`)));
-      msg = msg.toLowerCase().replaceAll(/(\s|^)((@betaos)|(@betautilities)|(@system))(\s|$)/gimu, " @"+this.nick.toLowerCase()+" ").trim()
+      msg = msg.data.content.toLowerCase().replaceAll(/(\s|^)((@betaos)|(@betautilities)|(@system))(\s|$)/gimu, " @"+this.nick.toLowerCase()+" ").trim()
       // Required methods
       // !kill
       // console.log("received" +msg);

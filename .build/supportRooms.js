@@ -374,7 +374,7 @@ class supportHandler {
         if (from < 0)
           break;
       }
-      text += "Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by @BetaOS_System. Commands are available here: &gt;&gt;commands \nLogged-in users: click on your username to update it.\nClick this message to dismiss it >>";
+      text += "Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by @BetaOS_System. Commands are available here: >>commands \nLogged-in users: click on your username to update it.\nClick this message to dismiss it >>";
       ev.send(JSON.stringify({ action: "msg", data: { id: +msgCt + 1, sender: "[SYSTEM]", time: Date.now() / 1e3, perms: 3, content: text } }));
     }
     thiscn.readyQ = true;
@@ -485,7 +485,6 @@ class supportHandler {
   static sendMsgTo(roomName, data) {
     for (let i = 0; i < this.connections.length; i++) {
       if (this.connections[i].roomName == roomName) {
-        data = data.replaceAll(">", "&gt;");
         this.connections[i].event.send(data);
       }
     }
@@ -493,7 +492,6 @@ class supportHandler {
   static sendMsgTo_ID(connectionID, data) {
     for (let i = 0; i < this.connections.length; i++) {
       if (this.connections[i].id == connectionID) {
-        data = data.replaceAll(">", "&gt;");
         this.connections[i].event.send(data);
       }
     }
@@ -511,7 +509,7 @@ async function sendMsg(msg, room, parent, token) {
   let parentDoc = await import_consts.msgDB.findOne({ fieldName: "MSG", msgID: Number(parent) });
   await import_consts.msgDB.insertOne({
     fieldName: "MSG",
-    data: msg.replaceAll(">", "&gt;"),
+    data: msg,
     permLevel: obj.data.perms ?? 1,
     sender: obj.data.alias ?? "" + processAnon(token),
     expiry: 9e99,
@@ -549,14 +547,20 @@ async function sendMsg(msg, room, parent, token) {
   }
   for (let i = 0; i < supportHandler.allRooms.length; i++)
     if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
-      supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token));
+      supportHandler.allRooms[i].handler.onMessage(
+        { action: "msg", data: {
+          id: msgCt,
+          content: msg
+        } },
+        obj.data.alias ?? processAnon(token)
+      );
     }
   if (parent == -1) {
     return { status: "SUCCESS", data: { autoThread: msgCt }, token };
   }
   return { status: "SUCCESS", data: { autoThread: null }, token };
 }
-async function sendMsg_B(msg, room) {
+async function sendMsg_B(msg, room, parent) {
   let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room });
   let msgCt = roomData ? roomData.msgCt : 0;
   let threadCt = roomData ? roomData.threadCt ?? 0 : 0;
@@ -572,19 +576,26 @@ async function sendMsg_B(msg, room) {
   }, { upsert: true });
   await import_consts.msgDB.insertOne({
     fieldName: "MSG",
-    data: msg.replaceAll("\\n\\n", "\n").replaceAll(">", "&gt;"),
+    data: msg.replaceAll("\\n\\n", "\n"),
     permLevel: 3,
     sender: betaNick,
     expiry: 9e99,
     room,
     msgID: msgCt,
-    parent: -1,
+    parent,
     threadID: threadCt
   });
   await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
     $inc: { msgCt: 1 }
   }, { upsert: true });
-  supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: betaNick, perms: 3, content: msg.replaceAll("\\n\\n", "\n"), time: Date.now() / 1e3 } }));
+  supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: {
+    id: msgCt,
+    sender: betaNick,
+    perms: 3,
+    content: msg.replaceAll("\\n\\n", "\n"),
+    time: Date.now() / 1e3,
+    parent
+  } }));
 }
 function processAnon(token) {
   return "Anon" + token.slice(0, 4);
@@ -700,17 +711,24 @@ async function loadLogs(rn, id, from, isBridge, token) {
       return { status: "SUCCESS", data: { from: -1 }, token };
     }
     let msgs = await import_consts.msgDB.find({ fieldName: "MSG", room: { $eq: rn }, threadID: { $gt: from - 5, $lte: from } }).sort({ threadID: -1, msgID: 1 }).toArray();
+    let sendOut = {
+      action: "logs",
+      data: {
+        logs: []
+      }
+    };
     for (let i = 0; i < msgs.length; i++) {
-      let dat = JSON.stringify({ action: "msg", data: {
+      let dat = {
         id: "-" + msgs[i].msgID,
         sender: msgs[i].sender,
         perms: msgs[i].permLevel,
         parent: msgs[i].parent ?? -1,
         content: msgs[i].data,
         time: msgs[i].time
-      } });
-      supportHandler.sendMsgTo_ID(id, dat);
+      };
+      sendOut.data.logs.push(dat);
     }
+    supportHandler.sendMsgTo_ID(id, JSON.stringify(sendOut));
     supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: from - 5 } }));
     return { status: "SUCCESS", data: { from: from - 5 }, token };
   } catch (e) {

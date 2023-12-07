@@ -269,13 +269,13 @@ async function initClient()
     if (failCt>5) location.reload();
     console.log("Connection closed by server."); setTimeout(initClient, 2000);
   };
-  source.onerror = ()=>{
-    ephemeralDialog("Connection error, reconnecting...")
-    // source.close();
-    failCt++;
-    if (failCt>5) location.reload();
-    console.log("Connection ERROR"); setTimeout(initClient, 2000)
-  };
+  // source.onerror = ()=>{
+  //   ephemeralDialog("Connection error, reconnecting...")
+  //   // source.close();
+  //   failCt++;
+  //   if (failCt>5) location.reload();
+  //   console.log("Connection ERROR"); setTimeout(initClient, 2000)
+  // };
   source.onmessage = (message) => {
     message = JSON.parse(message.data);
     
@@ -309,7 +309,7 @@ async function initClient()
       STARTIDVALID = false;
       byId("container").appendChild(BOTTOMINPUT);
       UNREAD = 0;
-      document.title = "BetaThreader"
+      document.title = "Support"
       loadStatus = -1;
       CONNECTIONID = -1;
       awaitingParent = [];
@@ -635,9 +635,19 @@ function handleMessageEvent(data, area) {
     ctn_inner.style.animation = "newMsg "+(60-(Date.now()/1000-data.time))+"s";
   let optn = document.createElement("div");
   optn.className = "options";
+  optn.onclick = (ev)=>{
+    ev.preventDefault();
+    ev.stopPropagation();
+  };
   optn.innerHTML = `
-  <button class="btn">
-    <span class="material-symbols-outlined">reply</span>
+  <button class="btn notooltip">
+    <span class="material-symbols-outlined blu">content_copy</span>
+  </button>
+  <button class="btn notooltip">
+    <span class="material-symbols-outlined blu">reply</span>
+  </button>
+  <button class="btn notooltip">
+    <span class="material-symbols-outlined red nooutline">delete</span>
   </button>`
   ctn_inner.appendChild(optn);
   ctn.appendChild(ctn_inner);

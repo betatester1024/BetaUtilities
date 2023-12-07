@@ -178,14 +178,6 @@ async function initClient() {
       console.log("Connection closed by server.");
       setTimeout(initClient, 2e3);
     };
-    source.onerror = () => {
-      ephemeralDialog("Connection error, reconnecting...");
-      failCt++;
-      if (failCt > 5)
-        location.reload();
-      console.log("Connection ERROR");
-      setTimeout(initClient, 2e3);
-    };
     source.onmessage = (message) => {
       message = JSON.parse(message.data);
       if (message.action != "ping")
@@ -248,6 +240,9 @@ async function initClient() {
         } else {
           loadStatus = -1;
           STARTID = message.data.id;
+        }
+        if (byId("msgArea").scrollHeight <= byId("msgArea").clientHeight) {
+          onScroll();
         }
         console.log("Fixing awaitingParent.");
         fixAwaitingParent();
@@ -479,8 +474,14 @@ function handleMessageEvent(data, area) {
   let optn = document.createElement("div");
   optn.className = "options";
   optn.innerHTML = `
-  <button class="btn">
+  <button class="btn notooltip">
+    <span class="material-symbols-outlined">content_copy</span>
+  </button>
+  <button class="btn notooltip">
     <span class="material-symbols-outlined">reply</span>
+  </button>
+  <button class="btn notooltip">
+    <span class="material-symbols-outlined">delete</span>
   </button>`;
   ctn_inner.appendChild(optn);
   ctn.appendChild(ctn_inner);

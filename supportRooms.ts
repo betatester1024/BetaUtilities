@@ -16,7 +16,6 @@ export class Room {
     this.name = name;
     this.handler = handler;
   };
-
 }
 
 export class BridgeSocket 
@@ -557,7 +556,7 @@ export async function sendMsg(msg: string, room: string, parent: number, token: 
     fieldName: "MSG", data: msg, permLevel: obj.data.perms ?? 1,
     sender: obj.data.alias ?? "" + processAnon(token), expiry: /*Date.now() + 3600 * 1000 * 24 * 30*/ 9e99,
     room: room, msgID: msgCt, parent:parent, threadID: parentDoc?(parentDoc.threadID??threadCt):threadCt,
-    time:Date.now()/1000
+    time:Date.now()/1000, senderID:obj.data.user ?? processAnon(token)
   });
 
   await msgDB.updateOne({ room: room, fieldName: "RoomInfo" }, {
@@ -568,20 +567,19 @@ export async function sendMsg(msg: string, room: string, parent: number, token: 
       id: msgCt, sender: obj.data.alias, 
       perms: obj.data.perms, parent: parent, 
       content: msg, time:Date.now()/1000,
-      autoThread:parent==-1
+      autoThread:parent==-1, senderID:obj.data.user ?? processAnon(token)
     } }));
   }
   else {
     supportHandler.sendMsgTo(room, JSON.stringify(
       { action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, 
                               parent: parent, content: msg, time:Date.now()/1000,
-                             autoThread:parent==-1} }));
+                             autoThread:parent==-1, senderID:obj.data.user ?? processAnon(token)} }));
   }
   for (let i = 0; i < supportHandler.allRooms.length; i++) 
     if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
       supportHandler.allRooms[i].handler.onMessage({action:"msg", data:{
-        id:msgCt, content:msg}}
-                                                   , obj.data.alias ?? processAnon(token))
+        id:msgCt, content:msg}}, obj.data.alias ?? processAnon(token))
     }
   if (parent == -1) {
     return {status:"SUCCESS", data:{autoThread:msgCt}, token};
@@ -608,7 +606,8 @@ export async function sendMsg_B(msg: string, room: string, parent) {
   await msgDB.insertOne({
     fieldName: "MSG", data: msg.replaceAll("\\n\\n", "\n"), permLevel: 3,
     sender: betaNick, expiry: /*Date.now() + 3600 * 1000 * 24 * 30*/ 9e99,
-    room: room, msgID: msgCt, parent:parent, threadID: threadCt
+    room: room, msgID: msgCt, parent:parent, threadID: threadCt,
+    time:Date.now()/1000, senderID:"BetaOS System"
   });
   await msgDB.updateOne({ room: room, fieldName: "RoomInfo" }, {
     $inc: { msgCt: 1 }
@@ -616,7 +615,7 @@ export async function sendMsg_B(msg: string, room: string, parent) {
   supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { 
     id: msgCt, sender: betaNick, perms: 3, 
     content: msg.replaceAll("\\n\\n", "\n"), time:Date.now()/1000,
-    parent:parent} }));
+    parent:parent, senderID:"BetaOS System"} }));
 }
 
 function processAnon(token: string) {
@@ -784,13 +783,15 @@ export async function loadLogs(rn: string, id: number, from: number, isBridge:bo
         perms: msgs[i].permLevel, 
         parent: msgs[i].parent ?? -1, 
         content: msgs[i].data,
-        time:msgs[i].time
+        time:msgs[i].time,
+        senderID: msgs[i].senderID
       } ;
       // console.log(dat);
       sendOut.data.logs.push(dat);
       // supportHandler.sendMsgTo_ID(id, dat);
     }
     // console.log(sendOut);
+    // console.log(JSON.stringify(sendOut));
     supportHandler.sendMsgTo_ID(id, JSON.stringify(sendOut));
     // console.log("LOADING COMPLETE, LOADED" + msgs.length, "MESSAGES");
     supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: from - 5 } }));
@@ -806,8 +807,12 @@ export async function delMsg(id: string, room: string, token: string) {
     // console.log({fieldName:"MSG", msgID:id, room:room});
     if (!supportHandler.checkFoundQ(room)) return { status: "ERROR", data: { error: "Room does not exist" }, token: token };
     let usrData = await userRequest(token) as { status: string, data: { perms: number } };
-    if (usrData.status != "SUCCESS") return usrData;
-    if (usrData.perms < 2) return { status: "ERROR", data: { error: "Insufficient permissions!" }, token: token };
+    // if (usrData.status != "SUCCESS") return usrData;
+    let messageInQuestion = await msgDB.findOne({ fieldName: "MSG", msgID: { $eq: id }, room: { $eq: room}});
+    if (usrData.perms < 2 && 
+        !(usrData.data.user == messageInQuestion.sender || 
+          userData.status == "ERROR" && processAnon(token) == messageInQuestion.sender))
+        return { status: "ERROR", data: { error: "Insufficient permissions!" }, token: token };
     await msgDB.deleteOne({ fieldName: "MSG", msgID: Number(id), room: room });
     supportHandler.sendMsgTo(room, JSON.stringify({ action: "delMsg", data: { id: Number(id) } }));
     return { status: "SUCCESS", data: null, token: token };

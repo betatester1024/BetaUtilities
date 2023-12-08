@@ -64,7 +64,7 @@ function onKeyPress(e) {
       // }
       toggleActiveReply(leaving.dataset.id, true);
     }
-    else if (!leaving.previousElementSibling) return;
+    // else if (!leaving.previousElementSibling) return;
     else if (leaving.children.length > 3) { // can go to child
       // falling off the edge to the parent
       leaving = leaving.children[leaving.children.length-2];
@@ -74,7 +74,7 @@ function onKeyPress(e) {
       // toggleActiveReply(leaving.dataset.id, true)
       toggleActiveReply(leaving.dataset.id, true);
     }
-    else if (leaving.previousElementSibling.className != "bar") 
+    else if (leaving.previousElementSibling && leaving.previousElementSibling.className != "bar") 
     {
       // console.log("prevelement");
       toggleActiveReply(leaving.previousElementSibling.dataset.id, true);
@@ -82,10 +82,12 @@ function onKeyPress(e) {
     else {
       // if there are no children and there are no siblings:
       leaving = byMsgId(ACTIVEREPLY).parentElement;
-      while ((leaving.previousElementSibling.className == "bar")) {
+      while (leaving.previousElementSibling && 
+             (leaving.previousElementSibling.className == "bar")) {
         leaving = leaving.parentElement;
       }
-      toggleActiveReply(leaving.previousElementSibling.dataset.id, true);
+      if (leaving.previousElementSibling)
+        toggleActiveReply(leaving.previousElementSibling.dataset.id, true);
     }
     // else if (leaving.nextElementSibling.children.length == 2) { // the bar and the message content
     //   // happy days.
@@ -119,65 +121,69 @@ function byMsgId(id)
   return byId("msgArea").querySelector("[data-id='"+id+"']")
 }
 function toggleActiveReply(id, forceQ = false) // force to set reply to ID ALWAYS 
-{
-  if (forceQ) {
-    byMsgId(ACTIVEREPLY).classList.remove("activeReply");
-    if (id != "-1") byMsgId(id).classList.add("activeReply");
-    else byId("container").appendChild(BOTTOMINPUT);
-    ACTIVEREPLY = id;
-    updateReplyBox();
-    return;
-  }
-  if (id == -1) { // you clicked the banner
-    byMsgId(-1).style.display = "none";
-    return;
-    // byMsgId(-1).style.transition= "all 0.5s";
-    // byMsgId(-1).style.height = "0px";
-    // byMsgId(-1).style.opacity = "0";
-    // byMsgId(-1).style.touchAction = "none";
-  }
-  if (ACTIVEREPLY == id) { // clicking again: activereply parent or clear activereply
-    byMsgId(id).classList.remove("activeReply");
-    let parent = byMsgId(id).parentElement;
-    if (parent.dataset.id) {
-      ACTIVEREPLY = parent.dataset.id;
-      parent.classList.add("activeReply");
-    }
-    else ACTIVEREPLY = -1;
-    byId("container").appendChild(BOTTOMINPUT);
-    // BOTTOMINPUT.style.display="flex";
-  }
-  else { // okay, not clicking again
-    // are you clicking on the direct child?
-    if (byMsgId(id).parentElement.dataset.id == ACTIVEREPLY) {
-      // that's right!
-      // okay so now activereply is the one you clickedre
-      if (ACTIVEREPLY != -1)
-        byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+{ 
+  try {
+    if (forceQ) {
+      byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+      if (id != "-1") byMsgId(id).classList.add("activeReply");
+      else byId("container").appendChild(BOTTOMINPUT);
       ACTIVEREPLY = id;
-      byMsgId(id).classList.add("activeReply");
-
+      updateReplyBox();
+      return;
     }
-    // are you clicking on something else?
-    // at this point you definitely are
-    // does it even have a parent?
-    else if (!byMsgId(id).parentElement.dataset.id) {
-      if (ACTIVEREPLY != -1)
-        byMsgId(ACTIVEREPLY).classList.remove("activeReply");
-      ACTIVEREPLY = id;
-      byMsgId(id).classList.add("activeReply");
+    if (id == -1) { // you clicked the banner
+      byMsgId(-1).style.display = "none";
+      return;
+      // byMsgId(-1).style.transition= "all 0.5s";
+      // byMsgId(-1).style.height = "0px";
+      // byMsgId(-1).style.opacity = "0";
+      // byMsgId(-1).style.touchAction = "none";
     }
-    // okay, it does
-    else {
+    if (ACTIVEREPLY == id) { // clicking again: activereply parent or clear activereply
+      byMsgId(id).classList.remove("activeReply");
       let parent = byMsgId(id).parentElement;
-      if (ACTIVEREPLY != -1) 
-        byMsgId(ACTIVEREPLY).classList.remove("activeReply");
-      ACTIVEREPLY = parent.dataset.id;
-      parent.classList.add("activeReply");
-      
+      if (parent.dataset.id) {
+        ACTIVEREPLY = parent.dataset.id;
+        parent.classList.add("activeReply");
+      }
+      else ACTIVEREPLY = -1;
+      byId("container").appendChild(BOTTOMINPUT);
+      // BOTTOMINPUT.style.display="flex";
     }
+    else { // okay, not clicking again
+      // are you clicking on the direct child?
+      if (byMsgId(id).parentElement.dataset.id == ACTIVEREPLY) {
+        // that's right!
+        // okay so now activereply is the one you clickedre
+        if (ACTIVEREPLY != -1)
+          byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+        ACTIVEREPLY = id;
+        byMsgId(id).classList.add("activeReply");
+  
+      }
+      // are you clicking on something else?
+      // at this point you definitely are
+      // does it even have a parent?
+      else if (!byMsgId(id).parentElement.dataset.id) {
+        if (ACTIVEREPLY != -1)
+          byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+        ACTIVEREPLY = id;
+        byMsgId(id).classList.add("activeReply");
+      }
+      // okay, it does
+      else {
+        let parent = byMsgId(id).parentElement;
+        if (ACTIVEREPLY != -1) 
+          byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+        ACTIVEREPLY = parent.dataset.id;
+        parent.classList.add("activeReply");
+        
+      }
+    }
+    updateReplyBox();
+  } catch(e) {
+    console.warn("ERROR:", e)
   }
-  updateReplyBox();
   // BOTTOMINPUT.style.display=(ACTIVEREPLY=="-1"?"flex":"none");
 }
 
@@ -290,6 +296,7 @@ async function initClient()
     let area = document.getElementById("msgArea");
     let scrDistOKQ =  (area.scrollTop) >= (area.scrollHeight-area.offsetHeight - 100)
     if (message.action == "logs") {
+      message.data.logs.sort((a, b)=>{return Math.abs(a.id)-Math.abs(b.id)})
       for (let i=0; i<message.data.logs.length; i++) 
         handleMessageEvent(message.data.logs[i], area);
     }
@@ -319,6 +326,11 @@ async function initClient()
     if (message.action == "delMsg") {
       let ele = byMsgId(message.data.id);
       if (ele) ele.remove();
+      if (!byMsgId(ACTIVEREPLY)) {
+        ACTIVEREPLY = -1;
+        toggleActiveReply(-1, true);
+      }
+      // if (ele.closest())
     }
     if (message.action == "autoThreading") {
       toggleActiveReply(message.data.id);
@@ -327,12 +339,12 @@ async function initClient()
       let thing = document.getElementById("msgArea")
       if (message.data.id<0) {
         if (!byId("errorEle")) {
-        let errorEle = document.createElement("b");
-        errorEle.className = "red";
-        errorEle.id="errorEle";
-        errorEle.innerText = "No more messages to load";
-        errorEle.style.display="block";
-        thing.prepend(errorEle);
+          let errorEle = document.createElement("b");
+          errorEle.className = "red";
+          errorEle.id="errorEle";
+          errorEle.innerText = "No more messages to load";
+          errorEle.style.display="block";
+          thing.prepend(errorEle);
         }
       }
       else {
@@ -340,9 +352,10 @@ async function initClient()
         STARTID=message.data.id;
         // alert("lcMatchId updated"+ STARTID);
       }
-      if (byId("msgArea").scrollHeight <= byId("msgArea").clientHeight) {
-        onScroll();
-      }
+      setTimeout(()=>{
+        if (byId("msgArea").scrollHeight <= byId("msgArea").clientHeight) 
+          onScroll();
+      }, 500);
       console.log("Fixing awaitingParent.")
       fixAwaitingParent();
       thing.scrollTop = thing.scrollTop+1;
@@ -485,8 +498,10 @@ function onScroll() {
     console.log("loading messages from" + STARTID)
     if (ISBRIDGE)
       source.send(JSON.stringify({action:"loadLogs", data:{before:earliestMessageID}}));
-    else
-      send(JSON.stringify({action:"loadLogs", data:{room:ROOMNAME, id:CONNECTIONID, from:STARTID}}), ()=>{});
+    else {
+      
+      send(JSON.stringify({action:"loadLogs", data:{room:ROOMNAME, id:CONNECTIONID, from:STARTID}}), ()=>{}, true);
+    }
   }
   
   else if (document.getElementById("msgArea").scrollTop < 30) console.log("loadStatus" + loadStatus)
@@ -548,7 +563,7 @@ function handleMessageEvent(data, area) {
 
   let ctn = document.createElement("div");
   ctn.dataset.id=matches[1];
-
+  ctn.dataset.senderID = data.senderID
   ctn.className='msgContainer';
   // if (!PREPENDFLAG) ctn.appendChild(newMsgSender);
   // newMsgBody.className = classStr[matches[3]];
@@ -630,6 +645,7 @@ function handleMessageEvent(data, area) {
   ctn_inner.className = "msgContents";
   ctn_inner.appendChild(newMsgSender);
   ctn_inner.appendChild(ele);
+  ctn_inner.dataset.message = data.content
   ctn_inner.innerHTML += `<div class="time" data-time="${data.time}">${minimalTime(Date.now()-data.time*1000)}</div>`
   if (Date.now()/1000 - data.time < 60)
     ctn_inner.style.animation = "newMsg "+(60-(Date.now()/1000-data.time))+"s";
@@ -639,16 +655,30 @@ function handleMessageEvent(data, area) {
     ev.preventDefault();
     ev.stopPropagation();
   };
-  optn.innerHTML = `
-  <button class="btn notooltip">
-    <span class="material-symbols-outlined blu">content_copy</span>
-  </button>
-  <button class="btn notooltip">
-    <span class="material-symbols-outlined blu">reply</span>
-  </button>
-  <button class="btn notooltip">
-    <span class="material-symbols-outlined red nooutline">delete</span>
-  </button>`
+  console.log(data.perms, data.sender);
+  if (data.sender != "[SYSTEM]") optn.innerHTML = `
+    <button class="btn" onclick="copyMessage(event)">
+      <span class="material-symbols-outlined blu">content_copy</span>
+      Copy message contents
+    </button>
+    <button class="btn" onclick="replyMessage(event)">
+      <span class="material-symbols-outlined blu">reply</span>
+      Reply
+    </button>`;
+  else optn.remove();
+  // console.log(byId("alias").value);
+  if (userData.user == ctn.dataset.senderID
+   || byId("alias").value == ctn.dataset.senderID
+     || userData.perms && userData.perms >=2 )
+    optn.innerHTML += `
+    <!-- <button class="btn">
+    //   <span class="material-symbols-outlined ylw">edit</span>
+    //   Edit message
+    // </button>-->
+    <button class="btn" onclick="deleteMessage(event)">
+      <span class="material-symbols-outlined red nooutline">delete</span>
+      Delete message
+    </button>`;
   ctn_inner.appendChild(optn);
   ctn.appendChild(ctn_inner);
   let bar = document.createElement("div");
@@ -694,4 +724,22 @@ function handleMessageEvent(data, area) {
   if (byMsgId(-1)) byId("msgArea").appendChild(byMsgId(-1));
   byId("msgArea").insertBefore(byId("placeholder"), byMsgId(-1))
   // byMsgId(-1).style.display = "none";
+}
+
+function copyMessage(ev) {
+  let el = ev.currentTarget.parentElement.parentElement;
+  navigator.clipboard.writeText(el.dataset.message);
+  ephemeralDialog("<span class='material-symbols-outlined grn'>check_circle</span> Copied")
+}
+function replyMessage(ev) {
+  // console.log(ev.currentTarget.parentElement.parentElement)
+  let id = ev.currentTarget.parentElement.parentElement.parentElement.dataset.id;
+  toggleActiveReply(id, true);
+  // console.log("hello", id);
+}
+function deleteMessage(ev) {
+  let id = ev.currentTarget.parentElement.parentElement.parentElement.dataset.id;
+  send(JSON.stringify({action:"delMsg", data:{id:id, room:ROOMNAME}}), (res)=>{
+    console.log(res);
+  });
 }

@@ -22,7 +22,7 @@ __export(EEHandler_exports, {
 });
 module.exports = __toCommonJS(EEHandler_exports);
 var import_consts = require("./consts");
-async function EE(getQ, token, newStr) {
+async function EE(getQ, token, newStr = "") {
   let obj = await import_consts.uDB.findOne({ fieldName: "EE" });
   if (getQ)
     return { status: "SUCCESS", data: { data: obj ? obj.data : "" }, token };

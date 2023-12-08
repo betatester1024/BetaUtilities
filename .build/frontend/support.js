@@ -51,19 +51,18 @@ function onKeyPress(e) {
     if (ACTIVEREPLY == -1) {
       leaving = byId("placeholder").previousElementSibling;
       toggleActiveReply(leaving.dataset.id, true);
-    } else if (!leaving.previousElementSibling)
-      return;
-    else if (leaving.children.length > 3) {
+    } else if (leaving.children.length > 3) {
       leaving = leaving.children[leaving.children.length - 2];
       toggleActiveReply(leaving.dataset.id, true);
-    } else if (leaving.previousElementSibling.className != "bar") {
+    } else if (leaving.previousElementSibling && leaving.previousElementSibling.className != "bar") {
       toggleActiveReply(leaving.previousElementSibling.dataset.id, true);
     } else {
       leaving = byMsgId(ACTIVEREPLY).parentElement;
-      while (leaving.previousElementSibling.className == "bar") {
+      while (leaving.previousElementSibling && leaving.previousElementSibling.className == "bar") {
         leaving = leaving.parentElement;
       }
-      toggleActiveReply(leaving.previousElementSibling.dataset.id, true);
+      if (leaving.previousElementSibling)
+        toggleActiveReply(leaving.previousElementSibling.dataset.id, true);
     }
   }
 }
@@ -190,6 +189,9 @@ async function initClient() {
       let area = document.getElementById("msgArea");
       let scrDistOKQ = area.scrollTop >= area.scrollHeight - area.offsetHeight - 100;
       if (message.action == "logs") {
+        message.data.logs.sort((a, b) => {
+          return Math.abs(a.id) - Math.abs(b.id);
+        });
         for (let i2 = 0; i2 < message.data.logs.length; i2++)
           handleMessageEvent(message.data.logs[i2], area);
       }
@@ -210,7 +212,7 @@ async function initClient() {
         STARTIDVALID = false;
         byId("container").appendChild(BOTTOMINPUT);
         UNREAD = 0;
-        document.title = "BetaThreader";
+        document.title = "Support";
         loadStatus = -1;
         CONNECTIONID = -1;
         awaitingParent = [];
@@ -222,6 +224,10 @@ async function initClient() {
         let ele2 = byMsgId(message.data.id);
         if (ele2)
           ele2.remove();
+        if (!byMsgId(ACTIVEREPLY)) {
+          ACTIVEREPLY = -1;
+          toggleActiveReply(-1, true);
+        }
       }
       if (message.action == "autoThreading") {
         toggleActiveReply(message.data.id);
@@ -241,9 +247,10 @@ async function initClient() {
           loadStatus = -1;
           STARTID = message.data.id;
         }
-        if (byId("msgArea").scrollHeight <= byId("msgArea").clientHeight) {
-          onScroll();
-        }
+        setTimeout(() => {
+          if (byId("msgArea").scrollHeight <= byId("msgArea").clientHeight)
+            onScroll();
+        }, 500);
         console.log("Fixing awaitingParent.");
         fixAwaitingParent();
         thing.scrollTop = thing.scrollTop + 1;
@@ -349,9 +356,10 @@ function onScroll() {
     console.log("loading messages from" + STARTID);
     if (ISBRIDGE)
       source.send(JSON.stringify({ action: "loadLogs", data: { before: earliestMessageID } }));
-    else
+    else {
       send(JSON.stringify({ action: "loadLogs", data: { room: ROOMNAME, id: CONNECTIONID, from: STARTID } }), () => {
-      });
+      }, true);
+    }
   } else if (document.getElementById("msgArea").scrollTop < 30)
     console.log("loadStatus" + loadStatus);
 }
@@ -401,6 +409,7 @@ function handleMessageEvent(data, area) {
   newMsgSender.className = classStr[matches[3]];
   let ctn = document.createElement("div");
   ctn.dataset.id = matches[1];
+  ctn.dataset.senderID = data.senderID;
   ctn.className = "msgContainer";
   let msg = "" + matches[4].replaceAll("&gt;", ";gt;").replaceAll(">", ";gt;");
   for (let i2 = 0; i2 < replacements.length; i2++) {
@@ -468,21 +477,39 @@ function handleMessageEvent(data, area) {
   ctn_inner.className = "msgContents";
   ctn_inner.appendChild(newMsgSender);
   ctn_inner.appendChild(ele);
+  ctn_inner.dataset.message = data.content;
   ctn_inner.innerHTML += `<div class="time" data-time="${data.time}">${minimalTime(Date.now() - data.time * 1e3)}</div>`;
   if (Date.now() / 1e3 - data.time < 60)
     ctn_inner.style.animation = "newMsg " + (60 - (Date.now() / 1e3 - data.time)) + "s";
   let optn = document.createElement("div");
   optn.className = "options";
-  optn.innerHTML = `
-  <button class="btn notooltip">
-    <span class="material-symbols-outlined">content_copy</span>
-  </button>
-  <button class="btn notooltip">
-    <span class="material-symbols-outlined">reply</span>
-  </button>
-  <button class="btn notooltip">
-    <span class="material-symbols-outlined">delete</span>
-  </button>`;
+  optn.onclick = (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+  };
+  console.log(data.perms, data.sender);
+  if (data.sender != "[SYSTEM]")
+    optn.innerHTML = `
+    <button class="btn" onclick="copyMessage(event)">
+      <span class="material-symbols-outlined blu">content_copy</span>
+      Copy message contents
+    </button>
+    <button class="btn" onclick="replyMessage(event)">
+      <span class="material-symbols-outlined blu">reply</span>
+      Reply
+    </button>`;
+  else
+    optn.remove();
+  if (userData.user == ctn.dataset.senderID || byId("alias").value == ctn.dataset.senderID || userData.perms && userData.perms >= 2)
+    optn.innerHTML += `
+    <!-- <button class="btn">
+    //   <span class="material-symbols-outlined ylw">edit</span>
+    //   Edit message
+    // </button>-->
+    <button class="btn" onclick="deleteMessage(event)">
+      <span class="material-symbols-outlined red nooutline">delete</span>
+      Delete message
+    </button>`;
   ctn_inner.appendChild(optn);
   ctn.appendChild(ctn_inner);
   let bar = document.createElement("div");
@@ -525,5 +552,20 @@ function handleMessageEvent(data, area) {
   if (byMsgId(-1))
     byId("msgArea").appendChild(byMsgId(-1));
   byId("msgArea").insertBefore(byId("placeholder"), byMsgId(-1));
+}
+function copyMessage(ev) {
+  let el = ev.currentTarget.parentElement.parentElement;
+  navigator.clipboard.writeText(el.dataset.message);
+  ephemeralDialog("<span class='material-symbols-outlined grn'>check_circle</span> Copied");
+}
+function replyMessage(ev) {
+  let id = ev.currentTarget.parentElement.parentElement.parentElement.dataset.id;
+  toggleActiveReply(id, true);
+}
+function deleteMessage(ev) {
+  let id = ev.currentTarget.parentElement.parentElement.parentElement.dataset.id;
+  send(JSON.stringify({ action: "delMsg", data: { id, room: ROOMNAME } }), (res) => {
+    console.log(res);
+  });
 }
 //# sourceMappingURL=support.js.map

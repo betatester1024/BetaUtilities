@@ -615,7 +615,7 @@ function ephemeralDialog(text) {
   byId("ephemerals").prepend(dialog);
   setTimeout(() => {
     closeEphemeral(dialog);
-  }, 2e4);
+  }, 1e4);
   dialog.onclick = () => {
     closeEphemeral(dialog);
   };

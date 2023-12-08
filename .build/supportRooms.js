@@ -517,7 +517,8 @@ async function sendMsg(msg, room, parent, token) {
     msgID: msgCt,
     parent,
     threadID: parentDoc ? parentDoc.threadID ?? threadCt : threadCt,
-    time: Date.now() / 1e3
+    time: Date.now() / 1e3,
+    senderID: obj.data.user ?? processAnon(token)
   });
   await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
     $inc: { msgCt: 1, threadCt: parentDoc ? 0 : 1 }
@@ -530,7 +531,8 @@ async function sendMsg(msg, room, parent, token) {
       parent,
       content: msg,
       time: Date.now() / 1e3,
-      autoThread: parent == -1
+      autoThread: parent == -1,
+      senderID: obj.data.user ?? processAnon(token)
     } }));
   } else {
     supportHandler.sendMsgTo(room, JSON.stringify(
@@ -541,19 +543,17 @@ async function sendMsg(msg, room, parent, token) {
         parent,
         content: msg,
         time: Date.now() / 1e3,
-        autoThread: parent == -1
+        autoThread: parent == -1,
+        senderID: obj.data.user ?? processAnon(token)
       } }
     ));
   }
   for (let i = 0; i < supportHandler.allRooms.length; i++)
     if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
-      supportHandler.allRooms[i].handler.onMessage(
-        { action: "msg", data: {
-          id: msgCt,
-          content: msg
-        } },
-        obj.data.alias ?? processAnon(token)
-      );
+      supportHandler.allRooms[i].handler.onMessage({ action: "msg", data: {
+        id: msgCt,
+        content: msg
+      } }, obj.data.alias ?? processAnon(token));
     }
   if (parent == -1) {
     return { status: "SUCCESS", data: { autoThread: msgCt }, token };
@@ -583,7 +583,9 @@ async function sendMsg_B(msg, room, parent) {
     room,
     msgID: msgCt,
     parent,
-    threadID: threadCt
+    threadID: threadCt,
+    time: Date.now() / 1e3,
+    senderID: "BetaOS System"
   });
   await import_consts.msgDB.updateOne({ room, fieldName: "RoomInfo" }, {
     $inc: { msgCt: 1 }
@@ -594,7 +596,8 @@ async function sendMsg_B(msg, room, parent) {
     perms: 3,
     content: msg.replaceAll("\\n\\n", "\n"),
     time: Date.now() / 1e3,
-    parent
+    parent,
+    senderID: "BetaOS System"
   } }));
 }
 function processAnon(token) {
@@ -676,25 +679,25 @@ function updateActive(name, activeQ) {
     supportHandler.deleteRoom("EUPH_ROOM", name);
 }
 async function WHOIS(token, user) {
-  let userData = await import_consts.authDB.findOne({ fieldName: "UserData", user });
-  let userData2 = await import_consts.authDB.find({ fieldName: "UserData", alias: user }).toArray();
+  let userData2 = await import_consts.authDB.findOne({ fieldName: "UserData", user });
+  let userData22 = await import_consts.authDB.find({ fieldName: "UserData", alias: user }).toArray();
   let out = [];
-  for (let i = 0; i < userData2.length; i++) {
+  for (let i = 0; i < userData22.length; i++) {
     out.push({
-      user: userData2[i].user,
-      tasks: userData2[i].tasksCompleted,
-      about: userData2[i].aboutme,
-      perms: userData2[i].permLevel
+      user: userData22[i].user,
+      tasks: userData22[i].tasksCompleted,
+      about: userData22[i].aboutme,
+      perms: userData22[i].permLevel
     });
   }
   return {
     status: "SUCCESS",
     data: {
       account: {
-        perms: userData ? userData.permLevel : "N/A",
+        perms: userData2 ? userData2.permLevel : "N/A",
         user,
-        tasks: userData ? userData.tasksCompleted : "N/A",
-        about: userData ? userData.aboutme : "Account not found"
+        tasks: userData2 ? userData2.tasksCompleted : "N/A",
+        about: userData2 ? userData2.aboutme : "Account not found"
       },
       users: out
     },
@@ -724,7 +727,8 @@ async function loadLogs(rn, id, from, isBridge, token) {
         perms: msgs[i].permLevel,
         parent: msgs[i].parent ?? -1,
         content: msgs[i].data,
-        time: msgs[i].time
+        time: msgs[i].time,
+        senderID: msgs[i].senderID
       };
       sendOut.data.logs.push(dat);
     }
@@ -741,9 +745,8 @@ async function delMsg(id, room, token) {
     if (!supportHandler.checkFoundQ(room))
       return { status: "ERROR", data: { error: "Room does not exist" }, token };
     let usrData = await (0, import_userRequest.userRequest)(token);
-    if (usrData.status != "SUCCESS")
-      return usrData;
-    if (usrData.perms < 2)
+    let messageInQuestion = await import_consts.msgDB.findOne({ fieldName: "MSG", msgID: { $eq: id }, room: { $eq: room } });
+    if (usrData.perms < 2 && !(usrData.data.user == messageInQuestion.sender || userData.status == "ERROR" && processAnon(token) == messageInQuestion.sender))
       return { status: "ERROR", data: { error: "Insufficient permissions!" }, token };
     await import_consts.msgDB.deleteOne({ fieldName: "MSG", msgID: Number(id), room });
     supportHandler.sendMsgTo(room, JSON.stringify({ action: "delMsg", data: { id: Number(id) } }));

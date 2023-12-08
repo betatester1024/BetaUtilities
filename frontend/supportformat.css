@@ -1,6 +1,6 @@
 
 
-#msgArea a, #msgArea p, #msgArea b, #msgArea span {
+#msgArea a, #msgArea p, #msgArea b, #msgArea span:not(.options span){
   color: var(--system-black);
 }
 #msgArea {
@@ -24,7 +24,7 @@
 
 #alias {
   height: unset;
-  font-size: 15px;
+  font-size: 16px;
   width: unset;
   display: inline-flex;
   align-items: center;
@@ -61,7 +61,7 @@
 }
 #msgInp {
   height: 100%;
-  font-size: 18px;
+  font-size: 16px;
   border-radius: 0px;
   margin-right: 0px;
 }
@@ -104,6 +104,7 @@ div#container > #bottomInput:before {
   gap: 5px;
   margin: 0px;
   margin-left: 2px;
+  margin-top: 5px;
   text-align: left;
   /* border-bottom: 2px solid var(--system-transp); */
   transition: all 0.2s;
@@ -148,7 +149,7 @@ input {
   /* margin-top: -100px; */
   /* margin-left: -100px; */
   /* z-index: 1; */
-  font-size: 18px;
+  font-size: 16px;
   height: 25px;
   padding: 5px;
   width: 100%;
@@ -200,7 +201,7 @@ button#sendBtn {
 span {
   white-space: pre-wrap;
   display: inline-block;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 
@@ -216,8 +217,8 @@ b {
 }
 
 md-span {
-  font-size: 18px;
-  font-family: 'Noto Sans Display';
+  font-size: 16px;
+  font-family: 'Noto Sans Display', 'Noto Color Emoji';
 }
 md-span > code {
   font-family: 'Noto Sans Mono';
@@ -236,7 +237,7 @@ p, md-span {
   max-width: 100%;
 /*   margin-left: 5px; */
 }
-h2 > span, .supportMsg {
+h2 > span, .supportMsg:not(.options span) {
   top: 5px;
   color: var(--system-blue) !important;
 }
@@ -294,7 +295,7 @@ div.msgContainer > div.msgContainer {
 .msgContents > .options {
   position: absolute;
   /* display: none; */
-  top: 0px;
+  top: -10px;
   right:0px;
   opacity: 0;
   transition: all 0.2s ease;
@@ -317,6 +318,7 @@ div.msgContainer > div.msgContainer {
   height: fit-content;
   width: fit-content;
   border-radius: 5px;
+  font-size: 0px;
   min-height:0px;
   background-color: var(--system-transp);
 }
@@ -378,7 +380,7 @@ md-span.superadmin, b.superadmin, span.superadmin, a.superadmin {
   /* color: #00df00 !important; */
   color: var(--system-blue) !important;
   /* font-variant-caps: small-caps; */
-  font-size: 20px;
+  font-size: 16px;
   /* font-size: large; */
 }
 

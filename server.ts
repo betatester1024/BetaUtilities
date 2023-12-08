@@ -129,10 +129,10 @@ export async function initServer() {
   // else sendFile(res, getToken(req), frontendDir+'/supportIndex.html');
   
   app.get('/EE', (req:any, res:any) => {
-    EE(true, (_status:string, data:any, _token:string)=>{
+    EE(true).then((obj)=>{
       res.set('Content-Type', 'text/html')
-      res.send(Buffer.from(eeFormat(data.data)));
-    }, "", "")
+      res.send(Buffer.from(eeFormat(obj.data.data)));
+    })
     
     incrRequests();
   });
@@ -546,7 +546,7 @@ async function makeRequest(action:string|null, token:string, data:any|null, sess
         obj = await loadLogs(data.room, data.id, data.from, /*don't touch it*/ false, token)
         break;
       case "delMsg":
-        obj = await delMsg(data.id, data.room, token)
+        obj = await delMsg(data.id, data.room, token||sessID)
         break
       case "updateDefaultLoad":
         obj = await updateDefaultLoad(data.new, token)

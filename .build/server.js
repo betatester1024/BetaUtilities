@@ -121,10 +121,10 @@ async function initServer() {
     (0, import_logging.incrRequests)();
   });
   app.get("/EE", (req, res) => {
-    (0, import_EEHandler.EE)(true, (_status, data, _token) => {
+    (0, import_EEHandler.EE)(true).then((obj) => {
       res.set("Content-Type", "text/html");
-      res.send(Buffer.from(eeFormat(data.data)));
-    }, "", "");
+      res.send(Buffer.from(eeFormat(obj.data.data)));
+    });
     (0, import_logging.incrRequests)();
   });
   app.ws("/bridge", (ws, req) => {
@@ -456,7 +456,7 @@ async function makeRequest(action, token, data, sessID) {
         obj = await (0, import_supportRooms.loadLogs)(data.room, data.id, data.from, false, token);
         break;
       case "delMsg":
-        obj = await (0, import_supportRooms.delMsg)(data.id, data.room, token);
+        obj = await (0, import_supportRooms.delMsg)(data.id, data.room, token || sessID);
         break;
       case "updateDefaultLoad":
         obj = await (0, import_supportRooms.updateDefaultLoad)(data.new, token);

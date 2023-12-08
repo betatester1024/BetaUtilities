@@ -723,7 +723,7 @@ function ephemeralDialog(text:string)
   byId("ephemerals").prepend(dialog);
   setTimeout(()=>{
     closeEphemeral(dialog)
-  }, 20000);
+  }, 10000);
   dialog.onclick = ()=>{closeEphemeral(dialog)}
 }
 function closeEphemeral(dialog:HTMLDivElement) 

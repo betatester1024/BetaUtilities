@@ -2,7 +2,10 @@ import { userRequest } from './userRequest';
 import { msgDB, authDB, uDB, roomRegex } from './consts';
 import { log } from './logging'
 // import { minID } from './database';
+import {WebSocket} from 'ws';
+import {realias} from './updateUser';
 import { WebH } from './betautilities/webHandler';
+const cookie = require('cookie');
 export class Room {
   type: string;
   name: string;
@@ -13,7 +16,276 @@ export class Room {
     this.name = name;
     this.handler = handler;
   };
+}
 
+export class BridgeSocket 
+{
+  euphSocket: WebSocket;
+  client: WebSocket;
+  token:string;
+  roomName:string;
+  setNick:boolean = false;
+  onOpen() {
+    // console.log("bridgeSocket was opened")
+    this.client.send(JSON.stringify({action:"RELOAD"}));
+    this.setNick = false;
+  }
+
+  loadLogs(before:string) {
+    // let usrData = await userRequeest(token);
+    this.euphSocket.send(JSON.stringify({type:"log", data:{n:100, before:before}}))
+    // this.client.send(JSON.stringify({
+      // action:"yourAlias",
+      // data:{alias:usrData.data.alias}
+    // }))
+  }
+
+  sendMsg(room:string, parent:string, content:string) {
+    this.euphSocket.send(JSON.stringify({
+      type:"send", 
+      id:parent=="-1"?"requiresAutoThreading":null, 
+      data:{
+        content:content, 
+        parent:(parent=="-1"?null:parent)
+      }
+    }))
+  }
+  
+  async onMessage(msg:string) {
+    let dat = JSON.parse(msg);
+    // console.log(dat);
+    let usrData = await userRequest(this.token);
+    if (usrData.status != "SUCCESS") usrData = {data:{alias:"AnonymousBridgeUser", perms:0}};
+    if (!this.setNick) {
+      this.setNick = true;
+      this.euphSocket.send(JSON.stringify({
+        type:"nick",
+        data:{name:usrData.data.alias}
+      }))
+    }
+    switch(dat.type) {
+      case "ping-event":
+        this.euphSocket.send(JSON.stringify({type:"ping-reply", data:{time:dat.data.time}}));
+        break;
+      case "snapshot-event":
+        for (let i=0; i<dat.data.listing.length; i++) {
+          // console.log(dat.data.log[i]);
+          if (!dat.data.listing[i].name) continue;
+          this.client.send(JSON.stringify({action:"addUser", data:{
+            user:dat.data.listing[i].name, 
+            isBot:dat.data.listing[i].id.match(/^bot:/)!=null}
+          }));
+        }
+        for (let i=0; i<dat.data.log.length; i++) {
+          this.client.send(JSON.stringify({
+            action:"msg",
+            data:{
+              id:dat.data.log[i].id,
+              parent:dat.data.log[i].parent,
+              sender:dat.data.log[i].sender.name,
+              time:dat.data.log[i].time,
+              perms: usrData.data.perms,
+              content:dat.data.log[i].content,
+            }
+          }))
+        }
+        break;
+      case "log-reply":
+        // console.log(dat);
+        dat.data.log.sort((a:{time:number}, b:{time:number})=>{return b.time-a.time;});
+        for (let i=0; i<dat.data.log.length; i++) 
+        {
+          // console.log(dat.data.log[i].time);
+          this.client.send(JSON.stringify({
+            action:"msg",
+            data:{
+              id:"-"+dat.data.log[i].id,
+              parent:dat.data.log[i].parent,
+              sender:dat.data.log[i].sender.name,
+              time:dat.data.log[i].time,
+              perms: usrData.data.perms,
+              content:dat.data.log[i].content,
+            }
+          }));
+        }
+        this.client.send(JSON.stringify({
+          action:"LOADCOMPLETE", 
+          data:{
+            id:dat.data.log.length<100?"-1":"randomthing"
+          }
+        }));
+        break;
+      case "send-event":
+      case "send-reply":
+        this.client.send(JSON.stringify({
+          action:"msg",
+          data:{
+            id:dat.data.id,
+            parent:dat.data.parent,
+            sender:dat.data.sender.name,
+            time:dat.data.time,
+            recentQ:Date.now() - dat.data.time < 60000,
+            perms: usrData.data.perms,
+            content:dat.data.content,
+          }
+        }));
+        if (dat.id == "requiresAutoThreading") {
+          this.client.send(JSON.stringify({
+            action:"autoThreading",
+            data:{id:dat.data.id}
+          }));
+        }
+        break;
+      case "nick-event":
+        this.client.send(JSON.stringify({
+          action:"removeUser",
+          data:{
+            isBot:dat.data.id.match(/^bot:/)!=null,
+            user:dat.data.from
+          }
+        }))
+        this.client.send(JSON.stringify({
+          action:"addUser",
+          data:{
+            user:dat.data.to,
+            isBot:dat.data.id.match(/^bot:/)!=null
+          }
+        }))
+        // this.client.send(JSON.stringify({
+        //   action:"yourAlias",
+        //   data:{alias:usrData.data.alias}
+        // }))
+        break;
+      case "hello-event":
+        // console.log(req);
+        if (dat.data.session.id.match(/^bot:/)) {
+          // don't do this perhaps
+          // this.euphSocket.send(JSON.stringify({
+          //   type:"login",
+          //   data:{
+          //     namespace:"email",
+          //     id:process.env["euphEmail"],
+          //     password:process.env["euphPassword"]
+          //   }
+          // }));
+        }
+        this.client.send(JSON.stringify({
+          action:"addUser",
+          data:{
+            user:usrData.data.alias,
+            isBot:dat.data.session.id.match(/^bot:/)!=null
+          }
+        }))
+        this.client.send(JSON.stringify({
+          action:"yourAlias",
+          data:{alias:usrData.data.alias}
+        }))
+        break;
+      case "disconnect-event":
+        // const cookies = 
+        break;
+        this.euphSocket= new WebSocket("wss://euphoria.io/room/"+this.roomName+"/ws",
+           [],
+           {
+             finishRequest:(request:any)=>{
+               request.addEventListener('response', (res)=>{
+                 console.log(res);
+               })
+               request.end();
+             }
+           });
+        //   [],
+        //   {
+        //     'headers': {'Cookie': cookie.serialize('a', '496E66DD')}
+        //   });
+        
+        this.euphSocket.on('open', this.onOpen.bind(this));
+        this.euphSocket.on('message', this.onMessage.bind(this));
+        // this.client.on('close', this.onClientClose.bind(this));
+        this.euphSocket.on('error', (e:any)=>{this.euphSocket.close(1000, "");})
+      case "login-reply":
+        // console.log(dat);
+        break;
+      case "join-event":
+        this.client.send(JSON.stringify({
+          action:"addUser",
+          data:{
+            user:dat.data.name,
+            isBot:dat.data.id.match(/^bot:/)!=null
+          }
+        }))
+        break;
+      case "part-event":
+        this.client.send(JSON.stringify({
+          action:"removeUser",
+          data:{
+            user:dat.data.name,
+            isBot:dat.data.id.match(/^bot:/)!=null
+          }
+        }));
+        break;
+      default: 
+        console.log("unknown event", dat.type)
+        // scream.
+        // console.log(dat);
+    }
+  }
+
+  async updateAlias(alias:string, token:string) {
+    if (alias.length == 0 || alias.length > 36) return;
+    let usrData = await userRequest(token);
+    let updateAliasRes = await realias(alias, token);
+    this.euphSocket.send(JSON.stringify({
+      type:"nick",
+      data:{name:alias}
+    }));
+  
+    // console.log("here we are");
+    // if (updateAliasRes.status != "SUCCESS") {
+      // return;
+    // }
+    // screw it, we realias it anyways!
+    // console.log("alias update was a success");
+    this.client.send(JSON.stringify({
+      action:"removeUser",
+      data:{
+        user:usrData.data.alias
+      }
+    }));
+    this.client.send(JSON.stringify({
+      action:"addUser",
+      data:{
+        user:alias,
+        isBot:true
+      }
+    }))
+    this.client.send(JSON.stringify({
+      action:"yourAlias",
+      data:{alias:alias}
+    }))
+    // return {status:"SUCCESS", data:null, token:token};
+  }
+
+  onClientClose() {
+    console.log("Client in room "+this.roomName+" was closed");
+    this.euphSocket.close(1000, "");
+  }
+  constructor(roomName:string, socket:WebSocket, token:string) 
+  {
+    console.log("Client in room",roomName,"was opened");
+    this.roomName = roomName;
+    this.client = socket;
+    this.token=token;
+    let URL = "wss://euphoria.io/room/"+roomName+"/ws";
+    this.euphSocket = new WebSocket(URL);
+    this.euphSocket.on('open', this.onOpen.bind(this));
+    this.euphSocket.on('message', this.onMessage.bind(this));
+    // this.client.on('close', this.onClientClose.bind(this));
+    this.euphSocket.on('error', (e:any)=>{
+      console.log("Error in euphSocket in room",roomName,":",e)
+      this.euphSocket.close(1000, "");
+    });
+  }
 }
 
 export class pseudoConnection {
@@ -26,7 +298,7 @@ export class supportHandler {
   static connectionCt = 0;
   static connections: { event: any, roomName: string, tk: string, readyQ: boolean, isPseudoConnection: boolean, minThreadID:number}[] = [];
   static addRoom(rm: Room) {
-    log("Room created!" + rm)
+    // log("Room created!" + rm)
     let idx = this.allRooms.findIndex((r: any) => { return r.type == rm.type && r.name == rm.name });
     if (idx >= 0) return;
     else this.allRooms.push(rm);
@@ -38,6 +310,7 @@ export class supportHandler {
   }
   static async addConnection(ev: any, rn: string, token: string, internalFlag: boolean = false) {
     // send existing connections to THIS EVENT ONLY
+    if (!internalFlag) console.log("added new connection", rn);
     this.connectionCt++;
     if (internalFlag) {
       token = "[SYSINTERNAL]";
@@ -46,21 +319,40 @@ export class supportHandler {
     for (let i = 0; i < this.connections.length; i++) {
       if (this.connections[i].roomName == rn)
         userRequest(this.connections[i].tk, this.connections[i].isPseudoConnection).then((obj: { status: string, data: any, token: string }) => {
-          if (obj.status == "SUCCESS") {
-            ev.send(JSON.stringify({ action: "addUser", data: { user: obj.data.alias, perms: obj.data.perms } }));
-          }
-          else {
-            ev.send(JSON.stringify({ action: "addUser", data: { user: processAnon(this.connections[i].tk), perms: 1 } }));
-          }
+          try {
+              if (obj.status == "SUCCESS") {
+              if (!this.connections[i]) return;
+              ev.send(JSON.stringify({ action: "addUser", data: { user: obj.data.alias, perms: obj.data.perms, isBot:this.connections[i].isPseudoConnection } }));
+            }
+            else {
+              ev.send(JSON.stringify({ action: "addUser", data: { user: processAnon(this.connections[i].tk), perms: 1 } }));
+            }
+          } catch(e) {}
         });
     }
+    let usrData = await userRequest(token, internalFlag);
+    if (usrData.status != "SUCCESS") usrData = {data:{user:""}}
+    ev.send(JSON.stringify({
+      action:"yourAlias", 
+      data:{
+        alias:(usrData.status=="SUCCESS"?usrData.data.alias:processAnon(token))
+      }
+    }))
     // add NEW CONNECTION
-    let thiscn = { id: this.connectionCt, event: ev, roomName: rn, tk: token, readyQ: false, isPseudoConnection: internalFlag };
+    let thiscn = { 
+      id: this.connectionCt, 
+      event: ev, 
+      roomName: rn, 
+      tk: token, 
+      readyQ: false, 
+      isPseudoConnection: internalFlag,
+      userID:usrData.data.user??""
+    };
     this.connections.push(thiscn);
     // TELL EVERYONE ELSE ABOUT THE NEW CONNECTION
     userRequest(token, internalFlag).then((obj: { status: string, data: any, token: string }) => {
       if (obj.status == "SUCCESS") this.sendMsgTo(rn, JSON.stringify({ action: "addUser", data: { user: obj.data.alias, perms: obj.data.perms } }));
-      else this.sendMsgTo(rn, JSON.stringify({ action: "addUser", data: { user: processAnon(obj.token), perms: 1 } }));
+      else this.sendMsgTo(rn, JSON.stringify({ action: "addUser", data: { user: processAnon(token), perms: 1 } }));
     });
     // console.log("added connection in "+rn);
     let roomData = await msgDB.findOne({ fieldName: "RoomInfo", room: { $eq: rn } });
@@ -106,10 +398,11 @@ export class supportHandler {
       //   ev.send(JSON.stringify({action:"msg", data:{id:msgs[i].msgID??-1, sender:msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent??-1, content:msgs[i].data}}));
       // }
       text += "Welcome to BetaOS Services support! Enter any message in the box below. " +
-        "Automated response services and utilities are provided by BetaOS System. " +
-        "Commands are available here: &gt;&gt;commands \n" +
-        "Enter !alias @[NEWALIAS] to re-alias yourself. Thank you for using BetaOS Systems!"
-      ev.send(JSON.stringify({ action: "msg", data: { id: +msgCt + 1, sender: "[SYSTEM]", perms: 3, content: text } }));
+        "Automated response services and utilities are provided by @BetaOS_System. " +
+        "Commands are available here: >>commands \n" +
+        "Logged-in users: click on your username to update it.\n"+
+        "Click this message to dismiss it >>"
+      ev.send(JSON.stringify({ action: "msg", data: { id: +msgCt + 1, sender: "[SYSTEM]", time:Date.now()/1000, perms: 3, content: text } }));
 
     }
     thiscn.readyQ = true;
@@ -120,7 +413,7 @@ export class supportHandler {
 
     userRequest(token).then((obj: { status: string, data: any, token: string }) => {
       if (obj.status == "SUCCESS") this.sendMsgTo(rn, JSON.stringify({ action: "removeUser", data: { user: obj.data.alias, perms: obj.data.perms } }));
-      else this.sendMsgTo(rn, JSON.stringify({ action: "removeUser", data: { user: processAnon(obj.token), perms: 1 } }));
+      else this.sendMsgTo(rn, JSON.stringify({ action: "removeUser", data: { user: processAnon(token), perms: 1 } }));
       // console.log("removed connection in "+rn); 
     });
   }
@@ -144,6 +437,41 @@ export class supportHandler {
       out.push(this.getPrefix(this.allRooms[i].type) + this.allRooms[i].name);
     }
     return out;
+  }
+
+  static async updateAlias(newAlias:string, token:string) {
+    
+    let usrData = await userRequest(token);
+    if (usrData.status != "SUCCESS") {
+      usrData.data = {alias:processAnon(token)};
+      return usrData;
+    }
+    let oldAlias = usrData.data.alias;
+    let resp = await realias(newAlias, token);
+    // find what rooms this user is in
+    for (let i=0; i<this.connections.length; i++)
+      if (this.connections[i].userID == usrData.data.user) {
+        // console.log("found connection", this.connections[i].userID);
+        // must broadcast to everyone for how many renames there are...
+        for (let j=0; j<this.connections.length; j++) {
+          this.connections[j].event.send(JSON.stringify({
+            action:"removeUser", 
+            data:{
+              user:oldAlias
+            }
+          }));
+          this.connections[j].event.send(JSON.stringify({
+            action:"addUser",
+            data:{
+              user:newAlias
+            }
+          }))
+        } 
+        // then tell this user what their alias is
+        this.connections[i].event.send(JSON.stringify({action:"yourAlias", data:{alias:newAlias}}));
+      }
+    return {status:"SUCCESS", data:null, token:token};
+    // else console.log(this.connections[i].userID);
   }
 
   static listEuphRooms() {
@@ -193,7 +521,7 @@ export class supportHandler {
     for (let i = 0; i < this.connections.length; i++) {
       if (this.connections[i].roomName == roomName) {
         // encode '>' -- used for message-breaks (yes, it is stupid.)
-        data = data.replaceAll(">", "&gt;");
+        // data = data.replaceAll(">", "&gt;");
         // console.log(data);
         this.connections[i].event.send(data);
       }
@@ -205,7 +533,7 @@ export class supportHandler {
     for (let i = 0; i < this.connections.length; i++) {
       if (this.connections[i].id == connectionID) {
         // encode '>' -- used for message-breaks (yes, it is stupid.)
-        data = data.replaceAll(">", "&gt;");
+        // data = data.replaceAll(">", "&gt;");
         // console.log(data);
         this.connections[i].event.send(data);
 
@@ -214,44 +542,52 @@ export class supportHandler {
   }
 }
 
-export function sendMsg(msg: string, room: string, parent: number, token: string, callback: (status: string, data: any, token: string) => any) {
-  userRequest(token).then(async (obj: { status: string, data: any, token: string }) => {
-    let roomData = await msgDB.findOne({ fieldName: "RoomInfo", room: room });
-    let msgCt = roomData ? roomData.msgCt : 0;
-    let threadCt = roomData ? (roomData.threadCt??0) : 0;
-    msg = msg.replaceAll("\\n", "\n");
-    let parentDoc = await msgDB.findOne({fieldName:"MSG", msgID:Number(parent)});
-    // if (parentDoc) console.log(threadCt);
-    await msgDB.insertOne({
-      fieldName: "MSG", data: msg.replaceAll(">", "&gt;"), permLevel: obj.data.perms ?? 1,
-      sender: obj.data.alias ?? "" + processAnon(token), expiry: Date.now() + 3600 * 1000 * 24 * 30,
-      room: room, msgID: msgCt, parent:parent, threadID: parentDoc?(parentDoc.threadID??threadCt):threadCt
-    });
-
-    await msgDB.updateOne({ room: room, fieldName: "RoomInfo" }, {
-      $inc: { msgCt: 1, threadCt:parentDoc?0:1}
-    }, { upsert: true });
-    if (obj.status == "SUCCESS") {
-      supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: obj.data.alias, perms: obj.data.perms, parent: parent, content: msg } }));
-    }
-    else {
-      //console.log("sending")
-      supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, parent: parent, content: msg } }));
-    }
-    //console.log(supportHandler.allRooms);
-    // console.log(supportHandler.allRooms);
-    for (let i = 0; i < supportHandler.allRooms.length; i++) {
-      if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
-        // console.log(supportHandler.allRooms[i].handler)
-        supportHandler.allRooms[i].handler.onMessage(msg, obj.data.alias ?? processAnon(token))
-      }
-
-    }
-    callback("SUCCESS", null, token);
+export async function sendMsg(msg: string, room: string, parent: number, token: string) {
+  if (msg.length == 0) return {status:"SUCCESS", data:null, token:token};
+  msg = msg.slice(0, 1024);
+  let obj = await userRequest(token);
+  let roomData = await msgDB.findOne({ fieldName: "RoomInfo", room: room });
+  let msgCt = roomData ? roomData.msgCt : 0;
+  let threadCt = roomData ? (roomData.threadCt??0) : 0;
+  msg = msg.replaceAll("\\n", "\n");
+  let parentDoc = await msgDB.findOne({fieldName:"MSG", msgID:Number(parent)});
+  // if (parentDoc) console.log(threadCt);
+  await msgDB.insertOne({
+    fieldName: "MSG", data: msg, permLevel: obj.data.perms ?? 1,
+    sender: obj.data.alias ?? "" + processAnon(token), expiry: /*Date.now() + 3600 * 1000 * 24 * 30*/ 9e99,
+    room: room, msgID: msgCt, parent:parent, threadID: parentDoc?(parentDoc.threadID??threadCt):threadCt,
+    time:Date.now()/1000, senderID:obj.data.user ?? processAnon(token)
   });
+
+  await msgDB.updateOne({ room: room, fieldName: "RoomInfo" }, {
+    $inc: { msgCt: 1, threadCt:parentDoc?0:1}
+  }, { upsert: true });
+  if (obj.status == "SUCCESS") {
+    supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: {
+      id: msgCt, sender: obj.data.alias, 
+      perms: obj.data.perms, parent: parent, 
+      content: msg, time:Date.now()/1000,
+      autoThread:parent==-1, senderID:obj.data.user ?? processAnon(token)
+    } }));
+  }
+  else {
+    supportHandler.sendMsgTo(room, JSON.stringify(
+      { action: "msg", data: { id: msgCt, sender: processAnon(token), perms: 1, 
+                              parent: parent, content: msg, time:Date.now()/1000,
+                             autoThread:parent==-1, senderID:obj.data.user ?? processAnon(token)} }));
+  }
+  for (let i = 0; i < supportHandler.allRooms.length; i++) 
+    if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
+      supportHandler.allRooms[i].handler.onMessage({action:"msg", data:{
+        id:msgCt, content:msg}}, obj.data.alias ?? processAnon(token))
+    }
+  if (parent == -1) {
+    return {status:"SUCCESS", data:{autoThread:msgCt}, token};
+  }
+  return {status:"SUCCESS", data:{autoThread:null}, token:token};
 }
 
-export async function sendMsg_B(msg: string, room: string) {
+export async function sendMsg_B(msg: string, room: string, parent) {
   let roomData = await msgDB.findOne({ fieldName: "RoomInfo", room: room });
   let msgCt = roomData ? roomData.msgCt : 0;
   let threadCt = roomData ? (roomData.threadCt??0) : 0;
@@ -266,20 +602,25 @@ export async function sendMsg_B(msg: string, room: string) {
   await msgDB.updateOne({ room: room, fieldName: "RoomInfo" }, {
     $inc: { msgCt: 1, threadCt:1}
   }, { upsert: true });
-  console.log(msg);
+  // console.log(msg);
   await msgDB.insertOne({
-    fieldName: "MSG", data: msg.replaceAll("\\n\\n", "\n").replaceAll(">", "&gt;"), permLevel: 3,
-    sender: betaNick, expiry: Date.now() + 3600 * 1000 * 24 * 30,
-    room: room, msgID: msgCt, parent:-1, threadID: threadCt
+    fieldName: "MSG", data: msg.replaceAll("\\n\\n", "\n"), permLevel: 3,
+    sender: betaNick, expiry: /*Date.now() + 3600 * 1000 * 24 * 30*/ 9e99,
+    room: room, msgID: msgCt, parent:parent, threadID: threadCt,
+    time:Date.now()/1000, senderID:"BetaOS System"
   });
   await msgDB.updateOne({ room: room, fieldName: "RoomInfo" }, {
     $inc: { msgCt: 1 }
   }, { upsert: true });
-  supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { id: msgCt, sender: betaNick, perms: 3, content: msg.replaceAll("\\n\\n", "\n") } }));
+  supportHandler.sendMsgTo(room, JSON.stringify({ action: "msg", data: { 
+    id: msgCt, sender: betaNick, perms: 3, 
+    content: msg.replaceAll("\\n\\n", "\n"), time:Date.now()/1000,
+    parent:parent, senderID:"BetaOS System"} }));
 }
 
 function processAnon(token: string) {
-  return "Anonymous user";
+  // console.log(token.slice(0,4));
+  return "Anon"+token.slice(0,4);
 }
 
 export function roomRequest(token: string, all: boolean = false) {
@@ -289,7 +630,7 @@ export function roomRequest(token: string, all: boolean = false) {
 
 export async function createRoom(name: string, token: string) {
   if (supportHandler.checkFoundQ(name)) return { status: "ERROR", data: { error: "Room already exists" }, token: token };
-  let usrData = await userRequest(token) as { status: string, data: { perms: number } };
+  let usrData = await userRequest(token);
   if (!name.match("^" + roomRegex + "$")) return { status: "ERROR", data: { error: "Invalid roomname!" }, token: token };
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
@@ -313,7 +654,7 @@ export async function createRoom(name: string, token: string) {
 
 export async function deleteRoom(name: string, token: string) {
   if (!supportHandler.checkFoundQ(name)) return { status: "ERROR", data: { error: "Room does not exist" }, token: token };
-  let usrData = await userRequest(token) as { status: string, data: { perms: number } };
+  let usrData = await userRequest(token);
   if (!name.match("^" + roomRegex + "$")) return { status: "ERROR", data: { error: "Invalid roomname!" }, token: token };
   if (usrData.status == "SUCCESS") {
     if (usrData.data.perms >= 2) {
@@ -381,8 +722,12 @@ export async function WHOIS(token: string, user: string) {
   };
 }
 
+// async function loadEuphLogs(rn:string, from:number) {
+  
+// };
 //loadLogs(data.room, data.id, data.from token)
-export async function loadLogs(rn: string, id: string, from: number, token: string) {
+export async function loadLogs(rn: string, id: number, from: number, isBridge:boolean, token: string) {
+  // if (isBridge) {await loadEuphLogs(rn, id, from); return;}
   try {
     // let j = -1;
     // let thiscn;
@@ -424,12 +769,30 @@ export async function loadLogs(rn: string, id: string, from: number, token: stri
       return { status: "SUCCESS", data: {from:-1}, token: token }
     }
     let msgs = await msgDB.find({ fieldName: "MSG", room: { $eq: rn }, threadID: { $gt: from - 5, $lte: from } }).sort({threadID:-1, msgID:1}).toArray();
+    let sendOut = {
+      action:"logs", 
+      data: {
+        logs:[]
+      }
+    };
     for (let i = 0; i <msgs.length; i++) {
       // console.log("thread id %d msgid %d content %s", msgs[i].threadID, msgs[i].msgID, msgs[i].data);
-      let dat = JSON.stringify({ action: "msg", data: { id: "-" + msgs[i].msgID, sender: msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent ?? -1, content: msgs[i].data } });
+      let dat = {
+        id: "-" + msgs[i].msgID, 
+        sender: msgs[i].sender, 
+        perms: msgs[i].permLevel, 
+        parent: msgs[i].parent ?? -1, 
+        content: msgs[i].data,
+        time:msgs[i].time,
+        senderID: msgs[i].senderID
+      } ;
       // console.log(dat);
-      supportHandler.sendMsgTo_ID(id, dat);
+      sendOut.data.logs.push(dat);
+      // supportHandler.sendMsgTo_ID(id, dat);
     }
+    // console.log(sendOut);
+    // console.log(JSON.stringify(sendOut));
+    supportHandler.sendMsgTo_ID(id, JSON.stringify(sendOut));
     // console.log("LOADING COMPLETE, LOADED" + msgs.length, "MESSAGES");
     supportHandler.sendMsgTo_ID(id, JSON.stringify({ action: "LOADCOMPLETE", data: { id: from - 5 } }));
     return { status: "SUCCESS", data: {from:from-5}, token: token };
@@ -444,8 +807,12 @@ export async function delMsg(id: string, room: string, token: string) {
     // console.log({fieldName:"MSG", msgID:id, room:room});
     if (!supportHandler.checkFoundQ(room)) return { status: "ERROR", data: { error: "Room does not exist" }, token: token };
     let usrData = await userRequest(token) as { status: string, data: { perms: number } };
-    if (usrData.status != "SUCCESS") return usrData;
-    if (usrData.perms < 2) return { status: "ERROR", data: { error: "Insufficient permissions!" }, token: token };
+    // if (usrData.status != "SUCCESS") return usrData;
+    let messageInQuestion = await msgDB.findOne({ fieldName: "MSG", msgID: { $eq: id }, room: { $eq: room}});
+    if (usrData.perms < 2 && 
+        !(usrData.data.user == messageInQuestion.sender || 
+          userData.status == "ERROR" && processAnon(token) == messageInQuestion.sender))
+        return { status: "ERROR", data: { error: "Insufficient permissions!" }, token: token };
     await msgDB.deleteOne({ fieldName: "MSG", msgID: Number(id), room: room });
     supportHandler.sendMsgTo(room, JSON.stringify({ action: "delMsg", data: { id: Number(id) } }));
     return { status: "SUCCESS", data: null, token: token };

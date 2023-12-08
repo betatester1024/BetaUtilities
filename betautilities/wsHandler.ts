@@ -13,6 +13,7 @@ export class WS
 {
   static notifRoom:WS;
   DATALOGGING = false;
+  bridgeRoomQ:string;
   static CALLTIMEOUT = 30000;
   url:string;
   static sockets:WS[] = [];
@@ -109,7 +110,7 @@ export class WS
   }
   
   onOpen() {
-    systemLog(("BetaUtilities open in "+this.socket.url));
+    // systemLog(("BetaUtilities open in "+this.socket.url));
     WS.FAILSAFETIMEOUT =setTimeout(()=>{WS.resetTime =1000;}, 10000);
   }
 
@@ -326,12 +327,13 @@ export class WS
     }
   }
   
-  constructor(url:string, nick:string, roomName:string, transferQ:boolean) {
+  constructor(url:string, nick:string, roomName:string, transferQ:boolean, isBridgeQ:boolean=false) {
     this.nick = nick;
     if (roomName == "test") WS.notifRoom = this;
     WS.sockets.push(this);
     // console.log(WS.sockets);
     this.url=url;
+    this.isBridgeQ = isBridgeQ;
     this.roomName = roomName;
     this.socket = new WebSocket(url);
     this.transferOutQ=transferQ;

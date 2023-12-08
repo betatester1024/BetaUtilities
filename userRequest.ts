@@ -8,11 +8,20 @@ export async function userRequest(token:string, internalFlag:boolean=false) {
   if (!tokenData) {
     return {status:"ERROR", data:{errorCode: 0, error:"Your session could not be found!"}, token:""}
   }
-  let userData:{permLevel:number, alias:string, darkTheme:boolean} = await authDB.findOne({fieldName:"UserData", user:tokenData.associatedUser});
+  let userData:{permLevel:number, alias:string, darkTheme:boolean, user:string, tasks:any, lastClicked:number} = 
+    await authDB.findOne({fieldName:"UserData", user:tokenData.associatedUser});
   if (Date.now() > tokenData.expiry) {
     return {status:"ERROR", data:{errorCode: 0, error:"Your session has expired!"}, token:""};
   }
-  return {status:"SUCCESS", data: {user: tokenData.associatedUser, alias:userData.alias??userData.user, perms:userData.permLevel, expiry: tokenData.expiry, tasks:userData.tasks, darkQ:userData.darkTheme??false, lastCl:userData.lastClicked}, token:token};
+  return {status:"SUCCESS", data: {
+    user: tokenData.associatedUser, 
+    alias:userData.alias??userData.user, 
+    perms:userData.permLevel, 
+    expiry: tokenData.expiry, 
+    tasks:userData.tasks, 
+    darkQ:userData.darkTheme??false, 
+    lastCl:userData.lastClicked,
+  }, token:token};
 }
 
 

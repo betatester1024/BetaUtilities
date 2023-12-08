@@ -2,7 +2,7 @@
 <html class="{{mainClass}}">
   <head>
     <script src='./utils.js'></script>
-    <title>IssueTracker | BetaOS Systems</title>
+    <title>IssueTracker</title>
     <script>
       function newIssue() 
       {
@@ -31,7 +31,7 @@
       let TOTALMINID = 0;
       function onLoad() 
       {
-        let u = new URL(document.URL);
+        let u = docURL;
         FROM = Number(u.searchParams.get("from")??1);
         ISSUECT = Number(u.searchParams.get("ct")??20);
         console.log(u.searchParams);

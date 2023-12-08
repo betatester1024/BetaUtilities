@@ -2,7 +2,7 @@
 <html class="{{mainClass}}">
   <head>
     <script src='./utils.js'></script>
-    <title>System Log | BetaOS Systems</title>
+    <title>System Log</title>
     <script>
       let LOADEDQ2 = false;
       
@@ -10,7 +10,7 @@
         ele = document.getElementById("txtarea");
         let scrDistOKQ =  (ele.scrollTop) >= (ele.scrollHeight-ele.offsetHeight - 100)
         send(JSON.stringify({action:"getLogs"}), (res)=>{
-          if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{location.href="/login?redirect=syslog"});
+          if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{login_v2();});
           else {
             document.getElementById("txtarea").value = res.data.logs+"\n\n"+res.data.upsince;
             
@@ -43,7 +43,7 @@
         <h2>System Log</h2>
         <hr class="rounded">
       </header>
-      <textarea id="txtarea" readonly></textarea>
+      <textarea id="txtarea" readonly>Loading system logs...</textarea>
       <button class="btn red" onclick="alertDialog('Confirm purge logs?', ()=>{
         send(JSON.stringify({action:'purgeLogs'}), (res)=>{
           if (res.status!='SUCCESS') alertDialog('ERROR: '+res.data.error, ()=>{})

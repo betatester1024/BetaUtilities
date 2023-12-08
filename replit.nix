@@ -1,5 +1,6 @@
 { pkgs }: {
     deps = [
+      pkgs.nano
       pkgs.nodejs
 		pkgs.gnupg
   pkgs.nodePackages.prettier

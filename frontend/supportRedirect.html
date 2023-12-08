@@ -2,8 +2,14 @@
 <html class="{{mainClass}}">
   <head>
     <script src='./utils.js'></script>
-    <title>Room not found</title>
-    <script></script>
+    <title>Redirecting</title>
+    <script>
+      function onLoad() {
+        let roomName = docURL.searchParams.get("room");
+        if (docURL.searchParams.get("bridge") == "true") location.href="/bridge/"+roomName;
+        else location.href="/room/"+roomName;
+      }
+    </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,28 +23,19 @@
         margin: 0px;
         width: 80%;
         margin: auto;
-        font-variant-caps: small-caps;
-      }
-      h2 {
-        padding: 20px;
-        font-variant-caps: unset;
-        font-size: 2em;
       }
     </style>
   </head>
-  <body onload= "globalOnload()">
+  <body onload= "globalOnload(onLoad)">
     <div class="main_content">
       <header>
-        <h1>Error: Room not found!</h1>
+        <h1>Redirecting</h1>
         <hr class="rounded">
-        <h2>If servers restarted within the last 5 seconds, try refreshing.
-        Otherwise visit the room-listing for a list of valid rooms.</h2>
       </header>
       <div class="btnRow">
-        <a class="btn szFull override" href="/support">
-          <span class="material-symbols-outlined">arrow_back_ios</span>
-          Return to room-listing<div class="anim"></div>
-        </a>
+        <p class="fsmed">
+          Redirecting
+        </p>
       </div>
     </div>
   </body>

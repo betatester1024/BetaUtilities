@@ -24,7 +24,7 @@ html, ::backdrop {
   --system-transp: rgba(0, 0, 0, 0);
   --system-black: #222;
   transition: all 1s ease;
-  font-family: 'Noto Sans Display', monospace;
+  font-family: 'Noto Sans Display', 'Noto Color Emoji', monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -323,7 +323,7 @@ input, select {
   font-size: 40px;
   font-weight: 500;
   color: var(--system-blue);
-  font-family: 'Noto Sans Display';
+  font-family: 'Noto Sans Display', 'Noto Color Emoji', monospace;
   transition: 0.2s all ease;
   border-radius: 10px;
   width: 100%;
@@ -382,7 +382,7 @@ select {
 
 option {
   background-color: var(--system-bg);
-  font-family: 'Noto Sans Display';
+  font-family: 'Noto Sans Display', 'Noto Color Emoji', monospace;
 }
 
 input:focus, select:focus {
@@ -407,7 +407,7 @@ span.material-symbols-outlined {
   font-variant-caps: normal !important;
 }
 
-kbd {
+kbd, md-span > code {
   font-family: "Noto Sans Mono", monospace;
   border-radius: 5px;
   padding-left: 2px;
@@ -681,7 +681,7 @@ footer, #footer {
   /* width: 120px; */
   /* paddin */
   background-color: #555;
-  color: #fff;
+  color: #fff !important;
   text-align: center;
   border-radius: 6px;
   padding: 5px 20px;
@@ -814,7 +814,7 @@ summary::marker {
   padding-left: 20px;
   padding-right: 20px;
   padding-top: 2px;
-  font-family: "Noto Sans Display", monospace;
+  font-family: "Noto Sans Display", 'Noto Color Emoji', monospace;
   text-align: center;
 }
 

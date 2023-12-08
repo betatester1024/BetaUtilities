@@ -1,6 +1,8 @@
+// require('dotenv').config();
+
 import {initServer} from './server';
 import {DBMaintenance, connectDB, client} from './database';
-import {supportHandler, Room} from './supportRooms'
+import {supportHandler, Room, BridgeHandler} from './supportRooms'
 import {log} from './logging';
 const fs = require('fs');
 import {uDB} from './consts';
@@ -14,6 +16,18 @@ const localEuphRooms = [
   // "bots", "room", "memes", "music", "srs"
 ]
 const { exec } = require("child_process");
+
+// const localtunnel = require('localtunnel');
+
+// (async () => {
+//   const tunnel = await localtunnel({ port: 3000, subdomain:"betaos" });
+//   console.log("Tunnelling at", tunnel.url);
+
+//   tunnel.on('close', () => {
+//     console.log("WARNING: Tunnel is closed!");
+//     // tunnels are closed
+//   });
+// })();
 
 let timedOutQ = false;
 export let UPSINCESTR = "";
@@ -81,9 +95,11 @@ async function init(startBots:boolean)
     console.log(obj);
     if (startBots)
     for (let i=0; i<obj.euphRooms.length; i++) {
+      // console.log("hello!")
       supportHandler.addRoom(new Room("EUPH_ROOM", obj.euphRooms[i]));
       new WS("wss://euphoria.io/room/" + obj.euphRooms[i] +"/ws", "BetaUtilities"+(process.env['branch']=="unstable"?"-U":""), obj.euphRooms[i], !(obj.euphRooms[i]=="test" || obj.euphRooms[i]=="bots"))
-      log("Connected euph_room")+obj.euphRooms[i];
+
+      // log("Connected euph_room")+obj.euphRooms[i];
       console.log("Connected euph_room", obj.euphRooms[i]);
     }
     // for (let i=0; i<localEuphRooms.length; i++) {

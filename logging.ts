@@ -7,8 +7,7 @@ export function log(thing:string) {
   // let out:any;
   // if (thing && typeof thing != "number" && typeof thing != "string") out = JSON.stringify(thing);
   // else out = thing;
-  
-  if (connectionSuccess) uDB.insertOne({fieldName:"SysLogV2", data:thing+"\n"});
+  if (connectionSuccess) uDB.insertOne({fieldName:"SysLogV2", data:"["+process.env['branch']+"]: "+thing+"\n"});
 }
 
 
@@ -22,7 +21,7 @@ export async function visitCt(token:string) {
     let obj = await uDB.findOne({fieldName:"VISITS"});
     return {status:"SUCCESS", data:{data:obj.visitCt}, token:token};
   }
-  else return {status:"ERROR", data:{error:"Service database connection failed"}, token:token}
+  else return {status:"ERROR", data:{error:"Database connection failed"}, token:token}
 }
 
 export async function getLogs(token:string) {

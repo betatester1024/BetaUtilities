@@ -2,7 +2,7 @@
 <html class="{{mainClass}}">
   <head>
     <script src='/utils.js'></script>
-    <title>PasteIt | BetaOS Systems</title></title>
+    <title>PasteIt</title></title>
     <script>   
       function validate() {
         let pwd = document.getElementById("inp").value
@@ -27,7 +27,7 @@
       function unlock() {
         closeDialog(()=>{}, "pwdInp");
         let pwd = document.getElementById("inp_pwd").value
-        send(JSON.stringify({action:"findPaste", data:{pwd:pwd, name:(new URL(document.URL)).searchParams.get("edit")}}), (res)=>{
+        send(JSON.stringify({action:"findPaste", data:{pwd:pwd, name:(docURL).searchParams.get("edit")}}), (res)=>{
           if (res.status != "SUCCESS") alertDialog("Error: "+res.data.error, ()=>{
             document.getElementById("inp_pwd").value="";
             openDialog("pwdInp");
@@ -37,7 +37,7 @@
         })
       }
       function onLoad() {
-        let match = (new URL(document.URL)).searchParams.get("edit");
+        let match = (docURL).searchParams.get("edit");
         if (match) {
           document.getElementById("h2").innerText= "PasteIt! Editor"
           openDialog("pwdInp");

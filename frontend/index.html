@@ -6,6 +6,14 @@
     <script>
       const accessLevels = ["error-level", "user", "admin", "super-admin"];
       function onLoad() {
+        function updateTimer(userInfo, res) 
+        {
+          userInfo.innerHTML = ""+accessLevels[res.data.perms]+" account | "+
+            (res.data.expiry<Date.now()?"session expired":
+             (res.data.expiry>100*365*24*60*60*1000?`session expiring in 
+             <span class="material-symbols-outlined">all_inclusive</span> days`:
+              " session expiring in "+minimalTime(res.data.expiry-Date.now(), true)+""));
+        }
         send(JSON.stringify({action:"userRequest"}), 
         (res)=>{
           if (res.status == "ERROR") {
@@ -18,12 +26,8 @@
           let ele = document.getElementById("welcomeHdr");
           ele.innerText = "Welcome "+res.data.user+"!"; 
           let userInfo = document.createElement("h2");
-          setInterval(()=>{userInfo.innerHTML = "logged in as "+accessLevels[res.data.perms]+
-            (res.data.expiry<Date.now()?" (session expired)":
-             (res.data.expiry>100*365*24*60*60*1000?` (session expiring in 
-             <span class="material-symbols-outlined">all_inclusive</span> days)`:
-              " (session expiring in "+toTime(res.data.expiry-Date.now())+")"));
-           }, 100);
+          setInterval(()=>{updateTimer(userInfo, res)}, 10000);
+          updateTimer(userInfo, res);
           ele.append(userInfo);
           userInfo.style.fontSize = "30px";
           let loginBtn = document.getElementById("loginBtn")
@@ -105,9 +109,12 @@
         <a class="btn szThird" href="/credits">
           <span class="material-symbols-outlined">check_circle</span>
           Credits<div class="anim"></div></a>
-        <a class="btn szTwoThirds" href="/issuetracker">
+        <!-- <a class="btn szTwoThirds" href="/issuetracker">
           <span class="material-symbols-outlined">pest_control</span>
-          IssueTracker (beta)<div class="anim"></div></a>
+          IssueTracker (beta)<div class="anim"></div></a> -->
+        <a class="btn szTwoThirds" href="/eval">
+          <span class="material-symbols-outlined">javascript</span>
+          JSEval<div class="anim"></div></a>
 <br><br>
         <a id="adminBtn" class="btn szFull grn" href="/admin" style="display:none">
           <span class="material-symbols-outlined" id="loginIco">security</span>
@@ -129,12 +136,12 @@
         <a class="btn szThird" href="/aboutme">
           <span class="material-symbols-outlined">search</span>
           WHOIS?<div class="anim"></div></a>
-        <a class="btn szHalf" href="//keepalive.betatester1024.repl.co">
+        <!-- <a class="btn szHalf" href="//keepalive.betatester1024.repl.co">
           <span class="material-symbols-outlined">open_in_new</span>
           KeepAlive<div class="anim"></div></a>
         <a class="btn szHalf" href="//keepalive2.betatester1024.repl.co">
           <span class="material-symbols-outlined">open_in_new</span>
-          KeepAlive2<div class="anim"></div></a>
+          KeepAlive2<div class="anim"></div></a> -->
         <hr class="rounded">
         <h2 class="fsmed szFull">Nonsense</h2>
         <a class="btn szHalf" href="/EE">

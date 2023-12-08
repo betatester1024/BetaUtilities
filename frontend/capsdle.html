@@ -2,7 +2,7 @@
 <html class="{{mainClass}}">
   <head>
     <script src='./utils.js'></script>
-    <title>Capsdle | BetaOS Systems</title>
+    <title>Capsdle</title>
     <script>
       let CURRROW = 0;
       let CURRCOL = 0;
@@ -101,7 +101,8 @@
           } else {
             PD = true;
             document.body.removeEventListener("keydown", keyDown_Capsdle);
-            alertDialog("You have lost.", ()=>{})
+            alertDialog("You have lost.", ()=>{});
+            return true;
           }
           updateHighlight();
         }

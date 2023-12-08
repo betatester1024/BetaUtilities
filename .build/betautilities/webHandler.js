@@ -113,14 +113,13 @@ class WebH {
     }
     this.incrRunCt();
   }
-  sendMsg(msg, user) {
+  sendMsg(msg, data) {
     if (msg.length == 0)
       return;
-    (0, import_supportRooms.sendMsg_B)(msg, this.roomName);
+    (0, import_supportRooms.sendMsg_B)(msg, this.roomName, data.parent);
     this.incrRunCt();
   }
   onOpen() {
-    (0, import_logging.systemLog)("BetaUtilities open");
     WebH.resetTime = 1e3;
   }
   initNick() {
@@ -130,11 +129,11 @@ class WebH {
     console.log("nick changed to", nick);
   }
   onMessage(msg, snd) {
-    let data = "";
+    let data = { parent: msg.data.id };
     if (DATALOGGING)
       fs.writeFileSync("betautilities/msgLog.txt", fs.readFileSync("betautilities/msgLog.txt").toString() + `(${this.roomName})[${snd}] ${msg}
 `);
-    msg = msg.toLowerCase().replaceAll(/(\s|^)((@betaos)|(@betautilities)|(@system))(\s|$)/gimu, " @" + this.nick.toLowerCase() + " ").trim();
+    msg = msg.data.content.toLowerCase().replaceAll(/(\s|^)((@betaos)|(@betautilities)|(@system))(\s|$)/gimu, " @" + this.nick.toLowerCase() + " ").trim();
     if (msg == "!kill @" + this.nick.toLowerCase()) {
       this.sendMsg("/me crashes", data);
       this.delaySendMsg("/me restarts", data, 200);
@@ -166,22 +165,6 @@ class WebH {
         outStr = "/me is rebooting.";
       if (outStr == "")
         return;
-      if (!this.bypass) {
-        this.callTimes.push(Date.now());
-        setTimeout(() => {
-          this.callTimes.shift();
-        }, 60 * 5 * 1e3);
-      }
-      if (!this.bypass && this.callTimes.length >= 5) {
-        if (this.callTimes.length < 10) {
-          outStr = this.transferOutQ ? outStr + "\\n[ANTISPAM] Consider moving to &bots or &test for large-scale testing. Thank you for your understanding." : outStr + " [ANTISPAM WARNING]";
-        } else {
-          outStr = outStr + "\\n[ANTISPAM] Automatically paused @" + this.nick;
-          this.pausedQ = true;
-          this.pauser = "BetaOS_ANTISPAM";
-          this.resetCall(data);
-        }
-      }
       this.sendMsg(outStr, data);
     }
   }

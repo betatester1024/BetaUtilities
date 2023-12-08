@@ -296,9 +296,15 @@ async function initClient()
     let area = document.getElementById("msgArea");
     let scrDistOKQ =  (area.scrollTop) >= (area.scrollHeight-area.offsetHeight - 100)
     if (message.action == "logs") {
-      message.data.logs.sort((a, b)=>{return Math.abs(a.id)-Math.abs(b.id)})
-      for (let i=0; i<message.data.logs.length; i++) 
+      // message.data.logs.sort((a, b)=>{
+      //   // console.log(Math.abs(a.id));
+      //   return Math.abs(a.id)-Math.abs(b.id)
+      // });
+      // console.log(message.data.logs);
+      for (let i=0; i<message.data.logs.length; i++) {
+        // console.log(message.data.logs[i].id)
         handleMessageEvent(message.data.logs[i], area);
+      }
     }
     if (message.action == "forceReload") location.reload();
     if (message.action == "ping") {
@@ -655,7 +661,7 @@ function handleMessageEvent(data, area) {
     ev.preventDefault();
     ev.stopPropagation();
   };
-  console.log(data.perms, data.sender);
+  // console.log(data.perms, data.sender);
   if (data.sender != "[SYSTEM]") optn.innerHTML = `
     <button class="btn" onclick="copyMessage(event)">
       <span class="material-symbols-outlined blu">content_copy</span>

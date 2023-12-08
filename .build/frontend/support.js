@@ -79,49 +79,53 @@ function byMsgId(id) {
   return byId("msgArea").querySelector("[data-id='" + id + "']");
 }
 function toggleActiveReply(id, forceQ = false) {
-  if (forceQ) {
-    byMsgId(ACTIVEREPLY).classList.remove("activeReply");
-    if (id != "-1")
-      byMsgId(id).classList.add("activeReply");
-    else
-      byId("container").appendChild(BOTTOMINPUT);
-    ACTIVEREPLY = id;
-    updateReplyBox();
-    return;
-  }
-  if (id == -1) {
-    byMsgId(-1).style.display = "none";
-    return;
-  }
-  if (ACTIVEREPLY == id) {
-    byMsgId(id).classList.remove("activeReply");
-    let parent = byMsgId(id).parentElement;
-    if (parent.dataset.id) {
-      ACTIVEREPLY = parent.dataset.id;
-      parent.classList.add("activeReply");
-    } else
-      ACTIVEREPLY = -1;
-    byId("container").appendChild(BOTTOMINPUT);
-  } else {
-    if (byMsgId(id).parentElement.dataset.id == ACTIVEREPLY) {
-      if (ACTIVEREPLY != -1)
-        byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+  try {
+    if (forceQ) {
+      byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+      if (id != "-1")
+        byMsgId(id).classList.add("activeReply");
+      else
+        byId("container").appendChild(BOTTOMINPUT);
       ACTIVEREPLY = id;
-      byMsgId(id).classList.add("activeReply");
-    } else if (!byMsgId(id).parentElement.dataset.id) {
-      if (ACTIVEREPLY != -1)
-        byMsgId(ACTIVEREPLY).classList.remove("activeReply");
-      ACTIVEREPLY = id;
-      byMsgId(id).classList.add("activeReply");
-    } else {
-      let parent = byMsgId(id).parentElement;
-      if (ACTIVEREPLY != -1)
-        byMsgId(ACTIVEREPLY).classList.remove("activeReply");
-      ACTIVEREPLY = parent.dataset.id;
-      parent.classList.add("activeReply");
+      updateReplyBox();
+      return;
     }
+    if (id == -1) {
+      byMsgId(-1).style.display = "none";
+      return;
+    }
+    if (ACTIVEREPLY == id) {
+      byMsgId(id).classList.remove("activeReply");
+      let parent = byMsgId(id).parentElement;
+      if (parent.dataset.id) {
+        ACTIVEREPLY = parent.dataset.id;
+        parent.classList.add("activeReply");
+      } else
+        ACTIVEREPLY = -1;
+      byId("container").appendChild(BOTTOMINPUT);
+    } else {
+      if (byMsgId(id).parentElement.dataset.id == ACTIVEREPLY) {
+        if (ACTIVEREPLY != -1)
+          byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+        ACTIVEREPLY = id;
+        byMsgId(id).classList.add("activeReply");
+      } else if (!byMsgId(id).parentElement.dataset.id) {
+        if (ACTIVEREPLY != -1)
+          byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+        ACTIVEREPLY = id;
+        byMsgId(id).classList.add("activeReply");
+      } else {
+        let parent = byMsgId(id).parentElement;
+        if (ACTIVEREPLY != -1)
+          byMsgId(ACTIVEREPLY).classList.remove("activeReply");
+        ACTIVEREPLY = parent.dataset.id;
+        parent.classList.add("activeReply");
+      }
+    }
+    updateReplyBox();
+  } catch (e) {
+    console.warn("ERROR:", e);
   }
-  updateReplyBox();
 }
 function updateReplyBox() {
   if (ACTIVEREPLY == "-1") {
@@ -192,8 +196,10 @@ async function initClient() {
         message.data.logs.sort((a, b) => {
           return Math.abs(a.id) - Math.abs(b.id);
         });
-        for (let i2 = 0; i2 < message.data.logs.length; i2++)
+        console.log(message.data.logs);
+        for (let i2 = 0; i2 < message.data.logs.length; i2++) {
           handleMessageEvent(message.data.logs[i2], area);
+        }
       }
       if (message.action == "forceReload")
         location.reload();
@@ -487,7 +493,6 @@ function handleMessageEvent(data, area) {
     ev.preventDefault();
     ev.stopPropagation();
   };
-  console.log(data.perms, data.sender);
   if (data.sender != "[SYSTEM]")
     optn.innerHTML = `
     <button class="btn" onclick="copyMessage(event)">

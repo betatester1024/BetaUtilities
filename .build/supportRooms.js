@@ -564,6 +564,7 @@ async function sendMsg_B(msg, room, parent) {
   let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room });
   let msgCt = roomData ? roomData.msgCt : 0;
   let threadCt = roomData ? roomData.threadCt ?? 0 : 0;
+  let parentDoc = await import_consts.msgDB.findOne({ fieldName: "MSG", msgID: Number(parent) });
   let betaNick = "";
   for (let i = 0; i < supportHandler.allRooms.length; i++) {
     if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
@@ -583,7 +584,7 @@ async function sendMsg_B(msg, room, parent) {
     room,
     msgID: msgCt,
     parent,
-    threadID: threadCt,
+    threadID: parentDoc ? parentDoc.threadID ?? threadCt : threadCt,
     time: Date.now() / 1e3,
     senderID: "BetaOS System"
   });

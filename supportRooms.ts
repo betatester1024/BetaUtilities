@@ -587,10 +587,11 @@ export async function sendMsg(msg: string, room: string, parent: number, token: 
   return {status:"SUCCESS", data:{autoThread:null}, token:token};
 }
 
-export async function sendMsg_B(msg: string, room: string, parent) {
+export async function sendMsg_B(msg: string, room: string, parent:number) {
   let roomData = await msgDB.findOne({ fieldName: "RoomInfo", room: room });
   let msgCt = roomData ? roomData.msgCt : 0;
   let threadCt = roomData ? (roomData.threadCt??0) : 0;
+  let parentDoc = await msgDB.findOne({fieldName:"MSG", msgID:Number(parent)});
   let betaNick = "";
   for (let i = 0; i < supportHandler.allRooms.length; i++) {
     if (supportHandler.allRooms[i].name == room && supportHandler.allRooms[i].type == "ONLINE_SUPPORT") {
@@ -606,7 +607,7 @@ export async function sendMsg_B(msg: string, room: string, parent) {
   await msgDB.insertOne({
     fieldName: "MSG", data: msg.replaceAll("\\n\\n", "\n"), permLevel: 3,
     sender: betaNick, expiry: /*Date.now() + 3600 * 1000 * 24 * 30*/ 9e99,
-    room: room, msgID: msgCt, parent:parent, threadID: threadCt,
+    room: room, msgID: msgCt, parent:parent, threadID: parentDoc?(parentDoc.threadID??threadCt):threadCt,
     time:Date.now()/1000, senderID:"BetaOS System"
   });
   await msgDB.updateOne({ room: room, fieldName: "RoomInfo" }, {

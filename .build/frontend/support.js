@@ -193,10 +193,6 @@ async function initClient() {
       let area = document.getElementById("msgArea");
       let scrDistOKQ = area.scrollTop >= area.scrollHeight - area.offsetHeight - 100;
       if (message.action == "logs") {
-        message.data.logs.sort((a, b) => {
-          return Math.abs(a.id) - Math.abs(b.id);
-        });
-        console.log(message.data.logs);
         for (let i2 = 0; i2 < message.data.logs.length; i2++) {
           handleMessageEvent(message.data.logs[i2], area);
         }

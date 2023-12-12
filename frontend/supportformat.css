@@ -1,6 +1,7 @@
 
 
-#msgArea a, #msgArea p, #msgArea b, #msgArea span:not(.options span){
+#msgArea a, #msgArea p, #msgArea b, 
+#msgArea span:not(.options span):not(.material-symbols-outlined){
   color: var(--system-black);
 }
 #msgArea {
@@ -58,13 +59,38 @@
 
 #bottomInput {
   border-bottom: 3px solid var(--system-green);
+  height: fit-content;
 }
-#msgInp {
-  height: 100%;
+#msgInp, #msg-text {
+  /* height: 100%; */
+  width: calc(100% - 10px);
   font-size: 16px;
   border-radius: 0px;
+  color: var(--system-blue);
+  padding: 5px;
+  margin: 5px;
+  font-family:'Noto Sans Display', monospace;
   margin-right: 0px;
+  margin-top: 0px;
+  word-wrap: break-word;
 }
+#msgInp {
+  position: absolute;
+  top: 0px;
+  resize: none;
+  left: 0px;
+  height: calc(100% - 10px);
+}
+#resizeParent2 {
+  height: fit-content;
+}
+#msg-text {
+  height: fit-content;
+  position: relative; /* must be relative to fit things*/
+  visibility: hidden;
+  top: 0px;
+}
+
 #containingDiv {
   white-space: nowrap;
   flex-wrap: nowrap;
@@ -100,7 +126,7 @@ div#container > #bottomInput:before {
 #bottomInput {
   /* width: 95%; */
   display: flex;
-  height: 35px;
+  /* height: 35px; */
   gap: 5px;
   margin: 0px;
   margin-left: 2px;
@@ -166,8 +192,11 @@ input {
 }
 
 #inpContainer {
-  flex-grow: 6;
-  height: 100%;
+  flex-shrink: 1;
+  height: fit-content;
+  position: relative;
+  width: 100%;
+  min-width: 0px;
 }
 /* #inpContainment > input { */
   /* width: 99%; */

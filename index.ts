@@ -38,30 +38,32 @@ try {
   connectDB().then((err:any)=>{
     // console.log(thing)
     if (!connectionSuccess) return;
+    // REMOVED: EUPHORIA.IO IS DOWN AND BOTS DO NOT WORK ANYMORE ANYWAYS.
     // uDB.findOne({fieldName:"lastActive"}).then((document:{time:number})=>{
-    if (process.env["branch"] == "unstable" && 
-        (!process.env["promptInstances"] || process.env["promptInstances"]!="0")) {
-      let readline = require('readline');
+    // if (process.env["branch"] == "unstable" && 
+    //     (!process.env["promptInstances"] || process.env["promptInstances"]!="0")) {
+    //   let readline = require('readline');
 
-      let rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
+    //   let rl = readline.createInterface({
+    //     input: process.stdin,
+    //     output: process.stdout
       
-      });
-      let timeout;
-      rl.question("Confirm start extra instance? ", (answer:string)=>{
-        clearTimeout(timeout);
-        rl.close();
-        answer = answer.trim().toLowerCase();
-        if (timedOutQ) return;
-        if (answer != "y" && answer != "yes") init(false);
-        else {
-          init(true)
-        } // extra instances approved
-      });
-      timeout = setTimeout(()=>{init(false)}, 30000);
-    }
-    else init(process.env["branch"]!= "unstable");
+    //   });
+    //   let timeout;
+    //   rl.question("Confirm start extra instance? ", (answer:string)=>{
+    //     clearTimeout(timeout);
+    //     rl.close();
+    //     answer = answer.trim().toLowerCase();
+    //     if (timedOutQ) return;
+    //     if (answer != "y" && answer != "yes") init(false);
+    //     else {
+    //       init(true)
+    //     } // extra instances approved
+    //   });
+    //   timeout = setTimeout(()=>{init(false)}, 30000);
+    // }
+    // else init(process.env["branch"]!= "unstable");
+    init(false);
     
     //   if (Date.now - time < 10000)  // <10sec since last report, assume it is active
     //   {

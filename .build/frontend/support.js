@@ -15,6 +15,12 @@ function onKeyPress(e) {
     ele2.style.display = ele2.style.display == "flex" ? "none" : "flex";
     e.preventDefault();
   }
+  if (e.target.id == "msgInp" && e.key == "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    e.stopPropagation();
+    byId("inpContainer").submit();
+    return;
+  }
   if (e.ctrlKey || e.metaKey || e.shiftKey)
     return;
   if (e.key == "Escape" || e.key == "ArrowRight" && byId("msgInp").value == "") {
@@ -27,7 +33,7 @@ function onKeyPress(e) {
       return;
     toggleActiveReply(ACTIVEREPLY);
   }
-  if (e.key == "ArrowDown") {
+  if (e.key == "ArrowDown" && byId("msgInp").value == "") {
     if (ACTIVEREPLY == -1)
       return;
     let leaving = byMsgId(ACTIVEREPLY);
@@ -46,7 +52,7 @@ function onKeyPress(e) {
       toggleActiveReply(leaving.dataset.id, true);
     }
   }
-  if (e.key == "ArrowUp") {
+  if (e.key == "ArrowUp" && byId("msgInp").value == "") {
     let leaving = byMsgId(ACTIVEREPLY);
     if (ACTIVEREPLY == -1) {
       leaving = byId("placeholder").previousElementSibling;
@@ -156,10 +162,16 @@ function sendMsg(ev) {
     send(JSON.stringify({ action: "sendMsg", data: { msg: inp.value, room: ROOMNAME, parent: ACTIVEREPLY } }), (res) => {
     }, true);
   inp.value = "";
+  fitSize2();
 }
 function fitSize() {
   byId("alias-text").innerText = byId("alias").value;
   byId("alias").focus();
+}
+function fitSize2(event) {
+  console.log(byId("msgInp").value);
+  byId("msg-text").innerText = byId("msgInp").value + " ";
+  byId("msgInp").focus();
 }
 const rmvReg = /(>|^)\-(.+)\([0-9]\)>/gm;
 const addReg = /(>|^)\+(.+)\([0-9]\)>/gm;
@@ -193,10 +205,6 @@ async function initClient() {
       let area = document.getElementById("msgArea");
       let scrDistOKQ = area.scrollTop >= area.scrollHeight - area.offsetHeight - 100;
       if (message.action == "logs") {
-        message.data.logs.sort((a, b) => {
-          return Math.abs(a.id) - Math.abs(b.id);
-        });
-        console.log(message.data.logs);
         for (let i2 = 0; i2 < message.data.logs.length; i2++) {
           handleMessageEvent(message.data.logs[i2], area);
         }

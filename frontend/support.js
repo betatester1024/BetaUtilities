@@ -23,6 +23,13 @@ function onKeyPress(e) {
     ele.style.display = (ele.style.display=="flex")?"none":"flex";
     e.preventDefault();
   }
+  if (e.target.id == "msgInp" && 
+      e.key == "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    e.stopPropagation();
+    byId("inpContainer").submit();
+    return;
+  }
   if (e.ctrlKey || e.metaKey || e.shiftKey) return;
   if (e.key == 'Escape' || e.key == "ArrowRight" && byId("msgInp").value=="") {
     byMsgId(ACTIVEREPLY).classList.remove("activeReply");
@@ -33,7 +40,7 @@ function onKeyPress(e) {
     if (ACTIVEREPLY == -1) return;
     toggleActiveReply(ACTIVEREPLY);
   }
-  if (e.key == "ArrowDown") 
+  if (e.key == "ArrowDown" && byId("msgInp").value=="") 
   {
     if (ACTIVEREPLY == -1) return;
     let leaving = byMsgId(ACTIVEREPLY);
@@ -55,7 +62,7 @@ function onKeyPress(e) {
       toggleActiveReply(leaving.dataset.id, true)
     }
   } // going down!
-  if (e.key == "ArrowUp") {
+  if (e.key == "ArrowUp" && byId("msgInp").value=="") {
     let leaving = byMsgId(ACTIVEREPLY);
     if (ACTIVEREPLY == -1) {
       leaving = byId("placeholder").previousElementSibling;
@@ -232,6 +239,7 @@ function sendMsg(ev) {
   if (ev && ev.target.id != "msgInp") return;
   let inp = document.getElementById("msgInp");
   if (inp.value.length == 0) return;
+  // byId("msgInp").value = "";
   // let match = inp.value.match("^!alias @(.+)");
   // if (match) {
   //   updateAlias(match[1])
@@ -245,12 +253,22 @@ function sendMsg(ev) {
     // toggleActiveReply()
   // }
   inp.value="";
+  fitSize2();
   // byId("alias-text").value=""
 }
 
 function fitSize() {
   byId("alias-text").innerText = byId("alias").value;
   byId("alias").focus();
+}
+
+function fitSize2(event) {
+  // console.log(event);
+
+  console.log(byId("msgInp").value)
+  byId("msg-text").innerText = byId("msgInp").value+" ";
+  byId("msgInp").focus();
+  // event.preventDefault();
 }
   
 const rmvReg = /(>|^)\-(.+)\([0-9]\)>/gm;

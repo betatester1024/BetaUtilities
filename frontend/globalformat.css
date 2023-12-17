@@ -493,6 +493,10 @@ dialog.CLOSEDALERT::backdrop {
   background-color: var(--system-transp);
 }
 
+dialog {
+  z-index: 1;
+}
+
 /* 
 
   l., lk;ji'ppoiooiuiioo*/
@@ -735,6 +739,25 @@ dialog {
   transform: translateY(-50%);
   margin: 20px auto;
 } */
+
+#dialog {
+  top: 50vh; 
+  /* height: unset; */
+  /* z-index: 0; */
+  /* position: absolute; */
+  /* opacity */
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+#dialog > .internal {
+  display: relative;
+  margin: 10px auto;
+  border-radius: 15px;
+  width: 90%;
+  background-color: var(--system-bg);
+  padding: 15px;
+}
 
 *:focus {
   outline: 3px solid var(--system-blue);

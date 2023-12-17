@@ -16,11 +16,10 @@ function onLoad() {
   document.title = "Support | "+(match[1] == "room"?"#":"&")+ROOMNAME;
   document.addEventListener("keydown", onKeyPress);
 }
+let debounceTimeout = -1;
 function onKeyPress(e) {
   if (e.key == "b" && e.ctrlKey && !e.metaKey && !e.shiftKey) {
-    let ele = byId("right");
-    console.log(e);
-    ele.style.display = (ele.style.display=="flex")?"none":"flex";
+    toggleSidebar();
     e.preventDefault();
   }
   if (e.target.id == "msgInp" && 
@@ -116,7 +115,19 @@ function onKeyPress(e) {
 function updateTime() {
   let allElements = document.getElementsByClassName("time");
   for (let ele of allElements) {
+    if (ele.dataset.time < 1000)
     ele.innerText = minimalTime(Date.now()-ele.dataset.time*1000);
+  }
+}
+
+function toggleSidebar() {
+  let ele = byId("right");
+  if (debounceTimeout < 0) {
+    // console.log(e);
+    ele.style.display = (ele.style.display=="flex" || ele.style.display == "")?"none":"flex";
+    if (ele.style.display == "flex") ele.classList.add("sidebarOpen")
+    else ele.classList.remove("sidebarOpen")
+    debounceTimeout = setTimeout(()=>{debounceTimeout = -1;}, 100)
   }
 }
 // system refresh auto!
@@ -393,8 +404,13 @@ async function initClient()
       span.innerText = message.data.user;
       span.id = (message.data.isBot?"zbot":"usr")+message.data.user;
       span.title = message.data.user;
-      if (message.data.isBot) span.classList.add("bot");
-      ele.appendChild(span);
+      span.style.backgroundColor = "hsl("+
+        // make @BetaOS blue!
+        (hashIt(message.data.user.replaceAll(" ", "").toLowerCase())%255+79)%255+
+        ", 74.5%, 80%)";
+      // if (message.data.isBot) span.classList.add("bot");
+      if (message.data.isBot) byId("botList").appendChild(span);
+      else byId("userList").appendChild(span);
     }
     if (message.action== "yourAlias") {
       byId("alias").value = message.data.alias;
@@ -583,6 +599,10 @@ function handleMessageEvent(data, area) {
   let newMsgSender = document.createElement("b");
   // parse things
   newMsgSender.innerText = matches[2];
+  newMsgSender.style.backgroundColor = "hsl("+
+      // make @BetaOS blue!
+      (hashIt(matches[2].replaceAll(" ", "").toLowerCase())%255+79)%255+
+      ", 74.5%, 80%)";
   newMsgSender.className = classStr[matches[3]];
 
   let ctn = document.createElement("div");
@@ -600,6 +620,7 @@ function handleMessageEvent(data, area) {
   msg = msg.replaceAll(/(#[a-zA-Z0-9_\-]{1,20})([^;]|$)/gm,">SUPPORT$1>$2")
   msg = msg.replaceAll(/(;gt;;gt;[a-zA-Z0-9\-/]{1,90})/g,">INTERNALLINK$1>");
   msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu,">LINK$<test>>")
+  msg = msg.replaceAll(/@([^ ]+)/g,">MENTION$1>");
   msg = msg.replaceAll(/\n/gmiu,">BR>")
   // console.log(msg);
   if (msg.match("^[ \n]*/me(.*)")) {
@@ -620,8 +641,8 @@ function handleMessageEvent(data, area) {
       ele.appendChild(fragment);
     }
     else {
-      let pref = split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)")[1];
-      let post = pref!="BR"?(split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)(.+)")[2]):"";
+      let pref = split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR|MENTION)")[1];
+      let post = pref!="BR"?(split[i].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR|MENTION)(.+)")[2]):"";
       if (pref == "EMOJI") {
         let replaced = document.createElement("span");
         replaced.title = ":"+findReplacement(post)+":";
@@ -636,6 +657,18 @@ function handleMessageEvent(data, area) {
         replaced.innerText = post.replaceAll(";gt;", ">");
         replaced.setAttribute("target", "_blank");
         ele.appendChild(replaced);
+      }
+      else if (pref == "MENTION") {
+        let replaced = document.createElement("span");
+        replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
+        replaced.innerText = "@"+post.replaceAll(";gt;", ">");
+        ele.appendChild(replaced);
+        // console.log(hashIt(post.replaceAll(";gt;", ">"))%360)
+        replaced.setAttribute("style", "color:hsl("+
+          // make @BetaOS blue!
+          (hashIt(post.replaceAll(";gt;", ">").toLowerCase())%255+79)%255+
+          ", 74.5%, 48%) !important");
+        replaced.style.fontWeight = "600";
       }
       else if (pref == "ROOM") {
         let replaced = document.createElement("a");

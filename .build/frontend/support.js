@@ -8,11 +8,10 @@ function onLoad() {
   document.title = "Support | " + (match[1] == "room" ? "#" : "&") + ROOMNAME;
   document.addEventListener("keydown", onKeyPress);
 }
+let debounceTimeout = -1;
 function onKeyPress(e) {
   if (e.key == "b" && e.ctrlKey && !e.metaKey && !e.shiftKey) {
-    let ele2 = byId("right");
-    console.log(e);
-    ele2.style.display = ele2.style.display == "flex" ? "none" : "flex";
+    toggleSidebar();
     e.preventDefault();
   }
   if (e.target.id == "msgInp" && e.key == "Enter" && !e.shiftKey) {
@@ -75,7 +74,21 @@ function onKeyPress(e) {
 function updateTime() {
   let allElements = document.getElementsByClassName("time");
   for (let ele2 of allElements) {
-    ele2.innerText = minimalTime(Date.now() - ele2.dataset.time * 1e3);
+    if (ele2.dataset.time < 1e3)
+      ele2.innerText = minimalTime(Date.now() - ele2.dataset.time * 1e3);
+  }
+}
+function toggleSidebar() {
+  let ele2 = byId("right");
+  if (debounceTimeout < 0) {
+    ele2.style.display = ele2.style.display == "flex" || ele2.style.display == "" ? "none" : "flex";
+    if (ele2.style.display == "flex")
+      ele2.classList.add("sidebarOpen");
+    else
+      ele2.classList.remove("sidebarOpen");
+    debounceTimeout = setTimeout(() => {
+      debounceTimeout = -1;
+    }, 100);
   }
 }
 let ACTIVEREPLY = -1;
@@ -279,6 +292,7 @@ async function initClient() {
         span.innerText = message.data.user;
         span.id = (message.data.isBot ? "zbot" : "usr") + message.data.user;
         span.title = message.data.user;
+        span.style.backgroundColor = "hsl(" + (hashIt(message.data.user.replaceAll(" ", "").toLowerCase()) % 255 + 79) % 255 + ", 74.5%, 80%)";
         if (message.data.isBot)
           span.classList.add("bot");
         ele.appendChild(span);
@@ -420,6 +434,7 @@ function handleMessageEvent(data, area) {
   }
   let newMsgSender = document.createElement("b");
   newMsgSender.innerText = matches[2];
+  newMsgSender.style.backgroundColor = "hsl(" + (hashIt(matches[2].replaceAll(" ", "").toLowerCase()) % 255 + 79) % 255 + ", 74.5%, 80%)";
   newMsgSender.className = classStr[matches[3]];
   let ctn = document.createElement("div");
   ctn.dataset.id = matches[1];
@@ -434,6 +449,7 @@ function handleMessageEvent(data, area) {
   msg = msg.replaceAll(/(#[a-zA-Z0-9_\-]{1,20})([^;]|$)/gm, ">SUPPORT$1>$2");
   msg = msg.replaceAll(/(;gt;;gt;[a-zA-Z0-9\-/]{1,90})/g, ">INTERNALLINK$1>");
   msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu, ">LINK$<test>>");
+  msg = msg.replaceAll(/@([^ ]+)/g, ">MENTION$1>");
   msg = msg.replaceAll(/\n/gmiu, ">BR>");
   if (msg.match("^[ \n]*/me(.*)")) {
     msg = msg.match("^[ \n]*/me(.*)")[1];
@@ -449,8 +465,8 @@ function handleMessageEvent(data, area) {
       fragment.className = classStr[matches[3]];
       ele.appendChild(fragment);
     } else {
-      let pref = split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)")[1];
-      let post = pref != "BR" ? split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)(.+)")[2] : "";
+      let pref = split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR|MENTION)")[1];
+      let post = pref != "BR" ? split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR|MENTION)(.+)")[2] : "";
       if (pref == "EMOJI") {
         let replaced = document.createElement("span");
         replaced.title = ":" + findReplacement(post) + ":";
@@ -464,6 +480,13 @@ function handleMessageEvent(data, area) {
         replaced.innerText = post.replaceAll(";gt;", ">");
         replaced.setAttribute("target", "_blank");
         ele.appendChild(replaced);
+      } else if (pref == "MENTION") {
+        let replaced = document.createElement("span");
+        replaced.className = "supportMsg " + classStr[matches[3]];
+        replaced.innerText = "@" + post.replaceAll(";gt;", ">");
+        ele.appendChild(replaced);
+        replaced.setAttribute("style", "color:hsl(" + (hashIt(post.replaceAll(";gt;", ">").toLowerCase()) % 255 + 79) % 255 + ", 74.5%, 48%) !important");
+        replaced.style.fontWeight = "600";
       } else if (pref == "ROOM") {
         let replaced = document.createElement("a");
         replaced.className = "supportMsg " + classStr[matches[3]];

@@ -1,4 +1,4 @@
-
+let docTitle = "";
 function onLoad() {
   // send(JSON.stringify({action:"refresh"}), (res)=>{
   // });
@@ -9,11 +9,12 @@ function onLoad() {
   BOTTOMINPUT = byId("bottomInput");
   // REPLYINPUT.id = "rep"
   setInterval(updateTime, 5000);
-  document.getElementById("header").innerText = "Support: "+(ISBRIDGE?"&":"#")+
-    docURL.pathname.match("^\\/(room|bridge)\\/(.+)")[2];
-  let match = docURL.pathname.match("^\\/(room|bridge)\\/(.+)");
+  document.getElementById("header").innerText = "That | "+(ISBRIDGE?"&":"#")+
+    docURL.pathname.match("^\\/(room|bridge|that)\\/(.+)")[2];
+  let match = docURL.pathname.match("^\\/(room|bridge|that)\\/(.+)");
   ROOMNAME = match[2]
-  document.title = "Support | "+(match[1] == "room"?"#":"&")+ROOMNAME;
+  docTitle = "That | #"+ROOMNAME;//(match[1] == "room"?"#":"&")+ROOMNAME;
+  document.title = docTitle;
   document.addEventListener("keydown", onKeyPress);
 }
 let debounceTimeout = -1;
@@ -295,9 +296,9 @@ async function initClient()
   // let isBridge = docURL.searchParams.get("bridge");
   if (ISBRIDGE)
     source = new WebSocket('wss://'+docURL.host+'/bridge?room='+
-       docURL.pathname.match("^\/(room|bridge)\/(.+)")[2]);
+       docURL.pathname.match("^\/(room|bridge|that)\/(.+)")[2]);
   else source = new WebSocket('wss://'+docURL.host+'?room='+
-                                 docURL.pathname.match("^\/(room|bridge)\/(.+)")[2]);
+                                 docURL.pathname.match("^\/(room|bridge|that)\/(.+)")[2]);
   source.onclose = ()=>{
     ephemeralDialog("Connection failed, reconnecting...");
     failCt++;
@@ -351,7 +352,7 @@ async function initClient()
       STARTIDVALID = false;
       byId("container").appendChild(BOTTOMINPUT);
       UNREAD = 0;
-      document.title = "Support"
+      // document.title = "Support"
       loadStatus = -1;
       CONNECTIONID = -1;
       awaitingParent = [];
@@ -408,6 +409,7 @@ async function initClient()
         // make @BetaOS blue!
         (hashIt(message.data.user.replaceAll(" ", "").toLowerCase())%255+79)%255+
         ", 74.5%, 80%)";
+      span.style.color = "#000"; // has background color so DO NOT INVERT ON DARK MODE
       // if (message.data.isBot) span.classList.add("bot");
       if (message.data.isBot) byId("botList").appendChild(span);
       else byId("userList").appendChild(span);
@@ -518,7 +520,7 @@ window.addEventListener("blur", () => {
 
 // when the user's focus is back to your tab (website) again
 window.addEventListener("focus", () => {
-  document.title = "Support";
+  document.title = docTitle;
   FOCUSSED = true;
   UNREAD = 0;
 });
@@ -772,7 +774,7 @@ function handleMessageEvent(data, area) {
   document.getElementById("placeholder").style.display="none";
   if (!FOCUSSED) {
     UNREAD ++ 
-    document.title = "("+UNREAD+") | Support"
+    document.title = "("+UNREAD+") | "+docTitle;
   }
   updateReplyBox();
   if (data.autoThread) 

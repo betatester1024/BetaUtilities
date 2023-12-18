@@ -731,6 +731,7 @@ function ephemeralDialog(text:string)
 function closeEphemeral(dialog:HTMLDivElement) 
 {
   dialog.style.animation = "disappear 0.6s forwards";
+  setTimeout(()=>{dialog.remove()}, 600); // because it's got some weird stuff going on
 }
 let loginDialog = null;
 function login_v2(ev:any, signup:boolean=false) 
@@ -764,7 +765,7 @@ function logout_v2(event)
 {
   event.preventDefault()
   send(JSON.stringify({action: "logout"}), (res)=>{
-    ephemeralDialog("Successfully logged out!");
+    ephemeralDialog("Successfullye logged out!");
     location.reload(); // some things do not reset properly on logout.
   })
 }

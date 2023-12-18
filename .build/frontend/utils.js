@@ -624,6 +624,9 @@ function ephemeralDialog(text) {
 }
 function closeEphemeral(dialog) {
   dialog.style.animation = "disappear 0.6s forwards";
+  setTimeout(() => {
+    dialog.remove();
+  }, 600);
 }
 let loginDialog = null;
 function login_v2(ev, signup = false) {
@@ -644,7 +647,7 @@ function globalReload() {
 function logout_v2(event) {
   event.preventDefault();
   send(JSON.stringify({ action: "logout" }), (res) => {
-    ephemeralDialog("Successfully logged out!");
+    ephemeralDialog("Successfullye logged out!");
     location.reload();
   });
 }

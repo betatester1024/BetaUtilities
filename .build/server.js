@@ -190,24 +190,31 @@ async function initServer() {
       import_supportRooms.supportHandler.removeConnection(ws, req.query.room, token);
     });
   });
-  app.get("/room/*", supportReply);
-  app.get("/bridge/*", supportReply);
-  app.get("/support", (req, res) => {
-    if (req.query.room) {
-      sendFile(res, getToken(req), import_consts.frontendDir + "/supportRedirect.html");
-      return;
-    }
+  app.get("/that", (req, res) => {
     sendFile(res, getToken(req), import_consts.frontendDir + "/supportIndex.html");
     (0, import_logging.incrRequests)();
   });
+  app.get("/that/*", supportReply);
+  app.get("/room/*", (req, res) => {
+    sendFile(res, getToken(req), import_consts.frontendDir + "/supportRedirect.html");
+    (0, import_logging.incrRequests)();
+  });
+  app.get("/bridge/*", (req, res) => {
+    sendFile(res, getToken(req), import_consts.frontendDir + "/supportRedirect.html");
+    (0, import_logging.incrRequests)();
+  });
+  app.get("/support", (req, res) => {
+    sendFile(res, getToken(req), import_consts.frontendDir + "/supportRedirect.html");
+    (0, import_logging.incrRequests)();
+  });
   function supportReply(req, res) {
-    let room = req.url.match("(?:bridge|room)\\/(" + import_consts.roomRegex + ")")[1];
+    let room = req.url.match("(?:bridge|room|that)\\/(" + import_consts.roomRegex + ")")[1];
     if (!import_supportRooms.supportHandler.checkFoundQ(room) && (req.query.bridge != "true" || req.url == "bridge")) {
       console.log("Room", room, "not found");
       sendFile(res, getToken(req), import_consts.frontendDir + "/room404.html");
       return;
     } else
-      sendFile(res, getToken(req), import_consts.frontendDir + "/support.html");
+      sendFile(res, getToken(req), import_consts.frontendDir + "/that.html");
     (0, import_logging.incrRequests)();
   }
   app.get("/accountDel", (req, res) => {

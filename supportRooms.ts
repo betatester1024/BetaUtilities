@@ -544,7 +544,7 @@ export class supportHandler {
 
 export async function sendMsg(msg: string, room: string, parent: number, token: string) {
   if (msg.length == 0) return {status:"SUCCESS", data:null, token:token};
-  msg = msg.slice(0, 1024);
+  msg = msg.trim().slice(0, 1024);
   let obj = await userRequest(token);
   let roomData = await msgDB.findOne({ fieldName: "RoomInfo", room: room });
   let msgCt = roomData ? roomData.msgCt : 0;

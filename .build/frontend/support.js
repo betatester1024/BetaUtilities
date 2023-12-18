@@ -1,11 +1,13 @@
 "use strict";
+let docTitle = "";
 function onLoad() {
   BOTTOMINPUT = byId("bottomInput");
   setInterval(updateTime, 5e3);
-  document.getElementById("header").innerText = "Support: " + (ISBRIDGE ? "&" : "#") + docURL.pathname.match("^\\/(room|bridge)\\/(.+)")[2];
-  let match = docURL.pathname.match("^\\/(room|bridge)\\/(.+)");
+  document.getElementById("header").innerText = "That | " + (ISBRIDGE ? "&" : "#") + docURL.pathname.match("^\\/(room|bridge|that)\\/(.+)")[2];
+  let match = docURL.pathname.match("^\\/(room|bridge|that)\\/(.+)");
   ROOMNAME = match[2];
-  document.title = "Support | " + (match[1] == "room" ? "#" : "&") + ROOMNAME;
+  docTitle = "That | #" + ROOMNAME;
+  document.title = docTitle;
   document.addEventListener("keydown", onKeyPress);
 }
 let debounceTimeout = -1;
@@ -195,9 +197,9 @@ async function initClient() {
   try {
     console.log("Starting client.");
     if (ISBRIDGE)
-      source = new WebSocket("wss://" + docURL.host + "/bridge?room=" + docURL.pathname.match("^/(room|bridge)/(.+)")[2]);
+      source = new WebSocket("wss://" + docURL.host + "/bridge?room=" + docURL.pathname.match("^/(room|bridge|that)/(.+)")[2]);
     else
-      source = new WebSocket("wss://" + docURL.host + "?room=" + docURL.pathname.match("^/(room|bridge)/(.+)")[2]);
+      source = new WebSocket("wss://" + docURL.host + "?room=" + docURL.pathname.match("^/(room|bridge|that)/(.+)")[2]);
     source.onclose = () => {
       ephemeralDialog("Connection failed, reconnecting...");
       failCt++;
@@ -239,7 +241,6 @@ async function initClient() {
         STARTIDVALID = false;
         byId("container").appendChild(BOTTOMINPUT);
         UNREAD = 0;
-        document.title = "Support";
         loadStatus = -1;
         CONNECTIONID = -1;
         awaitingParent = [];
@@ -293,9 +294,11 @@ async function initClient() {
         span.id = (message.data.isBot ? "zbot" : "usr") + message.data.user;
         span.title = message.data.user;
         span.style.backgroundColor = "hsl(" + (hashIt(message.data.user.replaceAll(" ", "").toLowerCase()) % 255 + 79) % 255 + ", 74.5%, 80%)";
+        span.style.color = "#000";
         if (message.data.isBot)
-          span.classList.add("bot");
-        ele.appendChild(span);
+          byId("botList").appendChild(span);
+        else
+          byId("userList").appendChild(span);
       }
       if (message.action == "yourAlias") {
         byId("alias").value = message.data.alias;
@@ -366,7 +369,7 @@ window.addEventListener("blur", () => {
   FOCUSSED = false;
 });
 window.addEventListener("focus", () => {
-  document.title = "Support";
+  document.title = docTitle;
   FOCUSSED = true;
   UNREAD = 0;
 });
@@ -578,7 +581,7 @@ function handleMessageEvent(data, area) {
   document.getElementById("placeholder").style.display = "none";
   if (!FOCUSSED) {
     UNREAD++;
-    document.title = "(" + UNREAD + ") | Support";
+    document.title = "(" + UNREAD + ") | " + docTitle;
   }
   updateReplyBox();
   if (data.autoThread)

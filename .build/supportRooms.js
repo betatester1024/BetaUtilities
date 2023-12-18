@@ -500,7 +500,7 @@ class supportHandler {
 async function sendMsg(msg, room, parent, token) {
   if (msg.length == 0)
     return { status: "SUCCESS", data: null, token };
-  msg = msg.slice(0, 1024);
+  msg = msg.trim().slice(0, 1024);
   let obj = await (0, import_userRequest.userRequest)(token);
   let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room });
   let msgCt = roomData ? roomData.msgCt : 0;

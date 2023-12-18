@@ -7,7 +7,7 @@
       function onLoad() {
         let ele = document.getElementById("ctntp");
         // nasty hack
-        let match = decodeURIComponent((document.URL.match("nick=(.*)")??["","BetaOS_System"])[1]);
+        let match = decodeURIComponent((document.URL.match("nick=(.*)")??["","thatbot"])[1]);
         ele.innerHTML =ele.innerHTML.replaceAll(/BetaUtilities/gmu, match);
         ele = document.getElementById("h");
         ele.innerHTML =ele.innerHTML.replaceAll(/BetaUtilities/gmu, match);

@@ -954,3 +954,7 @@ iframe {
   height: 100%;
   border: none;
 }
+
+del * {
+  text-decoration: line-through;
+}

@@ -17,6 +17,7 @@ function onLoad() {
   document.title = docTitle;
   document.addEventListener("keydown", onKeyPress);
 }
+let PINGED = false;
 let debounceTimeout = -1;
 function onKeyPress(e) {
   if (e.key == "b" && e.ctrlKey && !e.metaKey && !e.shiftKey) {
@@ -352,6 +353,7 @@ async function initClient()
       STARTIDVALID = false;
       byId("container").appendChild(BOTTOMINPUT);
       UNREAD = 0;
+      PINGED = false;
       // document.title = "Support"
       loadStatus = -1;
       CONNECTIONID = -1;
@@ -670,6 +672,10 @@ function handleMessageEvent(data, area) {
           // make @BetaOS blue!
           (hashIt(post.replaceAll(";gt;", ">").toLowerCase())%255+79)%255+
           ", 74.5%, 48%) !important");
+        if (replaced.innerText.toLowerCase() == "@"+byId("alias").value.toLowerCase()) {
+          replaced.style.border = "2px solid gold";
+          replaced.style.boxShadow = "0px 0px 3px gold";
+        }
         replaced.style.fontWeight = "600";
       }
       else if (pref == "ROOM") {
@@ -773,8 +779,9 @@ function handleMessageEvent(data, area) {
   }
   document.getElementById("placeholder").style.display="none";
   if (!FOCUSSED) {
+    if (data.content.match("@"+byId("alias").value)) PINGED = true;
     UNREAD ++ 
-    document.title = "("+UNREAD+") | "+docTitle;
+    document.title = "("+UNREAD+")"+(PINGED?"!":"")+" | "+docTitle;
   }
   updateReplyBox();
   if (data.autoThread) 

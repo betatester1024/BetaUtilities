@@ -528,7 +528,7 @@ function eeFormat(data, mainClass) {
   return `<!DOCTYPE html>
 <html class="${mainClass}">
   <head>
-    <script src='./utils.js'><\/script>
+    <script src='/utils.js'><\/script>
     <title>Everyone Edits</title>
     <script>
     <\/script>

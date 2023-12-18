@@ -374,7 +374,7 @@ class supportHandler {
         if (from < 0)
           break;
       }
-      text += "Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by @BetaOS_System. Commands are available here: >>commands \nLogged-in users: click on your username to update it.\nClick this message to dismiss it >>";
+      text += "Welcome to **that** threaded chat! Enter any message in the box below. Automated response services and utilities are provided by ~~@thatbot~~. It is currently down. Commands are not available here: ~~>>commands~~ \nLogged-in users: click on your username to update it.\nClick this message to dismiss it >>";
       ev.send(JSON.stringify({ action: "msg", data: { id: +msgCt + 1, sender: "[SYSTEM]", time: Date.now() / 1e3, perms: 3, content: text } }));
     }
     thiscn.readyQ = true;

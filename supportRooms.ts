@@ -448,6 +448,7 @@ export class supportHandler {
     }
     let oldAlias = usrData.data.alias;
     let resp = await realias(newAlias, token);
+    if (resp.status != "SUCCESS" && ) return resp;
     // find what rooms this user is in
     for (let i=0; i<this.connections.length; i++)
       if (this.connections[i].userID == usrData.data.user) {

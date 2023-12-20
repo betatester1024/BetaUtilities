@@ -394,7 +394,7 @@ export async function initServer() {
   })
   
 
-  const banList= [""];
+  const banList= [];
   app.post('/server', urlencodedParser, async (req:any, res:any) => {
     incrRequests();
     if (req.headers['content-length'] > 60000) {
@@ -403,7 +403,7 @@ export async function initServer() {
       return;
     }
     let addr = req.ip; 
-    // console.log(addr);
+    console.log(addr);
     if (banList.indexOf(addr) >= 0) 
     {
       res.end(JSON.stringify({status:"ERROR", data:{error: "IP banned, contact BetaOS if this was done in error."}}));

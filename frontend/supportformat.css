@@ -160,6 +160,7 @@ div#container > #bottomInput:before {
 #fitboxContainer {
   height:fit-content;
   display: flex;
+  flex-shrink: 0
 }
 #bottomInput {
   /* width: 95%; */

@@ -9,11 +9,11 @@ function onLoad() {
   BOTTOMINPUT = byId("bottomInput");
   // REPLYINPUT.id = "rep"
   setInterval(updateTime, 5000);
-  document.getElementById("header").innerText = "That | "+(ISBRIDGE?"&":"#")+
+  document.getElementById("header").innerText = "that threaded chat | "+(ISBRIDGE?"&":"#")+
     docURL.pathname.match("^\\/(room|bridge|that)\\/(.+)")[2];
   let match = docURL.pathname.match("^\\/(room|bridge|that)\\/(.+)");
   ROOMNAME = match[2]
-  docTitle = "That | #"+ROOMNAME;//(match[1] == "room"?"#":"&")+ROOMNAME;
+  docTitle = "#"+ROOMNAME+" | that threaded chat";//(match[1] == "room"?"#":"&")+ROOMNAME;
   document.title = docTitle;
   document.addEventListener("keydown", onKeyPress);
 }
@@ -278,7 +278,7 @@ function fitSize() {
 function fitSize2(event) {
   // console.log(event);
 
-  console.log(byId("msgInp").value)
+  // console.log(byId("msgInp").value)
   byId("msg-text").innerText = byId("msgInp").value+" ";
   byId("msgInp").focus();
   // event.preventDefault();
@@ -779,7 +779,7 @@ function handleMessageEvent(data, area) {
   }
   document.getElementById("placeholder").style.display="none";
   if (!FOCUSSED) {
-    if (data.content.match("@"+byId("alias").value)) PINGED = true;
+    if (data.content.match("@"+byId("alias").value), "gi") PINGED = true;
     UNREAD ++ 
     document.title = "("+UNREAD+")"+(PINGED?"!":"")+" | "+docTitle;
   }

@@ -3,10 +3,10 @@ let docTitle = "";
 function onLoad() {
   BOTTOMINPUT = byId("bottomInput");
   setInterval(updateTime, 5e3);
-  document.getElementById("header").innerText = "That | " + (ISBRIDGE ? "&" : "#") + docURL.pathname.match("^\\/(room|bridge|that)\\/(.+)")[2];
+  document.getElementById("header").innerText = "that threaded chat | " + (ISBRIDGE ? "&" : "#") + docURL.pathname.match("^\\/(room|bridge|that)\\/(.+)")[2];
   let match = docURL.pathname.match("^\\/(room|bridge|that)\\/(.+)");
   ROOMNAME = match[2];
-  docTitle = "That | #" + ROOMNAME;
+  docTitle = "#" + ROOMNAME + " | that threaded chat";
   document.title = docTitle;
   document.addEventListener("keydown", onKeyPress);
 }
@@ -185,7 +185,6 @@ function fitSize() {
   byId("alias").focus();
 }
 function fitSize2(event) {
-  console.log(byId("msgInp").value);
   byId("msg-text").innerText = byId("msgInp").value + " ";
   byId("msgInp").focus();
 }
@@ -586,7 +585,7 @@ function handleMessageEvent(data, area) {
   }
   document.getElementById("placeholder").style.display = "none";
   if (!FOCUSSED) {
-    if (data.content.match("@" + byId("alias").value))
+    if (data.content.match("@" + byId("alias").value), "gi")
       PINGED = true;
     UNREAD++;
     document.title = "(" + UNREAD + ")" + (PINGED ? "!" : "") + " | " + docTitle;

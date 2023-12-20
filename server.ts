@@ -187,7 +187,7 @@ export async function initServer() {
             .then((obj:any)=>{
               if (obj.status != "SUCCESS") ws.send(JSON.stringify({
                 action:"yourAlias",
-                data:{alias:obj.data.alias, error: true}
+                data:{alias:obj.data.alias, error: true, type:obj.data.type}
               }));
             });
           break;
@@ -444,9 +444,9 @@ export async function initServer() {
         body.action == "delAcc" || body.action == "signup")*/
       if (ignoreLog.indexOf(body.action)>=0){}
       else if (ret.status=="SUCCESS") {
-        log("Action performed: "+body.action+", response:"+JSON.stringify(ret.data));
+        log("["+addr+"]: "+body.action+", RESP:"+JSON.stringify(ret.data));
       }
-      else log("Action performed: "+body.action+", error:"+ret.data.error);
+      else log("F["+addr+"]: "+body.action+", ERR:"+ret.data.error);
       res.cookie('accountID', ret.token??"", {httpOnly: true, secure:true, sameSite:"None", maxAge:9e12});
       res.end(JSON.stringify({status:ret.status, data:ret.data}));
     });

@@ -34,16 +34,14 @@ async function updateUser(user, oldPass, newPass, newPermLevel, token) {
   if (newPass.length == 0) {
     NOUPDATE = true;
   }
-  let tokenData = await import_consts.authDB.findOne({ fieldName: "Token", token });
-  if (!tokenData) {
-    return { status: "ERROR", data: { error: "Cannot update user information: Your session could not be found!" }, token: "" };
-  }
-  let userData = await import_consts.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
-  if (Date.now() > tokenData.expiry) {
-    return { status: "ERROR", data: { error: "Cannot update user information: Your session has expired!" }, token: "" };
-  }
+  let userReq = await (0, import_userRequest.userRequest)(token);
+  if (userReq.status != "SUCCESS")
+    return userReq;
+  let userData = await import_consts.authDB.findOne({ fieldName: "UserData", user: userReq.data.user });
   let newUserData = await import_consts.authDB.findOne({ fieldName: "UserData", user });
   if (userData.permLevel >= 2 && (!newUserData || newUserData.permLevel < userData.permLevel) && newPermLevel < userData.permLevel) {
+    if (!newUserData && NOUPDATE)
+      return { status: "ERROR", data: { error: "New accounts must have a password." }, token };
     await import_consts.authDB.updateOne(
       { fieldName: "UserData", user },
       { $set: { permLevel: newPermLevel } },
@@ -59,7 +57,7 @@ async function updateUser(user, oldPass, newPass, newPermLevel, token) {
     return { status: "SUCCESS", data: { perms: newPermLevel }, token };
   } else if (await argon2.verify(userData.pwd, oldPass)) {
     await import_consts.authDB.updateOne(
-      { fieldName: "UserData", user: tokenData.associatedUser },
+      { fieldName: "UserData", user },
       { $set: { pwd: await argon2.hash(newPass, import_consts.hashingOptions) } }
     );
     return { status: "SUCCESS", data: { perms: userData.permLevel }, token };
@@ -68,16 +66,16 @@ async function updateUser(user, oldPass, newPass, newPermLevel, token) {
   }
 }
 async function realias(newalias, token) {
-  let tokenData = await import_consts.authDB.findOne({ fieldName: "Token", token });
-  if (!tokenData) {
-    return { status: "ERROR", data: { error: "Cannot update user information: Your session could not be found!" }, token: "" };
-  }
-  if (Date.now() > tokenData.expiry) {
-    return { status: "ERROR", data: { error: "Cannot update user information: Your session has expired!" }, token: "" };
-  }
+  let req = await (0, import_userRequest.userRequest)(token);
+  if (req.status != "SUCCESS")
+    return req;
   if (newalias.length > 30)
-    return { status: "ERROR", data: { error: "Alias too long" }, token };
-  await import_consts.authDB.updateOne({ fieldName: "UserData", user: tokenData.associatedUser }, {
+    return { status: "ERROR", data: {
+      error: "Alias too long",
+      type: 2,
+      alias: req.data.alias ?? req.data.user
+    }, token };
+  await import_consts.authDB.updateOne({ fieldName: "UserData", user: req.data.user }, {
     $set: { alias: newalias }
   });
   return { status: "SUCCESS", data: null, token };

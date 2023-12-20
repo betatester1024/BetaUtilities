@@ -158,7 +158,7 @@ async function initServer() {
             if (obj.status != "SUCCESS")
               ws.send(JSON.stringify({
                 action: "yourAlias",
-                data: { alias: obj.data.alias, error: true }
+                data: { alias: obj.data.alias, error: true, type: obj.data.type }
               }));
           });
           break;
@@ -354,9 +354,9 @@ async function initServer() {
     makeRequest(body.action, req.cookies.accountID, body.data, req.cookies.sessionID).then((ret) => {
       if (ignoreLog.indexOf(body.action) >= 0) {
       } else if (ret.status == "SUCCESS") {
-        (0, import_logging.log)("Action performed: " + body.action + ", response:" + JSON.stringify(ret.data));
+        (0, import_logging.log)("[" + addr + "]: " + body.action + ", RESP:" + JSON.stringify(ret.data));
       } else
-        (0, import_logging.log)("Action performed: " + body.action + ", error:" + ret.data.error);
+        (0, import_logging.log)("F[" + addr + "]: " + body.action + ", ERR:" + ret.data.error);
       res.cookie("accountID", ret.token ?? "", { httpOnly: true, secure: true, sameSite: "None", maxAge: 9e12 });
       res.end(JSON.stringify({ status: ret.status, data: ret.data }));
     });

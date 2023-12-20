@@ -416,6 +416,9 @@ class supportHandler {
     }
     let oldAlias = usrData.data.alias;
     let resp = await (0, import_updateUser.realias)(newAlias, token);
+    if (resp.status != "SUCCESS" && resp.data.type == 2) {
+      return { status: "ERROR", data: { type: 1, alias: resp.data.alias } };
+    }
     for (let i = 0; i < this.connections.length; i++)
       if (this.connections[i].userID == usrData.data.user) {
         for (let j = 0; j < this.connections.length; j++) {

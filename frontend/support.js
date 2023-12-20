@@ -419,7 +419,10 @@ async function initClient()
     if (message.action== "yourAlias") {
       byId("alias").value = message.data.alias;
       byId("alias-text").innerText = message.data.alias
-      if (message.data.error) ephemeralDialog("Error: You are not logged in and cannot update your alias.")
+      if (message.data.error && message.data.type==1); 
+        // ephemeralDialog("")
+      else if (message.data.error) 
+        ephemeralDialog("Error: You are not logged in and cannot update your alias.")
       byId("msgInp").focus();
     }
     if (message.action == "addUser" || message.action == "removeUser") {

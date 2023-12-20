@@ -40,7 +40,6 @@ export async function updateUser(user:string, oldPass:string, newPass:string, ne
 }
 
 export async function realias(newalias:string, token:string) {
-  // let tokenData:{associatedUser:string, expiry:number} = await authDB.findOne({fieldName:"Token", token:token});
   // if (!tokenData) {
   //   return {status:"ERROR", data:{error:"Cannot update user information: Your session could not be found!"}, token:""}
   // }

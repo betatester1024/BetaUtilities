@@ -371,7 +371,8 @@ function alertDialog(str, callback = () => {
     overlay2.style.opacity = "0";
   }
   let ele = document.getElementById("overlay");
-  ele.innerHTML = "";
+  if (ele)
+    ele.innerHTML = "";
   let p = newDialog.querySelector("#alerttext_v2");
   if (!ele || !p) {
     console.log("ERROR: Alert dialogs not enabled in this page.");
@@ -647,7 +648,7 @@ function globalReload() {
 function logout_v2(event) {
   event.preventDefault();
   send(JSON.stringify({ action: "logout" }), (res) => {
-    ephemeralDialog("Successfullye logged out!");
+    ephemeralDialog("Successfully logged out!");
     location.reload();
   });
 }

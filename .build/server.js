@@ -320,7 +320,6 @@ async function initServer() {
       return;
     }
     let addr = req.ip;
-    console.log(addr);
     if (banList.indexOf(addr) >= 0) {
       res.end(JSON.stringify({ status: "ERROR", data: { error: "IP banned, contact BetaOS if this was done in error." } }));
       return;

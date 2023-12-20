@@ -430,7 +430,7 @@ function alertDialog(str: string, callback: () => any = ()=>{}, requiresConfirma
     overlay.style.opacity="0";
   }
   let ele = document.getElementById("overlay") as HTMLDivElement;
-  ele.innerHTML="";
+  if (ele) ele.innerHTML="";
   let p = newDialog.querySelector("#alerttext_v2");
   if (!ele || !p) {
     console.log("ERROR: Alert dialogs not enabled in this page.")
@@ -765,7 +765,7 @@ function logout_v2(event)
 {
   event.preventDefault()
   send(JSON.stringify({action: "logout"}), (res)=>{
-    ephemeralDialog("Successfullye logged out!");
+    ephemeralDialog("Successfully logged out!");
     location.reload(); // some things do not reset properly on logout.
   })
 }

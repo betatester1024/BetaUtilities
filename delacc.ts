@@ -3,7 +3,6 @@ import {userRequest} from './userRequest';
 const argon2 = require('argon2');
 
 export async function deleteAccount(user:string, pass:string, token:string) {
-  // let tokenData:{associatedUser:string, expiry:number} = await authDB.findOne({fieldName:"Token", token:token});
   // if (!tokenData) {
   //   return {status:"ERROR", data:{error:"Cannot update user information: Your session could not be found!"}, token:""}
   // }

@@ -5,7 +5,7 @@
     <!-- markdownify -->
     <script type="module" src="https://md-block.verou.me/md-block.js"></script>
     
-    <title>Support</title>
+    <title>that threaded chat</title>
     <script src ='/support.js'>
     </script>
     <meta name="viewport" content="width=device-width">
@@ -25,25 +25,37 @@
   <body onload = "globalOnload(()=>{onLoad(); initClient()}); ">
     <div class="main_content">
       <header>
-        <h2 id="header">BetaOS Support</h2>
+        <h2 id="header">that threaded chat</h2>
         <hr class="rounded">
       </header>
         <div id="containingDiv" class="flex">
           <div id="msgArea" onscroll="onScroll()">
             <h2 id="placeholder"><span class="material-symbols-outlined">schedule</span> Loading messages... </h2>
           </div>
-          <div id="right">
-            <h2>Users</h2>
-            <sup class="blu nohover" style="white-space: normal">Press CTRL+B to toggle</sup>
+          <div id="right" class="sidebarOpen">
+            <div class="flex" style="flex-wrap: nowrap;">
+              <button class="btn" id="closeSidebar" tooltip="Close sidebar" onclick = "toggleSidebar()">
+                <span class="material-symbols-outlined">arrow_right</span>
+              </button>
+              <p class="blu nohover" style="white-space: normal">CTRL+B to toggle</p>
+            </div>
+            <h2 class="fssml">users</h2>
             <div id="userList" class="blu nohover"></div>
+            <h2 class="fssml">bots</h2>
+            <div id="botList" class="blu nohover"></div>
           </div>
+          <button class="btn" id="restoreSidebar" tooltip="Restore sidebar" onclick = "toggleSidebar()">
+            <span class="material-symbols-outlined">arrow_left</span>
+          </button>
         </div>
         <div id="container">
           <div id="bottomInput">
-            <form id="fit-box" action="javascript:updateAlias()">
-              <input id="alias" oninput="fitSize()" value="Loading alias"/>
-              <span id="alias-text">Loading alias</span>
-            </form>
+            <div id="fitboxContainer">
+              <form id="fit-box" action="javascript:updateAlias()">
+                <input id="alias" oninput="fitSize()" value="Loading alias"/>
+                <span id="alias-text">Loading alias...</span>
+              </form>
+            </div>
             <form id="inpContainer" action="javascript:sendMsg()">
               <div id="resizeParent2">
                 <span id="msg-text">Placeholder</span>
@@ -51,7 +63,7 @@
               </div>
               <!-- <input id="msgInp" class="fssml" placeholder="Enter a message..." autocomplete="off" > -->
             </form>
-            <button class="btn szIco override fssml notooltip"  id="sendBtn" onclick="sendMsg()">
+            <button class="btn szIco override fssml" tooltip="Send message" id="sendBtn" onclick="sendMsg()">
               <span class="material-symbols-outlined override notooltip">send</span>
               <!-- <div class="anim"></div> -->
             </button>
@@ -60,20 +72,32 @@
       <a class="btn override" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>
         Return to home<div class="anim"></div></a>
-      <a class="btn override" href="/support">
+      <a class="btn override" href="/that">
         <span class="material-symbols-outlined">arrow_back_ios</span>
         To room listing<div class="anim"></div></a>
       </div>
     </div>
     <div class="overlay" id="overlay">
+      
+    </div>
+    <div class="overlay_dialog" id="dialog">
       <div class="internal">
-        <p class="fsmed" id="alerttext">Hey, some text here</p>
-        <button class="btn szTwoThirds" onclick="closeAlert()">
-          Continue
-          <span class="material-symbols-outlined">arrow_forward_ios</span>
-          <div class="anim"></div>
-        </button>
+        <p class="fsmed" style="margin-bottom: 10px;"><span class="material-symbols-outlined">lock</span>
+        This room is locked. Please enter the password.</p>
+        <form action = "javascript:closeDialog(()=>{})">
+          <div class="inpContainer">
+            <input class="inp" type="password" placeholder = "Password" id="pwd">
+            <div class="anim inp"></div>
+          </div>
+          <button style="display:none"></button>
+        </form>
       </div>
+      <button onclick="closeDialog(()=>{})" class="btn grn">
+        <span class="material-symbols-outlined">check</span>
+        Close
+        <div class="anim"></div>
+      </button>
+
     </div>
   </body>
 </html>

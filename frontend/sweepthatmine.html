@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="{{mainClass}}">
   <head>
-    <script src='./utils.js'></script>
+    <script src='/utils.js'></script>
     <title>SweepThatMine!</title>
     <script>
       let TIMER = -1;
@@ -317,7 +317,8 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload(()=>{TIMER = setInterval(updateTimer, 100); onLoad();})" oncontextmenu='return false;'>
+  <body onload = "globalOnload(()=>{TIMER = setInterval(updateTimer, 100); onLoad();}) 
+    bSelRegister('difficulty', updateDifficulty, 'Medium');" oncontextmenu='return false;'>
     <div class="main_content">
       <div id="top"><!--href anchor--></div>
       <header>
@@ -325,11 +326,20 @@
         <hr class="rounded">
       </header>
       <p class="nobreak fssml">Select a difficulty: </p>
-      <select id="difficulty" onchange="updateDifficulty()" class="szHalf fssml">
+      <div class="bSel inpContainer" id="difficulty">
+        <input class="betterSelect">
+        <div class="optionMenu">
+          <div class="option" val=0>Easy</div>
+          <div class="option" val=1>Medium</div>
+          <div class="option" val=2>Hard</div>
+        </div>
+        <div class="anim inp"></div>
+      </div>
+      <!-- <select id="difficulty" onchange="updateDifficulty()" class="szHalf fssml">
         <option value = "0">Easy</option>
         <option value = "1" selected>Medium</option>
         <option value = "2">Hard</option>
-      </select> <button class="btn" onclick="resetGrid();"><span class='material-symbols-outlined'>refresh</span></button>
+      </select>--> <button class="btn" onclick="resetGrid();"><span class='material-symbols-outlined'>refresh</span></button>
       <h2 id="timer" class="fsmed centred">> LOADING TIMER <</h2>
       <div id="sweep"></div>
       <details>

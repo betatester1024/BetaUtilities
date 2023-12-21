@@ -47,15 +47,13 @@ async function userRequest(token, internalFlag = false) {
   }, token };
 }
 async function extendSession(token) {
-  let tokenData = await import_consts.authDB.findOne({ fieldName: "Token", token });
-  if (!tokenData) {
-    return { status: "ERROR", data: { error: "Your session could not be found!" }, token: "" };
-  }
-  let userData = await import_consts.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
-  if (Date.now() > tokenData.expiry) {
+  let userData = await userRequest(token);
+  if (userData.status != "SUCCESS")
+    return userData;
+  if (Date.now() > userData.data.expiry) {
     return { status: "ERROR", data: { error: "Your session has expired!" }, token: "" };
   }
-  let newExpiry = import_consts.expiry[userData.permLevel] + Date.now();
+  let newExpiry = import_consts.expiry[userData.data.perms] + Date.now();
   await import_consts.authDB.updateOne({ fieldName: "Token", token }, { $set: { expiry: newExpiry } });
   return { status: "SUCCESS", data: { expiry: newExpiry }, token };
 }

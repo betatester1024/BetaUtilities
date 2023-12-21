@@ -22,26 +22,22 @@ __export(delacc_exports, {
 });
 module.exports = __toCommonJS(delacc_exports);
 var import_consts = require("./consts");
+var import_userRequest = require("./userRequest");
 const argon2 = require("argon2");
 async function deleteAccount(user, pass, token) {
-  let tokenData = await import_consts.authDB.findOne({ fieldName: "Token", token });
-  if (!tokenData) {
-    return { status: "ERROR", data: { error: "Cannot update user information: Your session could not be found!" }, token: "" };
-  }
-  if (!user.match(import_consts.userRegex)) {
-    return { status: "ERROR", data: { error: "Invalid user string!" }, token };
-  }
+  let userResp = await (0, import_userRequest.userRequest)(token);
+  if (userResp.status != "SUCCESS")
+    return userResp;
   let usrInfo = await import_consts.authDB.findOne({ fieldName: "UserData", user: { $eq: user } });
   if (!usrInfo) {
     return { status: "ERROR", data: { error: "No such user!" }, token };
   }
-  let loginInfo = await import_consts.authDB.findOne({ fieldName: "UserData", user: tokenData.associatedUser });
-  if (loginInfo.permLevel > usrInfo.permLevel) {
+  if (userResp.data.perms > usrInfo.permLevel) {
     await import_consts.authDB.deleteMany({ fieldName: "Token", associatedUser: user });
     await import_consts.authDB.deleteOne({ fieldName: "UserData", user });
     return { status: "SUCCESS", data: null, token };
   }
-  if (pass.length == 0) {
+  if ((pass || "").length == 0) {
     return { status: "ERROR", data: { error: "No password provided!" }, token };
   } else if (await argon2.verify(usrInfo.pwd, pass)) {
     await import_consts.authDB.deleteOne({ fieldName: "Token", token: { $eq: token } });

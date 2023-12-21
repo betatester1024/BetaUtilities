@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html class="{{mainClass}}">
   <head>
-    <script src='./utils.js'></script>
+    <script src='/utils.js'></script>
     <title>Redirecting</title>
     <script>
       function onLoad() {
-        let roomName = docURL.searchParams.get("room");
+        let roomName = docURL.searchParams.get("room") || 
+          (docURL.pathname.match(/(?:room|bridge)\/(.+)/)??["",""])[1];
         if (docURL.searchParams.get("bridge") == "true") location.href="/bridge/"+roomName;
-        else location.href="/room/"+roomName;
+        else location.href="/that/"+roomName;
       }
     </script>
     <meta name="viewport" content="width=device-width">

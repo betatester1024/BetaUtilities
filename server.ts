@@ -187,7 +187,7 @@ export async function initServer() {
             .then((obj:any)=>{
               if (obj.status != "SUCCESS") ws.send(JSON.stringify({
                 action:"yourAlias",
-                data:{alias:obj.data.alias, error: true}
+                data:{alias:obj.data.alias, error: true, type:obj.data.type}
               }));
             });
           break;
@@ -225,30 +225,41 @@ export async function initServer() {
       // console.log("Removed stream");
     });
   });
-  
-  app.get('/room/*', supportReply);
-  app.get('/bridge/*', supportReply);
-  app.get('/support', (req:any, res:any) => {
-    if (req.query.room) {
-      sendFile(res, getToken(req), frontendDir+'/supportRedirect.html');
-      return;
-    }
+  app.get('/that', (req:any, res:any) => {
     sendFile(res, getToken(req), frontendDir+'/supportIndex.html');
     incrRequests();
   });
+  app.get('/that/*', supportReply);
+  app.get('/room/*', (req:any, res:any) => {
+           sendFile(res, getToken(req), frontendDir+'/supportRedirect.html');
+           incrRequests();
+         });
+  app.get('/bridge/*', (req:any, res:any) => {
+     sendFile(res, getToken(req), frontendDir+'/supportRedirect.html');
+     incrRequests();
+   })
+  app.get('/support', (req:any, res:any) => {
+    // if (req.query.room) {
+    //   sendFile(res, getToken(req), frontendDir+'/supportRedirect.html');
+    //   return;
+    // }
+    sendFile(res, getToken(req), frontendDir+'/supportRedirect.html');
+    incrRequests();
+  });
+  // app.get('/that')
   function supportReply(req:any, res:any) {
     // console.log(req.url);
     // let url = new URL(req.href);
     // let match = req.url.match('(?:.*)room=('+roomRegex+")");
     // if (req.url.match(/^\/(bridge|room)/)) {
-    let room = req.url.match('(?:bridge|room)\\/('+roomRegex+')')[1];
+    let room = req.url.match('(?:bridge|room|that)\\/('+roomRegex+')')[1];
     if (!supportHandler.checkFoundQ(room) && 
         (req.query.bridge!= "true" || req.url == "bridge")) {
       console.log("Room", room, "not found")
       sendFile(res, getToken(req), frontendDir+"/room404.html");
       return;
     }
-    else sendFile(res, getToken(req), frontendDir+'/support.html');
+    else sendFile(res, getToken(req), frontendDir+'/that.html');
     // }
     incrRequests();
   }
@@ -383,7 +394,7 @@ export async function initServer() {
   })
   
 
-  const banList= [""];
+  const banList= [];
   app.post('/server', urlencodedParser, async (req:any, res:any) => {
     incrRequests();
     if (req.headers['content-length'] > 60000) {
@@ -433,9 +444,9 @@ export async function initServer() {
         body.action == "delAcc" || body.action == "signup")*/
       if (ignoreLog.indexOf(body.action)>=0){}
       else if (ret.status=="SUCCESS") {
-        log("Action performed: "+body.action+", response:"+JSON.stringify(ret.data));
+        log("["+addr+"]: "+body.action+", RESP:"+JSON.stringify(ret.data));
       }
-      else log("Action performed: "+body.action+", error:"+ret.data.error);
+      else log("F["+addr+"]: "+body.action+", ERR:"+ret.data.error);
       res.cookie('accountID', ret.token??"", {httpOnly: true, secure:true, sameSite:"None", maxAge:9e12});
       res.end(JSON.stringify({status:ret.status, data:ret.data}));
     });
@@ -615,7 +626,7 @@ function eeFormat(data:string, mainClass:string) {
   return `<!DOCTYPE html>
 <html class="${mainClass}">
   <head>
-    <script src='./utils.js'></script>
+    <script src='/utils.js'></script>
     <title>Everyone Edits</title>
     <script>
     </script>

@@ -1,7 +1,7 @@
 <!DOCTYPE html> 
 <html class="{{mainClass}}">
   <head>
-    <script src='./utils.js'></script>
+    <script src='/utils.js'></script>
     <title>Capsdle</title>
     <script>
       let CURRROW = 0;
@@ -122,20 +122,6 @@
         else return letter;
       }
 
-      function hashIt(str, seed = 0) {
-        let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
-        for(let i = 0, ch; i < str.length; i++) {
-            ch = str.charCodeAt(i);
-            h1 = Math.imul(h1 ^ ch, 2654435761);
-            h2 = Math.imul(h2 ^ ch, 1597334677);
-        }
-        h1  = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
-        h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-        h2  = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
-        h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-      
-        return 4294967296 * (2097151 & h2) + (h1 >>> 0);
-      };
       let nowWord = "";
       const letters =  "qwertyuiopasdfghjklzxcvbnm0123456789";
       const capitals = "QWERTYUIOPASDFGHJKLZXCVBNM0123456789";
@@ -258,23 +244,6 @@
         font-size: 40px;
 
         background-color: var(--system-green2) !important;
-      }
-      #dialog {
-        top: 50vh; 
-        /* height: unset; */
-        /* z-index: 0; */
-        /* position: absolute; */
-        /* opacity */
-        opacity: 0;
-        pointer-events: none;
-      }
-      #dialog > .internal {
-        display: relative;
-        margin: 10px auto;
-        border-radius: 15px;
-        width: 90%;
-        background-color: var(--system-bg);
-        padding: 15px;
       }
       .democtn {
         display: inline-block;

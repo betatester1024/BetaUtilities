@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html class="{{mainClass}}">
   <head>
-    <script src='./utils.js'></script>
-    <title>Room listing</title>
+    <script src='/utils.js'></script>
+    <title>Room listing | That</title>
     <script>
       function onLoad() {
         send(JSON.stringify({action:"roomRequest"}), (res)=>{
@@ -10,7 +10,7 @@
           else {
             let btns = "";
             for (let i=0; i<res.data.length; i++) {
-              btns += `<a class="btn fsmed override" style="width:12em" href="/support?room=${res.data[i].slice(1)}">${res.data[i]}<div class="anim"></div></a>`;
+              btns += `<a class="btn fssml override" href="/that/${res.data[i].slice(1)}">${res.data[i]}<div class="anim"></div></a>`;
             }
             document.getElementById("rooms").innerHTML = btns;
           }
@@ -54,7 +54,7 @@
         inp.value="";
       }
       function visit() {
-        window.open("/support?room="+document.getElementById("inp").value, '_self');
+        window.open("/that/room="+document.getElementById("inp").value, '_self');
       }
     </script>
     <meta name="viewport" content="width=device-width">
@@ -67,13 +67,22 @@
       #rooms {
         width: 95%;
         margin: 0px auto;
+        display: flex;
+        flex-wrap: wrap;
+      }
+      #rooms > a {
+        flex-grow:1;
+        /* width: 100%; */
       }
     </style>
   </head>
   <body onload = "globalOnload(()=>{onLoad();});">
     <div class="main_content">
       <header>
-        <h2 id="header">Support rooms</h2>
+        <h2 id="header">Public rooms</h2>
+        <!-- <sup class="blu fssml nohover"> -->
+          <span class="grn nohover fssml">Th</span><span class="blu nohover fssml">readed ch</span><span class="grn nohover fssml">at</span>
+        <!-- <pre style="margin-top: 0px; position:relative; top:-10px;">          readed ch</pre> -->
         <hr class="rounded">
       </header>
       <form action="javascript:visit()">

@@ -158,7 +158,7 @@ async function initServer() {
             if (obj.status != "SUCCESS")
               ws.send(JSON.stringify({
                 action: "yourAlias",
-                data: { alias: obj.data.alias, error: true }
+                data: { alias: obj.data.alias, error: true, type: obj.data.type }
               }));
           });
           break;
@@ -190,24 +190,31 @@ async function initServer() {
       import_supportRooms.supportHandler.removeConnection(ws, req.query.room, token);
     });
   });
-  app.get("/room/*", supportReply);
-  app.get("/bridge/*", supportReply);
-  app.get("/support", (req, res) => {
-    if (req.query.room) {
-      sendFile(res, getToken(req), import_consts.frontendDir + "/supportRedirect.html");
-      return;
-    }
+  app.get("/that", (req, res) => {
     sendFile(res, getToken(req), import_consts.frontendDir + "/supportIndex.html");
     (0, import_logging.incrRequests)();
   });
+  app.get("/that/*", supportReply);
+  app.get("/room/*", (req, res) => {
+    sendFile(res, getToken(req), import_consts.frontendDir + "/supportRedirect.html");
+    (0, import_logging.incrRequests)();
+  });
+  app.get("/bridge/*", (req, res) => {
+    sendFile(res, getToken(req), import_consts.frontendDir + "/supportRedirect.html");
+    (0, import_logging.incrRequests)();
+  });
+  app.get("/support", (req, res) => {
+    sendFile(res, getToken(req), import_consts.frontendDir + "/supportRedirect.html");
+    (0, import_logging.incrRequests)();
+  });
   function supportReply(req, res) {
-    let room = req.url.match("(?:bridge|room)\\/(" + import_consts.roomRegex + ")")[1];
+    let room = req.url.match("(?:bridge|room|that)\\/(" + import_consts.roomRegex + ")")[1];
     if (!import_supportRooms.supportHandler.checkFoundQ(room) && (req.query.bridge != "true" || req.url == "bridge")) {
       console.log("Room", room, "not found");
       sendFile(res, getToken(req), import_consts.frontendDir + "/room404.html");
       return;
     } else
-      sendFile(res, getToken(req), import_consts.frontendDir + "/support.html");
+      sendFile(res, getToken(req), import_consts.frontendDir + "/that.html");
     (0, import_logging.incrRequests)();
   }
   app.get("/accountDel", (req, res) => {
@@ -304,7 +311,7 @@ async function initServer() {
     }
     (0, import_logging.incrRequests)();
   });
-  const banList = [""];
+  const banList = [];
   app.post("/server", urlencodedParser, async (req, res) => {
     (0, import_logging.incrRequests)();
     if (req.headers["content-length"] > 6e4) {
@@ -346,9 +353,9 @@ async function initServer() {
     makeRequest(body.action, req.cookies.accountID, body.data, req.cookies.sessionID).then((ret) => {
       if (ignoreLog.indexOf(body.action) >= 0) {
       } else if (ret.status == "SUCCESS") {
-        (0, import_logging.log)("Action performed: " + body.action + ", response:" + JSON.stringify(ret.data));
+        (0, import_logging.log)("[" + addr + "]: " + body.action + ", RESP:" + JSON.stringify(ret.data));
       } else
-        (0, import_logging.log)("Action performed: " + body.action + ", error:" + ret.data.error);
+        (0, import_logging.log)("F[" + addr + "]: " + body.action + ", ERR:" + ret.data.error);
       res.cookie("accountID", ret.token ?? "", { httpOnly: true, secure: true, sameSite: "None", maxAge: 9e12 });
       res.end(JSON.stringify({ status: ret.status, data: ret.data }));
     });
@@ -521,7 +528,7 @@ function eeFormat(data, mainClass) {
   return `<!DOCTYPE html>
 <html class="${mainClass}">
   <head>
-    <script src='./utils.js'><\/script>
+    <script src='/utils.js'><\/script>
     <title>Everyone Edits</title>
     <script>
     <\/script>

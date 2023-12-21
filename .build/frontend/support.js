@@ -1,18 +1,20 @@
 "use strict";
+let docTitle = "";
 function onLoad() {
   BOTTOMINPUT = byId("bottomInput");
   setInterval(updateTime, 5e3);
-  document.getElementById("header").innerText = "Support: " + (ISBRIDGE ? "&" : "#") + docURL.pathname.match("^\\/(room|bridge)\\/(.+)")[2];
-  let match = docURL.pathname.match("^\\/(room|bridge)\\/(.+)");
+  document.getElementById("header").innerText = "that threaded chat | " + (ISBRIDGE ? "&" : "#") + docURL.pathname.match("^\\/(room|bridge|that)\\/(.+)")[2];
+  let match = docURL.pathname.match("^\\/(room|bridge|that)\\/(.+)");
   ROOMNAME = match[2];
-  document.title = "Support | " + (match[1] == "room" ? "#" : "&") + ROOMNAME;
+  docTitle = "#" + ROOMNAME + " | that threaded chat";
+  document.title = docTitle;
   document.addEventListener("keydown", onKeyPress);
 }
+let PINGED = false;
+let debounceTimeout = -1;
 function onKeyPress(e) {
   if (e.key == "b" && e.ctrlKey && !e.metaKey && !e.shiftKey) {
-    let ele2 = byId("right");
-    console.log(e);
-    ele2.style.display = ele2.style.display == "flex" ? "none" : "flex";
+    toggleSidebar();
     e.preventDefault();
   }
   if (e.target.id == "msgInp" && e.key == "Enter" && !e.shiftKey) {
@@ -76,6 +78,19 @@ function updateTime() {
   let allElements = document.getElementsByClassName("time");
   for (let ele2 of allElements) {
     ele2.innerText = minimalTime(Date.now() - ele2.dataset.time * 1e3);
+  }
+}
+function toggleSidebar() {
+  let ele2 = byId("right");
+  if (debounceTimeout < 0) {
+    ele2.style.display = ele2.style.display == "flex" || ele2.style.display == "" ? "none" : "flex";
+    if (ele2.style.display == "flex")
+      ele2.classList.add("sidebarOpen");
+    else
+      ele2.classList.remove("sidebarOpen");
+    debounceTimeout = setTimeout(() => {
+      debounceTimeout = -1;
+    }, 100);
   }
 }
 let ACTIVEREPLY = -1;
@@ -169,7 +184,6 @@ function fitSize() {
   byId("alias").focus();
 }
 function fitSize2(event) {
-  console.log(byId("msgInp").value);
   byId("msg-text").innerText = byId("msgInp").value + " ";
   byId("msgInp").focus();
 }
@@ -182,9 +196,9 @@ async function initClient() {
   try {
     console.log("Starting client.");
     if (ISBRIDGE)
-      source = new WebSocket("wss://" + docURL.host + "/bridge?room=" + docURL.pathname.match("^/(room|bridge)/(.+)")[2]);
+      source = new WebSocket("wss://" + docURL.host + "/bridge?room=" + docURL.pathname.match("^/(room|bridge|that)/(.+)")[2]);
     else
-      source = new WebSocket("wss://" + docURL.host + "?room=" + docURL.pathname.match("^/(room|bridge)/(.+)")[2]);
+      source = new WebSocket("wss://" + docURL.host + "?room=" + docURL.pathname.match("^/(room|bridge|that)/(.+)")[2]);
     source.onclose = () => {
       ephemeralDialog("Connection failed, reconnecting...");
       failCt++;
@@ -226,7 +240,7 @@ async function initClient() {
         STARTIDVALID = false;
         byId("container").appendChild(BOTTOMINPUT);
         UNREAD = 0;
-        document.title = "Support";
+        PINGED = false;
         loadStatus = -1;
         CONNECTIONID = -1;
         awaitingParent = [];
@@ -279,14 +293,19 @@ async function initClient() {
         span.innerText = message.data.user;
         span.id = (message.data.isBot ? "zbot" : "usr") + message.data.user;
         span.title = message.data.user;
+        span.style.backgroundColor = "hsl(" + (hashIt(message.data.user.replaceAll(" ", "").toLowerCase()) % 255 + 79) % 255 + ", 74.5%, 80%)";
+        span.style.color = "#000";
         if (message.data.isBot)
-          span.classList.add("bot");
-        ele.appendChild(span);
+          byId("botList").appendChild(span);
+        else
+          byId("userList").appendChild(span);
       }
       if (message.action == "yourAlias") {
         byId("alias").value = message.data.alias;
         byId("alias-text").innerText = message.data.alias;
-        if (message.data.error)
+        if (message.data.error && message.data.type == 1)
+          ;
+        else if (message.data.error)
           ephemeralDialog("Error: You are not logged in and cannot update your alias.");
         byId("msgInp").focus();
       }
@@ -352,7 +371,7 @@ window.addEventListener("blur", () => {
   FOCUSSED = false;
 });
 window.addEventListener("focus", () => {
-  document.title = "Support";
+  document.title = docTitle;
   FOCUSSED = true;
   UNREAD = 0;
 });
@@ -420,6 +439,7 @@ function handleMessageEvent(data, area) {
   }
   let newMsgSender = document.createElement("b");
   newMsgSender.innerText = matches[2];
+  newMsgSender.style.backgroundColor = "hsl(" + (hashIt(matches[2].replaceAll(" ", "").toLowerCase()) % 255 + 79) % 255 + ", 74.5%, 80%)";
   newMsgSender.className = classStr[matches[3]];
   let ctn = document.createElement("div");
   ctn.dataset.id = matches[1];
@@ -434,6 +454,7 @@ function handleMessageEvent(data, area) {
   msg = msg.replaceAll(/(#[a-zA-Z0-9_\-]{1,20})([^;]|$)/gm, ">SUPPORT$1>$2");
   msg = msg.replaceAll(/(;gt;;gt;[a-zA-Z0-9\-/]{1,90})/g, ">INTERNALLINK$1>");
   msg = msg.replaceAll(/((http|ftp|https):\/\/)?(?<test>([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-]))/gmiu, ">LINK$<test>>");
+  msg = msg.replaceAll(/@([^ ]+)/g, ">MENTION$1>");
   msg = msg.replaceAll(/\n/gmiu, ">BR>");
   if (msg.match("^[ \n]*/me(.*)")) {
     msg = msg.match("^[ \n]*/me(.*)")[1];
@@ -449,8 +470,8 @@ function handleMessageEvent(data, area) {
       fragment.className = classStr[matches[3]];
       ele.appendChild(fragment);
     } else {
-      let pref = split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)")[1];
-      let post = pref != "BR" ? split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR)(.+)")[2] : "";
+      let pref = split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR|MENTION)")[1];
+      let post = pref != "BR" ? split[i2].match("^(EMOJI|LINK|ROOM|SUPPORT|INTERNALLINK|BR|MENTION)(.+)")[2] : "";
       if (pref == "EMOJI") {
         let replaced = document.createElement("span");
         replaced.title = ":" + findReplacement(post) + ":";
@@ -464,6 +485,17 @@ function handleMessageEvent(data, area) {
         replaced.innerText = post.replaceAll(";gt;", ">");
         replaced.setAttribute("target", "_blank");
         ele.appendChild(replaced);
+      } else if (pref == "MENTION") {
+        let replaced = document.createElement("span");
+        replaced.className = "supportMsg " + classStr[matches[3]];
+        replaced.innerText = "@" + post.replaceAll(";gt;", ">");
+        ele.appendChild(replaced);
+        replaced.setAttribute("style", "color:hsl(" + (hashIt(post.replaceAll(";gt;", ">").toLowerCase()) % 255 + 79) % 255 + ", 74.5%, 48%) !important");
+        if (replaced.innerText.toLowerCase() == "@" + byId("alias").value.toLowerCase()) {
+          replaced.style.border = "2px solid gold";
+          replaced.style.boxShadow = "0px 0px 3px gold";
+        }
+        replaced.style.fontWeight = "600";
       } else if (pref == "ROOM") {
         let replaced = document.createElement("a");
         replaced.className = "supportMsg " + classStr[matches[3]];
@@ -554,8 +586,10 @@ function handleMessageEvent(data, area) {
   }
   document.getElementById("placeholder").style.display = "none";
   if (!FOCUSSED) {
+    if (data.content.match("@" + byId("alias").value), "gi")
+      PINGED = true;
     UNREAD++;
-    document.title = "(" + UNREAD + ") | Support";
+    document.title = "(" + UNREAD + ")" + (PINGED ? "!" : "") + " | " + docTitle;
   }
   updateReplyBox();
   if (data.autoThread)

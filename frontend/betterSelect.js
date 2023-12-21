@@ -1,3 +1,5 @@
+/* ---> TRANSFERRED TO utils.ts <--- */
+
 let version="v4";
 
 function clickSelect(whichOne, openQ=0) 

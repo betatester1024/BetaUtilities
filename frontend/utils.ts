@@ -14,8 +14,9 @@ let HASNETWORK = false;
 let branch = "STABLE";
 let userData = null;
 let onloadCallback:()=>any = null;
-async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string="/server") {
+async function globalOnload(cbk:()=>any, networkLess:btoolean=false, link:string="/server") {
   onloadCallback = cbk;
+  bSelInitialise();
   if (!networkLess) {
     var script = document.createElement('script');
     script.src = "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js";
@@ -231,10 +232,16 @@ function pointerUp(ev:PointerEvent)
 }
 function toggleNBDFullScr(contentEle:HTMLDivElement) 
 {
-  contentEle.style.height = contentEle.style.height?"":"calc(100vh - 150px)";
+  // let ele = contentEle.parentElement.querySelector(".fullscr > span");
+  // ele.
+  if (contentEle.dataset.fullscreen=="no") contentEle.parentElement.classList.add("fscr");
+  else contentEle.parentElement.classList.remove("fscr");
+  contentEle.dataset.fullscreen = contentEle.dataset.fullscreen=="no"?"yes":"no";
+  contentEle.style.height = contentEle.style.height?"":(
+    contentEle.classList.contains("hasBtn")?"calc(100vh - 200px)":"calc(100vh - 100px)");
   contentEle.style.width = contentEle.style.width?"":"calc(100vw - 50px)";
   let ele = contentEle.parentElement.querySelector(".fullscr > span");
-  if (ele.innerText == "fullscreen") ele.innerText = "close_fullscreen";
+  if (contentEle.dataset.fullscreen=="yes") ele.innerText = "close_fullscreen";
   else ele.innerText = "fullscreen";
  }
 function pointerMove(ev:PointerEvent) 
@@ -247,6 +254,7 @@ function pointerMove(ev:PointerEvent)
   }
 }
 function pointerDown(ev:PointerEvent) {
+  if (ev.currentTarget.parentElement.querySelector(".content").dataset.fullscreen == "yes") return false;
   DRAGGING = ev.currentTarget;
   // document.body.appendChild(DRAGGING.parentElement);
   ev.preventDefault();
@@ -327,7 +335,7 @@ function send(params: any, callback: (thing: any) => any, silentLoading:boolean=
 }
 
 function acceptCookies(link:string="/server") {
-  let cpm = document.getElementById("compliance")
+  let cpm = document.getElementById("compliance") as HTMLDivElement;
   cpm.style.transition="all 0.5s ease";
   cpm.style.opacity="0";
   cpm.style.pointerEvents="none";
@@ -336,14 +344,23 @@ function acceptCookies(link:string="/server") {
 }
 
 // set text to "NOCONFIRM" to remove the confirm button
-function nonBlockingDialog(str:string, callback:()=>any = ()=>{}, text:string="Continue", clr:string="grn", ico:string="arrow_forward") 
+function nonBlockingDialog(data:{
+  text:string, 
+  colour?:string,
+  continueText?:string,
+  hasButton?:boolean,
+  ico?:string}, callback:()=>any) 
 {
+  if (data.colour == null)data.colour="grn";
+  if (data.continueText == null) data.continueText="Continue";
+  if (data.hasButton == null) data.hasButton=true;
+  if (data.ico == null) data.ico = "arrow_forward";
   let div = document.createElement("div");
   div.className="ALERT_NONBLOCK";
   div.isOpen = true;
   div.innerHTML = `
   
-  <div class="content">${str}</div>`; // yes, it can be html'd
+  <div class="content ${data.hasButton?"hasBtn":""}" data-fullscreen=no>${data.text}</div>`; // yes, it can be html'd
   let draggable = document.createElement("div");
   
   draggable.className = "ALERT_DRAGGER";
@@ -363,13 +380,13 @@ function nonBlockingDialog(str:string, callback:()=>any = ()=>{}, text:string="C
     draggable.onpointerdown = pointerDown;
   }, 20);
   let button = document.createElement("button");
-  div.appendChild(document.createElement("br"));
-  if (text != "NOCONFIRM") {
+  // div.appendChild(document.createElement("br"));
+  if (data.hasButton) {
     div.appendChild(button);
     button.outerHTML = `
-    <button class="${clr} btn fsmed closeBtn" onclick="closeNBD(this.parentElement, true)">
-    <span class='material-symbols-outlined'>${ico}</span>
-    ${text}<div class="anim"></div>
+    <button class="${data.colour} btn fsmed closeBtn" onclick="closeNBD(this.parentElement, true)">
+    <span class='material-symbols-outlined'>${data.ico}</span>
+    ${data.continueText}<div class="anim"></div>
     </button>`;
   }
   return div;
@@ -430,7 +447,7 @@ function alertDialog(str: string, callback: () => any = ()=>{}, requiresConfirma
     overlay.style.opacity="0";
   }
   let ele = document.getElementById("overlay") as HTMLDivElement;
-  ele.innerHTML="";
+  if (ele) ele.innerHTML="";
   let p = newDialog.querySelector("#alerttext_v2");
   if (!ele || !p) {
     console.log("ERROR: Alert dialogs not enabled in this page.")
@@ -655,13 +672,15 @@ function openDialog(name:string="dialog") {
 }
 
 function mouseOver(e:MouseEvent) {
-  let ele = e.target;
+  let ele = e.target.closest(".btn")|| e.target;
   let text = ele.innerHTML.replaceAll(/<.*((>.*<\/.*>)|(\/>))/gmiu, "").replaceAll("\n", "").trim();
-  // fuck off this is good enough, it's not even used as raw html
+  if (ele.getAttribute("tooltip")) text = ele.getAttribute("tooltip");
+
   if (typeof ele.className != "string") return;
   if (ele.className.match(/(\W|^)btn(\W|$)/) && !ele.className.match(/(\W|^)notooltip(\W|$)/)) {
     let tooltip = ele.children.namedItem("TOOLTIP");
-    if (!tooltip) {
+    if (!tooltip && text != "") {
+      // console.log(text);
       tooltip = document.createElement("span");
       tooltip.innerText = text;
       tooltip.id="TOOLTIP";
@@ -729,13 +748,16 @@ function ephemeralDialog(text:string)
 function closeEphemeral(dialog:HTMLDivElement) 
 {
   dialog.style.animation = "disappear 0.6s forwards";
+  setTimeout(()=>{dialog.remove()}, 600); // because it's got some weird stuff going on
 }
 let loginDialog = null;
 function login_v2(ev:any, signup:boolean=false) 
 {
   if (ev) ev.preventDefault();
   if (loginDialog && loginDialog.isOpen) return; // do not open TWO 
-  loginDialog = nonBlockingDialog(`<iframe class="loginiframe" src="/minimal${signup?"Signup":"Login"}"></iframe>`, ()=>{}, "NOCONFIRM");
+  loginDialog = nonBlockingDialog({
+    text:`<iframe class="loginiframe" src="/minimal${signup?"Signup":"Login"}"></iframe>`, 
+    hasButton:false}, null);
   toggleNBDFullScr(loginDialog.querySelector(".content"))
 }
 
@@ -766,3 +788,195 @@ function logout_v2(event)
     location.reload(); // some things do not reset properly on logout.
   })
 }
+
+function hashIt(str, seed = 0) {
+  let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+  for(let i = 0, ch; i < str.length; i++) {
+      ch = str.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1  = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+  h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2  = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+  h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+
+  return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+};
+
+/* BETTERSELECT SELECT DIALOGS */
+let bSelVersion="v4";
+
+function clickSelect(whichOne, openQ=0) 
+{
+  // console.log("which one?", whichOne);
+  let ctn = byId(whichOne);
+  // console.log(ctn);
+  // console.log(openQ);
+  if (openQ != 0) ctn.selectOpen = (openQ==1);
+  else ctn.selectOpen=!ctn.selectOpen;
+  // console.log(ctn.selectOpen);
+
+  if (!ctn) {
+    console.error("No container found!");
+    return;
+  }
+  // if open then close all others
+  // if (ctn.selectOpen)
+  // {
+    // if (currOpen) clickSelect(currOpen, -1);
+    // currOpen = whichOne;
+  // }
+  let inp = ctn.querySelector(".betterSelect");
+  inp.readOnly=!ctn.selectOpen;
+  inp.style.cursor = ctn.selectOpen?"text":"pointer";
+  ctn.querySelector(".optionMenu").className = "optionMenu "+ (ctn.selectOpen?"open":"");
+  // if (!ctn.selectOpen) {
+  {
+    inp.value = "";
+    // check if value is valid
+    let children = inp.nextElementSibling.children;
+    let valid = ctn.selectOpen; // valid if open
+    for (let i=0; i<children.length; i++) {
+      if (inp.selectedVal == children[i].innerText) { 
+        valid = true;
+        inp.bSelValid = true;
+      }
+      if (ctn.selectOpen) children[i].tabIndex = 0;
+      else children[i].tabIndex=-1;
+    }
+    if (valid) {
+      // console.log("valid");
+      inp.placeholder = inp.selectedVal?inp.selectedVal:"Make a selection...";
+      inp.classList.remove("invalid");
+    }
+    else if (inp.selectedVal != undefined) {
+      inp.selectedVal = "";
+      inp.bSelValid = false;
+      inp.classList.add("invalid");
+      inp.placeholder = "Invalid selection";
+    }
+  } // true
+}
+
+function enterEvent(inp:HTMLInputElement, e:Event) 
+{
+  if (!e.target.classList.contains("betterSelect"))
+    inp.value = e.target.innerText;
+  inp.selectedVal = inp.value;
+  // console.log('enter');
+  clickSelect(inp.parentElement.id);
+  inp.focus();
+  // console.log(inp.valueMap.get(inp.selectedVal));
+  if (inp.bSelValid) // console.log(inp.parentElement);
+    inp.parentElement.value = inp.valueMap.get(inp.selectedVal);
+  if (inp.bSelOnChangeEvent && inp.bSelValid) {
+    inp.bSelOnChangeEvent(inp.selectedVal, inp.valueMap.get(inp.selectedVal));
+  }
+  e.preventDefault();
+}
+let registered = [];
+function bSelRegister(id:string, onChange:()=>any, defaultVal:string) 
+{
+  let ctn = byId(id);
+  registered.push(id);
+  let inp = ctn.querySelector(".betterSelect");
+  inp.bSelOnChangeEvent = onChange;
+  // console.log(onChange);
+  inp.valueMap = new Map();
+  let children = inp.nextElementSibling.children;
+  for (let i=0; i<children.length; i++) {
+    inp.valueMap.set(children[i].innerText, children[i].getAttribute("val") || children[i].getAttribute("value"));
+  }
+  if (defaultVal) {
+    ctn.value=inp.valueMap.get(defaultVal);
+    inp.selectedVal = defaultVal;
+    inp.value=defaultVal;
+    inp.placeholder = defaultVal;
+  }
+  else inp.placeholder = "Make a selection...";
+  inp.addEventListener("pointerdown", (e)=>{
+    // console.log(e.target);
+    // console.log("pointerdown");
+    for (let i=0; i<registered.length; i++) 
+      clickSelect(registered[i], -1);
+    clickSelect(e.target.parentElement.id, 1);
+    e.preventDefault();
+  });
+  ctn.addEventListener("pointerup", (e)=>{
+    if (e.target.classList.contains("option")) 
+    {
+      let inp = e.target.parentElement.parentElement.querySelector("input");
+      // e.target.focus()
+      enterEvent(inp, e);
+    }
+  })
+  inp.bSelValid = false;
+}
+
+function bSelInitialise() {
+  console.log("Initialising BetterSelects");
+  // bSelRegister("selCtn", (value)=>{console.log(value);});
+  // <!-- bSelRegister("selCtn2"); -->
+  document.addEventListener("pointerup", (e)=>{
+    if (e.target.closest(".bSel")) return;
+    // console.log("clicked away");
+    for (let i=0; i<registered.length; i++) 
+      clickSelect(registered[i], -1);
+  })
+  document.addEventListener("keydown", (e)=>
+  {
+    if (!e.target.classList.contains("betterSelect") 
+     && !e.target.classList.contains("option")) return;
+    // console.log(e.key);
+    let inp;
+    if (!e.target.classList.contains("betterSelect")) 
+      inp = e.target.parentElement.parentElement.querySelector("input");
+    else inp = e.target;
+    switch (e.key) 
+    {
+      case " ":
+        if (e.target.classList.contains("betterSelect"))
+          break;
+      case "Enter":
+        enterEvent(inp, e);
+        return;
+      case 'Escape':
+        clickSelect(inp.parentElement.id, -1);
+        inp.value = "";
+        e.preventDefault();
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        clickSelect(inp.parentElement.id, 1);
+        if (e.target.classList.contains("option")) 
+          if (e.target.nextElementSibling)
+            e.target.nextElementSibling.focus();
+          else 
+            e.target.parentElement.children[0].focus();
+        else 
+          e.target.nextElementSibling.children[0].focus();
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        clickSelect(inp.parentElement.id, 1);
+        if (e.target.classList.contains("option")) 
+          if (e.target.previousElementSibling)
+            e.target.previousElementSibling.focus();
+          else 
+            e.target.parentElement.lastElementChild.focus();
+        else 
+          // console.log(e.target.nextElementSibling);
+          e.target.nextElementSibling.lastElementChild.focus();
+      break;
+      default:
+        if (e.key.length == 1 && !e.target.classList.contains("betterSelect")) // nothing stupid likee backspace/etc 
+        {
+          let inp = e.target.parentElement.parentElement.querySelector("input");
+          // inp.value = e.key;
+          inp.focus();
+
+        }
+    } // switch (key)
+  })
+};

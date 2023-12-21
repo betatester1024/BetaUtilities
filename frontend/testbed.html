@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html class="{{mainClass}}">
   <head>
-    <script src='./utils.js'></script>
+    <script src='/utils.js'></script>
     <title>Testbed</title>
+    <script src="p5.min.js" type="text/javascript"></script>
+    <script src="hsluv.min.js"  type="text/javascript"></script>
     <script>
       function openMoreDialogs() 
       {
@@ -13,13 +15,39 @@
 
       function openNonBlocking() 
       {
-        nonBlockingDialog('<a href="testbed">testing testing one two threeeeeee</a>?', ()=>{openMoreDialogs()});
+        nonBlockingDialog({text:'<a href="testbed">testing testing one two threeeeeee</a>?',
+                          colour:"red", continueText:"Cancel", ico:"cancel"}, ()=>{openMoreDialogs()});
       }
       function openEph() 
       {
         ephemeralDialog('<a href="testbed">testing testing one two threeeeeee</a>?', ()=>{openMoreDialogs()});
       }
-      
+      function toHex(n) {
+        return n.toString(16);
+      }
+      function onLoad() {
+        let grid = byId("palette");
+        for (let i=0; i<15; i++) {
+          let row = document.createElement("div");
+          // palette.appendChild(row);
+          for (let j=0; j<16; j++) {
+            let cell = document.createElement("div");
+            palette.appendChild(cell);
+            // let k = (i*64+j);
+            const rgb = hsluv.hsluvToRgb([0, 50, 50]);
+
+            // Then use the RGB values in a scale of 0-255
+            cell.style.backgroundColor = "#"+toHex(rgb[0]*255)+toHex(rgb[1]*255)+toHex(rgb[2]*255);
+            // cell.style.backgroundColor = `hsl(${(i*16+j)*360/256}, 100%, ${j*80/16+10}%)`;
+          }
+          // palette.appendChild(document.createElement("br"));
+        }
+        for (let j=0; j<16; j++) {
+          let cell = document.createElement("div");
+          palette.appendChild(cell);
+          cell.style.backgroundColor = `#`+toHex(j)+toHex(j)+toHex(j);
+        }
+      }
     </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -28,10 +56,30 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
     <style>
-
+      #palette div {
+        width: 10px;
+        height: 10px;
+        display: inline-block;
+        width: calc(100vmin/16);
+        height: calc(100vmin/16);
+      }
+      #palette
+      {
+        display: grid;
+        grid-template-columns: 
+          max-content max-content max-content max-content 
+          max-content max-content max-content max-content 
+          max-content max-content max-content max-content 
+          max-content max-content max-content max-content;
+        grid-gap: 0px;
+          column-gap: 0px;
+        grid-column-gap: 0px;
+        width: 80px;
+        /* width: 100%; */
+      }
     </style>
   </head>
-  <body onload = "globalOnload();">
+  <body onload = "globalOnload(onLoad);">
     <div class="main_content">
       <header class="redrounded">
         <h2>BetaOS Testbed</h2>
@@ -49,6 +97,9 @@
         <span class="material-symbols-outlined">add</span>
         Open an ephemeral dialog<div class="anim"></div>
       </button>
+      <div id="palette">
+        
+      </div>
       <a class="btn szFull override" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>
         Return to home<div class="anim"></div></a>

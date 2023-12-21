@@ -14,6 +14,7 @@ let userData = null;
 let onloadCallback = null;
 async function globalOnload(cbk, networkLess = false, link = "/server") {
   onloadCallback = cbk;
+  bSelInitialise();
   if (!networkLess) {
     var script = document.createElement("script");
     script.src = "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js";
@@ -196,10 +197,15 @@ function pointerUp(ev) {
   }
 }
 function toggleNBDFullScr(contentEle) {
-  contentEle.style.height = contentEle.style.height ? "" : "calc(100vh - 150px)";
+  if (contentEle.dataset.fullscreen == "no")
+    contentEle.parentElement.classList.add("fscr");
+  else
+    contentEle.parentElement.classList.remove("fscr");
+  contentEle.dataset.fullscreen = contentEle.dataset.fullscreen == "no" ? "yes" : "no";
+  contentEle.style.height = contentEle.style.height ? "" : contentEle.classList.contains("hasBtn") ? "calc(100vh - 200px)" : "calc(100vh - 100px)";
   contentEle.style.width = contentEle.style.width ? "" : "calc(100vw - 50px)";
   let ele = contentEle.parentElement.querySelector(".fullscr > span");
-  if (ele.innerText == "fullscreen")
+  if (contentEle.dataset.fullscreen == "yes")
     ele.innerText = "close_fullscreen";
   else
     ele.innerText = "fullscreen";
@@ -213,6 +219,8 @@ function pointerMove(ev) {
   }
 }
 function pointerDown(ev) {
+  if (ev.currentTarget.parentElement.querySelector(".content").dataset.fullscreen == "yes")
+    return false;
   DRAGGING = ev.currentTarget;
   ev.preventDefault();
   ev.stopPropagation();
@@ -292,14 +300,21 @@ function acceptCookies(link = "/server") {
   send(JSON.stringify({ action: "acceptCookies" }), (res) => {
   }, false, link);
 }
-function nonBlockingDialog(str, callback = () => {
-}, text = "Continue", clr = "grn", ico = "arrow_forward") {
+function nonBlockingDialog(data, callback) {
+  if (data.colour == null)
+    data.colour = "grn";
+  if (data.continueText == null)
+    data.continueText = "Continue";
+  if (data.hasButton == null)
+    data.hasButton = true;
+  if (data.ico == null)
+    data.ico = "arrow_forward";
   let div = document.createElement("div");
   div.className = "ALERT_NONBLOCK";
   div.isOpen = true;
   div.innerHTML = `
   
-  <div class="content">${str}</div>`;
+  <div class="content ${data.hasButton ? "hasBtn" : ""}" data-fullscreen=no>${data.text}</div>`;
   let draggable = document.createElement("div");
   draggable.className = "ALERT_DRAGGER";
   draggable.innerText = "ServiceAlert";
@@ -318,13 +333,12 @@ function nonBlockingDialog(str, callback = () => {
     draggable.onpointerdown = pointerDown;
   }, 20);
   let button = document.createElement("button");
-  div.appendChild(document.createElement("br"));
-  if (text != "NOCONFIRM") {
+  if (data.hasButton) {
     div.appendChild(button);
     button.outerHTML = `
-    <button class="${clr} btn fsmed closeBtn" onclick="closeNBD(this.parentElement, true)">
-    <span class='material-symbols-outlined'>${ico}</span>
-    ${text}<div class="anim"></div>
+    <button class="${data.colour} btn fsmed closeBtn" onclick="closeNBD(this.parentElement, true)">
+    <span class='material-symbols-outlined'>${data.ico}</span>
+    ${data.continueText}<div class="anim"></div>
     </button>`;
   }
   return div;
@@ -371,7 +385,8 @@ function alertDialog(str, callback = () => {
     overlay2.style.opacity = "0";
   }
   let ele = document.getElementById("overlay");
-  ele.innerHTML = "";
+  if (ele)
+    ele.innerHTML = "";
   let p = newDialog.querySelector("#alerttext_v2");
   if (!ele || !p) {
     console.log("ERROR: Alert dialogs not enabled in this page.");
@@ -553,13 +568,15 @@ function openDialog(name = "dialog") {
   document.getElementById("overlay").style.opacity = "1";
 }
 function mouseOver(e) {
-  let ele = e.target;
+  let ele = e.target.closest(".btn") || e.target;
   let text = ele.innerHTML.replaceAll(/<.*((>.*<\/.*>)|(\/>))/gmiu, "").replaceAll("\n", "").trim();
+  if (ele.getAttribute("tooltip"))
+    text = ele.getAttribute("tooltip");
   if (typeof ele.className != "string")
     return;
   if (ele.className.match(/(\W|^)btn(\W|$)/) && !ele.className.match(/(\W|^)notooltip(\W|$)/)) {
     let tooltip = ele.children.namedItem("TOOLTIP");
-    if (!tooltip) {
+    if (!tooltip && text != "") {
       tooltip = document.createElement("span");
       tooltip.innerText = text;
       tooltip.id = "TOOLTIP";
@@ -622,6 +639,9 @@ function ephemeralDialog(text) {
 }
 function closeEphemeral(dialog) {
   dialog.style.animation = "disappear 0.6s forwards";
+  setTimeout(() => {
+    dialog.remove();
+  }, 600);
 }
 let loginDialog = null;
 function login_v2(ev, signup = false) {
@@ -629,8 +649,10 @@ function login_v2(ev, signup = false) {
     ev.preventDefault();
   if (loginDialog && loginDialog.isOpen)
     return;
-  loginDialog = nonBlockingDialog(`<iframe class="loginiframe" src="/minimal${signup ? "Signup" : "Login"}"></iframe>`, () => {
-  }, "NOCONFIRM");
+  loginDialog = nonBlockingDialog({
+    text: `<iframe class="loginiframe" src="/minimal${signup ? "Signup" : "Login"}"></iframe>`,
+    hasButton: false
+  }, null);
   toggleNBDFullScr(loginDialog.querySelector(".content"));
 }
 function closeLogin() {
@@ -646,4 +668,162 @@ function logout_v2(event) {
     location.reload();
   });
 }
+function hashIt(str, seed = 0) {
+  let h1 = 3735928559 ^ seed, h2 = 1103547991 ^ seed;
+  for (let i = 0, ch; i < str.length; i++) {
+    ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ h1 >>> 16, 2246822507);
+  h1 ^= Math.imul(h2 ^ h2 >>> 13, 3266489909);
+  h2 = Math.imul(h2 ^ h2 >>> 16, 2246822507);
+  h2 ^= Math.imul(h1 ^ h1 >>> 13, 3266489909);
+  return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+}
+;
+let bSelVersion = "v4";
+function clickSelect(whichOne, openQ = 0) {
+  let ctn = byId(whichOne);
+  if (openQ != 0)
+    ctn.selectOpen = openQ == 1;
+  else
+    ctn.selectOpen = !ctn.selectOpen;
+  if (!ctn) {
+    console.error("No container found!");
+    return;
+  }
+  let inp = ctn.querySelector(".betterSelect");
+  inp.readOnly = !ctn.selectOpen;
+  inp.style.cursor = ctn.selectOpen ? "text" : "pointer";
+  ctn.querySelector(".optionMenu").className = "optionMenu " + (ctn.selectOpen ? "open" : "");
+  {
+    inp.value = "";
+    let children = inp.nextElementSibling.children;
+    let valid = ctn.selectOpen;
+    for (let i = 0; i < children.length; i++) {
+      if (inp.selectedVal == children[i].innerText) {
+        valid = true;
+        inp.bSelValid = true;
+      }
+      if (ctn.selectOpen)
+        children[i].tabIndex = 0;
+      else
+        children[i].tabIndex = -1;
+    }
+    if (valid) {
+      inp.placeholder = inp.selectedVal ? inp.selectedVal : "Make a selection...";
+      inp.classList.remove("invalid");
+    } else if (inp.selectedVal != void 0) {
+      inp.selectedVal = "";
+      inp.bSelValid = false;
+      inp.classList.add("invalid");
+      inp.placeholder = "Invalid selection";
+    }
+  }
+}
+function enterEvent(inp, e) {
+  if (!e.target.classList.contains("betterSelect"))
+    inp.value = e.target.innerText;
+  inp.selectedVal = inp.value;
+  clickSelect(inp.parentElement.id);
+  inp.focus();
+  if (inp.bSelValid)
+    inp.parentElement.value = inp.valueMap.get(inp.selectedVal);
+  if (inp.bSelOnChangeEvent && inp.bSelValid) {
+    inp.bSelOnChangeEvent(inp.selectedVal, inp.valueMap.get(inp.selectedVal));
+  }
+  e.preventDefault();
+}
+let registered = [];
+function bSelRegister(id, onChange, defaultVal) {
+  let ctn = byId(id);
+  registered.push(id);
+  let inp = ctn.querySelector(".betterSelect");
+  inp.bSelOnChangeEvent = onChange;
+  inp.valueMap = /* @__PURE__ */ new Map();
+  let children = inp.nextElementSibling.children;
+  for (let i = 0; i < children.length; i++) {
+    inp.valueMap.set(children[i].innerText, children[i].getAttribute("val") || children[i].getAttribute("value"));
+  }
+  if (defaultVal) {
+    ctn.value = inp.valueMap.get(defaultVal);
+    inp.selectedVal = defaultVal;
+    inp.value = defaultVal;
+    inp.placeholder = defaultVal;
+  } else
+    inp.placeholder = "Make a selection...";
+  inp.addEventListener("pointerdown", (e) => {
+    for (let i = 0; i < registered.length; i++)
+      clickSelect(registered[i], -1);
+    clickSelect(e.target.parentElement.id, 1);
+    e.preventDefault();
+  });
+  ctn.addEventListener("pointerup", (e) => {
+    if (e.target.classList.contains("option")) {
+      let inp2 = e.target.parentElement.parentElement.querySelector("input");
+      enterEvent(inp2, e);
+    }
+  });
+  inp.bSelValid = false;
+}
+function bSelInitialise() {
+  console.log("Initialising BetterSelects");
+  document.addEventListener("pointerup", (e) => {
+    if (e.target.closest(".bSel"))
+      return;
+    for (let i = 0; i < registered.length; i++)
+      clickSelect(registered[i], -1);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (!e.target.classList.contains("betterSelect") && !e.target.classList.contains("option"))
+      return;
+    let inp;
+    if (!e.target.classList.contains("betterSelect"))
+      inp = e.target.parentElement.parentElement.querySelector("input");
+    else
+      inp = e.target;
+    switch (e.key) {
+      case " ":
+        if (e.target.classList.contains("betterSelect"))
+          break;
+      case "Enter":
+        enterEvent(inp, e);
+        return;
+      case "Escape":
+        clickSelect(inp.parentElement.id, -1);
+        inp.value = "";
+        e.preventDefault();
+        break;
+      case "ArrowDown":
+        e.preventDefault();
+        clickSelect(inp.parentElement.id, 1);
+        if (e.target.classList.contains("option"))
+          if (e.target.nextElementSibling)
+            e.target.nextElementSibling.focus();
+          else
+            e.target.parentElement.children[0].focus();
+        else
+          e.target.nextElementSibling.children[0].focus();
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        clickSelect(inp.parentElement.id, 1);
+        if (e.target.classList.contains("option"))
+          if (e.target.previousElementSibling)
+            e.target.previousElementSibling.focus();
+          else
+            e.target.parentElement.lastElementChild.focus();
+        else
+          e.target.nextElementSibling.lastElementChild.focus();
+        break;
+      default:
+        if (e.key.length == 1 && !e.target.classList.contains("betterSelect")) {
+          let inp2 = e.target.parentElement.parentElement.querySelector("input");
+          inp2.focus();
+        }
+    }
+  });
+}
+;
 //# sourceMappingURL=utils.js.map

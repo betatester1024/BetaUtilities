@@ -493,6 +493,10 @@ dialog.CLOSEDALERT::backdrop {
   background-color: var(--system-transp);
 }
 
+dialog {
+  z-index: 1;
+}
+
 /* 
 
   l., lk;ji'ppoiooiuiioo*/
@@ -736,6 +740,25 @@ dialog {
   margin: 20px auto;
 } */
 
+#dialog {
+  top: 50vh; 
+  /* height: unset; */
+  /* z-index: 0; */
+  /* position: absolute; */
+  /* opacity */
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+#dialog > .internal {
+  /* display: relative; */
+  margin: 10px auto;
+  border-radius: 15px;
+  width: 90%;
+  background-color: var(--system-bg);
+  padding: 15px;
+}
+
 *:focus {
   outline: 3px solid var(--system-blue);
   transition: all 0.5s ease, outline 1ms ease;
@@ -806,13 +829,13 @@ summary::marker {
   background-color: var(--system-grey3);
   color: var(--system-blue);
   font-weight: 600;
-  width: calc(100% - 10px);
+  width: calc(100% + 30px);
   left: -15px;
   top: 0px;
   position: relative;
   cursor: move;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding-left: 0px;
+  padding-right: 0px;
   padding-top: 2px;
   font-family: "Noto Sans Display", 'Noto Color Emoji', monospace;
   text-align: center;
@@ -836,8 +859,20 @@ summary::marker {
   left: 50%;
   transform: translateX(-50%);
   margin: 5px 0px;
+  min-height: 0px;
+  padding: 5px;
+  padding-bottom: 0px;
 }
-
+.ALERT_NONBLOCK.fscr {
+  width: calc(100% - 30px);
+  height: 100%;
+  top: 0px !important;
+  left: 0px !important;
+  /* position: absolute; */
+}
+.btn ~ .content {
+  height: calc(100% - 30px) !important;
+}
 .ALERT_NONBLOCK > .content {
   background-color: var(--system-bg);
   color: var(--system-blue);
@@ -931,3 +966,92 @@ iframe {
   height: 100%;
   border: none;
 }
+
+del * {
+  text-decoration: line-through;
+}
+
+/* BETTERSELECT FORMATTING */
+.bSel.inpContainer 
+{
+  height: 50px;
+  margin-top: 5px;
+  margin-bottom: 20px;
+}
+.betterSelect:focus 
+{
+  cursor: text;
+}
+.betterSelect 
+{
+  cursor: pointer;
+  height: 40px;
+  font-size: 35px;
+  padding: 5px;
+  width: calc(100% - 10px);
+  transition: all 0.2s ease;
+  border-radius: 10px 10px 0px 0px;
+}
+/* .selCtn 
+{
+  width: 50%;
+} */
+.optionMenu
+{
+  position: relative;
+  top: 6px;
+
+  width: 100%;
+  transition: all 0.2s ease, outline 0s;
+  opacity: 0;
+  height: 0px;
+  pointer-events: none;
+  border-radius: 0px 0px 10px 10px;
+  z-index:1;
+  font-family: 'Noto Sans Display';
+}
+.optionMenu > .option:nth-last-of-type(1) 
+{
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+.optionMenu > .option 
+{
+  transition: all 0.2s ease;
+  width: calc(100% - 16px);
+  height: 0px;
+  padding: 8px;
+  font-size: 35px;
+  font-family: inherit;
+  background-color: var(--system-overlay3);
+  cursor: pointer;
+  color: var(--system-blue);
+  font-weight: 600;
+  /* unselectable */
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.option:hover, .option:focus
+{
+  background-color: var(--system-overlay);
+  outline: 3px solid var(--system-blue);
+  transition: outline 0s, background-color 0.3s;
+}
+
+.optionMenu.open 
+{
+  outline: 3px solid var(--system-overlay3);
+  height: unset;
+  width: unset;
+  pointer-events: auto;
+  opacity: 1;
+}
+.optionMenu.open > .option 
+{
+  height: 40px;
+}
+
+/* </BETTERSELECT FORMATTING> */

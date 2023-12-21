@@ -397,9 +397,9 @@ export class supportHandler {
       // for (let i=0; i<msgs.length; i++) {
       //   ev.send(JSON.stringify({action:"msg", data:{id:msgs[i].msgID??-1, sender:msgs[i].sender, perms: msgs[i].permLevel, parent: msgs[i].parent??-1, content:msgs[i].data}}));
       // }
-      text += "Welcome to BetaOS Services support! Enter any message in the box below. " +
-        "Automated response services and utilities are provided by @BetaOS_System. " +
-        "Commands are available here: >>commands \n" +
+      text += "Welcome to **that** threaded chat! Enter any message in the box below. " +
+        "Automated response services and utilities are provided by ~~@thatbot~~. It is currently down. " +
+        "Commands are not available here: ~~>>commands~~ \n" +
         "Logged-in users: click on your username to update it.\n"+
         "Click this message to dismiss it >>"
       ev.send(JSON.stringify({ action: "msg", data: { id: +msgCt + 1, sender: "[SYSTEM]", time:Date.now()/1000, perms: 3, content: text } }));
@@ -448,6 +448,12 @@ export class supportHandler {
     }
     let oldAlias = usrData.data.alias;
     let resp = await realias(newAlias, token);
+    if (resp.status != "SUCCESS" && resp.data.type == 2) // thing too long
+    {
+      // resp.status = 
+      // resp.data = {, alias:resp.data.alias};
+      return {status:"ERROR", data:{type:1, alias:resp.data.alias}};
+    }
     // find what rooms this user is in
     for (let i=0; i<this.connections.length; i++)
       if (this.connections[i].userID == usrData.data.user) {
@@ -544,7 +550,7 @@ export class supportHandler {
 
 export async function sendMsg(msg: string, room: string, parent: number, token: string) {
   if (msg.length == 0) return {status:"SUCCESS", data:null, token:token};
-  msg = msg.slice(0, 1024);
+  msg = msg.trim().slice(0, 1024);
   let obj = await userRequest(token);
   let roomData = await msgDB.findOne({ fieldName: "RoomInfo", room: room });
   let msgCt = roomData ? roomData.msgCt : 0;

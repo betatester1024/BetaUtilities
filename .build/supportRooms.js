@@ -374,7 +374,7 @@ class supportHandler {
         if (from < 0)
           break;
       }
-      text += "Welcome to BetaOS Services support! Enter any message in the box below. Automated response services and utilities are provided by @BetaOS_System. Commands are available here: >>commands \nLogged-in users: click on your username to update it.\nClick this message to dismiss it >>";
+      text += "Welcome to **that** threaded chat! Enter any message in the box below. Automated response services and utilities are provided by ~~@thatbot~~. It is currently down. Commands are not available here: ~~>>commands~~ \nLogged-in users: click on your username to update it.\nClick this message to dismiss it >>";
       ev.send(JSON.stringify({ action: "msg", data: { id: +msgCt + 1, sender: "[SYSTEM]", time: Date.now() / 1e3, perms: 3, content: text } }));
     }
     thiscn.readyQ = true;
@@ -416,6 +416,9 @@ class supportHandler {
     }
     let oldAlias = usrData.data.alias;
     let resp = await (0, import_updateUser.realias)(newAlias, token);
+    if (resp.status != "SUCCESS" && resp.data.type == 2) {
+      return { status: "ERROR", data: { type: 1, alias: resp.data.alias } };
+    }
     for (let i = 0; i < this.connections.length; i++)
       if (this.connections[i].userID == usrData.data.user) {
         for (let j = 0; j < this.connections.length; j++) {
@@ -500,7 +503,7 @@ class supportHandler {
 async function sendMsg(msg, room, parent, token) {
   if (msg.length == 0)
     return { status: "SUCCESS", data: null, token };
-  msg = msg.slice(0, 1024);
+  msg = msg.trim().slice(0, 1024);
   let obj = await (0, import_userRequest.userRequest)(token);
   let roomData = await import_consts.msgDB.findOne({ fieldName: "RoomInfo", room });
   let msgCt = roomData ? roomData.msgCt : 0;

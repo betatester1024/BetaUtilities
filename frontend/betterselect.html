@@ -3,26 +3,26 @@
   <head>
     <script src='/utils.js'></script>
     <title>BetterSelect</title>
-    <script src="./betterSelect.js"></script>
+    <!-- <script src="./betterSelect.js"></script> -->
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="/globalformat.css">
-    <link rel="stylesheet" href="/betterselect.css">
+    <!-- <link rel="stylesheet" href="/betterselect.css"> -->
     <style>
 
     </style>
   </head>
-  <body onload = "globalOnload(()=>{}); bSelInitialise(); bSelRegister('selCtn'); bSelRegister('selCtn2', (val1, val2)=>{console.log(val1, val2)});">
+  <body onload = "globalOnload(()=>{}); bSelRegister('selCtn'); bSelRegister('selCtn2', (selN, val)=>{console.log(selN, val)});">
     <div class="main_content">
       <header class="redrounded">
         <h2>BetterSelect</h2>
         <hr class="rounded">
       </header>
       <div class="bSel inpContainer" id="selCtn">
-        <input class="betterSelect" readonly>
+        <input class="betterSelect">
         <div class="optionMenu">
           <div class="option">ABC.</div>
           <div class="option">DEF</div>
@@ -32,7 +32,7 @@
       </div>
 
       <div class="bSel inpContainer" id="selCtn2">
-        <input class="betterSelect" readonly>
+        <input class="betterSelect">
         <div class="optionMenu">
           <div class="option" val="hel">HELLO</div>
           <div class="option" val="mosel">MoreSel</div>

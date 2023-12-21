@@ -117,7 +117,7 @@ function onKeyPress(e) {
 function updateTime() {
   let allElements = document.getElementsByClassName("time");
   for (let ele of allElements) {
-    if (ele.dataset.time < 1000)
+    // if (ele.dataset.time < 1000)
     ele.innerText = minimalTime(Date.now()-ele.dataset.time*1000);
   }
 }

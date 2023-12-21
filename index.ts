@@ -95,15 +95,16 @@ async function init(startBots:boolean)
   log(UPSINCESTR);
   uDB.findOne({fieldName:"ROOMS"}).then((obj:{euphRooms:string[], rooms:string[], hidRooms:string[]})=>{
     console.log(obj);
-    if (startBots)
-    for (let i=0; i<obj.euphRooms.length; i++) {
-      // console.log("hello!")
-      supportHandler.addRoom(new Room("EUPH_ROOM", obj.euphRooms[i]));
-      new WS("wss://euphoria.io/room/" + obj.euphRooms[i] +"/ws", "BetaUtilities"+(process.env['branch']=="unstable"?"-U":""), obj.euphRooms[i], !(obj.euphRooms[i]=="test" || obj.euphRooms[i]=="bots"))
+    // REMOVED: Euphoria is permanently down
+    // if (startBots)
+    // for (let i=0; i<obj.euphRooms.length; i++) {
+    //   // console.log("hello!")
+    //   supportHandler.addRoom(new Room("EUPH_ROOM", obj.euphRooms[i]));
+    //   new WS("wss://euphoria.io/room/" + obj.euphRooms[i] +"/ws", "BetaUtilities"+(process.env['branch']=="unstable"?"-U":""), obj.euphRooms[i], !(obj.euphRooms[i]=="test" || obj.euphRooms[i]=="bots"))
 
-      // log("Connected euph_room")+obj.euphRooms[i];
-      console.log("Connected euph_room", obj.euphRooms[i]);
-    }
+    //   // log("Connected euph_room")+obj.euphRooms[i];
+    //   console.log("Connected euph_room", obj.euphRooms[i]);
+    // }
     // for (let i=0; i<localEuphRooms.length; i++) {
     //   supportHandler.addRoom(new Room("EUPH_ROOM", localEuphRooms[i]));
     //   new WS("wss://euphoria.io/room/" + localEuphRooms[i] +"/ws", "BetaUtilities", localEuphRooms[i], false)

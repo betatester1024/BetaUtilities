@@ -6,6 +6,7 @@
     <script>
       const accessLevels = ["Error-level", "User", "Admin", "Super-admin"];
       function onLoad() {
+        bSelRegister("permSelect")
         send(JSON.stringify({action:"userRequest"}), (res)=> {
           if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{window.open('/login?redirect=admin', '_self')});
           else {
@@ -129,13 +130,21 @@
             <input id="pwdInp2" type="password" placeholder="Password confirmation">
             <div class="anim inp"></div>
           </div>
-          <div class="inpContainer">
+          <div class="bSel inpContainer" id="permSelect">
+            <input class="betterSelect">
+            <div class="optionMenu">
+              <div class="option" value="1">Basic user</div>
+              <div class="option" value="2">Administrator</div>
+            </div>
+            <div class="anim inp"></div>
+          </div>
+          <!-- <div class="inpContainer">
             <select id="permSelect">
               <option value="1">Basic user</option>
               <option value="2">Administrator</option>
             </select>
             <div class="anim inp"></div>
-          </div>
+          </div> -->
           <div class="flex addMargin">
           <button type=submit class="btn szHalf grn">
             <span class="material-symbols-outlined">update</span>

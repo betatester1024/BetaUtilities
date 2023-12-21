@@ -77,8 +77,7 @@ function onKeyPress(e) {
 function updateTime() {
   let allElements = document.getElementsByClassName("time");
   for (let ele2 of allElements) {
-    if (ele2.dataset.time < 1e3)
-      ele2.innerText = minimalTime(Date.now() - ele2.dataset.time * 1e3);
+    ele2.innerText = minimalTime(Date.now() - ele2.dataset.time * 1e3);
   }
 }
 function toggleSidebar() {

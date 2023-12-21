@@ -4,7 +4,8 @@
     <script src='/utils.js'></script>
     <title>Status</title>
     <script>
-      function onLoad() {
+      let rInterval = false;
+      function updateStatus() {
         console.log("onloading")
         send(JSON.stringify({action:"statusRequest"}), (res)=>{
           // if (res.status != "SUCCESS") {
@@ -12,38 +13,43 @@
           //   return;
           // }
           let euphOnlineQ = false;
-          let out = "<span>BetaUtilities is in: </span>";
+          let out = "<span>Active public rooms: </span>";
           for (let i=0; i<res.data.length; i++) {
             if (res.data[i].charAt(0) == "&") {
               euphOnlineQ = true;
               out += `<a class='blu' href="https://euphoria.io/room/${res.data[i].slice(1)}">${res.data[i]}</a>`;
             }
-            else out += `<a class='blu' href="/support?room=${res.data[i].slice(1)}">${res.data[i]}</a>`;
+            else out += `<a class='blu' href="/that/${res.data[i].slice(1)}">${res.data[i]}</a>`;
             if (i<res.data.length-1) out += ", ";
           }
           let hdr = document.getElementById("hdr");
           let hr = document.getElementById("hr");
-          if (euphOnlineQ) {
+          // if (euphOnlineQ) {
             hdr.innerText = "Status: ONLINE";
             hdr.className = "grn nohover";
-          } // services online on euph
-          else {
-            hdr.innerText = "Status: Euphoria connection FAILED";
-            hdr.className = "red nohover";
-            hr.className = "redrounded";
-          }
+          // <!-- } // services online on euph -->
+          // else {
+          //   hdr.innerText = "Status: Euphoria connection FAILED";
+          //   hdr.className = "red nohover";
+          //   hr.className = "redrounded";
+          // }
           if (res.data.length == 0 || !res.data) {
-            hdr.innerText = "Status: Euphoria connection and Support Rooms FAILED"
+            hdr.innerText = "Status: that FAILED"
           }
           document.getElementById("inner_content").innerHTML = out;
-        })
-        let match = document.URL.match("\\?refresh=([0-9]+)");
+        }, true)
+        let match = document.URL.match("\\?refresh=([0-9]+)") || rInterval;
         if (match) {
           document.getElementById("ardis").style.display="inline-block";
           document.getElementById("arenb").style.display="none";
           document.getElementById("sel").style.display="none";
-          setTimeout(()=>{location.reload()}, match[1]);
+          //setTimeout(()=>{updateStatus()}, match[1]);
         }
+        if (match && !rInterval) // coming from link
+          rInterval = setInterval(()=>{updateStatus()}, match[1]);
+          // setTimeout(()=>{updateStatus()}, match[1]);
+        // }
+      
         send(JSON.stringify({action:"uptime"}), (res)=>{
           UPTIME = res.data.up;
           TOTAL = res.data.total;
@@ -56,7 +62,7 @@
               Uptime: ${toTime(UPTIME+TIMEELAPSED)} 
               (Total: ${toTime(TOTAL+TIMEELAPSED)})`;
           }, 100);
-        })
+        }, true)
       }
       function updateUptime() {
         send(JSON.stringify({action:"uptime"}), (res)=>{
@@ -88,7 +94,7 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload(()=>{onLoad()});">
+  <body onload = "globalOnload(()=>{updateStatus()}); bSelRegister('sel')">
     <div class="main_content">
       <header>
         <h2 id="hdr" class="gry nohover">Status: Loading</h2>
@@ -103,18 +109,19 @@
         <span class="material-symbols-outlined">sync</span>Enable AutoRefresh - every:
       <div class="anim"></div></button>
       
-      <button id="ardis" style="display: none" class="btn fssml2" onclick="window.open('/status', '_self');">
+      <button id="ardis" style="display: none" class="btn fssml2" onclick="location.href = '?'">
         <span class="material-symbols-outlined">sync_disabled</span>Disable AutoRefresh
       <div class="anim"></div></button>
-      <select class="szThird" id="sel">
-        <option value="1000">1s</option>
-        <option value="1001">1001ms</option>
-        <option value="5000">5s</option>
-        <option value="15000">15s</option>
-        <option value="30000">30s</option>
-        <option value="60000">1min</option>
-        <option value="300000">5min</option>
-      </select><br>
+      <div class="bSel inpContainer" id="sel">
+        <input class="betterSelect">
+        <div class="optionMenu">
+          <div class="option" val=5000>5 sec</div>
+          <div class="option" val=30000>30 sec</div>
+          <div class="option" val=60000>1 min</div>
+          <div class="option" val=3000>5 min</div>
+        </div>
+        <div class="anim inp"></div>
+      </div><br>
         
       <a class="btn fsmed override" href="/">
         <span class="material-symbols-outlined">arrow_back_ios</span>

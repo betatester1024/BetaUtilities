@@ -682,7 +682,7 @@ function hashIt(str, seed = 0) {
   return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 }
 ;
-let version = "v4";
+let bSelVersion = "v4";
 function clickSelect(whichOne, openQ = 0) {
   let ctn = byId(whichOne);
   if (openQ != 0)
@@ -728,26 +728,31 @@ function enterEvent(inp, e) {
   inp.selectedVal = inp.value;
   clickSelect(inp.parentElement.id);
   inp.focus();
+  if (inp.bSelValid)
+    inp.parentElement.value = inp.valueMap.get(inp.selectedVal);
   if (inp.bSelOnChangeEvent && inp.bSelValid) {
     inp.bSelOnChangeEvent(inp.selectedVal, inp.valueMap.get(inp.selectedVal));
   }
-  if (inp.bSelValid)
-    inp.parentElement.value = inp.valueMap.get(inp.selectedVal);
   e.preventDefault();
 }
 let registered = [];
-function bSelRegister(id, onChange) {
+function bSelRegister(id, onChange, defaultVal) {
   let ctn = byId(id);
   registered.push(id);
   let inp = ctn.querySelector(".betterSelect");
   inp.bSelOnChangeEvent = onChange;
-  console.log(onChange);
   inp.valueMap = /* @__PURE__ */ new Map();
   let children = inp.nextElementSibling.children;
   for (let i = 0; i < children.length; i++) {
     inp.valueMap.set(children[i].innerText, children[i].getAttribute("val") || children[i].getAttribute("value"));
   }
-  inp.placeholder = "Make a selection...";
+  if (defaultVal) {
+    ctn.value = inp.valueMap.get(defaultVal);
+    inp.selectedVal = defaultVal;
+    inp.value = defaultVal;
+    inp.placeholder = defaultVal;
+  } else
+    inp.placeholder = "Make a selection...";
   inp.addEventListener("pointerdown", (e) => {
     for (let i = 0; i < registered.length; i++)
       clickSelect(registered[i], -1);

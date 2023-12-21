@@ -6,7 +6,6 @@
     <script>
       const accessLevels = ["Error-level", "User", "Admin", "Super-admin"];
       function onLoad() {
-        bSelRegister("permSelect")
         send(JSON.stringify({action:"userRequest"}), (res)=> {
           if (res.status == "ERROR") alertDialog("Error: "+res.data.error, ()=>{window.open('/login?redirect=admin', '_self')});
           else {
@@ -110,7 +109,7 @@
       }
     </style>
   </head>
-  <body onload = "globalOnload(onLoad)">
+  <body onload = "globalOnload(onLoad); bSelRegister('permSelect')">
     <div class="main_content">
       <header>
         <h2>Administrative panel</h2>

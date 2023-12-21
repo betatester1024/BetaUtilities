@@ -805,7 +805,7 @@ function hashIt(str, seed = 0) {
 };
 
 /* BETTERSELECT SELECT DIALOGS */
-let version="v4";
+let bSelVersion="v4";
 
 function clickSelect(whichOne, openQ=0) 
 {
@@ -868,27 +868,33 @@ function enterEvent(inp:HTMLInputElement, e:Event)
   clickSelect(inp.parentElement.id);
   inp.focus();
   // console.log(inp.valueMap.get(inp.selectedVal));
+  if (inp.bSelValid) // console.log(inp.parentElement);
+    inp.parentElement.value = inp.valueMap.get(inp.selectedVal);
   if (inp.bSelOnChangeEvent && inp.bSelValid) {
     inp.bSelOnChangeEvent(inp.selectedVal, inp.valueMap.get(inp.selectedVal));
   }
-  if (inp.bSelValid) // console.log(inp.parentElement);
-    inp.parentElement.value = inp.valueMap.get(inp.selectedVal);
   e.preventDefault();
 }
 let registered = [];
-function bSelRegister(id:string, onChange:()=>any) 
+function bSelRegister(id:string, onChange:()=>any, defaultVal:string) 
 {
   let ctn = byId(id);
   registered.push(id);
   let inp = ctn.querySelector(".betterSelect");
   inp.bSelOnChangeEvent = onChange;
-  console.log(onChange);
+  // console.log(onChange);
   inp.valueMap = new Map();
   let children = inp.nextElementSibling.children;
   for (let i=0; i<children.length; i++) {
     inp.valueMap.set(children[i].innerText, children[i].getAttribute("val") || children[i].getAttribute("value"));
   }
-  inp.placeholder = "Make a selection...";
+  if (defaultVal) {
+    ctn.value=inp.valueMap.get(defaultVal);
+    inp.selectedVal = defaultVal;
+    inp.value=defaultVal;
+    inp.placeholder = defaultVal;
+  }
+  else inp.placeholder = "Make a selection...";
   inp.addEventListener("pointerdown", (e)=>{
     // console.log(e.target);
     // console.log("pointerdown");

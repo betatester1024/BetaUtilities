@@ -25,10 +25,8 @@ __export(unstable_exports, {
 module.exports = __toCommonJS(unstable_exports);
 var import_server = require("./server");
 var import_database = require("./database");
-var import_supportRooms = require("./supportRooms");
 var import_logging = require("./logging");
 var import_consts = require("./consts");
-var import_wsHandler = require("./betautilities/wsHandler");
 var import_webHandler = require("./betautilities/webHandler");
 var import_wordler = require("./betautilities/wordler");
 const fs = require("fs");
@@ -69,12 +67,6 @@ async function init(startBots) {
   (0, import_logging.log)(UPSINCESTR);
   import_consts.uDB.findOne({ fieldName: "ROOMS" }).then((obj) => {
     console.log(obj);
-    if (startBots)
-      for (let i = 0; i < obj.euphRooms.length; i++) {
-        import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("EUPH_ROOM", obj.euphRooms[i]));
-        new import_wsHandler.WS("wss://euphoria.io/room/" + obj.euphRooms[i] + "/ws", "BetaUtilities" + (process.env["branch"] == "unstable" ? "-U" : ""), obj.euphRooms[i], !(obj.euphRooms[i] == "test" || obj.euphRooms[i] == "bots"));
-        console.log("Connected euph_room", obj.euphRooms[i]);
-      }
     for (let i = 0; i < obj.rooms.length; i++) {
       new import_webHandler.WebH(obj.rooms[i], false);
       console.log("Loaded support room", obj.rooms[i]);

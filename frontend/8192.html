@@ -26,7 +26,10 @@
         howManyGrids = Number(byId("inp").value);
         gSz = Number(byId("inp2").value);
         if (!(Number.isInteger(gSz) && howManyGrids > 0 && 
-           Number.isInteger(howManyGrids) && gSz > 0 && gSz < 10)) openDialog("initCtn");
+           Number.isInteger(howManyGrids) && gSz > 0 && gSz < 10)) {
+          ephemeralDialog("Enter grid size < 10 and at least 1 grid, please.")
+          openDialog("initCtn");
+        }
         byId("h2").innerHTML = "2048<sup>"+howManyGrids+"</sup>";
         for (let i=0; i<howManyGrids; i++) {
           byClass("ctn").innerHTML += "<canvas id=canv"+i+"></canvas>"

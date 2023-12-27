@@ -272,10 +272,8 @@ function replyMessage(hnd, msg, sender, data) {
   }
   let match = msg.match("^!remind(me | +@[^ ]+ )(in )?()()([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?(?: of)? (.+)");
   if (match) {
-    console.log(match);
     let remindUser = match[1];
     let remindMsg = match[9];
-    console.log(match[4] + "," + match[5] + "," + match[6] + "," + match[7] + "," + match[8]);
     let exp4 = Date.now();
     if (match[5])
       exp4 += Number(match[5].split("d")[0]) * 1e3 * 60 * 60 * 24;
@@ -288,13 +286,15 @@ function replyMessage(hnd, msg, sender, data) {
     if (exp4 == Date.now()) {
       return "No reminder time provided! Syntax: !remindme 1d2h3m4s message OR !remind @user 1d2h3m4s message";
     }
-    import_consts.uDB.insertOne({
+    let insertObj = {
       fieldName: "TIMER",
       expiry: exp4,
       notifyingUser: remindUser == "me " ? norm(sender) : remindUser.slice(2, remindUser.length - 1),
       msg: remindMsg,
       author: remindUser == "me " ? null : norm(sender)
-    });
+    };
+    console.log(insertObj);
+    import_consts.uDB.insertOne(insertObj);
     return "Will remind " + (remindUser == "me " ? "you" : remindUser.slice(2, remindUser.length - 1)) + " in " + toTime(exp4 - Date.now());
   } else if (msg.match(/^!remind/)) {
     return "Syntax: !remindme 1d2h3m4s message OR !remind @user 1d2h3m4s message";
@@ -343,7 +343,7 @@ function replyMessage(hnd, msg, sender, data) {
     if (import_supportRooms.supportHandler.mitoseable(match2[1]))
       return "We're already in this room!";
     try {
-      new import_wsHandler.WS("wss://euphoria.io/room/" + match2[1] + "/ws", newNick, match2[1], false);
+      new import_wsHandler.WS("wss://euphoria.leet.nu/room/" + match2[1] + "/ws", newNick, match2[1], false);
     } catch (e) {
       (0, import_logging.systemLog)(e);
     }

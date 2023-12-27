@@ -273,7 +273,13 @@ function send(params, callback, silentLoading = false, link = "/server") {
   xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");
   xhr.onreadystatechange = () => {
     if (xhr.readyState == 4 && xhr.status == 200) {
-      callback(JSON.parse(xhr.responseText));
+      let resp = JSON.parse(xhr.responseText);
+      if (resp.status != "SUCCESS" && resp.data.refreshRequired) {
+        alertDialog("Request failed requiring reload: " + resp.data.error, () => {
+          location.reload();
+        });
+      } else
+        callback(JSON.parse(xhr.responseText));
     } else if (xhr.readyState == 4 && xhr.status != 200) {
       alertDialog("Received status code " + xhr.status + " (" + decodeStatus(xhr.status) + ") -- resend request?", () => {
         send(params, callback, silentLoading);

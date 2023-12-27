@@ -39,31 +39,32 @@ try {
     // console.log(thing)
     if (!connectionSuccess) return;
     // REMOVED: EUPHORIA.IO IS DOWN AND BOTS DO NOT WORK ANYMORE ANYWAYS.
+    // UPDATE: euphoria.leet.nu WORKS
     // uDB.findOne({fieldName:"lastActive"}).then((document:{time:number})=>{
-    // if (process.env["branch"] == "unstable" && 
-    //     (!process.env["promptInstances"] || process.env["promptInstances"]!="0")) {
-    //   let readline = require('readline');
+    if (process.env["branch"] == "unstable" && 
+        (!process.env["promptInstances"] || process.env["promptInstances"]!="0")) {
+      let readline = require('readline');
 
-    //   let rl = readline.createInterface({
-    //     input: process.stdin,
-    //     output: process.stdout
+      let rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
       
-    //   });
-    //   let timeout;
-    //   rl.question("Confirm start extra instance? ", (answer:string)=>{
-    //     clearTimeout(timeout);
-    //     rl.close();
-    //     answer = answer.trim().toLowerCase();
-    //     if (timedOutQ) return;
-    //     if (answer != "y" && answer != "yes") init(false);
-    //     else {
-    //       init(true)
-    //     } // extra instances approved
-    //   });
-    //   timeout = setTimeout(()=>{init(false)}, 30000);
-    // }
-    // else init(process.env["branch"]!= "unstable");
-    init(false);
+      });
+      let timeout;
+      rl.question("Confirm start extra instance? ", (answer:string)=>{
+        clearTimeout(timeout);
+        rl.close();
+        answer = answer.trim().toLowerCase();
+        if (timedOutQ) return;
+        if (answer != "y" && answer != "yes") init(false);
+        else {
+          init(true)
+        } // extra instances approved
+      });
+      timeout = setTimeout(()=>{init(false)}, 30000);
+    }
+    else init(process.env["branch"]!= "unstable");
+    // init(false);
     
     //   if (Date.now - time < 10000)  // <10sec since last report, assume it is active
     //   {
@@ -96,15 +97,19 @@ async function init(startBots:boolean)
   uDB.findOne({fieldName:"ROOMS"}).then((obj:{euphRooms:string[], rooms:string[], hidRooms:string[]})=>{
     console.log(obj);
     // REMOVED: Euphoria is permanently down
-    // if (startBots)
-    // for (let i=0; i<obj.euphRooms.length; i++) {
-    //   // console.log("hello!")
-    //   supportHandler.addRoom(new Room("EUPH_ROOM", obj.euphRooms[i]));
-    //   new WS("wss://euphoria.io/room/" + obj.euphRooms[i] +"/ws", "BetaUtilities"+(process.env['branch']=="unstable"?"-U":""), obj.euphRooms[i], !(obj.euphRooms[i]=="test" || obj.euphRooms[i]=="bots"))
+    // RESTORED: euphoria.leet.nu is back
+    if (startBots)
+    for (let i=0; i<obj.euphRooms.length; i++) {
+      // console.log("hello!")
+      supportHandler.addRoom(new Room("EUPH_ROOM", obj.euphRooms[i]));
+      new WS("wss://euphoria.leet.nu/room/" + obj.euphRooms[i] +"/ws", 
+             "BetaUtilities"+(process.env['branch']=="unstable"?"-U":""), 
+             obj.euphRooms[i], 
+             !(obj.euphRooms[i]=="test" || obj.euphRooms[i]=="bots"))
 
-    //   // log("Connected euph_room")+obj.euphRooms[i];
-    //   console.log("Connected euph_room", obj.euphRooms[i]);
-    // }
+      // log("Connected euph_room")+obj.euphRooms[i];
+      console.log("Connected euph_room", obj.euphRooms[i]);
+    }
     // for (let i=0; i<localEuphRooms.length; i++) {
     //   supportHandler.addRoom(new Room("EUPH_ROOM", localEuphRooms[i]));
     //   new WS("wss://euphoria.io/room/" + localEuphRooms[i] +"/ws", "BetaUtilities", localEuphRooms[i], false)

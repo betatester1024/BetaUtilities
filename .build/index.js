@@ -25,8 +25,10 @@ __export(unstable_exports, {
 module.exports = __toCommonJS(unstable_exports);
 var import_server = require("./server");
 var import_database = require("./database");
+var import_supportRooms = require("./supportRooms");
 var import_logging = require("./logging");
 var import_consts = require("./consts");
+var import_wsHandler = require("./betautilities/wsHandler");
 var import_webHandler = require("./betautilities/webHandler");
 var import_wordler = require("./betautilities/wordler");
 const fs = require("fs");
@@ -41,7 +43,30 @@ try {
     (0, import_database.connectDB)().then((err) => {
       if (!connectionSuccess)
         return;
-      init(false);
+      if (process.env["branch"] == "unstable" && (!process.env["promptInstances"] || process.env["promptInstances"] != "0")) {
+        let readline = require("readline");
+        let rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout
+        });
+        let timeout;
+        rl.question("Confirm start extra instance? ", (answer) => {
+          clearTimeout(timeout);
+          rl.close();
+          answer = answer.trim().toLowerCase();
+          if (timedOutQ)
+            return;
+          if (answer != "y" && answer != "yes")
+            init(false);
+          else {
+            init(true);
+          }
+        });
+        timeout = setTimeout(() => {
+          init(false);
+        }, 3e4);
+      } else
+        init(process.env["branch"] != "unstable");
     });
   DBConnectFailure = setTimeout(() => {
     connectionSuccess = false;
@@ -67,6 +92,17 @@ async function init(startBots) {
   (0, import_logging.log)(UPSINCESTR);
   import_consts.uDB.findOne({ fieldName: "ROOMS" }).then((obj) => {
     console.log(obj);
+    if (startBots)
+      for (let i = 0; i < obj.euphRooms.length; i++) {
+        import_supportRooms.supportHandler.addRoom(new import_supportRooms.Room("EUPH_ROOM", obj.euphRooms[i]));
+        new import_wsHandler.WS(
+          "wss://euphoria.leet.nu/room/" + obj.euphRooms[i] + "/ws",
+          "BetaUtilities" + (process.env["branch"] == "unstable" ? "-U" : ""),
+          obj.euphRooms[i],
+          !(obj.euphRooms[i] == "test" || obj.euphRooms[i] == "bots")
+        );
+        console.log("Connected euph_room", obj.euphRooms[i]);
+      }
     for (let i = 0; i < obj.rooms.length; i++) {
       new import_webHandler.WebH(obj.rooms[i], false);
       console.log("Loaded support room", obj.rooms[i]);

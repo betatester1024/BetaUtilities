@@ -307,8 +307,11 @@ function send(params: any, callback: (thing: any) => any, silentLoading:boolean=
       // if (failureTimeout) clearTimeout(failureTimeout);
       
       // failureTimeout = null;
-      
-      callback(JSON.parse(xhr.responseText));
+      let resp = JSON.parse(xhr.responseText);
+      if (resp.status != "SUCCESS" && resp.data.refreshRequired) {
+        alertDialog("Request failed requiring reload: "+resp.data.error, ()=>{location.reload();});
+      }
+      else callback(JSON.parse(xhr.responseText));
     }
     else if (xhr.readyState == 4 && xhr.status != 200) {
       // if (failureTimeout) clearTimeout(failureTimeout);

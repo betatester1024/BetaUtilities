@@ -234,8 +234,9 @@ export async function initServer() {
            sendFile(res, getToken(req), frontendDir+'/supportRedirect.html');
            incrRequests();
          });
+  // bridge works again
   app.get('/bridge/*', (req:any, res:any) => {
-     sendFile(res, getToken(req), frontendDir+'/supportRedirect.html');
+     sendFile(res, getToken(req), frontendDir+'/that.html');
      incrRequests();
    })
   app.get('/support', (req:any, res:any) => {

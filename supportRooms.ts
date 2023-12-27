@@ -137,6 +137,8 @@ export class BridgeSocket
         }
         break;
       case "nick-event":
+      // case "nick-reply":
+        // console.log(data.data);
         this.client.send(JSON.stringify({
           action:"removeUser",
           data:{
@@ -184,7 +186,7 @@ export class BridgeSocket
       case "disconnect-event":
         // const cookies = 
         break;
-        this.euphSocket= new WebSocket("wss://euphoria.io/room/"+this.roomName+"/ws",
+        this.euphSocket= new WebSocket("wss://euphoria.leet.nu/room/"+this.roomName+"/ws",
            [],
            {
              finishRequest:(request:any)=>{
@@ -249,7 +251,8 @@ export class BridgeSocket
     this.client.send(JSON.stringify({
       action:"removeUser",
       data:{
-        user:usrData.data.alias
+        user:usrData.data.alias,
+        isBot:true
       }
     }));
     this.client.send(JSON.stringify({
@@ -276,7 +279,7 @@ export class BridgeSocket
     this.roomName = roomName;
     this.client = socket;
     this.token=token;
-    let URL = "wss://euphoria.io/room/"+roomName+"/ws";
+    let URL = "wss://euphoria.leet.nu/room/"+roomName+"/ws";
     this.euphSocket = new WebSocket(URL);
     this.euphSocket.on('open', this.onOpen.bind(this));
     this.euphSocket.on('message', this.onMessage.bind(this));

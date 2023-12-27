@@ -317,7 +317,7 @@ async function initClient()
     message = JSON.parse(message.data);
     
     if (message.action != "ping") console.log('RECV', message);
-    ele = document.getElementById("userList");
+    // ele = document.getElementById("userList");
     // let modif = message.data;
     let action = message.action;
     if (message.action == "CONNECTIONID") {
@@ -404,6 +404,8 @@ async function initClient()
     }
     if (message.action=="addUser") {
       let span = document.createElement("p");
+      let spanCtnr = document.createElement("p");
+      spanCtnr.className="pCtnr"
       span.innerText = message.data.user;
       span.id = (message.data.isBot?"zbot":"usr")+message.data.user;
       span.title = message.data.user;
@@ -413,8 +415,9 @@ async function initClient()
         ", 74.5%, 80%)";
       span.style.color = "#000"; // has background color so DO NOT INVERT ON DARK MODE
       // if (message.data.isBot) span.classList.add("bot");
-      if (message.data.isBot) byId("botList").appendChild(span);
-      else byId("userList").appendChild(span);
+      spanCtnr.appendChild(span);
+      if (message.data.isBot) byId("botList").appendChild(spanCtnr);
+      else byId("userList").appendChild(spanCtnr);
     }
     if (message.action== "yourAlias") {
       byId("alias").value = message.data.alias;
@@ -427,17 +430,8 @@ async function initClient()
     }
     if (message.action == "addUser" || message.action == "removeUser") {
       // console.log("sorting");
-      let children = ele.childNodes;
-      let outArr = [];
-      for (let i=0; i<children.length; i++) 
-        outArr.push(children[i]);
-      outArr.sort(function(a, b) {
-        return a.id == b.id?0:(a.id > b.id?1:-1);
-      });
-      ele.innerHTML = "";
-      for (i=0; i<outArr.length; i++) {
-        ele.appendChild(outArr[i]);
-      }
+      sortUserlist("userList");
+      sortUserlist("botList");
     }
     let modif = "";
     // console.log(modif);
@@ -467,7 +461,20 @@ async function initClient()
   document.getElementById("msgInp").focus();
 } // initClient();
 
-
+function sortUserlist(id) {
+  let sortEle = byId(id)
+  let children = sortEle.childNodes;
+  let outArr = [];
+  for (let i=0; i<children.length; i++) 
+    outArr.push(children[i]);
+  outArr.sort(function(a, b) {
+    return a.id == b.id?0:(a.id > b.id?1:-1);
+  });
+  sortEle.innerHTML = "";
+  for (i=0; i<outArr.length; i++) {
+    sortEle.appendChild(outArr[i]);
+  }
+}
 const replacements = [
   {from: "one", to: "counter_1"},
   {from: "two", to: "counter_2"},
@@ -527,6 +534,7 @@ window.addEventListener("blur", () => {
 window.addEventListener("focus", () => {
   document.title = docTitle;
   FOCUSSED = true;
+  PINGED = false;
   UNREAD = 0;
 });
 
@@ -735,9 +743,9 @@ function handleMessageEvent(data, area) {
     </button>`;
   else optn.remove();
   // console.log(byId("alias").value);
-  if (userData.user == ctn.dataset.senderID
+  if ((userData.user == ctn.dataset.senderID
    || byId("alias").value == ctn.dataset.senderID
-     || userData.perms && userData.perms >=2 )
+     || userData.perms && userData.perms >=2 ) && !ISBRIDGE)
     optn.innerHTML += `
     <!-- <button class="btn">
     //   <span class="material-symbols-outlined ylw">edit</span>

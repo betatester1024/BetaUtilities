@@ -55,8 +55,9 @@ export async function DBMaintenance() {
   (objs:{expiry:number, notifyingUser:string, msg:string}[])=>{
     for (let i=0; i<objs.length; i++) {
       if (Date.now()>objs[i].expiry || objs[i].expiry == null) {
+        console.log("NOTIFYING", objs[i]);
         uDB.deleteOne({fieldName:"TIMER",expiry:objs[i].expiry})
-        console.log("NOTIFYING");
+        
         WS.notifRoom.socket.send(
           WS.toSendInfo("!tell @"+objs[i].notifyingUser+" You are reminded of: "+
                         objs[i].msg.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, "\\\"")+

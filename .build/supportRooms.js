@@ -198,7 +198,7 @@ class BridgeSocket {
       case "disconnect-event":
         break;
         this.euphSocket = new import_ws.WebSocket(
-          "wss://euphoria.io/room/" + this.roomName + "/ws",
+          "wss://euphoria.leet.nu/room/" + this.roomName + "/ws",
           [],
           {
             finishRequest: (request) => {
@@ -250,7 +250,8 @@ class BridgeSocket {
     this.client.send(JSON.stringify({
       action: "removeUser",
       data: {
-        user: usrData.data.alias
+        user: usrData.data.alias,
+        isBot: true
       }
     }));
     this.client.send(JSON.stringify({
@@ -274,7 +275,7 @@ class BridgeSocket {
     this.roomName = roomName;
     this.client = socket;
     this.token = token;
-    let URL = "wss://euphoria.io/room/" + roomName + "/ws";
+    let URL = "wss://euphoria.leet.nu/room/" + roomName + "/ws";
     this.euphSocket = new import_ws.WebSocket(URL);
     this.euphSocket.on("open", this.onOpen.bind(this));
     this.euphSocket.on("message", this.onMessage.bind(this));

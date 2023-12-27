@@ -17,7 +17,7 @@
           for (let i=0; i<res.data.length; i++) {
             if (res.data[i].charAt(0) == "&") {
               euphOnlineQ = true;
-              out += `<a class='blu' href="https://euphoria.io/room/${res.data[i].slice(1)}">${res.data[i]}</a>`;
+              out += `<a class='blu' href="https://euphoria.leet.nu/room/${res.data[i].slice(1)}">${res.data[i]}</a>`;
             }
             else out += `<a class='blu' href="/that/${res.data[i].slice(1)}">${res.data[i]}</a>`;
             if (i<res.data.length-1) out += ", ";

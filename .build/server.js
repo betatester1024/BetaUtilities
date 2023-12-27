@@ -200,7 +200,7 @@ async function initServer() {
     (0, import_logging.incrRequests)();
   });
   app.get("/bridge/*", (req, res) => {
-    sendFile(res, getToken(req), import_consts.frontendDir + "/supportRedirect.html");
+    sendFile(res, getToken(req), import_consts.frontendDir + "/that.html");
     (0, import_logging.incrRequests)();
   });
   app.get("/support", (req, res) => {

@@ -3,8 +3,7 @@
   <head>
     <script src='/utils.js'></script>
     <title>Testbed</title>
-    <script src="p5.min.js" type="text/javascript"></script>
-    <script src="hsluv.min.js"  type="text/javascript"></script>
+    <script src="hslthing.js" type="text/javascript"></script>
     <script>
       function openMoreDialogs() 
       {
@@ -34,10 +33,16 @@
             let cell = document.createElement("div");
             palette.appendChild(cell);
             // let k = (i*64+j);
-            const rgb = hsluv.hsluvToRgb([0, 50, 50]);
+            // cont rgb()
+            cell.style.backgroundColor = `oklab(${(j*80/16+10)*100}% ${(i/15-0.5)*400}% ${(j/15-0.5)*400}%)`
+            // const rgb = okhsl_to_srgb((i*16+j)*360/256, 100, j*80/16+10);
 
             // Then use the RGB values in a scale of 0-255
-            cell.style.backgroundColor = "#"+toHex(rgb[0]*255)+toHex(rgb[1]*255)+toHex(rgb[2]*255);
+            // console.log(rgb);
+            // cell.style.backgroundColor = `oklch(50% 0.${(j*80/16+10)*100} ${(i*16+j)*360/256}deg)`;
+            // cell.style.backgroundColor = rgb_to_hex(srgb_transfer_function(rgb[0]), 
+                                                    // srgb_transfer_function(rgb[1]), 
+                                                    // srgb_transfer_function(rgb[2]));
             // cell.style.backgroundColor = `hsl(${(i*16+j)*360/256}, 100%, ${j*80/16+10}%)`;
           }
           // palette.appendChild(document.createElement("br"));

@@ -1,7 +1,7 @@
 {
   "name": "betaos_system",
   "version": "1.0.0",
-  "description": "BetaOS Systems home-page and BetaUtilities on Euphoria.io",
+  "description": "BetaOS Systems home-page and BetaUtilities on euphoria.leet.nu",
   "main": ".build/index.js",
   "scripts": {
     "start":"bash build.sh; pm2 start /betaos/.build/index.js --watch --restart-delay 3000"

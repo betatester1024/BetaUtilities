@@ -105,6 +105,7 @@
 }
 #msgInp {
   position: absolute;
+  padding-top: 10px;
   top: 0px;
   resize: none;
   left: 0px;
@@ -478,17 +479,32 @@ md-span.superadmin, span.superadmin, a.superadmin {
   color: var(--system-blue) !important;
 }
 
-#userList > p, #botList > p {
+#userList > p.pCtnr, #botList > p.pCtnr {
   display: block;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: 100%;
+  /* text-overflow: ellipsis; */
+  /* overflow: hidden; */
+  /* max-width: 100%; */
   white-space: nowrap;
   width: fit-content;
-  padding: 3px;
-  border-radius: 5px;
+  width: 100%;
+  padding: 0px;
+  /* border-radius: 5px; */
+  /* padding-right: ; */
+  margin: 0px;
   /* padding-right: */
 }
+
+.pCtnr > p {
+  border-radius:5px;
+  text-overflow:ellipsis;
+  overflow:hidden;
+  padding: 5px;
+  /* max-width: 100%; */
+  max-width: calc(100% - 10px);
+  margin: 0px;
+  /* padding-right */
+}
+
 /* 
 .bot {
   color: var(--system-green) !important;

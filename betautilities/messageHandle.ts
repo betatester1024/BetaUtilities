@@ -286,10 +286,10 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
 
   let match = msg.match("^!remind(me | +@[^ ]+ )(in )?()()([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?(?: of)? (.+)")
   if (match) {
-    console.log(match);
+    // console.log(match);
     let remindUser = match[1];
     let remindMsg = match[9];
-    console.log(match[4]+","+match[5]+","+match[6]+","+match[7]+","+match[8]);
+    // console.log(match[4]+","+match[5]+","+match[6]+","+match[7]+","+match[8]);
     let exp = Date.now();
     if (match[5]) exp += Number(match[5].split("d")[0])*1000*60*60*24;
     if (match[6]) exp += Number(match[6].split("h")[0])*1000*60*60;
@@ -298,13 +298,16 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     if (exp == Date.now()) {
       return "No reminder time provided! Syntax: !remindme 1d2h3m4s message OR !remind @user 1d2h3m4s message"
     }
-    uDB.insertOne({
+    let insertObj = {
       fieldName:"TIMER",
       expiry:exp, 
       notifyingUser:remindUser=="me "?norm(sender):remindUser.slice(2, remindUser.length-1), 
       msg:remindMsg,
       author:remindUser=="me "?null:norm(sender)
-    });
+    };
+    console.log(insertObj);
+    uDB.insertOne(insertObj);
+    // console.log(exp-Date.now());
     return "Will remind "+(remindUser=="me "?"you":remindUser.slice(2, remindUser.length-1))+" in "+toTime(exp-Date.now());
   }
   else if (msg.match(/^!remind/)) {
@@ -348,7 +351,7 @@ export function replyMessage(hnd:(WebH|WS), msg:string, sender:string, data:any)
     // systemLog(match2);
     let newNick = match2[2]==null?"BetaUtilities":match2[2];
     if (supportHandler.mitoseable(match2[1])) return "We're already in this room!";
-    try  {new WS("wss://euphoria.io/room/" + match2[1] + "/ws", newNick, match2[1], false);}
+    try  {new WS("wss://euphoria.leet.nu/room/" + match2[1] + "/ws", newNick, match2[1], false);}
     catch (e) {systemLog((e))}
     supportHandler.addRoom(new Room("EUPH_ROOM", match2[1]))
     return "Sent @"+newNick+" to &"+match2[1];

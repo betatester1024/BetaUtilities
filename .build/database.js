@@ -70,8 +70,8 @@ async function DBMaintenance() {
     (objs) => {
       for (let i = 0; i < objs.length; i++) {
         if (Date.now() > objs[i].expiry || objs[i].expiry == null) {
+          console.log("NOTIFYING", objs[i]);
           import_consts.uDB.deleteOne({ fieldName: "TIMER", expiry: objs[i].expiry });
-          console.log("NOTIFYING");
           import_wsHandler.WS.notifRoom.socket.send(
             import_wsHandler.WS.toSendInfo("!tell @" + objs[i].notifyingUser + " You are reminded of: " + objs[i].msg.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, '\\"') + ". This reminder sent by " + (objs[i].author ?? "yourself, probably."))
           );

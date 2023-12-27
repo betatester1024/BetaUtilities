@@ -290,15 +290,18 @@ async function initClient() {
       }
       if (message.action == "addUser") {
         let span = document.createElement("p");
+        let spanCtnr = document.createElement("p");
+        spanCtnr.className = "pCtnr";
         span.innerText = message.data.user;
         span.id = (message.data.isBot ? "zbot" : "usr") + message.data.user;
         span.title = message.data.user;
         span.style.backgroundColor = "hsl(" + (hashIt(message.data.user.replaceAll(" ", "").toLowerCase()) % 255 + 79) % 255 + ", 74.5%, 80%)";
         span.style.color = "#000";
+        spanCtnr.appendChild(span);
         if (message.data.isBot)
-          byId("botList").appendChild(span);
+          byId("botList").appendChild(spanCtnr);
         else
-          byId("userList").appendChild(span);
+          byId("userList").appendChild(spanCtnr);
       }
       if (message.action == "yourAlias") {
         byId("alias").value = message.data.alias;
@@ -545,7 +548,7 @@ function handleMessageEvent(data, area) {
     </button>`;
   else
     optn.remove();
-  if (userData.user == ctn.dataset.senderID || byId("alias").value == ctn.dataset.senderID || userData.perms && userData.perms >= 2)
+  if ((userData.user == ctn.dataset.senderID || byId("alias").value == ctn.dataset.senderID || userData.perms && userData.perms >= 2) && !ISBRIDGE)
     optn.innerHTML += `
     <!-- <button class="btn">
     //   <span class="material-symbols-outlined ylw">edit</span>

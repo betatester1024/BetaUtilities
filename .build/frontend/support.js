@@ -211,7 +211,6 @@ async function initClient() {
       message = JSON.parse(message.data);
       if (message.action != "ping")
         console.log("RECV", message);
-      ele = document.getElementById("userList");
       let action = message.action;
       if (message.action == "CONNECTIONID") {
         CONNECTIONID = message.data.id;
@@ -313,17 +312,8 @@ async function initClient() {
         byId("msgInp").focus();
       }
       if (message.action == "addUser" || message.action == "removeUser") {
-        let children = ele.childNodes;
-        let outArr = [];
-        for (let i2 = 0; i2 < children.length; i2++)
-          outArr.push(children[i2]);
-        outArr.sort(function(a, b) {
-          return a.id == b.id ? 0 : a.id > b.id ? 1 : -1;
-        });
-        ele.innerHTML = "";
-        for (i = 0; i < outArr.length; i++) {
-          ele.appendChild(outArr[i]);
-        }
+        sortUserlist("userList");
+        sortUserlist("botList");
       }
       let modif = "";
       if (message.action == "msg") {
@@ -340,6 +330,20 @@ async function initClient() {
     setTimeout(initClient, 0);
   }
   document.getElementById("msgInp").focus();
+}
+function sortUserlist(id) {
+  let sortEle = byId(id);
+  let children = sortEle.childNodes;
+  let outArr = [];
+  for (let i2 = 0; i2 < children.length; i2++)
+    outArr.push(children[i2]);
+  outArr.sort(function(a, b) {
+    return a.id == b.id ? 0 : a.id > b.id ? 1 : -1;
+  });
+  sortEle.innerHTML = "";
+  for (i = 0; i < outArr.length; i++) {
+    sortEle.appendChild(outArr[i]);
+  }
 }
 const replacements = [
   { from: "one", to: "counter_1" },
@@ -376,6 +380,7 @@ window.addEventListener("blur", () => {
 window.addEventListener("focus", () => {
   document.title = docTitle;
   FOCUSSED = true;
+  PINGED = false;
   UNREAD = 0;
 });
 let UNREAD = 0;

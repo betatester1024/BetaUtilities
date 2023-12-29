@@ -65,13 +65,26 @@ async function findPaste(loc, pwd, token) {
     return { status: "ERROR", data: { error: "Paste does not exist!" }, token };
   let userInfo = await (0, import_userRequest.userRequest)(token);
   if (existingDoc.pwd && await argon2.verify(existingDoc.pwd, pwd)) {
-    return { status: "SUCCESS", data: { content: existingDoc.data, security: "none" }, token };
+    return {
+      status: "SUCCESS",
+      data: {
+        content: existingDoc.data,
+        security: "none"
+      },
+      token
+    };
   } else if (existingDoc.encryptedData) {
     let out = "Unknown Decode Error";
     try {
       out = await decrypt(existingDoc.encryptedData, pwd);
     } catch (e) {
-      return { status: "ERROR", data: { error: "Decode error! \n This is probably because you entered an invalid password, or your paste was corrupted." }, token };
+      return {
+        status: "ERROR",
+        data: {
+          error: "Decode error! \n This is probably because you entered an invalid password, or your paste was corrupted."
+        },
+        token
+      };
     }
     return { status: "SUCCESS", data: { content: out, security: "encrypted" }, token };
   } else

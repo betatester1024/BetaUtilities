@@ -488,6 +488,7 @@ async function makeRequest(action, token, data, sessID) {
         break;
       case "findPaste":
         obj = await (0, import_paste.findPaste)(data.name, data.pwd, token);
+        break;
       case "editPaste":
         obj = await (0, import_paste.editPaste)(data.content, data.name, data.pwd, token);
         break;

@@ -583,6 +583,7 @@ async function makeRequest(action:string|null, token:string, data:any|null, sess
         break;
       case "findPaste":
         obj = await findPaste(data.name, data.pwd, token)
+        break;
       case "editPaste":
         obj = await editPaste(data.content, data.name, data.pwd, token)
         break;

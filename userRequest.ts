@@ -3,15 +3,24 @@ const argon2 = require('argon2');
 import {authDB, userRegex, expiry} from './consts';
 
 export async function userRequest(token:string, internalFlag:boolean=false) {
-  if (token == "[SYSINTERNAL]" && internalFlag) return {status:"SUCCESS", data:{user:"BetaOS_System", alias:"BetaOS_System", perms:3, expiry:9e99, tasks: [], darkQ:false}, token:"SYSINTERNAL"}
+  if (token == "[SYSINTERNAL]" && internalFlag) 
+    return {status:"SUCCESS", data:{user:"BetaOS_System", alias:"BetaOS_System", perms:3, expiry:9e99, tasks: [], darkQ:false}, token:"SYSINTERNAL"}
   let tokenData:{associatedUser:string, expiry:number} = await authDB.findOne({fieldName:"Token", token:token});
   if (!tokenData) {
-    return {status:"ERROR", data:{error:"Your session could not be found!"}, token:""}
+    return {status:"ERROR", data:{eType:"Auth", error:"Your session could not be found!"}, token:""}
   }
   let userData:{permLevel:number, alias:string, darkTheme:boolean, user:string, tasks:any, lastClicked:number} = 
     await authDB.findOne({fieldName:"UserData", user:tokenData.associatedUser});
   if (Date.now() > tokenData.expiry) {
-    return {status:"ERROR", data:{refreshRequired:true, error:"Your session has expired!"}, token:""};
+    return {
+      status:"ERROR", 
+      data:{
+        eType:"Auth",
+        refreshRequired:true, 
+        error:"Your session has expired!"
+      }, 
+      token:""
+     };
   }
   return {status:"SUCCESS", data: {
     user: tokenData.associatedUser, 

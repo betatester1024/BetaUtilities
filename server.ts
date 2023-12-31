@@ -151,7 +151,7 @@ export async function initServer() {
           break;
         case "updateAlias":
           // console.log("here");
-          bridgeH.updateAlias(dat.data.alias, req.cookies.accountID);
+          let resp = bridgeH.updateAlias(dat.data.alias, req.cookies.accountID);
       }
       // ws.send("reply:"+msg);
     });
@@ -559,7 +559,7 @@ async function makeRequest(action:string|null, token:string, data:any|null, sess
         break;
       case "delMsg":
         obj = await delMsg(data.id, data.room, token||sessID)
-        break
+        break;
       case "updateDefaultLoad":
         obj = await updateDefaultLoad(data.new, token)
         break;
@@ -699,7 +699,7 @@ const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/log
                     "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle', '/sweepthatmine',
                    "/stopwatch", "/testbed", '/credits', '/atomicmoose', '/issuetracker', '/graphIt', 
                     '/betterselect', '/redirect', '/betterselect.js', "/minimalLogin", "/minimalSignup",
-                    "/8192", "/imgedit", "/leaderboard", "/eval"];
+                    "/8192", "/imgedit", "/leaderboard", "/eval", "/smallsubway"];
 
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',

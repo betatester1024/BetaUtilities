@@ -315,6 +315,8 @@ function nonBlockingDialog(data, callback) {
     data.hasButton = true;
   if (data.ico == null)
     data.ico = "arrow_forward";
+  if (data.title == null)
+    data.title = "Information";
   let div = document.createElement("div");
   div.className = "ALERT_NONBLOCK";
   div.isOpen = true;
@@ -323,7 +325,7 @@ function nonBlockingDialog(data, callback) {
   <div class="content ${data.hasButton ? "hasBtn" : ""}" data-fullscreen=no>${data.text}</div>`;
   let draggable = document.createElement("div");
   draggable.className = "ALERT_DRAGGER";
-  draggable.innerText = "ServiceAlert";
+  draggable.innerHTML = `<span>${data.title}</span>`;
   draggable.innerHTML += `<div class="close" onclick="closeNBD(this.parentElement.parentElement, false)">
   <span class="red nooutline material-symbols-outlined">close</span>
   </div> 

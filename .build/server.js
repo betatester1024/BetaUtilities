@@ -138,7 +138,7 @@ async function initServer() {
           bridgeH.sendMsg(dat.data.room, dat.data.parent, dat.data.msg);
           break;
         case "updateAlias":
-          bridgeH.updateAlias(dat.data.alias, req.cookies.accountID);
+          let resp = bridgeH.updateAlias(dat.data.alias, req.cookies.accountID);
       }
     });
     let bridgeH = new import_supportRooms.BridgeSocket(req.query.room, ws, req.cookies.accountID);

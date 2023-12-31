@@ -10,7 +10,7 @@
         send(JSON.stringify({action:"clickIt"}), (res)=>{
           document.getElementById("thebutton").blur();
           if (res.status != "SUCCESS") {
-            if (res.data.errorCode != 0) 
+            if (res.data.eType != "Auth") 
               alertDialog("Error: "+res.data.error);
             else localClicked++;    
           }

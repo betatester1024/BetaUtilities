@@ -18,6 +18,7 @@ function onLoad() {
   document.addEventListener("keydown", onKeyPress);
 }
 let PINGED = false;
+let YOURALIAS = "Loading alias...";
 let debounceTimeout = -1;
 function onKeyPress(e) {
   if (e.key == "b" && e.ctrlKey && !e.metaKey && !e.shiftKey) {
@@ -350,6 +351,7 @@ async function initClient()
       LOADEDQ2=false;
       STARTID=-1;
       ACTIVEREPLY = -1;
+      YOURALIAS = "Loading alias...";
       STARTIDVALID = false;
       byId("container").appendChild(BOTTOMINPUT);
       UNREAD = 0;
@@ -409,10 +411,7 @@ async function initClient()
       span.innerText = message.data.user;
       span.id = (message.data.isBot?"zbot":"usr")+message.data.user;
       span.title = message.data.user;
-      span.style.backgroundColor = "hsl("+
-        // make @BetaOS blue!
-        (hashIt(message.data.user.replaceAll(" ", "").toLowerCase())%255+79)%255+
-        ", 74.5%, 80%)";
+      span.style.backgroundColor = getColour(message.data.user);
       span.style.color = "#000"; // has background color so DO NOT INVERT ON DARK MODE
       // if (message.data.isBot) span.classList.add("bot");
       spanCtnr.appendChild(span);
@@ -420,12 +419,14 @@ async function initClient()
       else byId("userList").appendChild(spanCtnr);
     }
     if (message.action== "yourAlias") {
+      YOURALIAS = message.data.alias;
       byId("alias").value = message.data.alias;
       byId("alias-text").innerText = message.data.alias
       if (message.data.error && message.data.type==1); 
         // ephemeralDialog("")
       else if (message.data.error) 
-        ephemeralDialog("Error: You are not logged in and cannot update your alias.")
+        ephemeralDialog("Error: You are not logged in and cannot update your alias."+
+                       `<button class="btn fssml grn" onclick="login_v2(null, true)">Sign up?</button>`)
       byId("msgInp").focus();
     }
     if (message.action == "addUser" || message.action == "removeUser") {
@@ -614,10 +615,7 @@ function handleMessageEvent(data, area) {
   let newMsgSender = document.createElement("b");
   // parse things
   newMsgSender.innerText = matches[2];
-  newMsgSender.style.backgroundColor = "hsl("+
-      // make @BetaOS blue!
-      (hashIt(matches[2].replaceAll(" ", "").toLowerCase())%255+79)%255+
-      ", 74.5%, 80%)";
+  newMsgSender.style.backgroundColor =getColour(matches[2]);
   newMsgSender.className = classStr[matches[3]];
 
   let ctn = document.createElement("div");
@@ -678,11 +676,7 @@ function handleMessageEvent(data, area) {
         replaced.className="supportMsg "+classStr[matches[3]] //+ (slashMe?" slashMe ":"");
         replaced.innerText = "@"+post.replaceAll(";gt;", ">");
         ele.appendChild(replaced);
-        // console.log(hashIt(post.replaceAll(";gt;", ">"))%360)
-        replaced.setAttribute("style", "color:hsl("+
-          // make @BetaOS blue!
-          (hashIt(post.replaceAll(";gt;", ">").toLowerCase())%255+79)%255+
-          ", 74.5%, 48%) !important");
+        replaced.setAttribute("style", "color:"+getColour(post.replaceAll(";gt;",">"), true)+"!important");
         if (replaced.innerText.toLowerCase() == "@"+byId("alias").value.toLowerCase()) {
           replaced.style.border = "2px solid gold";
           replaced.style.boxShadow = "0px 0px 3px gold";
@@ -790,7 +784,10 @@ function handleMessageEvent(data, area) {
   }
   document.getElementById("placeholder").style.display="none";
   if (!FOCUSSED) {
-    if (data.content.match("@"+byId("alias").value), "gi") PINGED = true;
+    if (data.content.match("@"+YOURALIAS, "gi")) {
+      PINGED = true;
+      console.log("pinged for:", data.content);
+    }
     UNREAD ++ 
     document.title = "("+UNREAD+")"+(PINGED?"!":"")+" | "+docTitle;
   }
@@ -819,4 +816,30 @@ function deleteMessage(ev) {
   send(JSON.stringify({action:"delMsg", data:{id:id, room:ROOMNAME}}), (res)=>{
     console.log(res);
   });
+}
+
+function getColour(data, darker=false) {
+  if (!ISBRIDGE) return "hsl("+
+    // make @BetaOS blue!
+    (hashIt(data.replaceAll(" ", "").toLowerCase())%255+79)%255+
+    ", 74.5%, "+(darker?48:80)+"%)";
+  let offset = -44;
+  data = data.replace(/[^\w_-]/g, '').toLowerCase();
+  data = data.replace(/:[a-zA-Z0-9_+-]+:/, "")
+
+  offset = offset || 0;
+  // DJBX33A-ish
+  var val = 0;
+  for (var i = 0; i < data.length; i++) {
+    // scramble char codes across [0-255]
+    // prime multiple chosen so @greenie can green, and @redtaboo red.
+    var charVal = (data.charCodeAt(i) * 439) % 256;
+    var origVal = val;
+    val = val << 5;
+    val += origVal;
+    val += charVal;
+  }
+  val = val << 0;
+  val += Math.pow(2, 31);
+  return "hsl("+(val + offset) % 255+", 65.8%, "+(darker?48:85.1)+"%)";
 }

@@ -807,6 +807,7 @@ summary::marker {
 }
 
 .ALERT_NONBLOCK {
+  z-index: 1;
   position: absolute;
   left: 15px;
   top: 15px;
@@ -824,6 +825,11 @@ summary::marker {
 
 .ALERT_DRAGGER {
   /* height: px; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* flex-direction: row; */
+  
   font-size: 30px;
   border-radius: 10px 10px 0px 0px;
   background-color: var(--system-grey3);
@@ -847,7 +853,7 @@ summary::marker {
   color:var(--system-red);
   position: relative;
   /* right: 10px; */
-  top: -2px;
+  top: -8px;
 }
 .close > span {
   border-radius: 3px;
@@ -933,8 +939,9 @@ summary::marker {
   margin-bottom: 10px;
   width: calc(100% - 20px);
   height: fit-content;
-  /* top: 0px;
-  position: relative; */
+  z-index: 2;
+  /* top: 0px;*/
+  position: relative;
 }
 @keyframes appear {
   0% { 

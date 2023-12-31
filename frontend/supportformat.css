@@ -36,11 +36,14 @@
   right: 5px;
   /* display: none; */
   top: 5px;
-  z-index: 1;
+  /* z-index: 1; */
   padding: 3px;
   margin: 5px;
   font-size: 30px;
   border-radius: 5px;
+}
+#restoreSidebar {
+  z-index: 1;
 }
 #closeSidebar {
   position: static;
@@ -67,7 +70,8 @@
 }
 
 #userList, #botList {
-  flex-grow: 1;
+  height:0px; /* will grow in time*/
+  flex-grow:1;
   border-radius: 10px;
   /* width: calc(12% - 20px); */
   /* height: 77vh; */

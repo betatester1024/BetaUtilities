@@ -247,6 +247,13 @@ class BridgeSocket {
       type: "nick",
       data: { name: alias }
     }));
+    if (updateAliasRes.status != "SUCCESS") {
+      this.client.send(JSON.stringify({
+        action: "yourAlias",
+        data: { alias: "AnonymousBridgeUser", error: true }
+      }));
+      return;
+    }
     this.client.send(JSON.stringify({
       action: "removeUser",
       data: {

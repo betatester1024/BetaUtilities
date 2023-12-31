@@ -352,12 +352,14 @@ function nonBlockingDialog(data:{
   colour?:string,
   continueText?:string,
   hasButton?:boolean,
-  ico?:string}, callback:()=>any) 
+  ico?:string,
+  title?:string}, callback:()=>any) 
 {
   if (data.colour == null)data.colour="grn";
   if (data.continueText == null) data.continueText="Continue";
   if (data.hasButton == null) data.hasButton=true;
   if (data.ico == null) data.ico = "arrow_forward";
+  if (data.title == null) data.title = "Information";
   let div = document.createElement("div");
   div.className="ALERT_NONBLOCK";
   div.isOpen = true;
@@ -367,7 +369,7 @@ function nonBlockingDialog(data:{
   let draggable = document.createElement("div");
   
   draggable.className = "ALERT_DRAGGER";
-  draggable.innerText = "ServiceAlert"
+  draggable.innerHTML = `<span>${data.title}</span>`;
   draggable.innerHTML += `<div class="close" onclick="closeNBD(this.parentElement.parentElement, false)">
   <span class="red nooutline material-symbols-outlined">close</span>
   </div> 

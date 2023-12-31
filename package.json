@@ -4,7 +4,7 @@
   "description": "BetaOS Systems home-page and BetaUtilities on euphoria.leet.nu",
   "main": ".build/index.js",
   "scripts": {
-    "start":"bash build.sh; pm2 start /betaos/.build/index.js --watch --restart-delay 3000"
+    "start": "bash build.sh; pm2 start /betaos/.build/index.js --watch --restart-delay 3000"
   },
   "keywords": [],
   "author": "",
@@ -33,7 +33,6 @@
     "express-ws": "^5.0.2",
     "get-random-values": "^3.0.0",
     "handlebars": "^4.7.8",
-    "localtunnel": "^2.0.2",
     "mongodb": "^6.3.0",
     "node": "^21.2.0",
     "ws": "^8.16.0"

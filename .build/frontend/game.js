@@ -300,7 +300,12 @@ function animLoop() {
       continue;
     if (percentCovered >= 1) {
       percentCovered = 0;
-      let delay = numberMatching(currTrain, trains[i].to);
+      console.log(numberMatching);
+      let delay = numberMatching(currTrain, trains[i].to) * 200;
+      let applicable = [];
+      let currentTo = trains[i].to;
+      while (true) {
+      }
     }
     currTrain.x = currTrain.from.x + (currTrain.to.x - currTrain.from.x) * percentCovered;
     currTrain.y = currTrain.from.y + (currTrain.to.y - currTrain.from.y) * percentCovered;

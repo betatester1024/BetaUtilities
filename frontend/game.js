@@ -339,9 +339,13 @@ function animLoop() {
     if (percentCovered < 0) continue;
     if (percentCovered >= 1) {
       percentCovered = 0;
-      console.log(nu)
-      let delay = numberMatching(currTrain, trains[i].to)
-      
+      console.log(numberMatching);
+      let delay = numberMatching(currTrain, trains[i].to)*200;
+      let applicable = [];
+      let currentTo = trains[i].to;
+      while (true) {
+        
+      }
     }
     currTrain.x = currTrain.from.x + (currTrain.to.x - currTrain.from.x)*percentCovered;
     currTrain.y = currTrain.from.y + (currTrain.to.y - currTrain.from.y)*percentCovered;
@@ -444,7 +448,7 @@ function pointerUp(ev) {
     // lines.push({path:currPath, 
                 // colour:getCSSProp("--system-"+colours[lines.length])});
     for (let i=1; i<currPath.length; i++) {
-      connections.push({from:currPath[i-1], to:currPath[i], 
+      connections.push({from:currPath[i-1], to:currPath[i],
                         colour:currCol, lineID: lineCt});
     }
     trains.push({x:currPath[0].x, y:currPath[0].y, 

@@ -330,6 +330,15 @@ export async function initServer() {
     incrRequests();
   })
 
+  app.get('/game.js', (req:any, res:any) => {
+    sendFile(res, getToken(req), frontendDir+"game.js");
+    incrRequests();
+  })
+  app.get('/thing', (req:any, res:any) => {
+    sendFile(res, getToken(req), frontendDir+"smallsubway.html");
+    incrRequests();
+  })
+
   app.get('*.svg', (req:any, res:any) => {
     const date = new Date();
     date.setFullYear(date.getFullYear() + 1);

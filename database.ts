@@ -59,7 +59,7 @@ export async function DBMaintenance() {
         uDB.deleteOne({fieldName:"TIMER",expiry:objs[i].expiry})
         
         WS.notifRoom.socket.send(
-          WS.toSendInfo("!tell @"+objs[i].notifyingUser+" You are reminded of: "+
+          WS.toSendInfo("!tell "+objs[i].notifyingUser+" You are reminded of: "+
                         objs[i].msg.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, "\\\"")+
                        ". This reminder sent by "+(objs[i].author??"yourself, probably.")));
       }

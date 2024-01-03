@@ -14,7 +14,7 @@ let HASNETWORK = false;
 let branch = "STABLE";
 let userData = null;
 let onloadCallback:()=>any = null;
-async function globalOnload(cbk:()=>any, networkLess:btoolean=false, link:string="/server") {
+async function globalOnload(cbk:()=>any, networkLess:boolean=false, link:string="/server") {
   onloadCallback = cbk;
   bSelInitialise();
   if (!networkLess) {
@@ -98,7 +98,7 @@ async function globalOnload(cbk:()=>any, networkLess:btoolean=false, link:string
                             <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                             <div class="anim"></div>
                           </form> |
-            BetaOS Systems V3, 2023`
+            BetaOS Systems V3, 2024`
           else if (res.status != "SUCCESS") {
             ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}" onclick="login_v2(event)">Login</a> | 
                           <a href='/signup?redirect=${encodeURIComponent(redirector)}' onclick="login_v2(event, true)">Sign-up</a> | 
@@ -109,7 +109,7 @@ async function globalOnload(cbk:()=>any, networkLess:btoolean=false, link:string
                             <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                             <div class="anim"></div>
                           </form> |
-                          BetaOS Systems V3, 2023`;
+                          BetaOS Systems V3, 2024`;
           }
           else if (res.status == "SUCCESS" && link == "/server") {
             resetExpiry(res);
@@ -132,7 +132,7 @@ async function globalOnload(cbk:()=>any, networkLess:btoolean=false, link:string
                             <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                             <div class="anim"></div>
                           </form> |
-                          BetaOS Systems V3, 2023`;
+                          BetaOS Systems V3, 2024`;
           }
           else 
           {
@@ -143,7 +143,7 @@ async function globalOnload(cbk:()=>any, networkLess:btoolean=false, link:string
                             <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                             <div class="anim"></div>
                           </form> |
-                          BetaOS Systems V3, 2023`;
+                          BetaOS Systems V3, 2024`;
           }
           ftr.appendChild(ele);
           let ephDiv = byId("ephemerals")??document.createElement("div");
@@ -221,6 +221,7 @@ function pointerUp(ev:PointerEvent)
   // if (ev.target.nodeName == "SPAN" && ev.target.parentElement &&
       // ev.target.closest(".ALERT_NONBLOCK") != null)  
     // closeNBD(ev.target.parentElement.parentElement.parentElement, false)
+  if (ev.target instanceof HTMLElement) return; // released outside the doc
   if (ev.target.classList.contains("ALERT_DRAGGER")) {
     if (Date.now() - lastPtrUp < 300) // up-up = doubleclick
     {
@@ -924,6 +925,7 @@ function bSelInitialise() {
   // bSelRegister("selCtn", (value)=>{console.log(value);});
   // <!-- bSelRegister("selCtn2"); -->
   document.addEventListener("pointerup", (e)=>{
+    if (e.target instanceof HTMLElement) return; // released outside the doc
     if (e.target.closest(".bSel")) return;
     // console.log("clicked away");
     for (let i=0; i<registered.length; i++) 
@@ -985,3 +987,9 @@ function bSelInitialise() {
     } // switch (key)
   })
 };
+
+
+
+function getCSSProp(name:string){
+  return getComputedStyle(document.body).getPropertyValue(name);
+} 

@@ -7,6 +7,7 @@ html, ::backdrop {
   --system-green: #00cc00;
   --system-green2: rgba(0, 255, 0, 0.1);
   --max-green: #00ef00;
+  --system-purple: #8b00ff;
   --system-yellow: #FFCC1F;
   scroll-behavior: smooth;
   --system-yellowtext: #e99201;

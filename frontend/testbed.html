@@ -34,7 +34,7 @@
             palette.appendChild(cell);
             // let k = (i*64+j);
             // cont rgb()
-            cell.style.backgroundColor = `oklab(${(j*80/16+10)*100}% ${(i/15-0.5)*400}% ${(j/15-0.5)*400}%)`
+            // cell.style.backgroundColor = `oklab(${(j*80/16+10)*100}% ${(i/15-0.5)*400}% ${(j/15-0.5)*400}%)`
             // const rgb = okhsl_to_srgb((i*16+j)*360/256, 100, j*80/16+10);
 
             // Then use the RGB values in a scale of 0-255
@@ -43,7 +43,7 @@
             // cell.style.backgroundColor = rgb_to_hex(srgb_transfer_function(rgb[0]), 
                                                     // srgb_transfer_function(rgb[1]), 
                                                     // srgb_transfer_function(rgb[2]));
-            // cell.style.backgroundColor = `hsl(${(i*16+j)*360/256}, 100%, ${j*80/16+10}%)`;
+            cell.style.backgroundColor = `hsl(${(i*16+j)*360/256}, 100%, ${j*80/16+10}%)`;
           }
           // palette.appendChild(document.createElement("br"));
         }

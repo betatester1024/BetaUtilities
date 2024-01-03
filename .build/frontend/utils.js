@@ -74,7 +74,7 @@ async function globalOnload(cbk, networkLess = false, link = "/server") {
                             <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                             <div class="anim"></div>
                           </form> |
-            BetaOS Systems V3, 2023`;
+            BetaOS Systems V3, 2024`;
           else if (res2.status != "SUCCESS") {
             ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}" onclick="login_v2(event)">Login</a> | 
                           <a href='/signup?redirect=${encodeURIComponent(redirector)}' onclick="login_v2(event, true)">Sign-up</a> | 
@@ -85,7 +85,7 @@ async function globalOnload(cbk, networkLess = false, link = "/server") {
                             <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                             <div class="anim"></div>
                           </form> |
-                          BetaOS Systems V3, 2023`;
+                          BetaOS Systems V3, 2024`;
           } else if (res2.status == "SUCCESS" && link == "/server") {
             resetExpiry(res2);
             ele.innerHTML = `Logged in as <kbd>${res2.data.user}</kbd> |
@@ -107,7 +107,7 @@ async function globalOnload(cbk, networkLess = false, link = "/server") {
                             <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                             <div class="anim"></div>
                           </form> |
-                          BetaOS Systems V3, 2023`;
+                          BetaOS Systems V3, 2024`;
           } else {
             ele.innerHTML = `Logged in as <kbd>${res2.data.user}</kbd> |
                           <a href='${startupData.domain}/logout'>Logout</a> | 
@@ -116,7 +116,7 @@ async function globalOnload(cbk, networkLess = false, link = "/server") {
                             <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
                             <div class="anim"></div>
                           </form> |
-                          BetaOS Systems V3, 2023`;
+                          BetaOS Systems V3, 2024`;
           }
           ftr.appendChild(ele);
           let ephDiv = byId("ephemerals") ?? document.createElement("div");
@@ -188,6 +188,8 @@ function pointerUp(ev) {
   DRAGGING = null;
   origLeft = -1;
   origTop = -1;
+  if (ev.target instanceof HTMLElement)
+    return;
   if (ev.target.classList.contains("ALERT_DRAGGER")) {
     if (Date.now() - lastPtrUp < 300) {
       toggleNBDFullScr(ev.target.closest(".ALERT_NONBLOCK").querySelector(".content"));
@@ -778,6 +780,8 @@ function bSelRegister(id, onChange, defaultVal) {
 function bSelInitialise() {
   console.log("Initialising BetterSelects");
   document.addEventListener("pointerup", (e) => {
+    if (e.target instanceof HTMLElement)
+      return;
     if (e.target.closest(".bSel"))
       return;
     for (let i = 0; i < registered.length; i++)
@@ -834,4 +838,7 @@ function bSelInitialise() {
   });
 }
 ;
+function getCSSProp(name) {
+  return getComputedStyle(document.body).getPropertyValue(name);
+}
 //# sourceMappingURL=utils.js.map

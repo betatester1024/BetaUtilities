@@ -73,7 +73,7 @@ async function DBMaintenance() {
           console.log("NOTIFYING", objs[i]);
           import_consts.uDB.deleteOne({ fieldName: "TIMER", expiry: objs[i].expiry });
           import_wsHandler.WS.notifRoom.socket.send(
-            import_wsHandler.WS.toSendInfo("!tell @" + objs[i].notifyingUser + " You are reminded of: " + objs[i].msg.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, '\\"') + ". This reminder sent by " + (objs[i].author ?? "yourself, probably."))
+            import_wsHandler.WS.toSendInfo("!tell " + objs[i].notifyingUser + " You are reminded of: " + objs[i].msg.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, '\\"') + ". This reminder sent by " + (objs[i].author ?? "yourself, probably."))
           );
         }
       }

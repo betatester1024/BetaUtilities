@@ -270,7 +270,7 @@ function replyMessage(hnd, msg, sender, data) {
     );
     return "Set information for @" + norm(sender);
   }
-  let match = msg.match("^!remind(me | +@[^ ]+ )(in )?()()([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?(?: of)? (.+)");
+  let match = msg.match("^(?:!remind|!delaytell)(me | +(?:@|\\*)[^ ]+ )(in )?()()([0-9.]+\\s*d)?\\s*([0-9.]+\\s*h)?\\s*([0-9.]+\\s*m)?\\s*([0-9.]+\\s*s)?(?: of)? (.+)");
   if (match) {
     let remindUser = match[1];
     let remindMsg = match[9];
@@ -284,12 +284,12 @@ function replyMessage(hnd, msg, sender, data) {
     if (match[8])
       exp4 += Number(match[8].split("s")[0]) * 1e3;
     if (exp4 == Date.now()) {
-      return "No reminder time provided! Syntax: !remindme 1d2h3m4s message OR !remind @user 1d2h3m4s message";
+      return "No reminder time provided! Syntax: !remindme 1d2h3m4s message OR !remind [@user or *group] 1d2h3m4s message";
     }
     let insertObj = {
       fieldName: "TIMER",
       expiry: exp4,
-      notifyingUser: remindUser == "me " ? norm(sender) : remindUser.slice(2, remindUser.length - 1),
+      notifyingUser: remindUser == "me " ? norm(sender) : remindUser.slice(1, remindUser.length - 1),
       msg: remindMsg,
       author: remindUser == "me " ? null : norm(sender)
     };

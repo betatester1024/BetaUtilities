@@ -1,5 +1,5 @@
 const DATALOGGING = true;
-// Copyright (c) 2023 BetaOS
+// Copyright (c) 2024 BetaOS
 // import {WebSocket} from 'ws';
 import {uDB} from '../consts';
 import {replyMessage} from './messageHandle';

@@ -260,6 +260,14 @@ async function initServer() {
     sendFile(res, getToken(req), import_consts.frontendDir + "support.js");
     (0, import_logging.incrRequests)();
   });
+  app.get("/game.js", (req, res) => {
+    sendFile(res, getToken(req), import_consts.frontendDir + "game.js");
+    (0, import_logging.incrRequests)();
+  });
+  app.get("/thing", (req, res) => {
+    sendFile(res, getToken(req), import_consts.frontendDir + "smallsubway.html");
+    (0, import_logging.incrRequests)();
+  });
   app.get("*.svg", (req, res) => {
     const date = new Date();
     date.setFullYear(date.getFullYear() + 1);
@@ -628,7 +636,8 @@ const validPages = [
   "/8192",
   "/imgedit",
   "/leaderboard",
-  "/eval"
+  "/eval",
+  "/smallsubway"
 ];
 const ignoreLog = [
   "getEE",

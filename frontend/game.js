@@ -5,13 +5,14 @@ const K = {
   HOLD:1,
   HOLD_NEWLINE:2
 }
-const trainSpeed = 50/1000; // pixels/ms
+const trainSpeed = 100/1000; // pixels/ms
 let holdState = K.NOHOLD;
 let ctx = null;
 let canv = null;
 let totalScaleFac = 1;
 let stops = [];
 let connections = [];
+let lineTypes = [];
 let stopCt = 0;
 let minSclFac = 0.5;
 const maxSclFac = 3;
@@ -21,7 +22,7 @@ let viewportMax, viewportMin;
 let currPath = [];
 let trains = [];
 const acceptRadius = 30;
-const stopSz = 5;
+const stopSz = 20;
 let currPos_canv = null;
 let lineCt = 0;
 let shiftStatus = false;
@@ -72,8 +73,8 @@ function redraw() {
   ctx.restore();
   ctx.beginPath();
   ctx.lineWidth = 3;
-  ctx.moveTo(0, 0);
-  ctx.lineTo(canv.width, canv.height);
+  ctx.moveTo(-viewportW/2, -viewportH/2);
+  ctx.lineTo(viewportW/2, viewportH/2);
   ctx.stroke();
   ctx.beginPath();
 
@@ -88,6 +89,7 @@ function redraw() {
       out += stops[i].waiting[j].toString();
     }
     ctx.fillText(out, stops[i].x+stopSz, stops[i].y-stopSz/2);
+    ctx.fillText(stops[i].type, stops[i].x, stops[i].y)
   }
   // existing paths///////////
   for (let i=0; i<connections.length; i++) {
@@ -220,19 +222,35 @@ function redraw() {
     
     // }
   }
+  for (let i=0; i<stops.length; i++) 
+    ctx.fillText(stops[i].type, stops[i].x, stops[i].y)
   // now we draw the trains!
   for (let i=0; i<trains.length; i++) {
     ctx.beginPath();
+    // console.log(trains[i].from, trains[i].to);
     let angBtw = Math.atan2(trains[i].to.y-trains[i].from.y,
                             trains[i].to.x-trains[i].from.x);
     let center = {x:trains[i].x, y:trains[i].y};
     // console.log(center);
+    const w = 15;
+    const h = 30;
+    const c = Math.cos(angBtw);
+    const c2 = Math.cos(angBtw+Math.PI/2)
+    const s = Math.sin(angBtw);
+    const s2 = Math.sin(angBtw+Math.PI/2);
+    // const halfDiag = Math.sqrt(w*w/4+h*h/4)/2;
     ctx.save();
       // ctx.translate(-center.x, -center.y)
       // ctx.rotate(angBtw);
       // ctx.translate(center.x, center.y);
       ctx.fillStyle = getCSSProp("--system-grey");
-      ctx.fillRect(center.x - 8, center.y-2.5, 16, 5);
+      ctx.moveTo(center.x+c*h/2+c2*w/2, center.y+s*h/2+s2*w/2);
+      ctx.lineTo(center.x+c*h/2-c2*w/2, center.y+s*h/2-s2*w/2);
+      ctx.lineTo(center.x-c*h/2-c2*w/2, center.y-s*h/2-s2*w/2);
+      ctx.lineTo(center.x-c*h/2+c2*w/2, center.y-s*h/2+s2*w/2);
+      ctx.fill();
+      ctx.fillText(trains[i].passengers.join(""), center.x, center.y)
+      // ctx.fillRect(center.x - 8, center.y-2.5, 16, 5);
     ctx.restore();
   }
 }
@@ -260,7 +278,8 @@ function populateStops() {
     let toAdd = Math.floor(Math.random()*(stops.length)/3)+1;
     for (let j=0; j<toAdd; j++) {
       let stopAdded = Math.floor(Math.random()*stops.length);
-      stops[stopAdded].waiting.push(getNextType());
+      // if (stopAdded >= stops[i].type) stopAdded++;
+      stops[stopAdded].waiting.push(getNextType(stops[stopAdded].type));
     }
   }
 }
@@ -307,16 +326,16 @@ function preLoad() {
   //////////
   // setup stops
   updateMinScl();
-  let firstPoint = genRandomPt();
-  firstPoint.waiting = [];
-  stops.push(firstPoint);
-  stops.type = 0;
+  // let firstPoint = genRandomPt();
+  // firstPoint.waiting = [];
+  // stops.push(firstPoint);
+  // stops.type = 0;
   // let canvMinDim = Math.min(viewportW, viewportH); 
-  for (let i=0; i<2; i++) {
-    addNewStop(i+1);
+  for (let i=0; i<3; i++) {
+    addNewStop(i);
   }
   totalScaleFac*= 0.8;
-  console.log(viewportW, viewportH);
+  // console.log(viewportW, viewportH);
   // translate(-viewportW/2, -viewportH/2);
   redraw();
   scale(totalScaleFac);
@@ -324,7 +343,8 @@ function preLoad() {
   translate(canv.width/2, canv.height/2);
   redraw();
   //////
-  setInterval(animLoop, 1000/60);
+  // setInterval(animLoop, 1000/60);
+  requestAnimationFrame(animLoop);
   setTimeout(stopPopulationLoop, 5000);
 }
 
@@ -337,29 +357,89 @@ function animLoop() {
     // console.log(distTravelled);
     let percentCovered = distTravelled/distTotal;
     if (percentCovered < 0) continue;
-    if (percentCovered >= 1) {
-      percentCovered = 0;
-      console.log(numberMatching);
-      let delay = numberMatching(currTrain, trains[i].to)*200;
-      let applicable = [];
-      let currentTo = trains[i].to;
-      while (true) {
-        
+    if (percentCovered >= 1) { // at a stop. 
+      let startT = Date.now();
+      percentCovered = 0; 
+      // let applicable = [];
+      let currentTo = trains[i].revDir?trains[i].from:trains[i].to;
+      let currStop = nearestStop(currentTo, 1);
+      // console.log(numberMatching(currTrain, currentTo));
+      // how many people to drop off here?
+      let delay = dropOff(currTrain, currentTo)*200;
+      console.log(delay);
+      // figure out if the train is due to reverse first.
+      let reverseQ = true;
+      let nextStop = null;
+      for (let j=0; j<connections.length && reverseQ; j++) {
+        if ((trains[i].revDir?samePt(connections[j].to, currStop)
+             :samePt(connections[j].from, currentTo))
+           && connections[j].lineID == trains[i].lineID) {
+          reverseQ = false;
+          nextStop = trains[i].revDir?connections[j].from:connections[j].to;
+        }
       }
-    }
+      if (reverseQ) {
+        nextStop = trains[i].revDir?trains[i].to:trains[i].from;
+        // console.log("reversing")
+        currTrain.revDir = !currTrain.revDir;
+      }
+      // who to pick up?
+      let supportedStops = new Set();
+      //  find which stops this line supports
+      // let availableTransfers = new Set();
+      while (true) {
+        let currStop = nearestStop(currentTo, 1);
+        let foundQ = false;
+        for (let j=0; j<connections.length; j++) {
+          // going forward: find the conection that starts from the currStop
+          if ((trains[i].revDir?samePt(connections[j].to, currStop)
+              :samePt(connections[j].from, currStop)) && 
+              connections[j].lineID == trains[i].lineID) {
+            currStop = trains[i].revDir?connections[j].from:connections[j].to;
+            foundQ = true;
+            break;
+          }
+          // availableTransfers.add(connections[j].lineID);
+        }
+        if (!foundQ) break; // no stops, reached end of line. we give up!
+        currentTo = currStop;
+        supportedStops.add(currStop.type);
+      }
+      for (let i=0; i<currStop.waiting.length; i++) {
+        if (supportedStops.has(currStop.waiting[i])) {
+          let adding = currStop.waiting[i];
+          currStop.waiting.splice(i, 1);
+          i--;
+          currTrain.passengers.push(adding);
+        }
+        delay += 200;
+      }
+      // console.log(supportedStops, currentTo)
+      // if (currTrain.revDir) {
+      currTrain.from = currTrain.to;
+      currTrain.to = nextStop;
+      currTrain.startT = Date.now()+delay;
+      console.log(currTrain.from, currTrain.to);
+      // }
+      console.log("StopHandler took: ", Date.now()-startT);
+    } // if percentcoered = 1
     currTrain.x = currTrain.from.x + (currTrain.to.x - currTrain.from.x)*percentCovered;
     currTrain.y = currTrain.from.y + (currTrain.to.y - currTrain.from.y)*percentCovered;
-    redraw();
-    // console.log(currTrain.x, currTrain.y, percentCovered)
   }
   redraw();
+  
+  requestAnimationFrame(animLoop);
 }
 
-function numberMatching(currTrain, pt) {
+function dropOff(currTrain, pt) {
   let stop = nearestStop(pt, 1);
   let matching = 0;
   for (let i=0; i<currTrain.passengers.length; i++) 
-    if (currTrain.passengers[i] == stop.type) matching++;
+    if (currTrain.passengers[i] == stop.type) {
+      matching++;
+      currTrain.passengers.splice(i, 1);
+      i--;
+    }
   return matching;
 }
 
@@ -371,8 +451,8 @@ function stopPopulationLoop() {
 
 function updateMinScl(newVal=minSclFac) {
   minSclFac = newVal;
-  viewportW = canv.width/minSclFac*0.2;
-  viewportH = canv.height/minSclFac*0.2;
+  viewportW = canv.width/minSclFac*0.4;
+  viewportH = canv.height/minSclFac*0.4;
   viewportMax = Math.max(viewportW, viewportH);
   viewportMin = Math.min(viewportW, viewportH);
 }
@@ -380,17 +460,20 @@ function updateMinScl(newVal=minSclFac) {
 function addNewStop(type=-1) {
   let newPt;
   if (type < 0) type = getNextType();
-  do {
-    // newPt = genRandomPt();
-    // this is stupid.
-    refPt = stops[Math.floor(Math.random()*stops.length)];
-    ang = Math.random()*2*Math.PI;
-    dist = 150+Math.random()*100
-    newPt = {x:refPt.x+dist*Math.cos(ang), y:refPt.y+dist*Math.sin(ang)};
-  } while (nearestStop(newPt, 150) ||
-          withinViewport(newPt));
+  if (stops.length>0)
+    do {
+      // newPt = genRandomPt();
+      // this is stupid.
+      refPt = stops[Math.floor(Math.random()*stops.length)];
+      // if (refPt)
+      ang = Math.random()*2*Math.PI;
+      dist = 150+Math.random()*100
+      newPt = {x:refPt.x+dist*Math.cos(ang), y:refPt.y+dist*Math.sin(ang)};
+    } while (!(!nearestStop(newPt, 150) && withinViewport(newPt)));
+  else newPt = genRandomPt();
+  // console.log(nearestStop(newPt, 150))
   stops.push(newPt);
-  updateMinScl(minSclFac * 0.99);
+  updateMinScl(minSclFac * 0.97);
   newPt.waiting = [];
   newPt.type = type;
   redraw();
@@ -450,7 +533,9 @@ function pointerUp(ev) {
     for (let i=1; i<currPath.length; i++) {
       connections.push({from:currPath[i-1], to:currPath[i],
                         colour:currCol, lineID: lineCt});
-    }
+    } 
+    // let supportedTypes = {new Set();
+    // lineTypes.push(supportedTypes);
     trains.push({x:currPath[0].x, y:currPath[0].y, 
                  from:currPath[0], to:currPath[1], path:currPath, 
                  lineID: lineCt, colour:currCol, startT: Date.now(), 
@@ -494,10 +579,11 @@ function withinViewport(newPt) {
   // let viewportScl = minSclFac*0.8;
   // console.log(viewportScl);
   // should be <1 and decreasing
-  if (newPt.x < 0) return false;
-  if (newPt.x > viewportW*0.95) return false;
-  if (newPt.y < 0) return false;
-  if (newPt.y > viewportH*0.95) return false;
+  if (newPt.x < -viewportW/2) return false;
+  if (newPt.x > viewportW/2) return false;
+  if (newPt.y < -viewportH/2) return false;
+  if (newPt.y > viewportH/2) return false;
+  return true;
 }
 function distBtw(pt1, pt2) {
   function sq(x) {return x*x;}
@@ -539,7 +625,9 @@ function star() {
 
 }
 
-function getNextType() {
-  return Math.floor(Math.random()*types.length)
+function getNextType(exclude) {
+  let type = Math.floor(Math.random()*(types.length-1))
+  if (type >= exclude) return type+1;
+  return type;
   // if ()
 }

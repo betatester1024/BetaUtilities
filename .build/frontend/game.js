@@ -6,13 +6,14 @@ const K = {
   HOLD: 1,
   HOLD_NEWLINE: 2
 };
-const trainSpeed = 50 / 1e3;
+const trainSpeed = 100 / 1e3;
 let holdState = K.NOHOLD;
 let ctx = null;
 let canv = null;
 let totalScaleFac = 1;
 let stops = [];
 let connections = [];
+let lineTypes = [];
 let stopCt = 0;
 let minSclFac = 0.5;
 const maxSclFac = 3;
@@ -22,7 +23,7 @@ let viewportMax, viewportMin;
 let currPath = [];
 let trains = [];
 const acceptRadius = 30;
-const stopSz = 5;
+const stopSz = 20;
 let currPos_canv = null;
 let lineCt = 0;
 let shiftStatus = false;
@@ -69,8 +70,8 @@ function redraw() {
   ctx.restore();
   ctx.beginPath();
   ctx.lineWidth = 3;
-  ctx.moveTo(0, 0);
-  ctx.lineTo(canv.width, canv.height);
+  ctx.moveTo(-viewportW / 2, -viewportH / 2);
+  ctx.lineTo(viewportW / 2, viewportH / 2);
   ctx.stroke();
   ctx.beginPath();
   for (let i = 0; i < stops.length; i++) {
@@ -83,6 +84,7 @@ function redraw() {
       out += stops[i].waiting[j].toString();
     }
     ctx.fillText(out, stops[i].x + stopSz, stops[i].y - stopSz / 2);
+    ctx.fillText(stops[i].type, stops[i].x, stops[i].y);
   }
   for (let i = 0; i < connections.length; i++) {
     let angBtw = Math.atan2(
@@ -198,6 +200,8 @@ function redraw() {
       ctx.restore();
     }
   }
+  for (let i = 0; i < stops.length; i++)
+    ctx.fillText(stops[i].type, stops[i].x, stops[i].y);
   for (let i = 0; i < trains.length; i++) {
     ctx.beginPath();
     let angBtw = Math.atan2(
@@ -205,9 +209,20 @@ function redraw() {
       trains[i].to.x - trains[i].from.x
     );
     let center = { x: trains[i].x, y: trains[i].y };
+    const w = 15;
+    const h = 30;
+    const c = Math.cos(angBtw);
+    const c2 = Math.cos(angBtw + Math.PI / 2);
+    const s = Math.sin(angBtw);
+    const s2 = Math.sin(angBtw + Math.PI / 2);
     ctx.save();
     ctx.fillStyle = getCSSProp("--system-grey");
-    ctx.fillRect(center.x - 8, center.y - 2.5, 16, 5);
+    ctx.moveTo(center.x + c * h / 2 + c2 * w / 2, center.y + s * h / 2 + s2 * w / 2);
+    ctx.lineTo(center.x + c * h / 2 - c2 * w / 2, center.y + s * h / 2 - s2 * w / 2);
+    ctx.lineTo(center.x - c * h / 2 - c2 * w / 2, center.y - s * h / 2 - s2 * w / 2);
+    ctx.lineTo(center.x - c * h / 2 + c2 * w / 2, center.y - s * h / 2 + s2 * w / 2);
+    ctx.fill();
+    ctx.fillText(trains[i].passengers.join(""), center.x, center.y);
     ctx.restore();
   }
 }
@@ -232,7 +247,7 @@ function populateStops() {
     let toAdd = Math.floor(Math.random() * stops.length / 3) + 1;
     for (let j = 0; j < toAdd; j++) {
       let stopAdded = Math.floor(Math.random() * stops.length);
-      stops[stopAdded].waiting.push(getNextType());
+      stops[stopAdded].waiting.push(getNextType(stops[stopAdded].type));
     }
   }
 }
@@ -273,21 +288,16 @@ function preLoad() {
     redraw();
   });
   updateMinScl();
-  let firstPoint = genRandomPt();
-  firstPoint.waiting = [];
-  stops.push(firstPoint);
-  stops.type = 0;
-  for (let i = 0; i < 2; i++) {
-    addNewStop(i + 1);
+  for (let i = 0; i < 3; i++) {
+    addNewStop(i);
   }
   totalScaleFac *= 0.8;
-  console.log(viewportW, viewportH);
   redraw();
   scale(totalScaleFac);
   redraw();
   translate(canv.width / 2, canv.height / 2);
   redraw();
-  setInterval(animLoop, 1e3 / 60);
+  requestAnimationFrame(animLoop);
   setTimeout(stopPopulationLoop, 5e3);
 }
 function animLoop() {
@@ -299,26 +309,70 @@ function animLoop() {
     if (percentCovered < 0)
       continue;
     if (percentCovered >= 1) {
+      let startT = Date.now();
       percentCovered = 0;
-      console.log(numberMatching);
-      let delay = numberMatching(currTrain, trains[i].to) * 200;
-      let applicable = [];
-      let currentTo = trains[i].to;
-      while (true) {
+      let currentTo = trains[i].revDir ? trains[i].from : trains[i].to;
+      let currStop = nearestStop(currentTo, 1);
+      let delay = dropOff(currTrain, currentTo) * 200;
+      console.log(delay);
+      let reverseQ = true;
+      let nextStop = null;
+      for (let j = 0; j < connections.length && reverseQ; j++) {
+        if ((trains[i].revDir ? samePt(connections[j].to, currStop) : samePt(connections[j].from, currentTo)) && connections[j].lineID == trains[i].lineID) {
+          reverseQ = false;
+          nextStop = trains[i].revDir ? connections[j].from : connections[j].to;
+        }
       }
+      if (reverseQ) {
+        nextStop = trains[i].revDir ? trains[i].to : trains[i].from;
+        currTrain.revDir = !currTrain.revDir;
+      }
+      let supportedStops = /* @__PURE__ */ new Set();
+      while (true) {
+        let currStop2 = nearestStop(currentTo, 1);
+        let foundQ = false;
+        for (let j = 0; j < connections.length; j++) {
+          if ((trains[i].revDir ? samePt(connections[j].to, currStop2) : samePt(connections[j].from, currStop2)) && connections[j].lineID == trains[i].lineID) {
+            currStop2 = trains[i].revDir ? connections[j].from : connections[j].to;
+            foundQ = true;
+            break;
+          }
+        }
+        if (!foundQ)
+          break;
+        currentTo = currStop2;
+        supportedStops.add(currStop2.type);
+      }
+      for (let i2 = 0; i2 < currStop.waiting.length; i2++) {
+        if (supportedStops.has(currStop.waiting[i2])) {
+          let adding = currStop.waiting[i2];
+          currStop.waiting.splice(i2, 1);
+          i2--;
+          currTrain.passengers.push(adding);
+        }
+        delay += 200;
+      }
+      currTrain.from = currTrain.to;
+      currTrain.to = nextStop;
+      currTrain.startT = Date.now() + delay;
+      console.log(currTrain.from, currTrain.to);
+      console.log("StopHandler took: ", Date.now() - startT);
     }
     currTrain.x = currTrain.from.x + (currTrain.to.x - currTrain.from.x) * percentCovered;
     currTrain.y = currTrain.from.y + (currTrain.to.y - currTrain.from.y) * percentCovered;
-    redraw();
   }
   redraw();
+  requestAnimationFrame(animLoop);
 }
-function numberMatching(currTrain, pt) {
+function dropOff(currTrain, pt) {
   let stop = nearestStop(pt, 1);
   let matching = 0;
   for (let i = 0; i < currTrain.passengers.length; i++)
-    if (currTrain.passengers[i] == stop.type)
+    if (currTrain.passengers[i] == stop.type) {
       matching++;
+      currTrain.passengers.splice(i, 1);
+      i--;
+    }
   return matching;
 }
 function stopPopulationLoop() {
@@ -328,8 +382,8 @@ function stopPopulationLoop() {
 }
 function updateMinScl(newVal = minSclFac) {
   minSclFac = newVal;
-  viewportW = canv.width / minSclFac * 0.2;
-  viewportH = canv.height / minSclFac * 0.2;
+  viewportW = canv.width / minSclFac * 0.4;
+  viewportH = canv.height / minSclFac * 0.4;
   viewportMax = Math.max(viewportW, viewportH);
   viewportMin = Math.min(viewportW, viewportH);
 }
@@ -337,14 +391,17 @@ function addNewStop(type = -1) {
   let newPt;
   if (type < 0)
     type = getNextType();
-  do {
-    refPt = stops[Math.floor(Math.random() * stops.length)];
-    ang = Math.random() * 2 * Math.PI;
-    dist = 150 + Math.random() * 100;
-    newPt = { x: refPt.x + dist * Math.cos(ang), y: refPt.y + dist * Math.sin(ang) };
-  } while (nearestStop(newPt, 150) || withinViewport(newPt));
+  if (stops.length > 0)
+    do {
+      refPt = stops[Math.floor(Math.random() * stops.length)];
+      ang = Math.random() * 2 * Math.PI;
+      dist = 150 + Math.random() * 100;
+      newPt = { x: refPt.x + dist * Math.cos(ang), y: refPt.y + dist * Math.sin(ang) };
+    } while (!(!nearestStop(newPt, 150) && withinViewport(newPt)));
+  else
+    newPt = genRandomPt();
   stops.push(newPt);
-  updateMinScl(minSclFac * 0.99);
+  updateMinScl(minSclFac * 0.97);
   newPt.waiting = [];
   newPt.type = type;
   redraw();
@@ -443,14 +500,15 @@ function nearestStop(newPt, minDist) {
   return found;
 }
 function withinViewport(newPt) {
-  if (newPt.x < 0)
+  if (newPt.x < -viewportW / 2)
     return false;
-  if (newPt.x > viewportW * 0.95)
+  if (newPt.x > viewportW / 2)
     return false;
-  if (newPt.y < 0)
+  if (newPt.y < -viewportH / 2)
     return false;
-  if (newPt.y > viewportH * 0.95)
+  if (newPt.y > viewportH / 2)
     return false;
+  return true;
 }
 function distBtw(pt1, pt2) {
   function sq(x) {
@@ -490,7 +548,10 @@ function circ() {
 }
 function star() {
 }
-function getNextType() {
-  return Math.floor(Math.random() * types.length);
+function getNextType(exclude) {
+  let type = Math.floor(Math.random() * (types.length - 1));
+  if (type >= exclude)
+    return type + 1;
+  return type;
 }
 //# sourceMappingURL=game.js.map

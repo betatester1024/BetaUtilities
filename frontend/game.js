@@ -361,7 +361,7 @@ function animLoop() {
       let startT = Date.now();
       percentCovered = 0; 
       // let applicable = [];
-      let currentTo = trains[i].revDir?trains[i].from:trains[i].to;
+      let currentTo = trains[i].to;//trains[i].revDir?trains[i].from:trains[i].to;
       let currStop = nearestStop(currentTo, 1);
       // console.log(numberMatching(currTrain, currentTo));
       // how many people to drop off here?
@@ -371,7 +371,7 @@ function animLoop() {
       let reverseQ = true;
       let nextStop = null;
       for (let j=0; j<connections.length && reverseQ; j++) {
-        if ((trains[i].revDir?samePt(connections[j].to, currStop)
+        if ((trains[i].revDir?samePt(connections[j].to, currentTo)
              :samePt(connections[j].from, currentTo))
            && connections[j].lineID == trains[i].lineID) {
           reverseQ = false;
@@ -379,10 +379,11 @@ function animLoop() {
         }
       }
       if (reverseQ) {
-        nextStop = trains[i].revDir?trains[i].to:trains[i].from;
+        nextStop = trains[i].from;
         // console.log("reversing")
         currTrain.revDir = !currTrain.revDir;
       }
+      console.log("nextstop", nextStop)
       // who to pick up?
       let supportedStops = new Set();
       //  find which stops this line supports
@@ -419,7 +420,7 @@ function animLoop() {
       currTrain.from = currTrain.to;
       currTrain.to = nextStop;
       currTrain.startT = Date.now()+delay;
-      console.log(currTrain.from, currTrain.to);
+      // console.log(currTrain.from, currTrain.to);
       // }
       console.log("StopHandler took: ", Date.now()-startT);
     } // if percentcoered = 1

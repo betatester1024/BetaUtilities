@@ -61,6 +61,6 @@
 	},
 	"exclude": [
 		"node_modules",
-		".build"
+		"build"
 	]
 }

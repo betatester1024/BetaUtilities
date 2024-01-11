@@ -4,7 +4,7 @@
   "description": "BetaOS Systems home-page and BetaUtilities on euphoria.leet.nu",
   "main": ".build/index.js",
   "scripts": {
-    "start": "bash build.sh; pm2 start /betaos/.build/index.js --watch --restart-delay 3000"
+    "start": "node --enable-source-maps build/index.js"
   },
   "keywords": [],
   "author": "",

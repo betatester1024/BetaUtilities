@@ -21,9 +21,12 @@ let viewportW = 0;
 let viewportH = 0;
 let viewportMax, viewportMin;
 let currPath = [];
+let typesOnLine = [];
 let trains = [];
+let maxUnlockedType = 0;
 const acceptRadius = 30;
 const stopSz = 20;
+let adj = [];
 let currPos_canv = null;
 let lineCt = 0;
 let shiftStatus = false;
@@ -222,6 +225,7 @@ function redraw() {
     ctx.lineTo(center.x - c * h / 2 - c2 * w / 2, center.y - s * h / 2 - s2 * w / 2);
     ctx.lineTo(center.x - c * h / 2 + c2 * w / 2, center.y - s * h / 2 + s2 * w / 2);
     ctx.fill();
+    ctx.fillStyle = defaultClr;
     ctx.fillText(trains[i].passengers.join(""), center.x, center.y);
     ctx.restore();
   }
@@ -311,25 +315,28 @@ function animLoop() {
     if (percentCovered >= 1) {
       let startT = Date.now();
       percentCovered = 0;
-      let currentTo = trains[i].revDir ? trains[i].from : trains[i].to;
+      let currentTo = trains[i].to;
       let currStop = nearestStop(currentTo, 1);
-      let delay = dropOff(currTrain, currentTo) * 200;
-      console.log(delay);
+      let delay = dropOff(currTrain, currentTo) * 400;
       let reverseQ = true;
       let nextStop = null;
       for (let j = 0; j < connections.length && reverseQ; j++) {
-        if ((trains[i].revDir ? samePt(connections[j].to, currStop) : samePt(connections[j].from, currentTo)) && connections[j].lineID == trains[i].lineID) {
+        if ((trains[i].revDir ? samePt(connections[j].to, currentTo) : samePt(connections[j].from, currentTo)) && connections[j].lineID == trains[i].lineID) {
           reverseQ = false;
           nextStop = trains[i].revDir ? connections[j].from : connections[j].to;
         }
       }
       if (reverseQ) {
-        nextStop = trains[i].revDir ? trains[i].to : trains[i].from;
+        nextStop = trains[i].from;
         currTrain.revDir = !currTrain.revDir;
       }
       let supportedStops = /* @__PURE__ */ new Set();
+      let upcomingLinesServed = /* @__PURE__ */ new Set();
       while (true) {
         let currStop2 = nearestStop(currentTo, 1);
+        for (const lineID of currStop2.linesServed) {
+          upcomingLinesServed.add(lineID);
+        }
         let foundQ = false;
         for (let j = 0; j < connections.length; j++) {
           if ((trains[i].revDir ? samePt(connections[j].to, currStop2) : samePt(connections[j].from, currStop2)) && connections[j].lineID == trains[i].lineID) {
@@ -344,18 +351,33 @@ function animLoop() {
         supportedStops.add(currStop2.type);
       }
       for (let i2 = 0; i2 < currStop.waiting.length; i2++) {
+        if (currTrain.passengers.length >= 6)
+          break;
         if (supportedStops.has(currStop.waiting[i2])) {
           let adding = currStop.waiting[i2];
           currStop.waiting.splice(i2, 1);
-          i2--;
           currTrain.passengers.push(adding);
+          i2--;
+          delay += 400;
         }
-        delay += 200;
+      }
+      for (let i2 = 0; i2 < currStop.waiting.length; i2++) {
+        if (currTrain.passengers.length >= 6)
+          break;
+        for (let j = 0; j < typesOnLine.length; j++) {
+          if (typesOnLine[i2].has(currStop.waiting[i2])) {
+            let adding = currStop.waiting[i2];
+            currStop.waiting.splice(i2, 1);
+            currTrain.passengers.push(adding);
+            i2--;
+          }
+          delay += 400;
+        }
       }
       currTrain.from = currTrain.to;
       currTrain.to = nextStop;
-      currTrain.startT = Date.now() + delay;
-      console.log(currTrain.from, currTrain.to);
+      currTrain.startT = startT + delay;
+      console.log(delay);
       console.log("StopHandler took: ", Date.now() - startT);
     }
     currTrain.x = currTrain.from.x + (currTrain.to.x - currTrain.from.x) * percentCovered;
@@ -401,8 +423,10 @@ function addNewStop(type = -1) {
   else
     newPt = genRandomPt();
   stops.push(newPt);
+  maxUnlockedType = Math.max(maxUnlockedType, type);
   updateMinScl(minSclFac * 0.97);
   newPt.waiting = [];
+  newPt.linesServed = /* @__PURE__ */ new Set();
   newPt.type = type;
   redraw();
 }
@@ -454,6 +478,20 @@ function pointerUp(ev) {
         lineID: lineCt
       });
     }
+    adj = [];
+    for (let i = 0; i < stops.length; i++) {
+      let row = [];
+      for (let j = 0; j < maxUnlockedType.length; j++) {
+        row.push(99);
+      }
+      adj.push(row);
+    }
+    let supportedTypes = /* @__PURE__ */ new Set();
+    for (let i = 0; i < currPath.length; i++) {
+      supportedTypes.add(currPath[i].type);
+      currPath[i].linesServed.add(lineCt);
+    }
+    typesOnLine.push(supportedTypes);
     trains.push({
       x: currPath[0].x,
       y: currPath[0].y,
@@ -548,9 +586,9 @@ function circ() {
 }
 function star() {
 }
-function getNextType(exclude) {
-  let type = Math.floor(Math.random() * (types.length - 1));
-  if (type >= exclude)
+function getNextType(exclude = -1) {
+  let type = Math.floor(Math.random() * (exclude < 0 ? types.length : maxUnlockedType));
+  if (type >= exclude && exclude >= 0)
     return type + 1;
   return type;
 }

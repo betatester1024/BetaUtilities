@@ -20,9 +20,12 @@ let viewportW = 0;
 let viewportH = 0;
 let viewportMax, viewportMin;
 let currPath = [];
+let typesOnLine =  []
 let trains = [];
+let maxUnlockedType = 0;
 const acceptRadius = 30;
 const stopSz = 20;
+let adj = [];
 let currPos_canv = null;
 let lineCt = 0;
 let shiftStatus = false;
@@ -249,6 +252,7 @@ function redraw() {
       ctx.lineTo(center.x-c*h/2-c2*w/2, center.y-s*h/2-s2*w/2);
       ctx.lineTo(center.x-c*h/2+c2*w/2, center.y-s*h/2+s2*w/2);
       ctx.fill();
+      ctx.fillStyle = defaultClr;
       ctx.fillText(trains[i].passengers.join(""), center.x, center.y)
       // ctx.fillRect(center.x - 8, center.y-2.5, 16, 5);
     ctx.restore();
@@ -365,8 +369,7 @@ function animLoop() {
       let currStop = nearestStop(currentTo, 1);
       // console.log(numberMatching(currTrain, currentTo));
       // how many people to drop off here?
-      let delay = dropOff(currTrain, currentTo)*200;
-      console.log(delay);
+      let delay = dropOff(currTrain, currentTo)*400;
       // figure out if the train is due to reverse first.
       let reverseQ = true;
       let nextStop = null;
@@ -383,13 +386,16 @@ function animLoop() {
         // console.log("reversing")
         currTrain.revDir = !currTrain.revDir;
       }
-      console.log("nextstop", nextStop)
       // who to pick up?
       let supportedStops = new Set();
       //  find which stops this line supports
       // let availableTransfers = new Set();
+      let upcomingLinesServed = new Set();
       while (true) {
         let currStop = nearestStop(currentTo, 1);
+        for (const lineID of currStop.linesServed) {
+          upcomingLinesServed.add(lineID);
+        }
         let foundQ = false;
         for (let j=0; j<connections.length; j++) {
           // going forward: find the conection that starts from the currStop
@@ -407,19 +413,37 @@ function animLoop() {
         supportedStops.add(currStop.type);
       }
       for (let i=0; i<currStop.waiting.length; i++) {
+        if (currTrain.passengers.length >= 6) break;
         if (supportedStops.has(currStop.waiting[i])) {
           let adding = currStop.waiting[i];
+          // setTimeout(()=>{
           currStop.waiting.splice(i, 1);
-          i--;
           currTrain.passengers.push(adding);
+          i--;
+          delay += 400;
         }
-        delay += 200;
+      }
+      // take the direct passengers before taking any transferrers
+      for (let i=0; i<currStop.waiting.length; i++) {
+        if (currTrain.passengers.length >= 6) break;
+        for (let j=0; j<typesOnLine.length; j++) {
+          
+          if (typesOnLine[i].has(currStop.waiting[i])) {
+            let adding = currStop.waiting[i];
+            currStop.waiting.splice(i, 1);
+            currTrain.passengers.push(adding);
+            i--;
+          }
+          delay += 400;
+        }
+
       }
       // console.log(supportedStops, currentTo)
       // if (currTrain.revDir) {
       currTrain.from = currTrain.to;
       currTrain.to = nextStop;
-      currTrain.startT = Date.now()+delay;
+      currTrain.startT = startT+delay;
+      console.log(delay);
       // console.log(currTrain.from, currTrain.to);
       // }
       console.log("StopHandler took: ", Date.now()-startT);
@@ -474,8 +498,10 @@ function addNewStop(type=-1) {
   else newPt = genRandomPt();
   // console.log(nearestStop(newPt, 150))
   stops.push(newPt);
+  maxUnlockedType = Math.max(maxUnlockedType, type);
   updateMinScl(minSclFac * 0.97);
   newPt.waiting = [];
+  newPt.linesServed = new Set();
   newPt.type = type;
   redraw();
 }
@@ -535,8 +561,21 @@ function pointerUp(ev) {
       connections.push({from:currPath[i-1], to:currPath[i],
                         colour:currCol, lineID: lineCt});
     } 
-    // let supportedTypes = {new Set();
-    // lineTypes.push(supportedTypes);
+    // run dijkstra?
+    adj = [];
+    for (let i=0; i<stops.length; i++) {
+      let row = [];
+      for (let j=0; j<maxUnlockedType.length; j++) {
+        row.push(99);
+      }
+      adj.push(row);
+    }
+    let supportedTypes = new Set();
+    for (let i=0; i<currPath.length; i++) {
+      supportedTypes.add(currPath[i].type);
+      currPath[i].linesServed.add(lineCt);
+    }
+    typesOnLine.push(supportedTypes);
     trains.push({x:currPath[0].x, y:currPath[0].y, 
                  from:currPath[0], to:currPath[1], path:currPath, 
                  lineID: lineCt, colour:currCol, startT: Date.now(), 
@@ -626,9 +665,9 @@ function star() {
 
 }
 
-function getNextType(exclude) {
-  let type = Math.floor(Math.random()*(types.length-1))
-  if (type >= exclude) return type+1;
+function getNextType(exclude=-1) {
+  let type = Math.floor(Math.random()*(exclude<0?types.length:maxUnlockedType));
+  if (type >= exclude && exclude>=0) return type+1;
   return type;
   // if ()
 }

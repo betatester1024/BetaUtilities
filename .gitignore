@@ -2,4 +2,3 @@ runtime.txt
 msgLog.txt
 systemLog.txt
 node_modules
-.build

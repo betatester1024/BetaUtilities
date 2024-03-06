@@ -289,7 +289,7 @@ function replyMessage(hnd, msg, sender, data) {
     let insertObj = {
       fieldName: "TIMER",
       expiry: exp4,
-      notifyingUser: remindUser == "me " ? norm(sender) : remindUser.slice(1, remindUser.length - 1),
+      notifyingUser: remindUser == "me " ? "@" + norm(sender) : remindUser.slice(1, remindUser.length - 1),
       msg: remindMsg,
       author: remindUser == "me " ? null : norm(sender)
     };

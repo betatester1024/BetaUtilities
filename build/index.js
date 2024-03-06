@@ -20,6 +20,7 @@ var unstable_exports = {};
 __export(unstable_exports, {
   DBConnectFailure: () => DBConnectFailure,
   UPSINCESTR: () => UPSINCESTR,
+  botsStarted: () => botsStarted,
   connectionSuccess: () => connectionSuccess
 });
 module.exports = __toCommonJS(unstable_exports);
@@ -38,6 +39,7 @@ const localEuphRooms = [];
 const { exec } = require("child_process");
 let timedOutQ = false;
 let UPSINCESTR = "";
+let botsStarted = false;
 try {
   if (connectionSuccess)
     (0, import_database.connectDB)().then((err) => {
@@ -82,10 +84,11 @@ try {
   console.log(e);
 }
 async function init(startBots) {
+  botsStarted = startBots;
   if (startBots)
     console.log("Starting EuphBots...");
   (0, import_server.initServer)();
-  (0, import_database.DBMaintenance)();
+  setTimeout(import_database.DBMaintenance, 1e3);
   (0, import_wordler.serverUpdate)();
   let now = new Date(Date.now());
   UPSINCESTR = "----------------------Systems restarted at " + now.toLocaleString("en-US", { timeZone: "America/New_York" }) + "-------------------";
@@ -101,7 +104,7 @@ async function init(startBots) {
           obj.euphRooms[i],
           !(obj.euphRooms[i] == "test" || obj.euphRooms[i] == "bots")
         );
-        console.log("Connected euph_room", obj.euphRooms[i]);
+        console.log("Connecting euph_room", obj.euphRooms[i]);
       }
     for (let i = 0; i < obj.rooms.length; i++) {
       new import_webHandler.WebH(obj.rooms[i], false);
@@ -117,6 +120,7 @@ async function init(startBots) {
 0 && (module.exports = {
   DBConnectFailure,
   UPSINCESTR,
+  botsStarted,
   connectionSuccess
 });
 //# sourceMappingURL=index.js.map

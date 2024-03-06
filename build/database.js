@@ -27,13 +27,14 @@ module.exports = __toCommonJS(database_exports);
 var import_consts = require("./consts");
 var import_wsHandler = require("./betautilities/wsHandler");
 var import_index = require("./index");
+var import_index2 = require("./index");
 const { MongoClient } = require("mongodb");
 const uri = `mongodb+srv://SystemLogin:${process.env["dbPwd"]}@betaos-datacluster00.d8o7x8n.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
 async function connectDB() {
   try {
     await client.connect();
-    clearTimeout(import_index.DBConnectFailure);
+    clearTimeout(import_index2.DBConnectFailure);
     return null;
   } catch (e) {
     console.log(e);
@@ -66,19 +67,21 @@ async function DBMaintenance() {
     }
   }
   ;
-  import_consts.uDB.find({ fieldName: "TIMER" }).toArray().then(
-    (objs) => {
-      for (let i = 0; i < objs.length; i++) {
-        if (Date.now() > objs[i].expiry || objs[i].expiry == null) {
-          console.log("NOTIFYING", objs[i]);
-          import_consts.uDB.deleteOne({ fieldName: "TIMER", expiry: objs[i].expiry });
-          import_wsHandler.WS.notifRoom.socket.send(
-            import_wsHandler.WS.toSendInfo("!tell " + objs[i].notifyingUser + " You are reminded of: " + objs[i].msg.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, '\\"') + ". This reminder sent by " + (objs[i].author ?? "yourself, probably."))
-          );
+  if (import_index.botsStarted) {
+    import_consts.uDB.find({ fieldName: "TIMER" }).toArray().then(
+      (objs) => {
+        for (let i = 0; i < objs.length; i++) {
+          if (Date.now() > objs[i].expiry || objs[i].expiry == null) {
+            console.log("NOTIFYING", objs[i]);
+            import_consts.uDB.deleteOne({ fieldName: "TIMER", expiry: objs[i].expiry });
+            import_wsHandler.WS.notifRoom.socket.send(
+              import_wsHandler.WS.toSendInfo("!tell " + objs[i].notifyingUser + " You are reminded of: " + objs[i].msg.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, '\\"') + ". This reminder sent by " + (objs[i].author ?? "yourself, probably."))
+            );
+          }
         }
       }
-    }
-  );
+    );
+  }
   setTimeout(DBMaintenance, 1e3);
 }
 // Annotate the CommonJS export names for ESM import in node:

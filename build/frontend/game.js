@@ -36,6 +36,12 @@ let defaultClr = "#000";
 const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 function onLoad() {
 }
+function closestRoute(stopID, destType) {
+  let connections2 = Array(stops.length).fill(Array(stops.length).fill(Infinity));
+  for (let i = 0; i < stops; i++) {
+  }
+  console.log(connections2);
+}
 function redraw() {
   function circle(pt) {
     ctx.save();
@@ -263,9 +269,6 @@ function preLoad() {
   canv.addEventListener("pointerdown", (ev) => {
     holdState = K.HOLD;
     downPt = { x: ev.clientX, y: ev.clientY };
-    if (ev.shiftKey) {
-      document.body.style.cursor = "grabbing";
-    }
     let actualPos = fromCanvPos(ev.clientX, ev.clientY);
     let nStop = nearestStop(actualPos, acceptRadius);
     if (nStop && colours.length > 0) {
@@ -274,13 +277,16 @@ function preLoad() {
       currPath = [nStop];
       redraw();
     }
+    if (holdState == K.HOLD) {
+      document.body.style.cursor = "grabbing";
+    }
     console.log("holdState", holdState);
   });
   window.addEventListener("keydown", keyUpdate);
   window.addEventListener("keyup", keyUpdate);
   window.addEventListener("pointerup", pointerUp);
   canv.addEventListener("wheel", (ev) => {
-    let sclFac = ev.deltaY < 0 ? Math.pow(10, -ev.deltaY / 750) : Math.pow(10, -ev.deltaY / 400);
+    let sclFac = ev.deltaY < 0 ? 1.2 : 1 / 1.2;
     if (sclFac * totalScaleFac > maxSclFac)
       sclFac = maxSclFac / totalScaleFac;
     if (sclFac * totalScaleFac < minSclFac)
@@ -431,15 +437,10 @@ function addNewStop(type = -1) {
   redraw();
 }
 function keyUpdate(ev) {
-  if (!shiftStatus && ev.shiftKey)
-    document.body.style.cursor = "grab";
-  else if (shiftStatus && !ev.shiftKey)
-    document.body.style.cursor = "";
-  shiftStatus = ev.shiftKey;
 }
 function onmove(ev) {
   currPos_canv = fromCanvPos(ev.clientX, ev.clientY);
-  if (holdState != K.NOHOLD && ev.shiftKey) {
+  if (holdState == K.HOLD) {
     translate(ev.movementX, ev.movementY);
     redraw();
   } else if (holdState == K.HOLD_NEWLINE) {
@@ -466,7 +467,7 @@ function onmove(ev) {
 }
 function pointerUp(ev) {
   holdState = K.NOHOLD;
-  document.body.style.cursor = shiftStatus ? "grab" : "";
+  document.body.style.cursor = holdState == K.HOLD ? "grab" : "";
   if (currPath.length > 1) {
     let currCol = getCSSProp("--system-" + colours[0]);
     colours.shift();

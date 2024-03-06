@@ -405,7 +405,7 @@ export async function initServer() {
   
 
   const banList= [];
-  app.post('/server', urlencodedParser, async (req:any, res:any) => {
+  app.post('/server', urlencodedParser, async (req:any, res:any) => {try {
     incrRequests();
     if (req.headers['content-length'] > 60000) {
       res.set("Connection", "close");
@@ -460,7 +460,7 @@ export async function initServer() {
       res.cookie('accountID', ret.token??"", {httpOnly: true, secure:true, sameSite:"None", maxAge:9e12});
       res.end(JSON.stringify({status:ret.status, data:ret.data}));
     });
-  });
+  } catch(e) {}});
   
   if (process.env.localhost) 
     app.listen(port, 'localhost', function() {

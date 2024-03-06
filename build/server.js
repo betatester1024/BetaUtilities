@@ -321,52 +321,55 @@ async function initServer() {
   });
   const banList = [];
   app.post("/server", urlencodedParser, async (req, res) => {
-    (0, import_logging.incrRequests)();
-    if (req.headers["content-length"] > 6e4) {
-      res.set("Connection", "close");
-      res.status(413).end();
-      return;
+    try {
+      (0, import_logging.incrRequests)();
+      if (req.headers["content-length"] > 6e4) {
+        res.set("Connection", "close");
+        res.status(413).end();
+        return;
+      }
+      let addr = req.ip;
+      if (banList.indexOf(addr) >= 0) {
+        res.end(JSON.stringify({ status: "ERROR", data: { error: "IP banned, contact BetaOS if this was done in error." } }));
+        return;
+      }
+      var body = await parse.json(req);
+      if (!body)
+        res.end(JSON.stringify({ status: "ERROR", data: { error: "No command string" } }));
+      if (body.action == "cookieRequest") {
+        res.end(JSON.stringify({ data: req.cookies.acceptedQ ?? false }));
+        return;
+      }
+      if (body.action == "acceptCookies") {
+        res.cookie("acceptedQ", true, { httpOnly: true, secure: true, sameSite: "None" });
+        res.end(JSON.stringify(""));
+        return;
+      }
+      if (body.action == "accountID") {
+        if (req.cookies.accountID)
+          res.end(JSON.stringify({ status: "SUCCESS", data: { id: req.cookies.accountID } }));
+        else
+          res.end(JSON.stringify({ status: "ERROR", data: { error: "Not logged in" } }));
+        return;
+      }
+      if (body.action == "setAccountID") {
+        res.cookie("accountID", body.data.id, { httpOnly: true, secure: true, sameSite: "None" });
+        res.end(JSON.stringify({ status: "SUCCESS", data: null }));
+        return;
+      }
+      if (!req.cookies.sessionID)
+        res.cookie("sessionID", crypto.randomUUID(), { httpOnly: true, secure: true, sameSite: "None" });
+      makeRequest(body.action, req.cookies.accountID, body.data, req.cookies.sessionID).then((ret) => {
+        if (ignoreLog.indexOf(body.action) >= 0) {
+        } else if (ret.status == "SUCCESS") {
+          (0, import_logging.log)("[" + addr + "]: " + body.action + ", RESP:" + JSON.stringify(ret.data));
+        } else
+          (0, import_logging.log)("F[" + addr + "]: " + body.action + ", ERR:" + ret.data.error);
+        res.cookie("accountID", ret.token ?? "", { httpOnly: true, secure: true, sameSite: "None", maxAge: 9e12 });
+        res.end(JSON.stringify({ status: ret.status, data: ret.data }));
+      });
+    } catch (e) {
     }
-    let addr = req.ip;
-    if (banList.indexOf(addr) >= 0) {
-      res.end(JSON.stringify({ status: "ERROR", data: { error: "IP banned, contact BetaOS if this was done in error." } }));
-      return;
-    }
-    var body = await parse.json(req);
-    if (!body)
-      res.end(JSON.stringify({ status: "ERROR", data: { error: "No command string" } }));
-    if (body.action == "cookieRequest") {
-      res.end(JSON.stringify({ data: req.cookies.acceptedQ ?? false }));
-      return;
-    }
-    if (body.action == "acceptCookies") {
-      res.cookie("acceptedQ", true, { httpOnly: true, secure: true, sameSite: "None" });
-      res.end(JSON.stringify(""));
-      return;
-    }
-    if (body.action == "accountID") {
-      if (req.cookies.accountID)
-        res.end(JSON.stringify({ status: "SUCCESS", data: { id: req.cookies.accountID } }));
-      else
-        res.end(JSON.stringify({ status: "ERROR", data: { error: "Not logged in" } }));
-      return;
-    }
-    if (body.action == "setAccountID") {
-      res.cookie("accountID", body.data.id, { httpOnly: true, secure: true, sameSite: "None" });
-      res.end(JSON.stringify({ status: "SUCCESS", data: null }));
-      return;
-    }
-    if (!req.cookies.sessionID)
-      res.cookie("sessionID", crypto.randomUUID(), { httpOnly: true, secure: true, sameSite: "None" });
-    makeRequest(body.action, req.cookies.accountID, body.data, req.cookies.sessionID).then((ret) => {
-      if (ignoreLog.indexOf(body.action) >= 0) {
-      } else if (ret.status == "SUCCESS") {
-        (0, import_logging.log)("[" + addr + "]: " + body.action + ", RESP:" + JSON.stringify(ret.data));
-      } else
-        (0, import_logging.log)("F[" + addr + "]: " + body.action + ", ERR:" + ret.data.error);
-      res.cookie("accountID", ret.token ?? "", { httpOnly: true, secure: true, sameSite: "None", maxAge: 9e12 });
-      res.end(JSON.stringify({ status: ret.status, data: ret.data }));
-    });
   });
   if (process.env.localhost)
     app.listen(import_consts.port, "localhost", function() {

@@ -10,6 +10,7 @@ const K = {
   INF: 9e99,
   PIANDABIT: Math.PI+0.1,
   NOACTION:0,
+  FAILTIME: 10000,
   BOARDPENDING:1, // just boarding 
   DEBOARDPENDING:2, // just deboarding
   TRANSFERPENDING:3 // deboarding FOR TRANSFER.
@@ -32,9 +33,12 @@ let viewportMax, viewportMin;
 let currPath = [];
 let typesOnLine = []
 let trains = [];
+let ticketCost = 10;
+let passengersServed = 0;
+let cash = 0;
 let maxUnlockedType = 0;
-const acceptRadius = 30;
-const stopSz = 20;
+const acceptRadius = 100;
+const stopSz = 50;
 let adj = [];
 let passengers = [];
 let currPos_canv = null;
@@ -47,6 +51,17 @@ const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
 function onLoad() {
   
+}
+
+function bezier(t , initial , p1, p2, final){
+return (1 - t) * (1 - t) * (1 - t) * initial
+        +
+        3 * (1 - t) * (1 - t) * t * p1
+        +
+        3 * (1 - t) * t * t * p2
+        +
+        t * t * t * final;
+
 }
 
 function getNextStop(currTrain) {
@@ -68,7 +83,6 @@ function getNextStop(currTrain) {
 }
 
 function handlePassenger(pass) {
-  
   if (pass.status != K.WAITING) return;
   let minRouteLength = K.INF;
   // let minRoute = [];
@@ -149,10 +163,40 @@ function redraw() {
   ////////// little stop circles //////////
   for (let i = 0; i < stops.length; i++) {
     ctx.save();
+    ctx.beginPath();
     if (stops[i].failureTimer > 0) {
-      let pctRemaining = 
+      ctx.fillStyle = getCSSProp("--system-red2");
+      let pctRemaining = (Date.now() - stops[i].failureTimer)/K.FAILTIME;
+      let pctOneSec = (Date.now() - stops[i].failureTimer)/300;
+      let radScl = 0;
+      if (pctOneSec < 1) 
+        radScl = (-4*(pctOneSec-0.5)**2)+0.5;
+      if (pctRemaining > 1 && pctRemaining < 2) {
+        radScl = pctRemaining**100;
+      }
+      let currRad = stopSz+(acceptRadius-stopSz)*2+5+10*radScl;
+      
+      // let radiusFcn = 
+      // cubic-bezier( 0.175, 0.885, 0.32, 1.275 )
+      
+      ctx.beginPath();
+      ctx.moveTo(stops[i].x, stops[i].y);
+      // ctx.strokeStyle = getCSSProp("--system-transp");
+      ctx.arc(stops[i].x, stops[i].y, currRad, 0, Math.PI*pctRemaining*2);
+      // ctx.stroke();
+      ctx.fill();
+      ctx.fill();
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(stops[i].x+currRad, stops[i].y);
+      ctx.arc(stops[i].x, stops[i].y, currRad, 0, Math.PI*pctRemaining*2);
+      ctx.strokeStyle = getCSSProp("--system-red");
+      // ctx.lineTo(stops[i].x, stops[i].y);
+      ctx.stroke();
+      ctx.beginPath();
     }
     ctx.restore();
+    clearCircle(stops[i], stopSz);
     ctx.arc(stops[i].x, stops[i].y, stopSz, 0, K.PIANDABIT * 2);
     ctx.stroke();
     ctx.beginPath();
@@ -305,10 +349,15 @@ function redraw() {
       trains[i].to.x - trains[i].from.x);
     let nStop = nearestStop(trains[i].to, stopSz);
     if (nStop) {
-      let pctRemaining = distBtw(nStop, trains[i].to)/stopSz;
+      let pctRemaining = distBtw(nStop, trains[i])/stopSz;
       let nextTrainTo = getNextStop(trains[i]);
-      let angBtw2 = Math.atan2(trains[i].to.y - trains[i].from.y,
-          trains[i].to.x - trains[i].from.x);
+      let angBtw2 = Math.atan2(trains[i].to.y - nextTrainTo.y,
+          trains[i].to.x - nextTrainTo.x);
+      if (pctRemaining < 1) {
+        console.log(pctRemaining);
+        angBtw = (angBtw+(angBtw2-angBtw)*(pctRemaining))
+        // console.log(angBtw);
+      }
       // at stop, turn according to distance
     }
     let center = { x: trains[i].x, y: trains[i].y };
@@ -369,8 +418,10 @@ function populateStops() {
       passengers.push(pass);
       handlePassenger(pass);
       stops[stopAdded].waiting.push(pass);
-      if (stops[stopAdded].waiting.length > stops[stopAdded].capacity) 
-        stops[stopAdded].failureTimer = Date.now();
+      let stop = stops[stopAdded]
+      if (stop.waiting.length > stop.capacity && stop.failureTimer < 0)
+        stop.failureTimer = Date.now();
+        
     }
   }
 }
@@ -454,7 +505,7 @@ function animLoop() {
       // let applicable = [];
       let currentTo = trains[i].to;//trains[i].revDir?trains[i].from:trains[i].to;
       let currStop = nearestStop(currentTo, 1);
-      currTrain.onCompletion = currTrain.passengers.length;
+      // currTrain.onCompletion = currTrain.passengers.length;
       // how many people to drop off here?
       let delay = dropOff(currTrain, currentTo) * K.DELAYPERPASSENGER;
       // figure out if the train is due to reverse first.
@@ -510,7 +561,7 @@ function animLoop() {
       }
       for (let j=0; j<currStop.waiting.length; j++) {
         let pass = currStop.waiting[j];
-        if (currTrain.onCompletion >= currTrain.cap) break;
+        // if (currTrain.onCompletion >= currTrain.cap) break;
         if (currStop.waiting[j].actionStatus != K.NOACTION) continue;
         if (pass.route.length > 0 && upcomingLinesServed.has(pass.route[0])) {
           // currStop.waiting.splice(j, 1);
@@ -528,7 +579,7 @@ function animLoop() {
         
       // 3. pick up people who do not have transfers at all
       for (let k = 0; k < currStop.waiting.length; k++) {
-        if (currTrain.passengers.length >= currTrain.cap) break;
+        // if (currTrain.passengers.length >= currTrain.cap) break;
         // for (let j = 0; j < typesOnLine.length; j++) {
 
         if (currStop.waiting[k].actionStatus != K.NOACTION) continue;
@@ -558,6 +609,14 @@ function animLoop() {
     currTrain.x = currTrain.from.x + (currTrain.to.x - currTrain.from.x) * percentCovered;
     currTrain.y = currTrain.from.y + (currTrain.to.y - currTrain.from.y) * percentCovered;
   }
+  for (let i=0; i<stops.length; i++) {
+    if (stops[i].failureTimer < 0) continue;
+    let pctRemaining = (Date.now() - stops[i].failureTimer)/K.FAILTIME;
+    if (pctRemaining > 1.1) {
+      alertDialog("loser!", ()=>{});
+      return;
+    }
+  }
   redraw();
 
   requestAnimationFrame(animLoop);
@@ -569,9 +628,10 @@ function handleAwaiting(currTrain, currStop) {
     if (pass.train != currTrain || pass.stop != currStop) continue;
     else if (pass.actionStatus == K.NOACTION) continue;
     // if people are trying to get on the train but unable to do so - abandon the action and wait for next recalculation
-    else if (currTrain.passengers.length >= currTrain.cap) {
+    else if (currTrain.passengers.length >= currTrain.cap && 
+             pass.actionStatus == K.BOARDPENDING) {
       pass.actionStatus = K.NOACTION;
-      break;
+      continue;
     }
     else if (pass.actionStatus == K.BOARDPENDING) {
       pass.actionStatus = K.NOACTION;
@@ -582,6 +642,7 @@ function handleAwaiting(currTrain, currStop) {
           break;
         }
       pass.status = K.ONTHEWAY;
+      pass.actionStatus = K.NOACTION;
       handled = true;
       break;
     }
@@ -593,6 +654,7 @@ function handleAwaiting(currTrain, currStop) {
           break;
         }
       pass.status = K.WAITING;
+      pass.actionStatus = K.NOACTION;
       handled = true;
       break;
     }
@@ -605,6 +667,7 @@ function handleAwaiting(currTrain, currStop) {
           break;
         }
       pass.status = K.WAITING;
+      pass.actionStatus = K.NOACTION;
       handled = true;
       break;
     }
@@ -668,6 +731,7 @@ function addNewStop(type = -1) {
   newPt.linesServed = new Set();
   newPt.type = type;
   newPt.toAdd = [];
+  newPt.failureTimer = -1;
   newPt.capacity = 8;
   redraw();
 }
@@ -799,14 +863,14 @@ function pointerUp(ev) {
       from: currPath[0], to: currPath[1], path: currPath,
       lineID: lineCt, colour: currCol, startT: Date.now(),
       status: K.MOVING, passengers: [], cap:12, revDir:false, 
-      toAdd:[], toRemove:[], onCompletion:0
+      //toAdd:[], toRemove:[], onCompletion:0
     });
     trains.push({
       x: currPath[0].x, y: currPath[0].y,
       from: currPath[currPath.length-1], to: currPath[currPath.length-2], path: currPath,
       lineID: lineCt, colour: currCol, startT: Date.now(),
-      status: K.MOVING, passengers: [], cap:12, revDir:true, toAdd:[], toRemove:[], 
-      onCompletion:0
+      status: K.MOVING, passengers: [], cap:12, revDir:true,//, toAdd:[], toRemove:[], 
+      //onCompletion:0
     });
     lineCt++;
   }

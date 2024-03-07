@@ -27,7 +27,6 @@ let viewportH = 0;
 let viewportMax, viewportMin;
 let currPath = [];
 let typesOnLine = []
-let lines = [];
 let trains = [];
 let maxUnlockedType = 0;
 const acceptRadius = 30;
@@ -46,14 +45,14 @@ function onLoad() {
   
 }
 
-function nextStop(train) {
+function getNextStop(currTrain) {
  let currToIdx = currTrain.path.indexOf(nearestStop(currTrain.to,1));
-  if (currToIdx == 0)
+  if (currTrain.revDir && currToIdx == 0)
   {
     currTrain.revDir = !currTrain.revDir;
     nextStop = currTrain.from
   }
-  else if (currToIdx == currTrain.path.length-1) {
+  else if (!currTrain.revDir && currToIdx == currTrain.path.length-1) {
     nextStop = currTrain.from;
     currTrain.revDir = !currTrain.revDir;
   }
@@ -299,7 +298,7 @@ function redraw() {
     let nStop = nearestStop(trains[i].to, stopSz);
     if (nStop) {
       let pctRemaining = distBtw(nStop, trains[i].to)/stopSz;
-      let nextTrainTo = nextStop(trains[i]);
+      let nextTrainTo = getNextStop(trains[i]);
       let angBtw2 = Math.atan2(trains[i].to.y - trains[i].from.y,
           trains[i].to.x - trains[i].from.x);
       // at stop, turn according to distance
@@ -458,7 +457,7 @@ function animLoop() {
       //   }
       // }
       // no need to do all this nonsense the train knows its path
-       nextStop = nextStop(currTrain);   
+       nextStop = getNextStop(currTrain);   
       // who to pick up?
       //  find which stops this line supports
       // let availableTransfers = new Set();
@@ -477,13 +476,12 @@ function animLoop() {
           // debugger;
           j--;
           pass.route.shift();
-          console.log("dropoff of ",pass.to);
           delay += K.DELAYPERPASSENGER;
         }
       }
       // 2. pick up people who need transfers (they typically wait very long)
       for (let j=0; j<connections.length; j++) {
-        if (connections[j].lineID == i) {
+        if (connections[j].lineID == currTrain.lineID) {
           let fStop = nearestStop(connections[j].from, 1);
           let tStop = nearestStop(connections[j].to, 1);
           for (const nextLine of fStop.linesServed) 
@@ -500,7 +498,6 @@ function animLoop() {
           j--;
           currTrain.passengers.push(pass);
           pass.status = K.ONTHEWAY;
-          console.log("added transferrer")
           delay += K.DELAYPERPASSENGER;
         }
       }
@@ -510,11 +507,10 @@ function animLoop() {
         if (currTrain.passengers.length >= currTrain.cap) break;
         // for (let j = 0; j < typesOnLine.length; j++) {
 
-        if (typesOnLine[i].has(currStop.waiting[k].to)) {
+        if (typesOnLine[currTrain.lineID].has(currStop.waiting[k].to)) {
           let adding = currStop.waiting[k];
           currStop.waiting.splice(k, 1);
           currTrain.passengers.push(adding);
-          console.log(" added direct-router")
           adding.status = K.ONTHEWAY;
           k--;
         }
@@ -528,7 +524,8 @@ function animLoop() {
       currTrain.to = nextStop;
       currTrain.startT = startT + delay;
       // }
-      console.log("StopHandler took ", Date.now() - startT+"s");
+      if (Date.now() - startT > 25) 
+        console.log("WARNING: StopHandler took ", Date.now() - startT+"ms");
     } // if percentcoered = 1
     currTrain.x = currTrain.from.x + (currTrain.to.x - currTrain.from.x) * percentCovered;
     currTrain.y = currTrain.from.y + (currTrain.to.y - currTrain.from.y) * percentCovered;

@@ -28,7 +28,6 @@ let viewportH = 0;
 let viewportMax, viewportMin;
 let currPath = [];
 let typesOnLine = [];
-let lines = [];
 let trains = [];
 let maxUnlockedType = 0;
 const acceptRadius = 30;
@@ -44,6 +43,20 @@ let defaultClr = "#000";
 const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
 function onLoad() {
+}
+function getNextStop(currTrain) {
+  let currToIdx = currTrain.path.indexOf(nearestStop(currTrain.to, 1));
+  if (currTrain.revDir && currToIdx == 0) {
+    currTrain.revDir = !currTrain.revDir;
+    nextStop = currTrain.from;
+  } else if (!currTrain.revDir && currToIdx == currTrain.path.length - 1) {
+    nextStop = currTrain.from;
+    currTrain.revDir = !currTrain.revDir;
+  } else if (currTrain.revDir) {
+    nextStop = currTrain.path[currToIdx - 1];
+  } else
+    nextStop = currTrain.path[currToIdx + 1];
+  return nearestStop(nextStop, 1);
 }
 function handlePassenger(pass2) {
   if (pass2.status != K.WAITING)
@@ -101,9 +114,11 @@ function redraw() {
   if (DEBUG) {
     ctx.beginPath();
     ctx.lineWidth = 3;
-    ctx.moveTo(-viewportW / 2, 0);
-    ctx.lineTo(viewportW / 2, 0);
+    ctx.moveTo(-viewportW / 2, -viewportH / 2);
+    ctx.lineTo(viewportW / 2, -viewportH / 2);
     ctx.lineTo(viewportW / 2, viewportH / 2);
+    ctx.lineTo(-viewportW / 2, viewportH / 2);
+    ctx.lineTo(-viewportW / 2, -viewportH / 2);
     ctx.stroke();
   }
   ctx.beginPath();
@@ -199,8 +214,8 @@ function redraw() {
     );
     let c = Math.cos(angBtw);
     let s = Math.sin(angBtw);
-    let nextStop = nearestStop(currPos_canv, acceptRadius);
-    if (nextStop && samePt(nextStop, lastPt)) {
+    let nextStop2 = nearestStop(currPos_canv, acceptRadius);
+    if (nextStop2 && samePt(nextStop2, lastPt)) {
       clearCircle(lastPt, acceptRadius);
       ctx.save();
       ctx.beginPath();
@@ -212,25 +227,25 @@ function redraw() {
       ctx.restore();
     }
     ctx.beginPath();
-    if (nextStop && samePt(nextStop, lastPt))
+    if (nextStop2 && samePt(nextStop2, lastPt))
       ;
-    else if (nextStop) {
+    else if (nextStop2) {
       angBtw = Math.atan2(
-        nextStop.y - lastPt.y,
-        nextStop.x - lastPt.x
+        nextStop2.y - lastPt.y,
+        nextStop2.x - lastPt.x
       );
       c = Math.cos(angBtw);
       s = Math.sin(angBtw);
       ctx.moveTo(lastPt.x + c * acceptRadius, lastPt.y + s * acceptRadius);
       ctx.save();
       ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
-      ctx.lineTo(nextStop.x - c * acceptRadius, nextStop.y - s * acceptRadius);
+      ctx.lineTo(nextStop2.x - c * acceptRadius, nextStop2.y - s * acceptRadius);
       ctx.stroke();
       ctx.beginPath();
       ctx.strokeStyle = getCSSProp("--system-red");
-      ctx.arc(nextStop.x, nextStop.y, stopSz, 0, K.PIANDABIT * 2);
+      ctx.arc(nextStop2.x, nextStop2.y, stopSz, 0, K.PIANDABIT * 2);
       ctx.stroke();
-      circle(nextStop);
+      circle(nextStop2);
       ctx.restore();
     } else {
       ctx.moveTo(lastPt.x + c * acceptRadius, lastPt.y + s * acceptRadius);
@@ -250,6 +265,15 @@ function redraw() {
       trains[i].to.y - trains[i].from.y,
       trains[i].to.x - trains[i].from.x
     );
+    let nStop = nearestStop(trains[i].to, stopSz);
+    if (nStop) {
+      let pctRemaining = distBtw(nStop, trains[i].to) / stopSz;
+      let nextTrainTo = getNextStop(trains[i]);
+      let angBtw2 = Math.atan2(
+        trains[i].to.y - trains[i].from.y,
+        trains[i].to.x - trains[i].from.x
+      );
+    }
     let center = { x: trains[i].x, y: trains[i].y };
     const w = 15;
     const h = 30;
@@ -348,6 +372,7 @@ function preLoad() {
   translate(canv.width / 2, canv.height / 2);
   redraw();
   requestAnimationFrame(animLoop);
+  startTime = Date.now();
   setTimeout(stopPopulationLoop, 5e3);
 }
 function animLoop() {
@@ -365,17 +390,8 @@ function animLoop() {
       let currStop = nearestStop(currentTo, 1);
       let delay = dropOff(currTrain, currentTo) * K.DELAYPERPASSENGER;
       let reverseQ = true;
-      let nextStop = null;
-      for (let j = 0; j < connections.length && reverseQ; j++) {
-        if ((trains[i].revDir ? samePt(connections[j].to, currentTo) : samePt(connections[j].from, currentTo)) && connections[j].lineID == trains[i].lineID) {
-          reverseQ = false;
-          nextStop = trains[i].revDir ? connections[j].from : connections[j].to;
-        }
-      }
-      if (reverseQ) {
-        nextStop = trains[i].from;
-        currTrain.revDir = !currTrain.revDir;
-      }
+      let nextStop2 = null;
+      nextStop2 = getNextStop(currTrain);
       currStop = nearestStop(currentTo, 1);
       let upcomingLinesServed = new Set(JSON.parse(JSON.stringify([...currStop.linesServed])));
       for (let j = 0; j < currTrain.passengers.length; j++) {
@@ -385,12 +401,11 @@ function animLoop() {
           currStop.waiting.push(pass2);
           j--;
           pass2.route.shift();
-          console.log("dropoff of ", pass2.to);
           delay += K.DELAYPERPASSENGER;
         }
       }
       for (let j = 0; j < connections.length; j++) {
-        if (connections[j].lineID == i) {
+        if (connections[j].lineID == currTrain.lineID) {
           let fStop = nearestStop(connections[j].from, 1);
           let tStop = nearestStop(connections[j].to, 1);
           for (const nextLine of fStop.linesServed)
@@ -408,27 +423,26 @@ function animLoop() {
           j--;
           currTrain.passengers.push(pass2);
           pass2.status = K.ONTHEWAY;
-          console.log("added transferrer");
           delay += K.DELAYPERPASSENGER;
         }
       }
       for (let k = 0; k < currStop.waiting.length; k++) {
         if (currTrain.passengers.length >= currTrain.cap)
           break;
-        if (typesOnLine[i].has(currStop.waiting[k].to)) {
+        if (typesOnLine[currTrain.lineID].has(currStop.waiting[k].to)) {
           let adding = currStop.waiting[k];
           currStop.waiting.splice(k, 1);
           currTrain.passengers.push(adding);
-          console.log(" added direct-router");
           adding.status = K.ONTHEWAY;
           k--;
         }
         delay += K.DELAYPERPASSENGER;
       }
       currTrain.from = currTrain.to;
-      currTrain.to = nextStop;
+      currTrain.to = nextStop2;
       currTrain.startT = startT + delay;
-      console.log("StopHandler took ", Date.now() - startT + "s");
+      if (Date.now() - startT > 25)
+        console.log("WARNING: StopHandler took ", Date.now() - startT + "ms");
     }
     currTrain.x = currTrain.from.x + (currTrain.to.x - currTrain.from.x) * percentCovered;
     currTrain.y = currTrain.from.y + (currTrain.to.y - currTrain.from.y) * percentCovered;
@@ -474,7 +488,7 @@ function addNewStop(type = -1) {
     newPt = genRandomPt();
   stops.push(newPt);
   maxUnlockedType = Math.max(maxUnlockedType, type);
-  updateMinScl(minSclFac * 0.97);
+  updateMinScl(minSclFac * 0.98);
   newPt.waiting = [];
   newPt.linesServed = /* @__PURE__ */ new Set();
   newPt.type = type;
@@ -588,7 +602,22 @@ function pointerUp(ev) {
       startT: Date.now(),
       status: K.MOVING,
       passengers: [],
-      cap: 12
+      cap: 12,
+      revDir: false
+    });
+    trains.push({
+      x: currPath[0].x,
+      y: currPath[0].y,
+      from: currPath[currPath.length - 1],
+      to: currPath[currPath.length - 2],
+      path: currPath,
+      lineID: lineCt,
+      colour: currCol,
+      startT: Date.now(),
+      status: K.MOVING,
+      passengers: [],
+      cap: 12,
+      revDir: true
     });
     lineCt++;
   }

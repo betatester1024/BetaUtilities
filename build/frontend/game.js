@@ -4,13 +4,19 @@ const K = {
   STOPPED: 2,
   NOHOLD: 0,
   HOLD: 1,
-  HOLD_NEWLINE: 2
+  HOLD_NEWLINE: 2,
+  WAITING: 0,
+  ONTHEWAY: 1,
+  DELAYPERPASSENGER: 400,
+  INF: 9e99,
+  PIANDABIT: Math.PI + 0.1
 };
 const trainSpeed = 100 / 1e3;
 let holdState = K.NOHOLD;
 let ctx = null;
 let canv = null;
 let totalScaleFac = 1;
+let hovering = null;
 let stops = [];
 let connections = [];
 let lineTypes = [];
@@ -22,11 +28,13 @@ let viewportH = 0;
 let viewportMax, viewportMin;
 let currPath = [];
 let typesOnLine = [];
+let lines = [];
 let trains = [];
 let maxUnlockedType = 0;
 const acceptRadius = 30;
 const stopSz = 20;
 let adj = [];
+let passengers = [];
 let currPos_canv = null;
 let lineCt = 0;
 let shiftStatus = false;
@@ -34,23 +42,36 @@ let downPt = null;
 let types = [triangle, square, circ, star];
 let defaultClr = "#000";
 const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
+let DEBUG = true;
 function onLoad() {
 }
-function closestRoute(stopID, destType) {
-  let connections2 = Array(stops.length).fill(Array(stops.length).fill(Infinity));
-  for (let i = 0; i < stops; i++) {
+function handlePassenger(pass2) {
+  if (pass2.status != K.WAITING)
+    return;
+  let minRouteLength = K.INF;
+  for (let l = 0; l < pass2.from.linesServed.size; l++) {
+    let lIdx = Array.from(pass2.from.linesServed)[l];
+    for (let i = 0; i < typesOnLine.length; i++) {
+      if (!typesOnLine[i].has(pass2.to))
+        continue;
+      if (minRouteLength > adj[lIdx][i].val) {
+        minRouteLength = adj[lIdx][i].val;
+        pass2.route = [];
+        for (let e of adj[lIdx][i].route)
+          pass2.route.push(e);
+      }
+    }
   }
-  console.log(connections2);
 }
 function redraw() {
   function circle(pt) {
     ctx.save();
     clearCircle(pt, acceptRadius);
     ctx.beginPath();
-    ctx.arc(pt.x, pt.y, stopSz, 0, Math.PI * 2);
+    ctx.arc(pt.x, pt.y, stopSz, 0, K.PIANDABIT * 2);
     ctx.stroke();
     ctx.beginPath();
-    ctx.arc(pt.x, pt.y, acceptRadius, 0, Math.PI * 2);
+    ctx.arc(pt.x, pt.y, acceptRadius, 0, K.PIANDABIT * 2);
     ctx.stroke();
     ctx.restore();
     ctx.beginPath();
@@ -59,7 +80,7 @@ function redraw() {
     ctx.beginPath();
     ctx.fillStyle = getCSSProp("--system-grey3");
     ctx.save();
-    ctx.arc(pt.x, pt.y, rad + 2, 0, Math.PI * 2);
+    ctx.arc(pt.x, pt.y, rad + 2, 0, K.PIANDABIT * 2);
     ctx.clip();
     ctx.save();
     ctx.resetTransform();
@@ -77,20 +98,32 @@ function redraw() {
   ctx.clearRect(0, 0, canv.width, canv.height);
   ctx.fillRect(0, 0, canv.width, canv.height);
   ctx.restore();
+  if (DEBUG) {
+    ctx.beginPath();
+    ctx.lineWidth = 3;
+    ctx.moveTo(-viewportW / 2, 0);
+    ctx.lineTo(viewportW / 2, 0);
+    ctx.lineTo(viewportW / 2, viewportH / 2);
+    ctx.stroke();
+  }
   ctx.beginPath();
-  ctx.lineWidth = 3;
-  ctx.moveTo(-viewportW / 2, -viewportH / 2);
-  ctx.lineTo(viewportW / 2, viewportH / 2);
-  ctx.stroke();
-  ctx.beginPath();
+  if (hovering) {
+    ctx.save();
+    ctx.fillStyle = getCSSProp("--system-green2");
+    ctx.beginPath();
+    ctx.arc(hovering.x, hovering.y, acceptRadius, 0, K.PIANDABIT * 2);
+    ctx.fill();
+    clearCircle({ x: hovering.x, y: hovering.y }, stopSz);
+    ctx.restore();
+  }
   for (let i = 0; i < stops.length; i++) {
-    ctx.arc(stops[i].x, stops[i].y, stopSz, 0, Math.PI * 2);
+    ctx.arc(stops[i].x, stops[i].y, stopSz, 0, K.PIANDABIT * 2);
     ctx.stroke();
     ctx.beginPath();
     ctx.fillStyle = defaultClr;
     let out = " ";
     for (let j = 0; j < stops[i].waiting.length; j++) {
-      out += stops[i].waiting[j].toString();
+      out += stops[i].waiting[j].to.toString();
     }
     ctx.fillText(out, stops[i].x + stopSz, stops[i].y - stopSz / 2);
     ctx.fillText(stops[i].type, stops[i].x, stops[i].y);
@@ -148,10 +181,10 @@ function redraw() {
     clearCircle(connections[i].to, stopSz);
     ctx.beginPath();
     ctx.strokeStyle = defaultClr;
-    ctx.arc(connections[i].from.x, connections[i].from.y, stopSz, 0, Math.PI * 2);
+    ctx.arc(connections[i].from.x, connections[i].from.y, stopSz, 0, K.PIANDABIT * 2);
     ctx.stroke();
     ctx.beginPath();
-    ctx.arc(connections[i].to.x, connections[i].to.y, stopSz, 0, Math.PI * 2);
+    ctx.arc(connections[i].to.x, connections[i].to.y, stopSz, 0, K.PIANDABIT * 2);
     ctx.stroke();
   }
   ctx.restore();
@@ -173,7 +206,7 @@ function redraw() {
       ctx.beginPath();
       ctx.lineWidth = 4;
       ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
-      ctx.arc(lastPt.x, lastPt.y, stopSz, 0, Math.PI * 2);
+      ctx.arc(lastPt.x, lastPt.y, stopSz, 0, K.PIANDABIT * 2);
       ctx.stroke();
       circle(lastPt);
       ctx.restore();
@@ -195,7 +228,7 @@ function redraw() {
       ctx.stroke();
       ctx.beginPath();
       ctx.strokeStyle = getCSSProp("--system-red");
-      ctx.arc(nextStop.x, nextStop.y, stopSz, 0, Math.PI * 2);
+      ctx.arc(nextStop.x, nextStop.y, stopSz, 0, K.PIANDABIT * 2);
       ctx.stroke();
       circle(nextStop);
       ctx.restore();
@@ -221,9 +254,9 @@ function redraw() {
     const w = 15;
     const h = 30;
     const c = Math.cos(angBtw);
-    const c2 = Math.cos(angBtw + Math.PI / 2);
+    const c2 = Math.cos(angBtw + K.PIANDABIT / 2);
     const s = Math.sin(angBtw);
-    const s2 = Math.sin(angBtw + Math.PI / 2);
+    const s2 = Math.sin(angBtw + K.PIANDABIT / 2);
     ctx.save();
     ctx.fillStyle = getCSSProp("--system-grey");
     ctx.moveTo(center.x + c * h / 2 + c2 * w / 2, center.y + s * h / 2 + s2 * w / 2);
@@ -232,13 +265,15 @@ function redraw() {
     ctx.lineTo(center.x - c * h / 2 + c2 * w / 2, center.y - s * h / 2 + s2 * w / 2);
     ctx.fill();
     ctx.fillStyle = defaultClr;
-    ctx.fillText(trains[i].passengers.join(""), center.x, center.y);
+    let str = "";
+    for (let pass2 of trains[i].passengers)
+      str += pass2.to.toString();
+    ctx.fillText(str, center.x, center.y);
     ctx.restore();
   }
 }
 function registerMaximisingCanvas(id, widthPc, heightPc, redrawFcn) {
   window.addEventListener("resize", (ev) => {
-    console.log("resizing");
     canv.width = window.innerWidth * widthPc;
     canv.height = window.innerHeight * heightPc;
     applyTransfm();
@@ -257,7 +292,11 @@ function populateStops() {
     let toAdd = Math.floor(Math.random() * stops.length / 3) + 1;
     for (let j = 0; j < toAdd; j++) {
       let stopAdded = Math.floor(Math.random() * stops.length);
-      stops[stopAdded].waiting.push(getNextType(stops[stopAdded].type));
+      let currType = getNextType(stops[stopAdded].type);
+      let pass2 = { from: stops[stopAdded], to: currType, route: [], status: K.WAITING };
+      passengers.push(pass2);
+      handlePassenger(pass2);
+      stops[stopAdded].waiting.push(pass2);
     }
   }
 }
@@ -265,6 +304,9 @@ function preLoad() {
   canv = byId("canv");
   ctx = canv.getContext("2d");
   registerMaximisingCanvas("canv", 1, 0.95, redraw);
+  if ((docURL.searchParams.get("debug") ?? "yesplease").match(/false|no|beans/)) {
+    DEBUG = false;
+  }
   canv.addEventListener("pointermove", onmove);
   canv.addEventListener("pointerdown", (ev) => {
     holdState = K.HOLD;
@@ -273,20 +315,18 @@ function preLoad() {
     let nStop = nearestStop(actualPos, acceptRadius);
     if (nStop && colours.length > 0) {
       holdState = K.HOLD_NEWLINE;
-      console.log(nStop);
       currPath = [nStop];
       redraw();
     }
     if (holdState == K.HOLD) {
       document.body.style.cursor = "grabbing";
     }
-    console.log("holdState", holdState);
   });
   window.addEventListener("keydown", keyUpdate);
   window.addEventListener("keyup", keyUpdate);
   window.addEventListener("pointerup", pointerUp);
   canv.addEventListener("wheel", (ev) => {
-    let sclFac = ev.deltaY < 0 ? 1.2 : 1 / 1.2;
+    let sclFac = ev.deltaY < 0 ? 1.15 : 1 / 1.15;
     if (sclFac * totalScaleFac > maxSclFac)
       sclFac = maxSclFac / totalScaleFac;
     if (sclFac * totalScaleFac < minSclFac)
@@ -323,7 +363,7 @@ function animLoop() {
       percentCovered = 0;
       let currentTo = trains[i].to;
       let currStop = nearestStop(currentTo, 1);
-      let delay = dropOff(currTrain, currentTo) * 400;
+      let delay = dropOff(currTrain, currentTo) * K.DELAYPERPASSENGER;
       let reverseQ = true;
       let nextStop = null;
       for (let j = 0; j < connections.length && reverseQ; j++) {
@@ -336,55 +376,59 @@ function animLoop() {
         nextStop = trains[i].from;
         currTrain.revDir = !currTrain.revDir;
       }
-      let supportedStops = /* @__PURE__ */ new Set();
-      let upcomingLinesServed = /* @__PURE__ */ new Set();
-      while (true) {
-        let currStop2 = nearestStop(currentTo, 1);
-        for (const lineID of currStop2.linesServed) {
-          upcomingLinesServed.add(lineID);
+      currStop = nearestStop(currentTo, 1);
+      let upcomingLinesServed = new Set(JSON.parse(JSON.stringify([...currStop.linesServed])));
+      for (let j = 0; j < currTrain.passengers.length; j++) {
+        let pass2 = currTrain.passengers[j];
+        if (pass2.route.length > 0 && pass2.status == K.ONTHEWAY && upcomingLinesServed.has(pass2.route[0])) {
+          currTrain.passengers.splice(j, 1);
+          currStop.waiting.push(pass2);
+          j--;
+          pass2.route.shift();
+          console.log("dropoff of ", pass2.to);
+          delay += K.DELAYPERPASSENGER;
         }
-        let foundQ = false;
-        for (let j = 0; j < connections.length; j++) {
-          if ((trains[i].revDir ? samePt(connections[j].to, currStop2) : samePt(connections[j].from, currStop2)) && connections[j].lineID == trains[i].lineID) {
-            currStop2 = trains[i].revDir ? connections[j].from : connections[j].to;
-            foundQ = true;
-            break;
-          }
-        }
-        if (!foundQ)
-          break;
-        currentTo = currStop2;
-        supportedStops.add(currStop2.type);
       }
-      for (let i2 = 0; i2 < currStop.waiting.length; i2++) {
-        if (currTrain.passengers.length >= 6)
+      for (let j = 0; j < connections.length; j++) {
+        if (connections[j].lineID == i) {
+          let fStop = nearestStop(connections[j].from, 1);
+          let tStop = nearestStop(connections[j].to, 1);
+          for (const nextLine of fStop.linesServed)
+            upcomingLinesServed.add(nextLine);
+          for (const nextLine of tStop.linesServed)
+            upcomingLinesServed.add(nextLine);
+        }
+      }
+      for (let j = 0; j < currStop.waiting.length; j++) {
+        let pass2 = currStop.waiting[j];
+        if (currTrain.passengers.length >= currTrain.cap)
           break;
-        if (supportedStops.has(currStop.waiting[i2])) {
-          let adding = currStop.waiting[i2];
-          currStop.waiting.splice(i2, 1);
+        if (pass2.route.length > 0 && upcomingLinesServed.has(pass2.route[0])) {
+          currStop.waiting.splice(j, 1);
+          j--;
+          currTrain.passengers.push(pass2);
+          pass2.status = K.ONTHEWAY;
+          console.log("added transferrer");
+          delay += K.DELAYPERPASSENGER;
+        }
+      }
+      for (let k = 0; k < currStop.waiting.length; k++) {
+        if (currTrain.passengers.length >= currTrain.cap)
+          break;
+        if (typesOnLine[i].has(currStop.waiting[k].to)) {
+          let adding = currStop.waiting[k];
+          currStop.waiting.splice(k, 1);
           currTrain.passengers.push(adding);
-          i2--;
-          delay += 400;
+          console.log(" added direct-router");
+          adding.status = K.ONTHEWAY;
+          k--;
         }
-      }
-      for (let i2 = 0; i2 < currStop.waiting.length; i2++) {
-        if (currTrain.passengers.length >= 6)
-          break;
-        for (let j = 0; j < typesOnLine.length; j++) {
-          if (typesOnLine[i2].has(currStop.waiting[i2])) {
-            let adding = currStop.waiting[i2];
-            currStop.waiting.splice(i2, 1);
-            currTrain.passengers.push(adding);
-            i2--;
-          }
-          delay += 400;
-        }
+        delay += K.DELAYPERPASSENGER;
       }
       currTrain.from = currTrain.to;
       currTrain.to = nextStop;
       currTrain.startT = startT + delay;
-      console.log(delay);
-      console.log("StopHandler took: ", Date.now() - startT);
+      console.log("StopHandler took ", Date.now() - startT + "s");
     }
     currTrain.x = currTrain.from.x + (currTrain.to.x - currTrain.from.x) * percentCovered;
     currTrain.y = currTrain.from.y + (currTrain.to.y - currTrain.from.y) * percentCovered;
@@ -396,7 +440,7 @@ function dropOff(currTrain, pt) {
   let stop = nearestStop(pt, 1);
   let matching = 0;
   for (let i = 0; i < currTrain.passengers.length; i++)
-    if (currTrain.passengers[i] == stop.type) {
+    if (currTrain.passengers[i].to == stop.type) {
       matching++;
       currTrain.passengers.splice(i, 1);
       i--;
@@ -422,7 +466,7 @@ function addNewStop(type = -1) {
   if (stops.length > 0)
     do {
       refPt = stops[Math.floor(Math.random() * stops.length)];
-      ang = Math.random() * 2 * Math.PI;
+      ang = Math.random() * 2 * K.PIANDABIT;
       dist = 150 + Math.random() * 100;
       newPt = { x: refPt.x + dist * Math.cos(ang), y: refPt.y + dist * Math.sin(ang) };
     } while (!(!nearestStop(newPt, 150) && withinViewport(newPt)));
@@ -439,13 +483,15 @@ function addNewStop(type = -1) {
 function keyUpdate(ev) {
 }
 function onmove(ev) {
+  hovering = null;
   currPos_canv = fromCanvPos(ev.clientX, ev.clientY);
   if (holdState == K.HOLD) {
     translate(ev.movementX, ev.movementY);
     redraw();
-  } else if (holdState == K.HOLD_NEWLINE) {
-    let actualPos = fromCanvPos(ev.clientX, ev.clientY);
-    let nStop = nearestStop(actualPos, acceptRadius);
+  }
+  let actualPos = fromCanvPos(ev.clientX, ev.clientY);
+  let nStop = nearestStop(actualPos, acceptRadius);
+  if (holdState == K.HOLD_NEWLINE) {
     let lastStop = currPath[currPath.length - 1];
     if (nStop) {
       let canAdd = true;
@@ -459,10 +505,11 @@ function onmove(ev) {
       }
       if (canAdd) {
         currPath.push(nStop);
-        console.log(nStop);
       }
     }
     redraw();
+  } else if (nStop) {
+    hovering = nStop;
   }
 }
 function pointerUp(ev) {
@@ -479,20 +526,57 @@ function pointerUp(ev) {
         lineID: lineCt
       });
     }
-    adj = [];
-    for (let i = 0; i < stops.length; i++) {
-      let row = [];
-      for (let j = 0; j < maxUnlockedType.length; j++) {
-        row.push(99);
-      }
-      adj.push(row);
-    }
     let supportedTypes = /* @__PURE__ */ new Set();
     for (let i = 0; i < currPath.length; i++) {
       supportedTypes.add(currPath[i].type);
       currPath[i].linesServed.add(lineCt);
     }
     typesOnLine.push(supportedTypes);
+    adj = [];
+    for (let i = 0; i < typesOnLine.length; i++) {
+      let row = [];
+      for (let j = 0; j < typesOnLine.length; j++) {
+        row.push({ route: [], val: K.INF });
+      }
+      adj.push(row);
+    }
+    for (let i = 0; i < stops.length; i++) {
+      let served = Array.from(stops[i].linesServed);
+      for (let j = 0; j < served.length; j++) {
+        for (let k = 0; k < served.length; k++) {
+          adj[served[j]][served[k]].val = 1;
+          adj[served[j]][served[k]].route = [served[k]];
+          adj[served[k]][served[j]].val = 1;
+          adj[served[k]][served[j]].route = [served[j]];
+        }
+      }
+      for (let j = 0; j < served.length; j++) {
+        adj[served[j]][served[j]].val = 0;
+        adj[served[j]][served[j]].route = [];
+      }
+    }
+    for (let k = 0; k < adj.length; k++) {
+      for (let j = 0; j < adj.length; j++) {
+        for (let i = 0; i < adj.length; i++) {
+          if (i == k || j == k)
+            continue;
+          let newCost = adj[i][k].val + adj[k][j].val;
+          if (newCost < adj[i][j].val) {
+            adj[i][j].val = newCost;
+            adj[i][j].route = [];
+            for (let n = 0; n < adj[i][k].route.length; n++)
+              adj[i][j].route.push(adj[i][k].route[n]);
+            for (let n = 0; n < adj[k][j].route.length; n++)
+              adj[i][j].route.push(adj[k][j].route[n]);
+            console.log("newCost", newCost, "rL", adj[i][j].route.length);
+          }
+        }
+      }
+    }
+    console.log("==== RECALCULATION SUCCESS ====");
+    for (pass of passengers) {
+      handlePassenger(pass);
+    }
     trains.push({
       x: currPath[0].x,
       y: currPath[0].y,
@@ -503,7 +587,8 @@ function pointerUp(ev) {
       colour: currCol,
       startT: Date.now(),
       status: K.MOVING,
-      passengers: []
+      passengers: [],
+      cap: 12
     });
     lineCt++;
   }

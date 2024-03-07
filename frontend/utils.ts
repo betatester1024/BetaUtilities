@@ -925,7 +925,7 @@ function bSelInitialise() {
   // bSelRegister("selCtn", (value)=>{console.log(value);});
   // <!-- bSelRegister("selCtn2"); -->
   document.addEventListener("pointerup", (e)=>{
-    if (e.target instanceof HTMLElement) return; // released outside the doc
+    if (!e.target || e.target instanceof HTMLElement) return; // released outside the doc
     if (e.target.closest(".bSel")) return;
     // console.log("clicked away");
     for (let i=0; i<registered.length; i++) 

@@ -780,7 +780,7 @@ function bSelRegister(id, onChange, defaultVal) {
 function bSelInitialise() {
   console.log("Initialising BetterSelects");
   document.addEventListener("pointerup", (e) => {
-    if (e.target instanceof HTMLElement)
+    if (!e.target || e.target instanceof HTMLElement)
       return;
     if (e.target.closest(".bSel"))
       return;

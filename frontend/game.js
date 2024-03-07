@@ -9,6 +9,10 @@ const K = {
   DELAYPERPASSENGER: 400,
   INF: 9e99,
   PIANDABIT: Math.PI+0.1,
+  NOACTION:0,
+  BOARDPENDING:1, // just boarding 
+  DEBOARDPENDING:2, // just deboarding
+  TRANSFERPENDING:3 // deboarding FOR TRANSFER.
 }
 const trainSpeed = 100 / 1000; // pixels/ms
 let holdState = K.NOHOLD;
@@ -82,8 +86,6 @@ function handlePassenger(pass) {
       }
     }
   }
-  // if (minRouteLength == K.INF) console.log("stranded"); 
-  // else console.log("from route",pass.from,"to type",pass.to,"took route",pass.route,"transferring",minRouteLength,"times.")
 }
 
 function redraw() {
@@ -146,6 +148,11 @@ function redraw() {
   }
   ////////// little stop circles //////////
   for (let i = 0; i < stops.length; i++) {
+    ctx.save();
+    if (stops[i].failureTimer > 0) {
+      let pctRemaining = 
+    }
+    ctx.restore();
     ctx.arc(stops[i].x, stops[i].y, stopSz, 0, K.PIANDABIT * 2);
     ctx.stroke();
     ctx.beginPath();
@@ -156,6 +163,7 @@ function redraw() {
     }
     ctx.fillText(out, stops[i].x + stopSz, stops[i].y - stopSz / 2);
     ctx.fillText(stops[i].type, stops[i].x, stops[i].y)
+    // if ()
   }
   // existing paths///////////
   for (let i = 0; i < connections.length; i++) {
@@ -356,10 +364,13 @@ function populateStops() {
       let stopAdded = Math.floor(Math.random() * stops.length);
       // if (stopAdded >= stops[i].type) stopAdded++;
       let currType = getNextType(stops[stopAdded].type);
-      let pass = { from: stops[stopAdded], to: currType, route: [], status: K.WAITING };
+      let pass = { from: stops[stopAdded], to: currType, route: [], 
+                  status: K.WAITING, actionStatus: K.NOACTION, train:null, stop:null};
       passengers.push(pass);
       handlePassenger(pass);
       stops[stopAdded].waiting.push(pass);
+      if (stops[stopAdded].waiting.length > stops[stopAdded].capacity) 
+        stops[stopAdded].failureTimer = Date.now();
     }
   }
 }
@@ -443,6 +454,7 @@ function animLoop() {
       // let applicable = [];
       let currentTo = trains[i].to;//trains[i].revDir?trains[i].from:trains[i].to;
       let currStop = nearestStop(currentTo, 1);
+      currTrain.onCompletion = currTrain.passengers.length;
       // how many people to drop off here?
       let delay = dropOff(currTrain, currentTo) * K.DELAYPERPASSENGER;
       // figure out if the train is due to reverse first.
@@ -468,13 +480,19 @@ function animLoop() {
       // 1. drop off people who are transferring - MAKE SURE THEY'RE ON THEIR WAY!
       for (let j=0; j<currTrain.passengers.length; j++) {
         let pass = currTrain.passengers[j];
-        if (pass.route.length > 0 && pass.status == K.ONTHEWAY && 
+        if (pass.route.length > 0 && pass.status == K.ONTHEWAY 
+            && pass.actionStatus == K.NOACTION &&
             upcomingLinesServed.has(pass.route[0])) {
-          currTrain.passengers.splice(j, 1);
-          
-          currStop.waiting.push(pass);
-          // debugger;
-          j--;
+          // currTrain.passengers.splice(j, 1);
+          // currStop.toAdd.push({from:currTrain,pass:pass});
+          // currTrain.onCompletion--;
+          // // currStop.waiting.push(pass);
+          // // debugger;
+          // // j--;
+          pass.actionStatus = K.TRANSFERPENDING;
+          // pass.status = K.WAITING;
+          pass.stop = currStop;
+          pass.train = currTrain;
           pass.route.shift();
           delay += K.DELAYPERPASSENGER;
         }
@@ -492,12 +510,18 @@ function animLoop() {
       }
       for (let j=0; j<currStop.waiting.length; j++) {
         let pass = currStop.waiting[j];
-        if (currTrain.passengers.length >= currTrain.cap) break;
+        if (currTrain.onCompletion >= currTrain.cap) break;
+        if (currStop.waiting[j].actionStatus != K.NOACTION) continue;
         if (pass.route.length > 0 && upcomingLinesServed.has(pass.route[0])) {
-          currStop.waiting.splice(j, 1);
-          j--;
-          currTrain.passengers.push(pass);
-          pass.status = K.ONTHEWAY;
+          // currStop.waiting.splice(j, 1);
+          currStop.waiting[j].actionStatus = K.BOARDPENDING;
+          // pass.status = K.ONTHEWAY;
+          currStop.waiting[j].stop = currStop;
+          currStop.waiting[j].train = currTrain;
+          // j--;
+          // currTrain.onCompletion++;
+          // currTrain.toAdd.push({stop:currStop,pass:pass});
+          // pass.status = K.ONTHEWAY;
           delay += K.DELAYPERPASSENGER;
         }
       }
@@ -507,22 +531,26 @@ function animLoop() {
         if (currTrain.passengers.length >= currTrain.cap) break;
         // for (let j = 0; j < typesOnLine.length; j++) {
 
+        if (currStop.waiting[k].actionStatus != K.NOACTION) continue;
         if (typesOnLine[currTrain.lineID].has(currStop.waiting[k].to)) {
           let adding = currStop.waiting[k];
-          currStop.waiting.splice(k, 1);
-          currTrain.passengers.push(adding);
-          adding.status = K.ONTHEWAY;
-          k--;
+          currStop.waiting[k].actionStatus = K.BOARDPENDING;
+          currStop.waiting[k].stop = currStop;
+          currStop.waiting[k].train = currTrain;
+          // adding.status = K.ONTHEWAY;
+          // currStop.waiting.splice(k, 1);
+          // currTrain.toAdd.push({stop:currStop,pass:adding});
+          // k--;
         }
         delay += K.DELAYPERPASSENGER;
         // }
       }
       // if (currTrain.revDir) {
-
-      
+      if (delay > 0) currTrain.startT = K.INF;
+      handleAwaiting(currTrain, currStop);
       currTrain.from = currTrain.to;
       currTrain.to = nextStop;
-      currTrain.startT = startT + delay;
+      
       // }
       if (Date.now() - startT > 25) 
         console.log("WARNING: StopHandler took ", Date.now() - startT+"ms");
@@ -535,14 +563,72 @@ function animLoop() {
   requestAnimationFrame(animLoop);
 }
 
+function handleAwaiting(currTrain, currStop) {
+  let handled = false;
+  for (const pass of passengers) {
+    if (pass.train != currTrain || pass.stop != currStop) continue;
+    else if (pass.actionStatus == K.NOACTION) continue;
+    // if people are trying to get on the train but unable to do so - abandon the action and wait for next recalculation
+    else if (currTrain.passengers.length >= currTrain.cap) {
+      pass.actionStatus = K.NOACTION;
+      break;
+    }
+    else if (pass.actionStatus == K.BOARDPENDING) {
+      pass.actionStatus = K.NOACTION;
+      for (let i=0; i<currStop.waiting.length; i++) 
+        if (currStop.waiting[i] == pass) {
+          currStop.waiting.splice(i, 1);
+          currTrain.passengers.push(pass);
+          break;
+        }
+      pass.status = K.ONTHEWAY;
+      handled = true;
+      break;
+    }
+    else if (pass.actionStatus == K.DEBOARDPENDING) {
+      pass.actionStatus = K.NOACTION;
+      for (let i=0; i<currTrain.passengers.length; i++) 
+        if (currTrain.passengers[i] == pass) {
+          currTrain.passengers.splice(i,1);
+          break;
+        }
+      pass.status = K.WAITING;
+      handled = true;
+      break;
+    }
+    else if (pass.actionStatus == K.TRANSFERPENDING) {
+      pass.actionStatus = K.NOACTION;
+      for (let i=0; i<currTrain.passengers.length; i++) 
+        if (currTrain.passengers[i] == pass) {
+          currTrain.passengers.splice(i,1);
+          currStop.waiting.push(pass);
+          break;
+        }
+      pass.status = K.WAITING;
+      handled = true;
+      break;
+    }
+    else throw("invalid actionStatus!");
+  }
+  if (handled) setTimeout(()=>{handleAwaiting(currTrain, currStop)}, K.DELAYPERPASSENGER);
+  else {
+    currTrain.startT = Date.now();
+  }
+}
+
 function dropOff(currTrain, pt) {
   let stop = nearestStop(pt, 1);
   let matching = 0;
   for (let i = 0; i < currTrain.passengers.length; i++)
-    if (currTrain.passengers[i].to == stop.type) {
+    if (currTrain.passengers[i].to == stop.type && currTrain.passengers[i].actionStatus == K.NOACTION) {
       matching++;
-      currTrain.passengers.splice(i, 1);
-      i--;
+      // currTrain.passengers.splice(i, 1);
+      // currTrain.onCompletion--;
+      currTrain.passengers[i].actionStatus = K.DEBOARDPENDING;
+      currTrain.passengers[i].stop = stop;
+      currTrain.passengers[i].train = currTrain;
+      // currTrain.toRemove.push({stop:stop, pass:currTrain.passengers[i]});
+      // i--;
     }
   return matching;
 }
@@ -581,6 +667,8 @@ function addNewStop(type = -1) {
   newPt.waiting = [];
   newPt.linesServed = new Set();
   newPt.type = type;
+  newPt.toAdd = [];
+  newPt.capacity = 8;
   redraw();
 }
 
@@ -627,7 +715,9 @@ function onmove(ev) {
   }
   else if (nStop) {
     hovering = nStop;
+    document.body.style.cursor = "pointer";
   }
+  else if (holdState == K.NOHOLD) document.body.style.cursor = "";
 }
 
 function pointerUp(ev) {
@@ -694,7 +784,6 @@ function pointerUp(ev) {
               adj[i][j].route.push(adj[i][k].route[n])
             for (let n=0; n<adj[k][j].route.length; n++) 
               adj[i][j].route.push(adj[k][j].route[n])
-            console.log("newCost",newCost,"rL",adj[i][j].route.length);
           }
           // adj[i][j].val = Math.min(adj[i][j].val, adj[i][k].val + adj[k][j].val);
         }
@@ -709,13 +798,15 @@ function pointerUp(ev) {
       x: currPath[0].x, y: currPath[0].y,
       from: currPath[0], to: currPath[1], path: currPath,
       lineID: lineCt, colour: currCol, startT: Date.now(),
-      status: K.MOVING, passengers: [], cap:12, revDir:false
+      status: K.MOVING, passengers: [], cap:12, revDir:false, 
+      toAdd:[], toRemove:[], onCompletion:0
     });
     trains.push({
       x: currPath[0].x, y: currPath[0].y,
       from: currPath[currPath.length-1], to: currPath[currPath.length-2], path: currPath,
       lineID: lineCt, colour: currCol, startT: Date.now(),
-      status: K.MOVING, passengers: [], cap:12, revDir:true
+      status: K.MOVING, passengers: [], cap:12, revDir:true, toAdd:[], toRemove:[], 
+      onCompletion:0
     });
     lineCt++;
   }

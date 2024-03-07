@@ -9,7 +9,11 @@ const K = {
   ONTHEWAY: 1,
   DELAYPERPASSENGER: 400,
   INF: 9e99,
-  PIANDABIT: Math.PI + 0.1
+  PIANDABIT: Math.PI + 0.1,
+  NOACTION: 0,
+  BOARDPENDING: 1,
+  DEBOARDPENDING: 2,
+  TRANSFERPENDING: 3
 };
 const trainSpeed = 100 / 1e3;
 let holdState = K.NOHOLD;
@@ -137,8 +141,8 @@ function redraw() {
     ctx.beginPath();
     ctx.fillStyle = defaultClr;
     let out = " ";
-    for (let j = 0; j < stops[i].waiting.length; j++) {
-      out += stops[i].waiting[j].to.toString();
+    for (let j2 = 0; j2 < stops[i].waiting.length; j2++) {
+      out += stops[i].waiting[j2].to.toString();
     }
     ctx.fillText(out, stops[i].x + stopSz, stops[i].y - stopSz / 2);
     ctx.fillText(stops[i].type, stops[i].x, stops[i].y);
@@ -314,10 +318,18 @@ function populateStops() {
     if (Math.random() < 0.4)
       continue;
     let toAdd = Math.floor(Math.random() * stops.length / 3) + 1;
-    for (let j = 0; j < toAdd; j++) {
+    for (let j2 = 0; j2 < toAdd; j2++) {
       let stopAdded = Math.floor(Math.random() * stops.length);
       let currType = getNextType(stops[stopAdded].type);
-      let pass2 = { from: stops[stopAdded], to: currType, route: [], status: K.WAITING };
+      let pass2 = {
+        from: stops[stopAdded],
+        to: currType,
+        route: [],
+        status: K.WAITING,
+        actionStatus: K.NOACTION,
+        train: null,
+        stop: null
+      };
       passengers.push(pass2);
       handlePassenger(pass2);
       stops[stopAdded].waiting.push(pass2);
@@ -387,57 +399,63 @@ function animLoop() {
       let startT = Date.now();
       percentCovered = 0;
       let currentTo = trains[i].to;
-      let currStop = nearestStop(currentTo, 1);
+      let currStop2 = nearestStop(currentTo, 1);
+      currTrain.onCompletion = currTrain.passengers.length;
       let delay = dropOff(currTrain, currentTo) * K.DELAYPERPASSENGER;
       let reverseQ = true;
       let nextStop2 = null;
       nextStop2 = getNextStop(currTrain);
-      currStop = nearestStop(currentTo, 1);
-      let upcomingLinesServed = new Set(JSON.parse(JSON.stringify([...currStop.linesServed])));
-      for (let j = 0; j < currTrain.passengers.length; j++) {
-        let pass2 = currTrain.passengers[j];
-        if (pass2.route.length > 0 && pass2.status == K.ONTHEWAY && upcomingLinesServed.has(pass2.route[0])) {
-          currTrain.passengers.splice(j, 1);
-          currStop.waiting.push(pass2);
-          j--;
+      currStop2 = nearestStop(currentTo, 1);
+      let upcomingLinesServed = new Set(JSON.parse(JSON.stringify([...currStop2.linesServed])));
+      for (let j2 = 0; j2 < currTrain.passengers.length; j2++) {
+        let pass2 = currTrain.passengers[j2];
+        if (pass2.route.length > 0 && pass2.status == K.ONTHEWAY && pass2.actionStatus == K.NOACTION && upcomingLinesServed.has(pass2.route[0])) {
+          pass2.actionStatus = K.TRANSFERPENDING;
+          currStop2.waiting[j2].stop = currStop2;
+          currStop2.waiting[j2].train = currTrain;
           pass2.route.shift();
           delay += K.DELAYPERPASSENGER;
         }
       }
-      for (let j = 0; j < connections.length; j++) {
-        if (connections[j].lineID == currTrain.lineID) {
-          let fStop = nearestStop(connections[j].from, 1);
-          let tStop = nearestStop(connections[j].to, 1);
+      for (let j2 = 0; j2 < connections.length; j2++) {
+        if (connections[j2].lineID == currTrain.lineID) {
+          let fStop = nearestStop(connections[j2].from, 1);
+          let tStop = nearestStop(connections[j2].to, 1);
           for (const nextLine of fStop.linesServed)
             upcomingLinesServed.add(nextLine);
           for (const nextLine of tStop.linesServed)
             upcomingLinesServed.add(nextLine);
         }
       }
-      for (let j = 0; j < currStop.waiting.length; j++) {
-        let pass2 = currStop.waiting[j];
-        if (currTrain.passengers.length >= currTrain.cap)
+      for (let j2 = 0; j2 < currStop2.waiting.length; j2++) {
+        let pass2 = currStop2.waiting[j2];
+        if (currTrain.onCompletion >= currTrain.cap)
           break;
+        if (currStop2.waiting[j2].actionStatus != K.NOACTION)
+          continue;
         if (pass2.route.length > 0 && upcomingLinesServed.has(pass2.route[0])) {
-          currStop.waiting.splice(j, 1);
-          j--;
-          currTrain.passengers.push(pass2);
-          pass2.status = K.ONTHEWAY;
+          currStop2.waiting[j2].actionStatus = K.BOARDPENDING;
+          currStop2.waiting[j2].stop = currStop2;
+          currStop2.waiting[j2].train = currTrain;
           delay += K.DELAYPERPASSENGER;
         }
       }
-      for (let k = 0; k < currStop.waiting.length; k++) {
+      for (let k = 0; k < currStop2.waiting.length; k++) {
         if (currTrain.passengers.length >= currTrain.cap)
           break;
-        if (typesOnLine[currTrain.lineID].has(currStop.waiting[k].to)) {
-          let adding = currStop.waiting[k];
-          currStop.waiting.splice(k, 1);
-          currTrain.passengers.push(adding);
+        if (currStop2.waiting[k].actionStatus != K.NOACTION)
+          continue;
+        if (typesOnLine[currTrain.lineID].has(currStop2.waiting[k].to)) {
+          let adding = currStop2.waiting[k];
+          currStop2.waiting[k].actionStatus = K.BOARDPENDING;
+          currStop2.waiting[j].stop = currStop2;
+          currStop2.waiting[j].train = currTrain;
           adding.status = K.ONTHEWAY;
-          k--;
         }
         delay += K.DELAYPERPASSENGER;
       }
+      console.log(currTrain.toAdd.length, currTrain.toRemove.length, currStop2.toAdd.length);
+      handleAwaiting(currTrain, currStop2);
       currTrain.from = currTrain.to;
       currTrain.to = nextStop2;
       currTrain.startT = startT + delay;
@@ -450,14 +468,54 @@ function animLoop() {
   redraw();
   requestAnimationFrame(animLoop);
 }
+function handleAwaiting(currTrain, currStop2) {
+  for (const pass2 of passengers) {
+    if (pass2.train != currTrain || pass2.stop != currStop2)
+      continue;
+    if (pass2.actionStatus == K.NOACTION)
+      continue;
+    if (pass2.actionStatus == K.BOARDING) {
+      pass2.actionStatus = K.NOACTION;
+      for (let i = 0; i < currStop2.waiting.length; i++)
+        if (currStop2.waiting[i] == pass2) {
+          currStop2.waiting.splice(i, 1);
+          currTrain.passengers.push(pass2);
+          break;
+        }
+      break;
+    } else if (pass2.actionStatus == K.DEBOARDING) {
+      pass2.actionStatus = K.NOACTION;
+      for (let i = 0; i < currTrain.passengers.length; i++)
+        if (currTrain.passengers[i] == pass2) {
+          currTrain.passengers.splice(i, 1);
+          break;
+        }
+      break;
+    } else if (pass2.actionStatus == K.TRANSFERPENDING) {
+      pass2.actionStatus = K.NOACTION;
+      for (let i = 0; i < currTrain.passengers.length; i++)
+        if (currTrain.passengers[i] == pass2) {
+          currTrain.passengers.splice(i, 1);
+          currStop2.waiting.push(pass2);
+          break;
+        }
+      break;
+    } else
+      alert("invalid actionStatus!");
+  }
+  setTimeout(() => {
+    handleAwaiting(currTrain, currStop2);
+  }, K.DELAYPERPASSENGER);
+}
 function dropOff(currTrain, pt) {
   let stop = nearestStop(pt, 1);
   let matching = 0;
   for (let i = 0; i < currTrain.passengers.length; i++)
-    if (currTrain.passengers[i].to == stop.type) {
+    if (currTrain.passengers[i].to == stop.type && currTrain.passenger[i].actionStatus == K.NOACTION) {
       matching++;
-      currTrain.passengers.splice(i, 1);
-      i--;
+      currTrain.passenger[i].actionStatus = K.DEBOARDPENDING;
+      currStop.waiting[j].stop = currStop;
+      currStop.waiting[j].train = currTrain;
     }
   return matching;
 }
@@ -492,6 +550,7 @@ function addNewStop(type = -1) {
   newPt.waiting = [];
   newPt.linesServed = /* @__PURE__ */ new Set();
   newPt.type = type;
+  newPt.toAdd = [];
   redraw();
 }
 function keyUpdate(ev) {
@@ -549,40 +608,40 @@ function pointerUp(ev) {
     adj = [];
     for (let i = 0; i < typesOnLine.length; i++) {
       let row = [];
-      for (let j = 0; j < typesOnLine.length; j++) {
+      for (let j2 = 0; j2 < typesOnLine.length; j2++) {
         row.push({ route: [], val: K.INF });
       }
       adj.push(row);
     }
     for (let i = 0; i < stops.length; i++) {
       let served = Array.from(stops[i].linesServed);
-      for (let j = 0; j < served.length; j++) {
+      for (let j2 = 0; j2 < served.length; j2++) {
         for (let k = 0; k < served.length; k++) {
-          adj[served[j]][served[k]].val = 1;
-          adj[served[j]][served[k]].route = [served[k]];
-          adj[served[k]][served[j]].val = 1;
-          adj[served[k]][served[j]].route = [served[j]];
+          adj[served[j2]][served[k]].val = 1;
+          adj[served[j2]][served[k]].route = [served[k]];
+          adj[served[k]][served[j2]].val = 1;
+          adj[served[k]][served[j2]].route = [served[j2]];
         }
       }
-      for (let j = 0; j < served.length; j++) {
-        adj[served[j]][served[j]].val = 0;
-        adj[served[j]][served[j]].route = [];
+      for (let j2 = 0; j2 < served.length; j2++) {
+        adj[served[j2]][served[j2]].val = 0;
+        adj[served[j2]][served[j2]].route = [];
       }
     }
     for (let k = 0; k < adj.length; k++) {
-      for (let j = 0; j < adj.length; j++) {
+      for (let j2 = 0; j2 < adj.length; j2++) {
         for (let i = 0; i < adj.length; i++) {
-          if (i == k || j == k)
+          if (i == k || j2 == k)
             continue;
-          let newCost = adj[i][k].val + adj[k][j].val;
-          if (newCost < adj[i][j].val) {
-            adj[i][j].val = newCost;
-            adj[i][j].route = [];
+          let newCost = adj[i][k].val + adj[k][j2].val;
+          if (newCost < adj[i][j2].val) {
+            adj[i][j2].val = newCost;
+            adj[i][j2].route = [];
             for (let n = 0; n < adj[i][k].route.length; n++)
-              adj[i][j].route.push(adj[i][k].route[n]);
-            for (let n = 0; n < adj[k][j].route.length; n++)
-              adj[i][j].route.push(adj[k][j].route[n]);
-            console.log("newCost", newCost, "rL", adj[i][j].route.length);
+              adj[i][j2].route.push(adj[i][k].route[n]);
+            for (let n = 0; n < adj[k][j2].route.length; n++)
+              adj[i][j2].route.push(adj[k][j2].route[n]);
+            console.log("newCost", newCost, "rL", adj[i][j2].route.length);
           }
         }
       }
@@ -603,7 +662,10 @@ function pointerUp(ev) {
       status: K.MOVING,
       passengers: [],
       cap: 12,
-      revDir: false
+      revDir: false,
+      toAdd: [],
+      toRemove: [],
+      onCompletion: 0
     });
     trains.push({
       x: currPath[0].x,
@@ -617,7 +679,10 @@ function pointerUp(ev) {
       status: K.MOVING,
       passengers: [],
       cap: 12,
-      revDir: true
+      revDir: true,
+      toAdd: [],
+      toRemove: [],
+      onCompletion: 0
     });
     lineCt++;
   }

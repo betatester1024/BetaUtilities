@@ -31,6 +31,7 @@
         position: absolute;
         top:0px;
         left: 0px;
+        touch-action: none;
         /* pointer-events: none; */
       }
     </style>
@@ -39,7 +40,7 @@
     <div class="main_content">
       
       <canvas id="canv"></canvas>
-      <button onclick="addNewStop()" class="btn blu fssml">
+      <button onclick="addNewStop()" class="btn blu fssml override">
         Add new stop
       </button>
       <details class="blu ">

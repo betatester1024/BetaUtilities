@@ -11,6 +11,7 @@ const K = {
   PIANDABIT: Math.PI+0.1,
   NOACTION:0,
   FAILTIME: 10000,
+  LINEWIDTH:5,
   BOARDPENDING:1, // just boarding 
   DEBOARDPENDING:2, // just deboarding
   TRANSFERPENDING:3 // deboarding FOR TRANSFER.
@@ -37,8 +38,8 @@ let ticketCost = 10;
 let passengersServed = 0;
 let cash = 0;
 let maxUnlockedType = 0;
-const acceptRadius = 100;
-const stopSz = 50;
+const acceptRadius = 40;
+const stopSz = 20;
 let adj = [];
 let passengers = [];
 let currPos_canv = null;
@@ -53,27 +54,39 @@ function onLoad() {
   
 }
 
-function bezier(t , initial , p1, p2, final){
-return (1 - t) * (1 - t) * (1 - t) * initial
-        +
-        3 * (1 - t) * (1 - t) * t * p1
-        +
-        3 * (1 - t) * t * t * p2
-        +
-        t * t * t * final;
-
+function bezier(t , p1, p2, p3){
+return (1-t)**2*p1 + 2*(1-t)*t*p2 + t**2*p3;
 }
 
-function getNextStop(currTrain) {
+function parallelStops(cmp) {
+  let ct = 0;
+  let idx = -1;
+  let flipped = 0;
+  for (let i=0; i<connections.length; i++) {
+    let cnn= connections[i];
+    if (samePt(cnn.from, cmp.from) && samePt(cnn.to, cmp.to)
+       || samePt(cnn.from, cmp.to) && samePt(cnn.to, cmp.from)) {
+      if (cmp == cnn && idx == -1) {  
+        idx=ct;
+      }
+      if (samePt(cnn.from, cmp.to) && flipped == 0) flipped=1; // ONLY SET THIS ONCE
+      else if (flipped == 0) flipped = 2;
+      ct++;
+    }
+  }
+  return {idx:idx, flipped:flipped==1, ct:ct};
+}
+
+function getNextStop(currTrain, actQ=true) {
  let currToIdx = currTrain.path.indexOf(nearestStop(currTrain.to,1));
   if (currTrain.revDir && currToIdx == 0)
   {
-    currTrain.revDir = !currTrain.revDir;
+    if (actQ) currTrain.revDir = !currTrain.revDir;
     nextStop = currTrain.from
   }
   else if (!currTrain.revDir && currToIdx == currTrain.path.length-1) {
     nextStop = currTrain.from;
-    currTrain.revDir = !currTrain.revDir;
+    if (actQ) currTrain.revDir = !currTrain.revDir;
   }
   else if (currTrain.revDir) {
     nextStop = currTrain.path[currToIdx-1];
@@ -102,6 +115,25 @@ function handlePassenger(pass) {
   }
 }
 
+function handleOffset(connection) {
+  let angBtw = Math.atan2(connection.to.y - connection.from.y,
+    connection.to.x - connection.from.x);
+  // angBtw += K.PIANDABIT;
+  let info = parallelStops(connection);
+  let offsetR = (K.LINEWIDTH)*(2*info.idx-1 - info.ct) //+ stopSz;
+  console.log(offsetR);
+  let newAng = info.flipped?(angBtw+Math.PI):angBtw;
+  return {x:offsetR*Math.cos(newAng+Math.PI/2), y: offsetR*Math.sin(newAng+Math.PI/2)}
+}
+
+function getAssociatedConnection(train) {
+  for (let cn of connections) {
+    if (samePt(cn.to, train.to) && samePt(cn.from, train.from) || 
+        samePt(cn.from, train.to) && samePt(cn.to, train.from))
+      if (cn.lineID == train.lineID) return cn;
+  }
+  return null;
+}
 function redraw() {
   // function connect(currPath, clr) {
   function circle(pt) {
@@ -213,18 +245,21 @@ function redraw() {
   for (let i = 0; i < connections.length; i++) {
     // if (lines.length > 0) ctx.arc(lines[i][0].x, lines[i][0].y, acceptRadius, 0, K.PIANDABIT*2);
     // // for (let i=1; i<currPath.length; i++) {
+    let offset = handleOffset(connections[i]);
     let angBtw = Math.atan2(connections[i].to.y - connections[i].from.y,
       connections[i].to.x - connections[i].from.x);
     // angBtw += K.PIANDABIT;
     ctx.save();
+    ctx.lineWidth = K.LINEWIDTH;
+    ctx.strokeStyle = connections[i].colour;
     ctx.beginPath();
     let c = Math.cos(angBtw);
     let s = Math.sin(angBtw);
-    ctx.strokeStyle = connections[i].colour;
-    ctx.moveTo(connections[i].from.x + c * stopSz,
-      connections[i].from.y + s * stopSz);
-    ctx.lineTo(connections[i].to.x - c * stopSz,
-      connections[i].to.y - s * stopSz)
+    // let newAng = angBtw;
+    ctx.moveTo(connections[i].from.x + c * stopSz + offset.x,
+      connections[i].from.y + s * stopSz          + offset.y);
+    ctx.lineTo(connections[i].to.x - c * stopSz   + offset.x,
+      connections[i].to.y - s * stopSz            + offset.y)
     ctx.stroke();
     ctx.restore();
   }
@@ -260,12 +295,13 @@ function redraw() {
     ctx.restore();
   }
 
-  //////////////// existing path lines ////////////////////
+  //////////////// existing path line circles ////////////////////
   for (let i = 0; i < connections.length; i++) {
     // ctx.strokeStyle = getCSSProp("--")
     clearCircle(connections[i].from, stopSz);
     clearCircle(connections[i].to, stopSz);
     ctx.beginPath();
+    // ctx.lineWidth = K.LINEWIDTH;      
     ctx.strokeStyle = defaultClr;
     ctx.arc(connections[i].from.x, connections[i].from.y, stopSz, 0, K.PIANDABIT * 2);
     ctx.stroke();
@@ -347,20 +383,58 @@ function redraw() {
     ctx.beginPath();
     let angBtw = Math.atan2(trains[i].to.y - trains[i].from.y,
       trains[i].to.x - trains[i].from.x);
-    let nStop = nearestStop(trains[i].to, stopSz);
-    if (nStop) {
-      let pctRemaining = distBtw(nStop, trains[i])/stopSz;
-      let nextTrainTo = getNextStop(trains[i]);
-      let angBtw2 = Math.atan2(trains[i].to.y - nextTrainTo.y,
-          trains[i].to.x - nextTrainTo.x);
-      if (pctRemaining < 1) {
-        console.log(pctRemaining);
-        angBtw = (angBtw+(angBtw2-angBtw)*(pctRemaining))
-        // console.log(angBtw);
-      }
-      // at stop, turn according to distance
-    }
-    let center = { x: trains[i].x, y: trains[i].y };
+    let nStop = nearestStop(trains[i], stopSz);
+    // if (!nStop) nStop = nearestStop(trains[i].from, stopSz);
+// angBtw = 0;
+    let associatedConnection = getAssociatedConnection(trains[i]);
+    let offset = handleOffset(associatedConnection);
+    let center = { x: trains[i].x+offset.x, y: trains[i].y+offset.y };
+    // if (nStop) {
+    //   let pctRemaining = distBtw(nStop, trains[i])/(stopSz-15);
+    //   let nextTrainTo = getNextStop(trains[i], false);
+    //   let movingAway = !samePt(nStop, trains[i].to);
+    //   console.log(movingAway);
+    //   let angBtw2 = Math.atan2(trains[i].to.y - nextTrainTo.y,
+    //       trains[i].to.x - nextTrainTo.x);
+    //   if (movingAway) {
+    //     trains[i].revDir = !trains[i].revDir;
+       
+    //     let savedTo = trains[i].to;
+    //     let savedFrom = trains[i].from;
+    //     let nextTrainTo = getNextStop(trains[i], false);
+    //     trains[i].to = nextTrainTo;
+    //     trains[i].from = savedTo;
+    //     nextTrainTo = getNextStop(trains[i], false);
+    //     trains[i].to = savedTo;
+    //     trains[i].from = savedFrom;
+    //     console.log(nextTrainTo.type);
+    //     trains[i].revDir = !trains[i].revDir;
+    //     angBtw2 = Math.atan2(trains[i].from.y -nextTrainTo.y,
+    //       trains[i].from.x - nextTrainTo.x); 
+    //   }
+    //   // x'(t) = x1 + 2*x2*t + 3*x3*t*t
+    //   // y'(t) = y1 + 2*y2*t + 3*y3*t*t
+    //   // let ctrlPt1 = {}
+    //   if (pctRemaining < 1) {
+    //     // console.log(pctRemaining);
+        
+    //     let pct = samePt(nStop, trains[i].to)?pctRemaining:(1-pctRemaining);
+    //     center.x = bezier(pct, nStop.x+Math.cos(angBtw2+K.PIANDABIT)*stopSz, nStop.x, nStop.x+Math.cos(angBtw+K.PIANDABIT)*stopSz);
+    //     center.y = bezier(pct, nStop.y+Math.sin(angBtw2+K.PIANDABIT)*stopSz, nStop.y, nStop.y+Math.sin(angBtw+K.PIANDABIT)*stopSz);
+    //     ctx.beginPath();
+    //     ctx.moveTo(nStop.x+Math.cos(angBtw2+Math.PI)*stopSz, nStop.y+Math.sin(angBtw2+Math.PI)*stopSz);
+    //     ctx.lineTo(nStop.x, nStop.y);
+    //     ctx.lineTo(nStop.x+Math.cos(angBtw+Math.PI)*stopSz, nStop.y+Math.sin(angBtw+Math.PI)*stopSz);
+    //     ctx.stroke();
+    //     // ctx.beginPath();
+    //     let delta = angBtw2-angBtw;
+    //     angBtw = angBtw+delta*(1-pctRemaining);
+    //       // x1 = 2*xc - x0/2 - x2/2
+    //      // y1 = 2*yc - y0/2 - y2/2
+    //     // console.log(angBtw);
+    //   }
+    //   // at stop, turn according to distance
+    // } // if nstop
     const w = 15;
     const h = 30;
     const c = Math.cos(angBtw);
@@ -372,7 +446,8 @@ function redraw() {
     // ctx.translate(-center.x, -center.y)
     // ctx.rotate(angBtw);
     // ctx.translate(center.x, center.y);
-    ctx.fillStyle = getCSSProp("--system-grey");
+    ctx.globalAlpha = 0.6;
+    ctx.fillStyle = associatedConnection.colour;
     ctx.moveTo(center.x + c * h / 2 + c2 * w / 2, center.y + s * h / 2 + s2 * w / 2);
     ctx.lineTo(center.x + c * h / 2 - c2 * w / 2, center.y + s * h / 2 - s2 * w / 2);
     ctx.lineTo(center.x - c * h / 2 - c2 * w / 2, center.y - s * h / 2 - s2 * w / 2);
@@ -382,6 +457,18 @@ function redraw() {
     let str = "";
     for (let pass of trains[i].passengers)
       str+= pass.to.toString();
+    ctx.save();
+    /// here coems the transformation!
+    ctx.globalAlpha = 1;
+    ctx.translate(center.x, center.y);
+    ctx.beginPath();
+    // console.log(angBtw);
+    ctx.rotate(angBtw+Math.PI/2);
+    ctx.moveTo(-w/2, -h/2);
+    ctx.lineTo(w/2, h/2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.restore();
     ctx.fillText(str, center.x, center.y)
     // ctx.fillRect(center.x - 8, center.y-2.5, 16, 5);
     ctx.restore();
@@ -435,6 +522,7 @@ function preLoad() {
   }
   canv.addEventListener("pointermove", onmove);
   canv.addEventListener("pointerdown", (ev) => {
+    if (event.button != 0) return;
     holdState = K.HOLD;
     downPt = { x: ev.clientX, y: ev.clientY };
     let actualPos = fromCanvPos(ev.clientX, ev.clientY);
@@ -641,6 +729,8 @@ function handleAwaiting(currTrain, currStop) {
           currTrain.passengers.push(pass);
           break;
         }
+      if (currStop.waiting.length < currStop.capacity)
+        currStop.failureTimer = -1;
       pass.status = K.ONTHEWAY;
       pass.actionStatus = K.NOACTION;
       handled = true;
@@ -654,6 +744,8 @@ function handleAwaiting(currTrain, currStop) {
           break;
         }
       pass.status = K.WAITING;
+      if (currStop.waiting.length < currStop.capacity)
+        currStop.failureTimer = -1;
       pass.actionStatus = K.NOACTION;
       handled = true;
       break;
@@ -668,6 +760,9 @@ function handleAwaiting(currTrain, currStop) {
         }
       pass.status = K.WAITING;
       pass.actionStatus = K.NOACTION;
+      let stop = currStop;
+      if (stop.waiting.length > stop.capacity && stop.failureTimer < 0)
+        stop.failureTimer = Date.now();
       handled = true;
       break;
     }
@@ -732,7 +827,7 @@ function addNewStop(type = -1) {
   newPt.type = type;
   newPt.toAdd = [];
   newPt.failureTimer = -1;
-  newPt.capacity = 8;
+  newPt.capacity = 6;
   redraw();
 }
 
@@ -865,13 +960,13 @@ function pointerUp(ev) {
       status: K.MOVING, passengers: [], cap:12, revDir:false, 
       //toAdd:[], toRemove:[], onCompletion:0
     });
-    trains.push({
-      x: currPath[0].x, y: currPath[0].y,
-      from: currPath[currPath.length-1], to: currPath[currPath.length-2], path: currPath,
-      lineID: lineCt, colour: currCol, startT: Date.now(),
-      status: K.MOVING, passengers: [], cap:12, revDir:true,//, toAdd:[], toRemove:[], 
-      //onCompletion:0
-    });
+    // trains.push({
+    //   x: currPath[0].x, y: currPath[0].y,
+    //   from: currPath[currPath.length-1], to: currPath[currPath.length-2], path: currPath,
+    //   lineID: lineCt, colour: currCol, startT: Date.now(),
+    //   status: K.MOVING, passengers: [], cap:12, revDir:true,//, toAdd:[], toRemove:[], 
+    //   //onCompletion:0
+    // });
     lineCt++;
   }
   currPath = [];

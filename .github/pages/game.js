@@ -41,7 +41,8 @@ const K = {
   let viewportH = 0;
   let viewportMax, viewportMin;
   let currPath = [];
-  let typesOnLine = []
+  let typesOnLine = [];
+  let lines = [];
   let trains = [];
   let ticketCost = 10;
   let passengersServed = 0;

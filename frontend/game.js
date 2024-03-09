@@ -1,3 +1,16 @@
+/**
+ * PLEASE DON'T TOUCH THIS FILE.
+ * 
+ * THANKS.
+ * 
+ * 
+ * YOU MAY BE LOOKING FOR THE ONE IN .github/...!
+ * 
+ * 
+ */
+
+
+
 const K = {
   /// train statuses, probably.
   MOVING: 1,
@@ -988,7 +1001,7 @@ function routeConfirm(ev) {
     for (const e of currPath) {
       currPath.push(currLine);
     }
-    lines.push({lineID:lineCt, path:currLine, );
+    lines.push({lineID:lineCt, path:currLine, loopingQ:(currPath[0] == currPath[currPath.length-1])});
 
     let supportedTypes = new Set();
     for (let i = 0; i < currPath.length; i++) {

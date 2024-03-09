@@ -80,10 +80,10 @@ function parallelStops(cmp) {
   return { idx, flipped: flipped == 1, ct };
 }
 function getNextStop(currTrain, actQ = true) {
-  let currToIdx = currTrain.path.indexOf(nearestStop(currTrain.to, 1));
+  let line = lines[currTrain.lineID];
+  let currToIdx = line.path.indexOf(nearestStop(currTrain.to, 1));
   if (currTrain.revDir && currToIdx == 0) {
-    if (lines[currTrain.lineID].loopingQ) {
-      let line = lines[currTrain.lineID];
+    if (line.loopingQ) {
       nextStop = line.path[line.path.length - 2];
       console.log("looped!");
     } else {
@@ -91,14 +91,14 @@ function getNextStop(currTrain, actQ = true) {
         currTrain.revDir = !currTrain.revDir;
       nextStop = currTrain.from;
     }
-  } else if (!currTrain.revDir && currToIdx == currTrain.path.length - 1) {
+  } else if (!currTrain.revDir && currToIdx == line.path.length - 1) {
     nextStop = currTrain.from;
     if (actQ)
       currTrain.revDir = !currTrain.revDir;
   } else if (currTrain.revDir) {
-    nextStop = currTrain.path[currToIdx - 1];
+    nextStop = line.path[currToIdx - 1];
   } else
-    nextStop = currTrain.path[currToIdx + 1];
+    nextStop = line.path[currToIdx + 1];
   return nearestStop(nextStop, 1);
 }
 function handlePassenger(pass2) {
@@ -583,9 +583,6 @@ function animLoop() {
       let nextStop2 = null;
       let prevStop = currTrain.from;
       nextStop2 = getNextStop(currTrain);
-      let reusingConnection = false;
-      if (samePt(prevStop, nextStop2))
-        reusingConnection = true;
       currStop = nearestStop(currentTo, 1);
       let upcomingLinesServed = new Set(JSON.parse(JSON.stringify([...currStop.linesServed])));
       for (let j = 0; j < currTrain.passengers.length; j++) {
@@ -633,11 +630,9 @@ function animLoop() {
       if (delay > 0)
         currTrain.startT = K.INF;
       let connBeforeUpdate = getAssociatedConnection(currTrain);
-      if (!connBeforeUpdate.pendingUpdateTo)
-        connBeforeUpdate = null;
       currTrain.from = currTrain.to;
       currTrain.to = nextStop2;
-      handleAwaiting(currTrain, currStop, reusingConnection ? null : connBeforeUpdate);
+      handleAwaiting(currTrain, currStop, connBeforeUpdate);
       if (Date.now() - startT > 25)
         console.log("WARNING: StopHandler took ", Date.now() - startT + "ms");
     }
@@ -720,15 +715,15 @@ function handleAwaiting(currTrain, currStop, affectedConn) {
   else {
     currTrain.startT = Date.now();
     let currConn = getAssociatedConnection(currTrain);
+    let currLine = lines[currTrain.lineID];
     let canUpdate = true;
-    if (affectedConn && currConn.pendingUpdateTo) {
+    if (affectedConn && currConn.pendingRemove) {
       for (affectedTrain of currLine.trains) {
         if (getAssociatedConnection(affectedTrain) == modifyingConn) {
           canUpdate = false;
           break;
         }
       }
-      updateToNow(currLine, affectedConn);
     }
   }
 }
@@ -812,19 +807,38 @@ function onmove(ev) {
     redraw();
   } else if (holdState == K.HOLD_CONNECTION) {
     if (nStop) {
-      let currLine2 = lines[modifyingConn.lineID];
+      let currLine = lines[modifyingConn.lineID];
       if (!lines[modifyingConn.lineID].stops.has(nStop)) {
-        for (affectedTrain of currLine2.trains) {
+        for (affectedTrain of currLine.trains) {
           if (getAssociatedConnection(affectedTrain) == modifyingConn) {
-            modifyingConn.pendingUpdateTo = nStop;
+            modifyingConn.pendingRemove = true;
             break;
           }
         }
-        if (!modifyingConn.pendingUpdateTo) {
-          updateToNow(currLine2, modifyingConn);
+        let newConn = {
+          from: modifyingConn.from,
+          to: nStop,
+          lineID: modifyingConn.lineID,
+          colour: modifyingConn.colour
+        };
+        let newConn2 = {
+          from: nStop,
+          to: modifyingConn.to,
+          lineID: modifyingConn.lineID,
+          colour: modifyingConn.colour
+        };
+        connections.push(newConn);
+        connections.push(newConn2);
+        if (!modifyingConn.pendingRemove) {
+          modifyingConn.pendingRemove = true;
+          updateToNow(currLine, modifyingConn);
         }
         nStop.linesServed.add(modifyingConn.lineID);
+        let idx = currLine.path.indexOf(modifyingConn.from);
+        currLine.path.splice(idx + 1, 0, nStop);
       }
+      holdState = K.NOHOLD;
+      routeConfirm();
     }
   } else if (nStop) {
     hovering = nStop;
@@ -836,17 +850,9 @@ function onmove(ev) {
   } else if (holdState == K.NOHOLD)
     document.body.style.cursor = "";
 }
-function updateToNow(currLine2, conn) {
-  let nStop = conn.pendingUpdateTo;
-  for (affectedTrain of currLine2.trains) {
-    fIdx = affectedTrain.path.indexOf(conn.from);
-    affectedTrain.path.splice(fIdx, 0, nStop);
-  }
-  let idx = currLine2.path.indexOf(conn.from);
-  currLine2.path.splice(idx, 0, nStop);
-  let newConn = { from: nStop, to: conn.to, lineID: conn.lineID, colour: conn.colour };
-  conn.to = nStop;
-  connections.push(newConn);
+function updateToNow(currLine, conn) {
+  let idx = connections.indexOf(conn);
+  connections.splice(idx, 1);
 }
 function routeConfirm(ev) {
   holdState = K.NOHOLD;
@@ -862,20 +868,20 @@ function routeConfirm(ev) {
         lineID: lineCt
       });
     }
-    let currLine2 = [];
+    let currLine = [];
     let stopsOnLine = /* @__PURE__ */ new Set();
     for (const e of currPath) {
-      currLine2.push(e);
+      currLine.push(e);
       stopsOnLine.add(e);
     }
-    let currLine22 = {
+    let currLine2 = {
       lineID: lineCt,
-      path: currLine2,
+      path: currLine,
       stops: stopsOnLine,
       loopingQ: currPath[0] == currPath[currPath.length - 1],
       trains: []
     };
-    lines.push(currLine22);
+    lines.push(currLine2);
     let supportedTypes = /* @__PURE__ */ new Set();
     for (let i = 0; i < currPath.length; i++) {
       supportedTypes.add(currPath[i].type);
@@ -956,7 +962,7 @@ function routeConfirm(ev) {
     };
     trains.push(t1);
     trains.push(t2);
-    currLine22.trains = [t1, t2];
+    currLine2.trains = [t1, t2];
     lineCt++;
   }
   currPath = [];

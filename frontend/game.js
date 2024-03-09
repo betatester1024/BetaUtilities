@@ -91,28 +91,30 @@ function parallelStops(cmp) {
 }
 
 function getNextStop(currTrain, actQ=true) {
- let currToIdx = currTrain.path.indexOf(nearestStop(currTrain.to,1));
+  let line = lines[currTrain.lineID]
+  let currToIdx = line.path.indexOf(nearestStop(currTrain.to,1));
   if (currTrain.revDir && currToIdx == 0)
   {
-    if (lines[currTrain.lineID].loopingQ) {
-      let line = lines[currTrain.lineID];
+    if (line.loopingQ) {
       nextStop = line.path[line.path.length-2];
       
       console.log("looped!");
     }
     else {
       if (actQ) currTrain.revDir = !currTrain.revDir;
-      nextStop = currTrain.from
+      nextStop = line.path[1];
     }
   }
-  else if (!currTrain.revDir && currToIdx == currTrain.path.length-1) {
-    nextStop = currTrain.from;
+  else if (!currTrain.revDir && currToIdx == line.path.length-1) {
+    // nextStop = currTrain.from;
+    nextStop = line.path[line.path.length-2];
     if (actQ) currTrain.revDir = !currTrain.revDir;
   }
   else if (currTrain.revDir) {
-    nextStop = currTrain.path[currToIdx-1];
+    nextStop = line.path[currToIdx-1];
   }
-  else nextStop = currTrain.path[currToIdx+1]; 
+  else nextStop = line.path[currToIdx+1]; 
+  if (!nextStop) debugger;
   return nearestStop(nextStop, 1);
 }
 
@@ -725,9 +727,7 @@ function animLoop() {
       // }
       // no need to do all this nonsense the train knows its path
       let prevStop = currTrain.from;
-       nextStop = getNextStop(currTrain);
-      let reusingConnection = false;
-      if (samePt(prevStop, nextStop)) reusingConnection = true; 
+      nextStop = getNextStop(currTrain);
       // if next stop is the same as the prev stop - we know that the train is reversing
 
       
@@ -809,11 +809,11 @@ function animLoop() {
       // if (currTrain.revDir) {
       if (delay > 0) currTrain.startT = K.INF;
       let connBeforeUpdate = getAssociatedConnection(currTrain);
-      if (!connBeforeUpdate.pendingUpdateTo) connBeforeUpdate = null;
+      // if (!connBeforeUpdate.pendingRemove) connBeforeUpdate = null;
       currTrain.from = currTrain.to;
       currTrain.to = nextStop;
-      
-      handleAwaiting(currTrain, currStop, reusingConnection?null:connBeforeUpdate);
+
+      handleAwaiting(currTrain, currStop);
       
 
       // }
@@ -838,7 +838,7 @@ function animLoop() {
   requestAnimationFrame(animLoop);
 }
 
-function handleAwaiting(currTrain, currStop, affectedConn){
+function handleAwaiting(currTrain, currStop) {
   let handled = false;
   for (const pass of passengers) {
     if (pass.train != currTrain || pass.stop != currStop) continue;
@@ -896,21 +896,22 @@ function handleAwaiting(currTrain, currStop, affectedConn){
     }
     else throw("invalid actionStatus!");
   }
-  if (handled) setTimeout(()=>{handleAwaiting(currTrain, currStop, affectedConn)}, K.DELAYPERPASSENGER);
+  if (handled) setTimeout(()=>{handleAwaiting(currTrain, currStop)}, K.DELAYPERPASSENGER);
   else {
     currTrain.startT = Date.now();
-    let currConn = getAssociatedConnection(currTrain);
-    let currLine = lines[currTrain.lineID];
     let canUpdate = true;
-    if (affectedConn && currConn.pendingUpdateTo) {
-      // check if all trains have cleared this connection
-      for (affectedTrain of currLine.trains) {
-        if (getAssociatedConnection(affectedTrain) == modifyingConn) {
-          canUpdate = false;
-          break;
+    for (const affectedConn of connections) {
+      if (affectedConn.pendingRemove) {
+        // check if all trains have cleared this connection
+        let currLine = lines[affectedConn.lineID];
+        for (affectedTrain of currLine.trains) {
+          if (getAssociatedConnection(affectedTrain) == affectedConn) {
+            canUpdate = false;
+            break;
+          }
         }
+        if (canUpdate) updateToNow(currLine, affectedConn);
       }
-      updateToNow(currLine, affectedConn);
     }
   }
 }
@@ -1025,18 +1026,35 @@ function onmove(ev) {
         // now we can modify the connection
         for (affectedTrain of currLine.trains) {
           if (getAssociatedConnection(affectedTrain) == modifyingConn) {
-            modifyingConn.pendingUpdateTo = nStop;
+            modifyingConn.pendingRemove = true;
             break;
           }
         }
-        if (!modifyingConn.pendingUpdateTo) {
-          modifyingConn.pendingUpdateTo = nStop;
+        currLine.stops.add(nStop);
+        // modifyingConn.pendingUpdateTo = nStop;
+        let newConn = {from:modifyingConn.from, to:nStop, 
+                       lineID:modifyingConn.lineID, 
+                       colour:modifyingConn.colour};
+        let newConn2 = {from:nStop, to:modifyingConn.to, 
+                        lineID:modifyingConn.lineID, 
+                        colour:modifyingConn.colour};
+        connections.push(newConn);
+        connections.push(newConn2);
+        if (!modifyingConn.pendingRemove) {
+          modifyingConn.pendingRemove = true;
            updateToNow(currLine, modifyingConn); 
         }
+        typesOnLine[modifyingConn.lineID].add(nStop.type)
         nStop.linesServed.add(modifyingConn.lineID);
+        for (let pass of passengers)
+          handlePassenger(pass);
+        let idx = currLine.path.indexOf(modifyingConn.from);
+        currLine.path.splice(idx+1, 0, nStop);
         
         // if (!modifyingConn.pendingRemoval) 
       }
+      holdState = K.NOHOLD;
+      routeConfirm();
     }
   }
   else if (nStop) {
@@ -1052,16 +1070,14 @@ function onmove(ev) {
 }
 
 function updateToNow(currLine, conn) {
-  let nStop = conn.pendingUpdateTo;
-  for (affectedTrain of currLine.trains) {
-    fIdx = affectedTrain.path.indexOf(conn.from);
-    affectedTrain.path.splice(fIdx, 0, nStop);
-  }
-  let idx = currLine.path.indexOf(conn.from);
-  currLine.path.splice(idx, 0, nStop);
-  let newConn = {from:nStop, to:conn.to, lineID:conn.lineID, colour:conn.colour};
-  conn.to = nStop; 
-  connections.push(newConn);
+  // for (affectedTrain of currLine.trains) {
+  // let fIdx = affectedTrain.path.indexOf(conn.from);
+    // affectedTrain.path.splice(fIdx+1, 0, nStop);
+  // }
+  // conn.to = nStop; 
+  let idx = connections.indexOf(conn);
+  connections.splice(idx, 1);
+  // connections.push(newConn);
 }
 
 function routeConfirm(ev) {

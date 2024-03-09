@@ -5,6 +5,7 @@ const K = {
   NOHOLD: 0,
   HOLD: 1,
   HOLD_NEWLINE: 2,
+  HOLD_CONNECTION: 3,
   WAITING: 0,
   ONTHEWAY: 1,
   DELAYPERPASSENGER: 400,
@@ -25,6 +26,7 @@ let canv = null;
 let totalScaleFac = 1;
 let hovering = null, hoveringConn = null;
 let stops = [];
+let modifyingConn = null;
 let connections = [];
 let lineTypes = [];
 let stopCt = 0;
@@ -80,9 +82,15 @@ function parallelStops(cmp) {
 function getNextStop(currTrain, actQ = true) {
   let currToIdx = currTrain.path.indexOf(nearestStop(currTrain.to, 1));
   if (currTrain.revDir && currToIdx == 0) {
-    if (actQ)
-      currTrain.revDir = !currTrain.revDir;
-    nextStop = currTrain.from;
+    if (lines[currTrain.lineID].loopingQ) {
+      let line = lines[currTrain.lineID];
+      nextStop = line.path[line.path.length - 2];
+      console.log("looped!");
+    } else {
+      if (actQ)
+        currTrain.revDir = !currTrain.revDir;
+      nextStop = currTrain.from;
+    }
   } else if (!currTrain.revDir && currToIdx == currTrain.path.length - 1) {
     nextStop = currTrain.from;
     if (actQ)
@@ -186,34 +194,19 @@ function redraw() {
     clearCircle({ x: hovering.x, y: hovering.y }, stopSz);
     ctx.restore();
   }
-  for (let i = 0; i < stops.length; i++) {
+  if (holdState == K.HOLD_CONNECTION) {
     ctx.save();
     ctx.beginPath();
-    if (stops[i].failureTimer > 0) {
-      ctx.fillStyle = getCSSProp("--system-red2");
-      let pctRemaining = (Date.now() - stops[i].failureTimer) / K.FAILTIME;
-      let pctOneSec = (Date.now() - stops[i].failureTimer) / 300;
-      let radScl = 0;
-      if (pctOneSec < 1)
-        radScl = -4 * (pctOneSec - 0.5) ** 2 + 0.5;
-      if (pctRemaining > 1 && pctRemaining < 2) {
-        radScl = pctRemaining ** 120;
-      }
-      let currRad = stopSz + (acceptRadius - stopSz) * 2 + 10 * radScl;
-      ctx.beginPath();
-      ctx.moveTo(stops[i].x, stops[i].y);
-      ctx.arc(stops[i].x, stops[i].y, currRad, 0, Math.PI * pctRemaining * 2);
-      ctx.fill();
-      ctx.fill();
-      ctx.lineCap = "round";
-      ctx.beginPath();
-      ctx.moveTo(stops[i].x + currRad, stops[i].y);
-      ctx.arc(stops[i].x, stops[i].y, currRad, 0, Math.PI * pctRemaining * 2);
-      ctx.strokeStyle = getCSSProp("--system-red");
-      ctx.stroke();
-      ctx.beginPath();
-    }
+    ctx.strokeStyle = modifyingConn.colour;
+    ctx.lineWidth = K.LINEWIDTH;
+    ctx.moveTo(modifyingConn.from.x, modifyingConn.from.y);
+    ctx.lineTo(currPos_canv.x, currPos_canv.y);
+    ctx.moveTo(modifyingConn.to.x, modifyingConn.to.y);
+    ctx.lineTo(currPos_canv.x, currPos_canv.y);
+    ctx.stroke();
     ctx.restore();
+  }
+  for (let i = 0; i < stops.length; i++) {
     clearCircle(stops[i], stopSz);
     ctx.arc(stops[i].x, stops[i].y, stopSz, 0, K.PI * 2);
     ctx.stroke();
@@ -233,12 +226,12 @@ function redraw() {
       connections[i].to.x - connections[i].from.x
     );
     ctx.save();
-    ctx.lineWidth = hoveringConn == connections[i] ? K.LINEACCEPTDIST : K.LINEWIDTH;
-    ctx.lineCap = "square";
-    if (!hoveringConn || hoveringConn == connections[i])
+    ctx.lineWidth = K.LINEWIDTH;
+    ctx.lineCap = "round";
+    if (hoveringConn && hoveringConn != connections[i] || holdState == K.HOLD_CONNECTION)
+      ctx.strokeStyle = getCSSProp("--system-grey3");
+    else
       ctx.strokeStyle = connections[i].colour;
-    else if (hoveringConn)
-      ctx.strokeStyle = connections[i].colour + "55";
     ctx.beginPath();
     let c = Math.cos(angBtw);
     let s = Math.sin(angBtw);
@@ -350,6 +343,35 @@ function redraw() {
       ctx.restore();
     }
   }
+  for (let i = 0; i < stops.length; i++) {
+    ctx.save();
+    ctx.beginPath();
+    if (stops[i].failureTimer > 0) {
+      ctx.fillStyle = getCSSProp("--system-red2");
+      let pctRemaining = (Date.now() - stops[i].failureTimer) / K.FAILTIME;
+      let pctOneSec = (Date.now() - stops[i].failureTimer) / 300;
+      let radScl = 0;
+      if (pctOneSec < 1)
+        radScl = -4 * (pctOneSec - 0.5) ** 2 + 0.5;
+      if (pctRemaining > 1 && pctRemaining < 2) {
+        radScl = pctRemaining ** 120;
+      }
+      let currRad = stopSz + (acceptRadius - stopSz) * 2 + 10 * radScl;
+      ctx.beginPath();
+      ctx.moveTo(stops[i].x, stops[i].y);
+      ctx.arc(stops[i].x, stops[i].y, currRad, 0, Math.PI * pctRemaining * 2);
+      ctx.fill();
+      ctx.fill();
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(stops[i].x + currRad, stops[i].y);
+      ctx.arc(stops[i].x, stops[i].y, currRad, 0, Math.PI * pctRemaining * 2);
+      ctx.strokeStyle = getCSSProp("--system-red");
+      ctx.stroke();
+      ctx.beginPath();
+    }
+    ctx.restore();
+  }
   for (let i = 0; i < stops.length; i++)
     ctx.fillText(stops[i].type, stops[i].x, stops[i].y);
   for (let i = 0; i < trains.length; i++) {
@@ -393,7 +415,12 @@ function redraw() {
     for (let j = 0; j < trains[i].passengers.length; j++) {
       if (j >= cap / 2)
         y = 1;
-      ctx.fillText(trains[i].passengers[j].to, j % (cap / 2) * uSz + uSz / 2 - h / 2, y * uSz + uSz / 2 - w / 2);
+      let px = j % (cap / 2) * uSz + uSz / 2 - h / 2;
+      let py = y * uSz + uSz / 2 - w / 2;
+      if (trains[i].passengers[j].to == 0)
+        star(1.1, px, py);
+      else
+        ctx.fillText(trains[i].passengers[j].to, px, py);
     }
     ctx.beginPath();
     ctx.restore();
@@ -454,18 +481,25 @@ function preLoad() {
     downPt = { x: ev.clientX, y: ev.clientY };
     let actualPos = fromCanvPos(ev.clientX, ev.clientY);
     let nStop = nearestStop(actualPos, acceptRadius);
+    let nConn = nearestConnection(actualPos.x, actualPos.y);
     if (nStop && colours.length > 0) {
       holdState = K.HOLD_NEWLINE;
       currPath = [nStop];
       redraw();
+    } else if (nConn) {
+      holdState = K.HOLD_CONNECTION;
+      modifyingConn = nConn;
     }
-    if (holdState == K.HOLD) {
+    if (holdState == K.HOLD || holdState == K.HOLD_CONNECTION) {
       document.body.style.cursor = "grabbing";
     }
   });
   window.addEventListener("keydown", keyUpdate);
   window.addEventListener("keyup", keyUpdate);
-  window.addEventListener("pointerup", routeConfirm);
+  window.addEventListener("pointerup", (e) => {
+    routeConfirm(e);
+    onmove(e);
+  });
   canv.addEventListener("wheel", (ev) => {
     let sclFac = ev.deltaY < 0 ? 1.15 : 1 / 1.15;
     if (sclFac * totalScaleFac > maxSclFac)
@@ -547,7 +581,11 @@ function animLoop() {
       let delay = dropOff(currTrain, currentTo) * K.DELAYPERPASSENGER;
       let reverseQ = true;
       let nextStop2 = null;
+      let prevStop = currTrain.from;
       nextStop2 = getNextStop(currTrain);
+      let reusingConnection = false;
+      if (samePt(prevStop, nextStop2))
+        reusingConnection = true;
       currStop = nearestStop(currentTo, 1);
       let upcomingLinesServed = new Set(JSON.parse(JSON.stringify([...currStop.linesServed])));
       for (let j = 0; j < currTrain.passengers.length; j++) {
@@ -594,9 +632,12 @@ function animLoop() {
       }
       if (delay > 0)
         currTrain.startT = K.INF;
-      handleAwaiting(currTrain, currStop);
+      let connBeforeUpdate = getAssociatedConnection(currTrain);
+      if (!connBeforeUpdate.pendingUpdateTo)
+        connBeforeUpdate = null;
       currTrain.from = currTrain.to;
       currTrain.to = nextStop2;
+      handleAwaiting(currTrain, currStop, reusingConnection ? null : connBeforeUpdate);
       if (Date.now() - startT > 25)
         console.log("WARNING: StopHandler took ", Date.now() - startT + "ms");
     }
@@ -617,7 +658,7 @@ function animLoop() {
   redraw();
   requestAnimationFrame(animLoop);
 }
-function handleAwaiting(currTrain, currStop) {
+function handleAwaiting(currTrain, currStop, affectedConn) {
   let handled = false;
   for (const pass2 of passengers) {
     if (pass2.train != currTrain || pass2.stop != currStop)
@@ -674,10 +715,22 @@ function handleAwaiting(currTrain, currStop) {
   }
   if (handled)
     setTimeout(() => {
-      handleAwaiting(currTrain, currStop);
+      handleAwaiting(currTrain, currStop, affectedConn);
     }, K.DELAYPERPASSENGER);
   else {
     currTrain.startT = Date.now();
+    let currConn = getAssociatedConnection(currTrain);
+    let currLine = lines[currTrain.lineID];
+    let canUpdate = true;
+    if (affectedConn && currConn.pendingUpdateTo) {
+      for (affectedTrain of currLine.trains) {
+        if (getAssociatedConnection(affectedTrain) == modifyingConn) {
+          canUpdate = false;
+          break;
+        }
+      }
+      updateToNow(currLine, affectedConn);
+    }
   }
 }
 function dropOff(currTrain, pt) {
@@ -758,6 +811,23 @@ function onmove(ev) {
       }
     }
     redraw();
+  } else if (holdState == K.HOLD_CONNECTION) {
+    if (nStop) {
+      let currLine = lines[modifyingConn.lineID];
+      if (!lines[modifyingConn.lineID].stops.has(nStop)) {
+        for (affectedTrain of currLine.trains) {
+          if (getAssociatedConnection(affectedTrain) == modifyingConn) {
+            modifyingConn.pendingUpdateTo = nStop;
+            break;
+          }
+        }
+        if (!modifyingConn.pendingUpdateTo) {
+          modifyingConn.pendingUpdateTo = nStop;
+          updateToNow(currLine, modifyingConn);
+        }
+        nStop.linesServed.add(modifyingConn.lineID);
+      }
+    }
   } else if (nStop) {
     hovering = nStop;
     document.body.style.cursor = "pointer";
@@ -767,6 +837,18 @@ function onmove(ev) {
     document.body.style.cursor = "pointer";
   } else if (holdState == K.NOHOLD)
     document.body.style.cursor = "";
+}
+function updateToNow(currLine, conn) {
+  let nStop = conn.pendingUpdateTo;
+  for (affectedTrain of currLine.trains) {
+    fIdx = affectedTrain.path.indexOf(conn.from);
+    affectedTrain.path.splice(fIdx, 0, nStop);
+  }
+  let idx = currLine.path.indexOf(conn.from);
+  currLine.path.splice(idx, 0, nStop);
+  let newConn = { from: nStop, to: conn.to, lineID: conn.lineID, colour: conn.colour };
+  conn.to = nStop;
+  connections.push(newConn);
 }
 function routeConfirm(ev) {
   holdState = K.NOHOLD;
@@ -783,10 +865,19 @@ function routeConfirm(ev) {
       });
     }
     let currLine = [];
+    let stopsOnLine = /* @__PURE__ */ new Set();
     for (const e of currPath) {
       currLine.push(e);
+      stopsOnLine.add(e);
     }
-    lines.push({ lineID: lineCt, path: currLine, loopingQ: currPath[0] == currPath[currPath.length - 1] });
+    let currLine2 = {
+      lineID: lineCt,
+      path: currLine,
+      stops: stopsOnLine,
+      loopingQ: currPath[0] == currPath[currPath.length - 1],
+      trains: []
+    };
+    lines.push(currLine2);
     let supportedTypes = /* @__PURE__ */ new Set();
     for (let i = 0; i < currPath.length; i++) {
       supportedTypes.add(currPath[i].type);
@@ -837,7 +928,7 @@ function routeConfirm(ev) {
     for (pass of passengers) {
       handlePassenger(pass);
     }
-    trains.push({
+    let t1 = {
       x: currPath[0].x,
       y: currPath[0].y,
       from: currPath[0],
@@ -850,8 +941,8 @@ function routeConfirm(ev) {
       passengers: [],
       cap: 6,
       revDir: false
-    });
-    trains.push({
+    };
+    let t2 = {
       x: currPath[0].x,
       y: currPath[0].y,
       from: currPath[currPath.length - 1],
@@ -864,7 +955,10 @@ function routeConfirm(ev) {
       passengers: [],
       cap: 6,
       revDir: true
-    });
+    };
+    trains.push(t1);
+    trains.push(t2);
+    currLine2.trains = [t1, t2];
     lineCt++;
   }
   currPath = [];
@@ -945,7 +1039,23 @@ function square() {
 }
 function circ() {
 }
-function star() {
+function star(scl, x, y) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x - 3 * scl, y + 1 * scl);
+  ctx.lineTo(x - 0.75 * scl, y + 1 * scl);
+  ctx.lineTo(x, y + 3 * scl);
+  ctx.lineTo(x + 0.75 * scl, y + 1 * scl);
+  ctx.lineTo(x + 3 * scl, y + 1 * scl);
+  ctx.lineTo(x + 1.25 * scl, y - 0.5 * scl);
+  ctx.lineTo(x + 2 * scl, y - 2.5 * scl);
+  ctx.lineTo(x, y - 1.25 * scl);
+  ctx.lineTo(x - 2 * scl, y - 2.5 * scl);
+  ctx.lineTo(x - 1.25 * scl, y - 0.5 * scl);
+  ctx.lineTo(x - 3 * scl, y + 1 * scl);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.restore();
 }
 function getNextType(exclude = -1) {
   let type = Math.floor(Math.random() * (exclude < 0 ? types.length : maxUnlockedType));

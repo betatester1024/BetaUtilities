@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../EEHandler.ts"],
+  "sourcesContent": ["import {uDB} from './consts';\n\nexport async function EE(getQ:boolean, token:string, newStr:string=\"\") {\n  let obj = await uDB.findOne({fieldName:\"EE\"});\n  if (getQ) return {status:\"SUCCESS\", data:{data:obj?obj.data:\"\"}, token:token};\n  else {\n    await uDB.updateOne({fieldName:\"EE\"}, {\n      $set:{data:newStr}\n    }, {upsert:true})\n    return {status:\"SUCCESS\", data:null, token:token}\n  }\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,oBAAkB;AAElB,eAAsB,GAAG,MAAc,OAAc,SAAc,IAAI;AACrE,MAAI,MAAM,MAAM,kBAAI,QAAQ,EAAC,WAAU,KAAI,CAAC;AAC5C,MAAI;AAAM,WAAO,EAAC,QAAO,WAAW,MAAK,EAAC,MAAK,MAAI,IAAI,OAAK,GAAE,GAAG,MAAW;AAAA,OACvE;AACH,UAAM,kBAAI,UAAU,EAAC,WAAU,KAAI,GAAG;AAAA,MACpC,MAAK,EAAC,MAAK,OAAM;AAAA,IACnB,GAAG,EAAC,QAAO,KAAI,CAAC;AAChB,WAAO,EAAC,QAAO,WAAW,MAAK,MAAM,MAAW;AAAA,EAClD;AACF;",
+  "names": []
+}

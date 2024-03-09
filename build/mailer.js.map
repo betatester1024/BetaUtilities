@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../mailer.ts"],
+  "sourcesContent": ["import { CourierClient } from \"@trycourier/courier\";\nconst courier = CourierClient({ authorizationToken: process.env['authToken'] }); // get from the Courier UI\n// Example: send a password reset email to a user's email address\nexport async function mail(email: string, token: string) {\n  const { requestId } = await courier.send({\n    message: {\n      to: {\n        email: email,\n      },\n      content: {\n        title: \"Password Reset Request\",\n        body: \"Click the following link to reset your password: https://www.example.com/reset-password?token=\" + token,\n      },\n      routing: {\n        method: \"single\",\n        channels: [\"email\"],\n      },\n    },\n  });\n  console.log(requestId);\n}\n\n// requestResetPassword() is the function that handles the password reset request\nconst token = generateTokenForUser(); // generate token for password reset\nmail(userEmail, token); // send email to user requesting password reset using the token"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,qBAA8B;AAC9B,MAAM,cAAU,8BAAc,EAAE,oBAAoB,QAAQ,IAAI,aAAa,CAAC;AAE9E,eAAsB,KAAK,OAAeA,QAAe;AACvD,QAAM,EAAE,UAAU,IAAI,MAAM,QAAQ,KAAK;AAAA,IACvC,SAAS;AAAA,MACP,IAAI;AAAA,QACF;AAAA,MACF;AAAA,MACA,SAAS;AAAA,QACP,OAAO;AAAA,QACP,MAAM,mGAAmGA;AAAA,MAC3G;AAAA,MACA,SAAS;AAAA,QACP,QAAQ;AAAA,QACR,UAAU,CAAC,OAAO;AAAA,MACpB;AAAA,IACF;AAAA,EACF,CAAC;AACD,UAAQ,IAAI,SAAS;AACvB;AAGA,MAAM,QAAQ,qBAAqB;AACnC,KAAK,WAAW,KAAK;",
+  "names": ["token"]
+}

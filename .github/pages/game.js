@@ -1013,7 +1013,7 @@ function onmove(ev) {
   //   document.body.style.cursor = "grabbing";
   // }
   hovering = null;
-  let rmsettings = true;
+  let rmSettings = true;
   hoveringConn = null;
   currPos_canv = fromCanvPos(ev.clientX, ev.clientY);
   // let 
@@ -1095,7 +1095,7 @@ function onmove(ev) {
         stop:nStop, time:Date.now()+50,
         hgt:K.SETTINGSHEIGHT*terms.length, lines:terms};
       redraw();
-      rmsettings = false;
+      rmSettings = false;
     }
     hovering = nStop;
     document.body.style.cursor = "pointer";

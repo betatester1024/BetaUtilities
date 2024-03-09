@@ -10,12 +10,16 @@ const K = {
   // passenger status 
   WAITING: 0,
   ONTHEWAY: 1,
+  // settings dialog - base pixel height per terminal to be handled:
+  SETTINGSHEIGHT: 50,
   // board/deboard time/passenger
   DELAYPERPASSENGER: 400,
   INF: 9e99,
   /// was supposed to be pi and a bit to make arcs completely touching but it didn't seem to work.
   PI: Math.PI,
-  // 
+  // animation times:
+  ANIM_SETTINGSDIALOG: 200,
+
   // stop over-capacity timeout
   FAILTIME: 30000,
   LINEWIDTH:10, // width of one line in base-size pixels 
@@ -28,12 +32,15 @@ const K = {
 }
 const trainSpeed = 100 / 1000; // pixels/ms
 let holdState = K.NOHOLD;
+let activeSettingsDialog = null;
 let ctx = null;
 let canv = null;
+let startTime = -1;
 let totalScaleFac = 1;
 let hovering = null, hoveringConn = null;
 let stops = [];
 let modifyingConn = null;
+let recentlyRemoved = [];
 let connections = [];
 let lineTypes = [];
 let stopCt = 0;
@@ -60,7 +67,7 @@ let lineCt = 0;
 let shiftStatus = false;
 let downPt = null;
 let types = [triangle, square, circ, star];
-let defaultClr = "#000";
+let defaultClr = "#555";
 const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
 function onLoad() {
@@ -97,8 +104,6 @@ function getNextStop(currTrain, actQ=true) {
   {
     if (line.loopingQ) {
       nextStop = line.path[line.path.length-2];
-      
-      console.log("looped!");
     }
     else {
       if (actQ) currTrain.revDir = !currTrain.revDir;
@@ -156,12 +161,13 @@ function getAssociatedConnection(train) {
   }
   return null;
 }
-function redraw() {
+function redraw(delta) {
+  let fpsCurr = 1000/delta;
   ctx.lineCap = "round";
   // function connect(currPath, clr) {
-  function circle(pt) {
+  function circle(pt, clear=true) {
     ctx.save();
-    clearCircle(pt, acceptRadius);
+    if (clear) clearCircle(pt, acceptRadius);
     ctx.beginPath();
     ctx.arc(pt.x, pt.y, stopSz, 0, K.PI * 2);
     ctx.stroke();
@@ -186,6 +192,7 @@ function redraw() {
     ctx.restore();
     ctx.beginPath();
   }
+  ctx.strokeStyle = defaultClr;
   updateMinScl();
   ctx.beginPath();
   ctx.save();
@@ -203,9 +210,44 @@ function redraw() {
     ctx.lineTo(-viewportW/2, viewportH/2);
     ctx.lineTo(-viewportW/2, -viewportH/2);
     ctx.stroke();
+    ctx.fillText(fpsCurr.toFixed(2)+"fps", -viewportW/2+30, -viewportH/2+30)
   }
   ctx.beginPath();
-  if (hovering) {
+
+  if (activeSettingsDialog) {
+    let stop = activeSettingsDialog.stop;
+    let h = -activeSettingsDialog.hgt*
+      Math.min(1, (Date.now()-activeSettingsDialog.time)/K.ANIM_SETTINGSDIALOG);
+    ctx.save();
+    ctx.beginPath();
+    ctx.fillStyle = getCSSProp("--system-overlay");
+    ctx.moveTo(stop.x+acceptRadius, stop.y);
+    // ctx.arc(stop.x, stop.y+h, acceptRadius, 0, K.PI*2);
+    ctx.lineTo(stop.x+acceptRadius, stop.y+h);
+    ctx.arc(stop.x, stop.y+h, acceptRadius, 0, K.PI, true);
+    // ctx.lineTo(stop.x-acceptRadius, stop.y+h);
+    ctx.lineTo(stop.x-acceptRadius, stop.y);
+    ctx.arc(stop.x, stop.y, acceptRadius, 0, K.PI);
+    // ctx.stroke();
+    ctx.fill();
+    ctx.beginPath();
+    for (let i=0; i<(-h/K.SETTINGSHEIGHT); i++) {
+      ctx.beginPath();
+      ctx.save();
+      ctx.fillStyle = activeSettingsDialog.lines[i].colour+"95";
+      ctx.arc(stop.x, stop.y-(i+1)*K.SETTINGSHEIGHT, stopSz, 0, K.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+    // ctx.beginPath();
+    // ctx.fillStyle = getCSSProp("--system-red");
+    // ctx.fill();
+    ctx.restore();
+    ctx.beginPath();
+
+  }
+  
+  if (hovering && !activeSettingsDialog) {
     ctx.save();
     ctx.fillStyle = getCSSProp("--system-green2");
     // ctx.strokeWidth = acceptRadius - stopSz;
@@ -213,6 +255,7 @@ function redraw() {
     ctx.arc(hovering.x, hovering.y, acceptRadius, 0, K.PI*2);
     ctx.fill();
     clearCircle({x:hovering.x,y:hovering.y},stopSz);
+    ctx.beginPath();
     ctx.restore();
   }
 
@@ -226,8 +269,11 @@ function redraw() {
     ctx.moveTo(modifyingConn.to.x, modifyingConn.to.y);
     ctx.lineTo(currPos_canv.x, currPos_canv.y);
     ctx.stroke();
+    ctx.beginPath();
     ctx.restore();
   }
+
+
   ////////// little stop circles //////////
   for (let i = 0; i < stops.length; i++) {
     clearCircle(stops[i], stopSz);
@@ -257,7 +303,8 @@ function redraw() {
     ctx.lineCap = "round";
     
     if (hoveringConn && hoveringConn != connections[i] 
-     || holdState == K.HOLD_CONNECTION)
+     || holdState == K.HOLD_CONNECTION
+     || connections[i].pendingRemove)
       ctx.strokeStyle = getCSSProp("--system-grey3")//connections[i].colour+"55";
     else  
       ctx.strokeStyle = connections[i].colour;
@@ -272,6 +319,25 @@ function redraw() {
     ctx.lineTo(connections[i].to.x - c * stopSz   + offset.x,
       connections[i].to.y - s * stopSz            + offset.y)
     ctx.stroke();
+    ctx.restore();
+  }
+
+  for (let i=0; i<recentlyRemoved.length; i++) {
+    ctx.beginPath();
+    ctx.save();
+    ctx.strokeStyle = getCSSProp("--system-red");
+    if (Date.now() - recentlyRemoved[i].time > 500) {
+      recentlyRemoved.splice(i, 1);
+      i--;
+      continue;
+    }
+    ctx.globalAlpha = (1-(Date.now() - recentlyRemoved[i].time)/500)*0.5;
+    // let off = handleOffset(recentlyRemoved[i].conn);
+    ctx.lineWidth = K.LINEWIDTH;
+    ctx.moveTo(recentlyRemoved[i].conn.from.x, recentlyRemoved[i].conn.from.y);
+    ctx.lineTo(recentlyRemoved[i].conn.to.x, recentlyRemoved[i].conn.to.y);
+    ctx.stroke();
+    ctx.beginPath();
     ctx.restore();
   }
 
@@ -316,6 +382,7 @@ function redraw() {
     // circle(connections[i].from)//, connections[i].colour);
     // circle(connections[i].to) //, connections[i].colour);
   }
+  
   ctx.restore();
   ctx.beginPath();
   ////////////////////////////////
@@ -442,48 +509,7 @@ function redraw() {
     let associatedConnection = getAssociatedConnection(trains[i]);
     let offset = handleOffset(associatedConnection);
     let center = { x: trains[i].x+offset.x, y: trains[i].y+offset.y };
-    // if (nStop) {
-    //   let pctRemaining = distBtw(nStop, trains[i])/(stopSz-15);
-    //   let nextTrainTo = getNextStop(trains[i], false);
-    //   let movingAway = !samePt(nStop, trains[i].to);
-    //   let angBtw2 = Math.atan2(trains[i].to.y - nextTrainTo.y,
-    //       trains[i].to.x - nextTrainTo.x);
-    //   if (movingAway) {
-    //     trains[i].revDir = !trains[i].revDir;
 
-    //     let savedTo = trains[i].to;
-    //     let savedFrom = trains[i].from;
-    //     let nextTrainTo = getNextStop(trains[i], false);
-    //     trains[i].to = nextTrainTo;
-    //     trains[i].from = savedTo;
-    //     nextTrainTo = getNextStop(trains[i], false);
-    //     trains[i].to = savedTo;
-    //     trains[i].from = savedFrom;
-    //     trains[i].revDir = !trains[i].revDir;
-    //     angBtw2 = Math.atan2(trains[i].from.y -nextTrainTo.y,
-    //       trains[i].from.x - nextTrainTo.x); 
-    //   }
-    //   // x'(t) = x1 + 2*x2*t + 3*x3*t*t
-    //   // y'(t) = y1 + 2*y2*t + 3*y3*t*t
-    //   // let ctrlPt1 = {}
-    //   if (pctRemaining < 1) {
-
-    //     let pct = samePt(nStop, trains[i].to)?pctRemaining:(1-pctRemaining);
-    //     center.x = bezier(pct, nStop.x+Math.cos(angBtw2+K.PI)*stopSz, nStop.x, nStop.x+Math.cos(angBtw+K.PI)*stopSz);
-    //     center.y = bezier(pct, nStop.y+Math.sin(angBtw2+K.PI)*stopSz, nStop.y, nStop.y+Math.sin(angBtw+K.PI)*stopSz);
-    //     ctx.beginPath();
-    //     ctx.moveTo(nStop.x+Math.cos(angBtw2+Math.PI)*stopSz, nStop.y+Math.sin(angBtw2+Math.PI)*stopSz);
-    //     ctx.lineTo(nStop.x, nStop.y);
-    //     ctx.lineTo(nStop.x+Math.cos(angBtw+Math.PI)*stopSz, nStop.y+Math.sin(angBtw+Math.PI)*stopSz);
-    //     ctx.stroke();
-    //     // ctx.beginPath();
-    //     let delta = angBtw2-angBtw;
-    //     angBtw = angBtw+delta*(1-pctRemaining);
-    //       // x1 = 2*xc - x0/2 - x2/2
-    //      // y1 = 2*yc - y0/2 - y2/2
-    //   }
-    //   // at stop, turn according to distance
-    // } // if nstop
     const w = 15;
     const h = 30;
     const c = Math.cos(angBtw);
@@ -522,6 +548,8 @@ function redraw() {
       let px = j%(cap/2)*uSz+uSz/2-h/2;
       let py = y*uSz+uSz/2-w/2;
       if (trains[i].passengers[j].to == 0) star(1.1, px, py);
+      else if (trains[i].passengers[j].to == 1) square(0.9, px, py);
+        else if (trains[i].passengers[j].to == 2) triangle(1, px, py);
       else ctx.fillText(trains[i].passengers[j].to, px, py);
 
     }
@@ -633,9 +661,7 @@ function preLoad() {
   }
   totalScaleFac *= 0.8;
   // translate(-viewportW/2, -viewportH/2);
-  redraw();
   scale(totalScaleFac);
-  redraw();
   translate(canv.width / 2, canv.height / 2);
   redraw();
   //////
@@ -833,8 +859,9 @@ function animLoop() {
       return;
     }
   }
-  redraw();
-
+  let delta = Date.now() - startTime;
+  startTime = Date.now();
+  redraw(delta);
   requestAnimationFrame(animLoop);
 }
 
@@ -986,6 +1013,7 @@ function onmove(ev) {
   //   document.body.style.cursor = "grabbing";
   // }
   hovering = null;
+  let rmsettings = true;
   hoveringConn = null;
   currPos_canv = fromCanvPos(ev.clientX, ev.clientY);
   // let 
@@ -994,7 +1022,6 @@ function onmove(ev) {
     redraw();
   }
   let actualPos = fromCanvPos(ev.clientX, ev.clientY);
-  // console.log()
   let nConn = nearestConnection(actualPos.x, actualPos.y);
   let nStop = nearestStop(actualPos, acceptRadius);
   if (holdState == K.HOLD_NEWLINE) {
@@ -1021,8 +1048,16 @@ function onmove(ev) {
   }
   else if (holdState == K.HOLD_CONNECTION) {
     if (nStop) {
-      let currLine = lines[modifyingConn.lineID]
-      if (!lines[modifyingConn.lineID].stops.has(nStop)) {
+      let currLine = lines[modifyingConn.lineID];
+      // 
+      let newConn = {from:modifyingConn.from, to:nStop, 
+         lineID:modifyingConn.lineID, 
+         colour:modifyingConn.colour};
+      let newConn2 = {from:nStop, to:modifyingConn.to, 
+          lineID:modifyingConn.lineID, 
+          colour:modifyingConn.colour};
+      if (parallelStops(newConn).ct < 3 && parallelStops(newConn2).ct < 3
+      &&  !lines[modifyingConn.lineID].stops.has(nStop)) {
         // now we can modify the connection
         for (affectedTrain of currLine.trains) {
           if (getAssociatedConnection(affectedTrain) == modifyingConn) {
@@ -1032,12 +1067,7 @@ function onmove(ev) {
         }
         currLine.stops.add(nStop);
         // modifyingConn.pendingUpdateTo = nStop;
-        let newConn = {from:modifyingConn.from, to:nStop, 
-                       lineID:modifyingConn.lineID, 
-                       colour:modifyingConn.colour};
-        let newConn2 = {from:nStop, to:modifyingConn.to, 
-                        lineID:modifyingConn.lineID, 
-                        colour:modifyingConn.colour};
+        
         connections.push(newConn);
         connections.push(newConn2);
         if (!modifyingConn.pendingRemove) {
@@ -1059,15 +1089,32 @@ function onmove(ev) {
     }
   }
   else if (nStop) {
+    let terms = terminals(nStop);
+    if (terms && (!activeSettingsDialog || activeSettingsDialog.stop != nStop)) {
+      activeSettingsDialog = {
+        stop:nStop, time:Date.now()+50,
+        hgt:K.SETTINGSHEIGHT*terms.length, lines:terms};
+      redraw();
+      rmsettings = false;
+    }
     hovering = nStop;
     document.body.style.cursor = "pointer";
   }
   else if (nConn) {
-    console.log(nConn);
     hoveringConn = nConn;
     document.body.style.cursor = "pointer";
   }
   else if (holdState == K.NOHOLD) document.body.style.cursor = "";
+  if (rmSettings) activeSettingsDialog = null;
+}
+
+function terminals(stop) {
+  let out = [];
+  for (let i=0; i<lines.length; i++)
+    if ((lines[i].path[0] == stop || lines[i].path[lines[i].path.length-1] == stop)
+      && lines[i].path[0] != lines[i].path[lines[i].path.length-1])
+      out.push(lines[i]);
+  return out.length == 0?null:out;
 }
 
 function updateToNow(currLine, conn) {
@@ -1078,6 +1125,7 @@ function updateToNow(currLine, conn) {
   // conn.to = nStop; 
   let idx = connections.indexOf(conn);
   connections.splice(idx, 1);
+  recentlyRemoved.push({conn:conn, time:Date.now()});
   // connections.push(newConn);
 }
 
@@ -1107,6 +1155,7 @@ function routeConfirm(ev) {
     let currLine2 = {
         lineID:lineCt, 
         path:currLine, 
+        colour:currCol,
         stops:stopsOnLine, 
         loopingQ:(currPath[0] == currPath[currPath.length-1]),
         trains:[]};
@@ -1259,11 +1308,29 @@ function applyTransfm() {
   ctx.setTransform(transfm[0], transfm[3], transfm[1], transfm[4], transfm[2], transfm[5]);
 }
 
-function triangle() {
-
+function square(scl, x, y) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x-3*scl, y-3*scl);
+  ctx.lineTo(x+3*scl, y-3*scl);
+  ctx.lineTo(x+3*scl, y+3*scl);
+  ctx.lineTo(x-3*scl, y+3*scl);
+  ctx.lineTo(x-3*scl, y-3*scl);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.restore();
 }
-function square() {
-
+function triangle(scl, x, y) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x-3*scl, y+3*scl);
+  // ctx.lineTo(x+3*scl, y-3*scl);
+  ctx.lineTo(x, y-3*scl);
+  ctx.lineTo(x+3*scl, y+3*scl);
+  ctx.lineTo(x-3*scl, y+3*scl);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.restore();
 }
 function circ() {
 

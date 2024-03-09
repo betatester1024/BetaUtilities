@@ -8,6 +8,7 @@ const K = {
   HOLD_CONNECTION: 3,
   WAITING: 0,
   ONTHEWAY: 1,
+  SETTINGSHEIGHT: 50,
   DELAYPERPASSENGER: 400,
   INF: 9e99,
   PI: Math.PI,
@@ -21,8 +22,10 @@ const K = {
 };
 const trainSpeed = 100 / 1e3;
 let holdState = K.NOHOLD;
+let activeSettingsDialog = null;
 let ctx = null;
 let canv = null;
+let startTime = -1;
 let totalScaleFac = 1;
 let hovering = null, hoveringConn = null;
 let stops = [];
@@ -85,7 +88,6 @@ function getNextStop(currTrain, actQ = true) {
   if (currTrain.revDir && currToIdx == 0) {
     if (line.loopingQ) {
       nextStop = line.path[line.path.length - 2];
-      console.log("looped!");
     } else {
       if (actQ)
         currTrain.revDir = !currTrain.revDir;
@@ -140,7 +142,8 @@ function getAssociatedConnection(train) {
   }
   return null;
 }
-function redraw() {
+function redraw(delta) {
+  let fpsCurr = 1e3 / delta;
   ctx.lineCap = "round";
   function circle(pt) {
     ctx.save();
@@ -185,6 +188,7 @@ function redraw() {
     ctx.lineTo(-viewportW / 2, viewportH / 2);
     ctx.lineTo(-viewportW / 2, -viewportH / 2);
     ctx.stroke();
+    ctx.fillText(fpsCurr.toFixed(2) + "fps", -viewportW / 2 + 30, -viewportH / 2 + 30);
   }
   ctx.beginPath();
   if (hovering) {
@@ -208,6 +212,22 @@ function redraw() {
     ctx.stroke();
     ctx.restore();
   }
+  if (activeSettingsDialog) {
+    let stop = activeSettingsDialog.stop;
+    let h = -activeSettingsDialog.hgt;
+    ctx.save();
+    ctx.beginPath();
+    ctx.fillStyle = getCSSProp("--system-overlay");
+    ctx.moveTo(stop.x, stop.y);
+    ctx.arc(stop.x, stop.y, acceptRadius, 0, K.PI * 2);
+    ctx.lineTo(stop.x + acceptRadius, stop.y + h);
+    ctx.arc(stop.x, stop.y + h, acceptRadius, 0, K.PI, true);
+    ctx.lineTo(stop.x - acceptRadius, stop.y);
+    ctx.lineTo(stop.x, stop.y);
+    ctx.fill();
+    ctx.restore();
+    ctx.beginPath();
+  }
   for (let i = 0; i < stops.length; i++) {
     clearCircle(stops[i], stopSz);
     ctx.arc(stops[i].x, stops[i].y, stopSz, 0, K.PI * 2);
@@ -230,7 +250,7 @@ function redraw() {
     ctx.save();
     ctx.lineWidth = K.LINEWIDTH;
     ctx.lineCap = "round";
-    if (hoveringConn && hoveringConn != connections[i] || holdState == K.HOLD_CONNECTION)
+    if (hoveringConn && hoveringConn != connections[i] || holdState == K.HOLD_CONNECTION || connections[i].pendingRemove)
       ctx.strokeStyle = getCSSProp("--system-grey3");
     else
       ctx.strokeStyle = connections[i].colour;
@@ -421,6 +441,10 @@ function redraw() {
       let py = y * uSz + uSz / 2 - w / 2;
       if (trains[i].passengers[j].to == 0)
         star(1.1, px, py);
+      else if (trains[i].passengers[j].to == 1)
+        square(1, px, py);
+      else if (trains[i].passengers[j].to == 2)
+        triangle(1, px, py);
       else
         ctx.fillText(trains[i].passengers[j].to, px, py);
     }
@@ -519,9 +543,7 @@ function preLoad() {
     addNewStop(i);
   }
   totalScaleFac *= 0.8;
-  redraw();
   scale(totalScaleFac);
-  redraw();
   translate(canv.width / 2, canv.height / 2);
   redraw();
   requestAnimationFrame(animLoop);
@@ -652,7 +674,9 @@ function animLoop() {
       return;
     }
   }
-  redraw();
+  let delta = Date.now() - startTime;
+  startTime = Date.now();
+  redraw(delta);
   requestAnimationFrame(animLoop);
 }
 function handleAwaiting(currTrain, currStop) {
@@ -813,7 +837,19 @@ function onmove(ev) {
   } else if (holdState == K.HOLD_CONNECTION) {
     if (nStop) {
       let currLine = lines[modifyingConn.lineID];
-      if (!lines[modifyingConn.lineID].stops.has(nStop)) {
+      let newConn = {
+        from: modifyingConn.from,
+        to: nStop,
+        lineID: modifyingConn.lineID,
+        colour: modifyingConn.colour
+      };
+      let newConn2 = {
+        from: nStop,
+        to: modifyingConn.to,
+        lineID: modifyingConn.lineID,
+        colour: modifyingConn.colour
+      };
+      if (parallelStops(newConn).ct < 3 && parallelStops(newConn2).ct < 3 && !lines[modifyingConn.lineID].stops.has(nStop)) {
         for (affectedTrain of currLine.trains) {
           if (getAssociatedConnection(affectedTrain) == modifyingConn) {
             modifyingConn.pendingRemove = true;
@@ -821,18 +857,6 @@ function onmove(ev) {
           }
         }
         currLine.stops.add(nStop);
-        let newConn = {
-          from: modifyingConn.from,
-          to: nStop,
-          lineID: modifyingConn.lineID,
-          colour: modifyingConn.colour
-        };
-        let newConn2 = {
-          from: nStop,
-          to: modifyingConn.to,
-          lineID: modifyingConn.lineID,
-          colour: modifyingConn.colour
-        };
         connections.push(newConn);
         connections.push(newConn2);
         if (!modifyingConn.pendingRemove) {
@@ -850,14 +874,25 @@ function onmove(ev) {
       }
     }
   } else if (nStop) {
+    let terms = terminals(nStop);
+    if (terms) {
+      activeSettingsDialog = { stop: nStop, hgt: K.SETTINGSHEIGHT * terms.length, lines: terms };
+      redraw();
+    }
     hovering = nStop;
     document.body.style.cursor = "pointer";
   } else if (nConn) {
-    console.log(nConn);
     hoveringConn = nConn;
     document.body.style.cursor = "pointer";
   } else if (holdState == K.NOHOLD)
     document.body.style.cursor = "";
+}
+function terminals(stop) {
+  let out = [];
+  for (let i = 0; i < lines.length; i++)
+    if ((lines[i].path[0] == stop || lines[i].path[lines[i].path.length - 1] == stop) && lines[i].path[0] != lines[i].path[lines[i].path.length - 1])
+      out.push(i);
+  return out;
 }
 function updateToNow(currLine, conn) {
   let idx = connections.indexOf(conn);
@@ -1046,9 +1081,28 @@ function scale(scl) {
 function applyTransfm() {
   ctx.setTransform(transfm[0], transfm[3], transfm[1], transfm[4], transfm[2], transfm[5]);
 }
-function triangle() {
+function square(scl, x, y) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x - 3 * scl, y - 3 * scl);
+  ctx.lineTo(x + 3 * scl, y - 3 * scl);
+  ctx.lineTo(x + 3 * scl, y + 3 * scl);
+  ctx.lineTo(x - 3 * scl, y + 3 * scl);
+  ctx.lineTo(x - 3 * scl, y - 3 * scl);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.restore();
 }
-function square() {
+function triangle(scl, x, y) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x - 3 * scl, y + 3 * scl);
+  ctx.lineTo(x, y - 3 * scl);
+  ctx.lineTo(x + 3 * scl, y + 3 * scl);
+  ctx.lineTo(x - 3 * scl, y + 3 * scl);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.restore();
 }
 function circ() {
 }

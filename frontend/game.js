@@ -1052,9 +1052,10 @@ function onmove(ev) {
         currLine.path.splice(idx+1, 0, nStop);
         
         // if (!modifyingConn.pendingRemoval) 
+        holdState = K.NOHOLD;
+        routeConfirm();
       }
-      holdState = K.NOHOLD;
-      routeConfirm();
+
     }
   }
   else if (nStop) {

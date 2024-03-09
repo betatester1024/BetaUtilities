@@ -986,7 +986,7 @@ const K = {
       // run dijkstra?
       let currLine = [];
       for (const e of currPath) {
-        currPath.push(currLine);
+        currLine.push(e);
       }
       lines.push({lineID:lineCt, path:currLine, loopingQ:(currPath[0] == currPath[currPath.length-1])});
   

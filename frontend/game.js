@@ -1053,7 +1053,7 @@ function onmove(ev) {
         
         // if (!modifyingConn.pendingRemoval) 
         holdState = K.NOHOLD;
-        routeConfirm();
+        routeConfirm(); 
       }
 
     }

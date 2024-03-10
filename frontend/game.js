@@ -566,7 +566,7 @@ function redraw(delta) {
       ctx.arc(stop.x, stop.y-(i+1)*K.SETTINGSHEIGHT, stopSz, 0, K.PI*2);
       ctx.fill();
       // ctx.beginPath();
-      if (activeSettingsDialog.selected == i) {
+      if (activeSettingsDialog.selected == activeSettingsDialog.lines[i].lineID) {
         ctx.lineWidth = 4;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";

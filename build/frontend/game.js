@@ -6,12 +6,14 @@ const K = {
   HOLD: 1,
   HOLD_NEWLINE: 2,
   HOLD_CONNECTION: 3,
+  HOLD_EXTEND: 4,
   WAITING: 0,
   ONTHEWAY: 1,
   SETTINGSHEIGHT: 50,
   DELAYPERPASSENGER: 400,
   INF: 9e99,
   PI: Math.PI,
+  ANIM_SETTINGSDIALOG: 100,
   FAILTIME: 3e4,
   LINEWIDTH: 10,
   LINEACCEPTDIST: 20,
@@ -30,9 +32,11 @@ let totalScaleFac = 1;
 let hovering = null, hoveringConn = null;
 let stops = [];
 let modifyingConn = null;
+let recentlyRemoved = [];
 let connections = [];
 let lineTypes = [];
 let stopCt = 0;
+let extendInfo = null;
 let minSclFac = 0.5;
 const maxSclFac = 3;
 let viewportW = 0;
@@ -55,7 +59,7 @@ let lineCt = 0;
 let shiftStatus = false;
 let downPt = null;
 let types = [triangle, square, circ, star];
-let defaultClr = "#000";
+let defaultClr = "#555";
 const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
 function onLoad() {
@@ -145,9 +149,10 @@ function getAssociatedConnection(train) {
 function redraw(delta) {
   let fpsCurr = 1e3 / delta;
   ctx.lineCap = "round";
-  function circle(pt) {
+  function circle(pt, clear = true) {
     ctx.save();
-    clearCircle(pt, acceptRadius);
+    if (clear)
+      clearCircle(pt, acceptRadius);
     ctx.beginPath();
     ctx.arc(pt.x, pt.y, stopSz, 0, K.PI * 2);
     ctx.stroke();
@@ -171,6 +176,7 @@ function redraw(delta) {
     ctx.restore();
     ctx.beginPath();
   }
+  ctx.strokeStyle = defaultClr;
   updateMinScl();
   ctx.beginPath();
   ctx.save();
@@ -191,13 +197,14 @@ function redraw(delta) {
     ctx.fillText(fpsCurr.toFixed(2) + "fps", -viewportW / 2 + 30, -viewportH / 2 + 30);
   }
   ctx.beginPath();
-  if (hovering) {
+  if (hovering && !activeSettingsDialog) {
     ctx.save();
     ctx.fillStyle = getCSSProp("--system-green2");
     ctx.beginPath();
     ctx.arc(hovering.x, hovering.y, acceptRadius, 0, K.PI * 2);
     ctx.fill();
     clearCircle({ x: hovering.x, y: hovering.y }, stopSz);
+    ctx.beginPath();
     ctx.restore();
   }
   if (holdState == K.HOLD_CONNECTION) {
@@ -210,36 +217,25 @@ function redraw(delta) {
     ctx.moveTo(modifyingConn.to.x, modifyingConn.to.y);
     ctx.lineTo(currPos_canv.x, currPos_canv.y);
     ctx.stroke();
+    ctx.beginPath();
     ctx.restore();
   }
-  if (activeSettingsDialog) {
-    let stop = activeSettingsDialog.stop;
-    let h = -activeSettingsDialog.hgt;
+  if (holdState == K.HOLD_EXTEND) {
     ctx.save();
     ctx.beginPath();
-    ctx.fillStyle = getCSSProp("--system-overlay");
+    let line = extendInfo.line;
+    let stop = extendInfo.stop;
+    ctx.strokeStyle = line.colour;
+    ctx.lineWidth = K.LINEWIDTH;
     ctx.moveTo(stop.x, stop.y);
-    ctx.arc(stop.x, stop.y, acceptRadius, 0, K.PI * 2);
-    ctx.lineTo(stop.x + acceptRadius, stop.y + h);
-    ctx.arc(stop.x, stop.y + h, acceptRadius, 0, K.PI, true);
-    ctx.lineTo(stop.x - acceptRadius, stop.y);
-    ctx.lineTo(stop.x, stop.y);
-    ctx.fill();
-    ctx.restore();
+    ctx.lineTo(currPos_canv.x, currPos_canv.y);
+    ctx.stroke();
     ctx.beginPath();
+    ctx.restore();
   }
   for (let i = 0; i < stops.length; i++) {
     clearCircle(stops[i], stopSz);
-    ctx.arc(stops[i].x, stops[i].y, stopSz, 0, K.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.fillStyle = defaultClr;
-    let out = " ";
-    for (let j = 0; j < stops[i].waiting.length; j++) {
-      out += stops[i].waiting[j].to.toString();
-    }
-    ctx.fillText(out, stops[i].x + stopSz, stops[i].y - stopSz / 2);
-    ctx.fillText(stops[i].type, stops[i].x, stops[i].y);
+    renderStop(stops[i]);
   }
   for (let i = 0; i < connections.length; i++) {
     let offset = handleOffset(connections[i]);
@@ -266,6 +262,23 @@ function redraw(delta) {
       connections[i].to.y - s * stopSz + offset.y
     );
     ctx.stroke();
+    ctx.restore();
+  }
+  for (let i = 0; i < recentlyRemoved.length; i++) {
+    ctx.beginPath();
+    ctx.save();
+    ctx.strokeStyle = getCSSProp("--system-red");
+    if (Date.now() - recentlyRemoved[i].time > 500) {
+      recentlyRemoved.splice(i, 1);
+      i--;
+      continue;
+    }
+    ctx.globalAlpha = (1 - (Date.now() - recentlyRemoved[i].time) / 500) * 0.5;
+    ctx.lineWidth = K.LINEWIDTH;
+    ctx.moveTo(recentlyRemoved[i].conn.from.x, recentlyRemoved[i].conn.from.y);
+    ctx.lineTo(recentlyRemoved[i].conn.to.x, recentlyRemoved[i].conn.to.y);
+    ctx.stroke();
+    ctx.beginPath();
     ctx.restore();
   }
   ctx.save();
@@ -442,7 +455,7 @@ function redraw(delta) {
       if (trains[i].passengers[j].to == 0)
         star(1.1, px, py);
       else if (trains[i].passengers[j].to == 1)
-        square(1, px, py);
+        square(0.9, px, py);
       else if (trains[i].passengers[j].to == 2)
         triangle(1, px, py);
       else
@@ -452,6 +465,64 @@ function redraw(delta) {
     ctx.restore();
     ctx.restore();
   }
+  if (activeSettingsDialog) {
+    let stop = activeSettingsDialog.stop;
+    let h = -activeSettingsDialog.hgt * Math.min(1, (Date.now() - activeSettingsDialog.time) / K.ANIM_SETTINGSDIALOG);
+    ctx.save();
+    ctx.beginPath();
+    ctx.fillStyle = getCSSProp("--system-overlay");
+    ctx.moveTo(stop.x + acceptRadius, stop.y);
+    ctx.lineTo(stop.x + acceptRadius, stop.y + h);
+    ctx.arc(stop.x, stop.y + h, acceptRadius, 0, K.PI, true);
+    ctx.lineTo(stop.x - acceptRadius, stop.y);
+    ctx.arc(stop.x, stop.y, acceptRadius, 0, K.PI);
+    ctx.fill();
+    renderStop(stop);
+    ctx.beginPath();
+    for (let i = 0; i < Math.floor(-h / K.SETTINGSHEIGHT); i++) {
+      ctx.beginPath();
+      ctx.save();
+      ctx.fillStyle = activeSettingsDialog.lines[i].colour + "95";
+      if (activeSettingsDialog.selected == i) {
+        ctx.fillStyle = activeSettingsDialog.lines[i].colour;
+      }
+      ctx.arc(stop.x, stop.y - (i + 1) * K.SETTINGSHEIGHT, stopSz, 0, K.PI * 2);
+      ctx.fill();
+      if (activeSettingsDialog.selected == i) {
+        ctx.lineWidth = 4;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = defaultClr;
+        ctx.font = "30px Noto Sans Display";
+        let baseX = stop.x;
+        let baseY = stop.y - (i + 1) * K.SETTINGSHEIGHT;
+        ctx.moveTo(baseX - stopSz * 0.5, baseY);
+        ctx.lineTo(baseX + stopSz * 0.5, baseY);
+        ctx.moveTo(baseX, baseY - stopSz * 0.5);
+        ctx.lineTo(baseX, baseY + stopSz * 0.5);
+        ctx.strokeStyle = defaultClr;
+        ctx.stroke();
+      }
+      ctx.beginPath();
+      ctx.restore();
+    }
+    ctx.restore();
+    ctx.beginPath();
+  }
+}
+function renderStop(stop) {
+  ctx.beginPath();
+  ctx.arc(stop.x, stop.y, stopSz, 0, K.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.fillStyle = defaultClr;
+  let out = " ";
+  for (let j = 0; j < stop.waiting.length; j++) {
+    out += stop.waiting[j].to.toString();
+  }
+  ctx.fillText(out, stop.x + stopSz, stop.y - stopSz / 2);
+  ctx.fillText(stop.type, stop.x, stop.y);
+  ctx.beginPath();
 }
 function registerMaximisingCanvas(id, widthPc, heightPc, redrawFcn) {
   window.addEventListener("resize", (ev) => {
@@ -510,8 +581,14 @@ function preLoad() {
     let nConn = nearestConnection(actualPos.x, actualPos.y);
     if (nStop && colours.length > 0) {
       holdState = K.HOLD_NEWLINE;
+      activeSettingsDialog = null;
       currPath = [nStop];
       redraw();
+    } else if (activeSettingsDialog && activeSettingsDialog.selected != null) {
+      let sel = activeSettingsDialog.selected;
+      holdState = K.HOLD_EXTEND;
+      extendInfo = { line: lines[sel], stop: activeSettingsDialog.stop };
+      activeSettingsDialog = null;
     } else if (nConn) {
       holdState = K.HOLD_CONNECTION;
       modifyingConn = nConn;
@@ -808,6 +885,7 @@ function keyUpdate(ev) {
 }
 function onmove(ev) {
   hovering = null;
+  let rmSettings = true;
   hoveringConn = null;
   currPos_canv = fromCanvPos(ev.clientX, ev.clientY);
   if (holdState == K.HOLD) {
@@ -873,33 +951,86 @@ function onmove(ev) {
         routeConfirm();
       }
     }
+  } else if (holdState == K.HOLD_EXTEND && nStop) {
+    let currLine = lines[modifyingConn.lineID];
+    if (currLine.stops.has(nStop))
+      ;
+    else {
+      let newConn = {
+        from: modifyingConn.from,
+        to: nStop,
+        lineID: modifyingConn.lineID,
+        colour: modifyingConn.colour
+      };
+      holdState = K.NOHOLD;
+      connections.push(newConn);
+      typesOnLine[currLine.lineID].add(nStop.type);
+      nStop.linesServed.add(currLine.lineID);
+      currLine.stops.add(nStop);
+      if (currLine.path[currLine.length - 1] == extendInfo.stop)
+        currLine.path.push(nStop);
+      else
+        currLine.path.splice(0, 0, nStop);
+      routeConfirm();
+    }
   } else if (nStop) {
     let terms = terminals(nStop);
-    if (terms) {
-      activeSettingsDialog = { stop: nStop, hgt: K.SETTINGSHEIGHT * terms.length, lines: terms };
+    if (terms && holdState == K.NOHOLD && (!activeSettingsDialog || activeSettingsDialog.stop != nStop)) {
+      activeSettingsDialog = {
+        stop: nStop,
+        time: Date.now() + 50,
+        hgt: K.SETTINGSHEIGHT * terms.length,
+        lines: terms,
+        selected: null
+      };
       redraw();
     }
+    if (terms)
+      rmSettings = false;
     hovering = nStop;
+    if (activeSettingsDialog)
+      activeSettingsDialog.selected = null;
     document.body.style.cursor = "pointer";
-  } else if (nConn) {
-    hoveringConn = nConn;
-    document.body.style.cursor = "pointer";
-  } else if (holdState == K.NOHOLD)
-    document.body.style.cursor = "";
+  } else {
+    let setSelected = false;
+    for (let stop of stops) {
+      if (activeSettingsDialog && currPos_canv.x < stop.x + acceptRadius && currPos_canv.x > stop.x - acceptRadius && currPos_canv.y < stop.y + acceptRadius && currPos_canv.y > stop.y - activeSettingsDialog.hgt - acceptRadius) {
+        rmSettings = false;
+        let dy = (currPos_canv.y - (stop.y - acceptRadius - activeSettingsDialog.hgt)) / K.SETTINGSHEIGHT;
+        let activeSel = activeSettingsDialog.lines.length - Math.floor(dy) - 1;
+        activeSettingsDialog.selected = activeSel < 0 ? null : activeSel;
+        if (activeSettingsDialog.selected != null)
+          setSelected = true;
+        document.body.style.cursor = "pointer";
+      }
+    }
+    if (!setSelected && activeSettingsDialog)
+      activeSettingsDialog.selected = null;
+    if (rmSettings && nConn) {
+      hoveringConn = nConn;
+      document.body.style.cursor = "pointer";
+    } else if (rmSettings && holdState == K.NOHOLD)
+      document.body.style.cursor = "";
+  }
+  if (rmSettings) {
+    activeSettingsDialog = null;
+  }
 }
 function terminals(stop) {
   let out = [];
   for (let i = 0; i < lines.length; i++)
     if ((lines[i].path[0] == stop || lines[i].path[lines[i].path.length - 1] == stop) && lines[i].path[0] != lines[i].path[lines[i].path.length - 1])
-      out.push(i);
-  return out;
+      out.push(lines[i]);
+  return out.length == 0 ? null : out;
 }
 function updateToNow(currLine, conn) {
   let idx = connections.indexOf(conn);
   connections.splice(idx, 1);
+  recentlyRemoved.push({ conn, time: Date.now() });
 }
 function routeConfirm(ev) {
   holdState = K.NOHOLD;
+  extendInfo = null;
   document.body.style.cursor = holdState == K.HOLD ? "grab" : "";
   if (currPath.length > 1) {
     let currCol = getCSSProp("--system-" + colours[0]);
@@ -921,6 +1052,7 @@ function routeConfirm(ev) {
     let currLine2 = {
       lineID: lineCt,
       path: currLine,
+      colour: currCol,
       stops: stopsOnLine,
       loopingQ: currPath[0] == currPath[currPath.length - 1],
       trains: []

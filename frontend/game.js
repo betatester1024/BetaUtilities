@@ -22,7 +22,8 @@ const K = {
   ANIM_SETTINGSDIALOG: 100,
 
   // stop over-capacity timeout
-  FAILTIME: 30000,
+  FAILTIME: 30000, // in ticks (scalable ms)
+  PCTPERTICK: 1/30000,
   LINEWIDTH:10, // width of one line in base-size pixels 
   LINEACCEPTDIST: 20, // base-size pixels under which line dragging will be accepted
   // actionStatuses: 
@@ -71,12 +72,18 @@ let types = [triangle, square, circ, star];
 let defaultClr = "#555";
 const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
+let globalTicks = 0;
+let currSpeed = 2;
 function onLoad() {
 
 }
 
 function bezier(t , p1, p2, p3){
 return (1-t)**2*p1 + 2*(1-t)*t*p2 + t**2*p3;
+}
+
+function timeNow() {
+  return globalTicks;
 }
 
 function parallelStops(cmp) {
@@ -301,12 +308,12 @@ function redraw(delta) {
     ctx.beginPath();
     ctx.save();
     ctx.strokeStyle = getCSSProp("--system-red");
-    if (Date.now() - recentlyRemoved[i].time > 500) {
+    if (timeNow() - recentlyRemoved[i].time > 500) {
       recentlyRemoved.splice(i, 1);
       i--;
       continue;
     }
-    ctx.globalAlpha = (1-(Date.now() - recentlyRemoved[i].time)/500)*0.5;
+    ctx.globalAlpha = (1-(timeNow() - recentlyRemoved[i].time)/500)*0.5;
     // let off = handleOffset(recentlyRemoved[i].conn);
     ctx.lineWidth = K.LINEWIDTH;
     ctx.moveTo(recentlyRemoved[i].conn.from.x, recentlyRemoved[i].conn.from.y);
@@ -437,10 +444,11 @@ function redraw(delta) {
   for (let i=0; i<stops.length; i++) {
     ctx.save();
     ctx.beginPath();
-    if (stops[i].failureTimer > 0) {
+    if (stops[i].failurePct > 0) {
       ctx.fillStyle = getCSSProp("--system-red2");
-      let pctRemaining = (Date.now() - stops[i].failureTimer)/K.FAILTIME;
-      let pctOneSec = (Date.now() - stops[i].failureTimer)/300;
+      // let pctRemaining = (timeNow() - stops[i].failureTimer)/K.FAILTIME;
+      let pctRemaining = stops[i].failurePct;
+      let pctOneSec = (timeNow() - stops[i].failurePct*K.FAILTIME)/300;
       let radScl = 0;
       if (pctOneSec < 1) 
         radScl = (-4*(pctOneSec-0.5)**2)+0.5;
@@ -522,7 +530,7 @@ function redraw(delta) {
       if (j>=cap/2) y = 1;
       let px = j%(cap/2)*uSz+uSz/2-h/2;
       let py = y*uSz+uSz/2-w/2;
-      if (trains[i].passengers[j].to == 0) star(1.1, px, py);
+      if (trains[i].passengers[j].to == 0) star(1.2, px, py);
       else if (trains[i].passengers[j].to == 1) square(0.9, px, py);
         else if (trains[i].passengers[j].to == 2) triangle(1, px, py);
       else ctx.fillText(trains[i].passengers[j].to, px, py);
@@ -541,7 +549,7 @@ function redraw(delta) {
   if (activeSettingsDialog) {
     let stop = activeSettingsDialog.stop;
     let h = -activeSettingsDialog.hgt*
-      Math.min(1, (Date.now()-activeSettingsDialog.time)/K.ANIM_SETTINGSDIALOG);
+      Math.min(1, (timeNow()-activeSettingsDialog.time)/K.ANIM_SETTINGSDIALOG);
     ctx.save();
     ctx.beginPath();
     ctx.fillStyle = getCSSProp("--system-overlay");
@@ -560,7 +568,7 @@ function redraw(delta) {
       ctx.beginPath();
       ctx.save();
       ctx.fillStyle = activeSettingsDialog.lines[i].colour+"95";
-      if (activeSettingsDialog.selected == i) {
+      if (activeSettingsDialog.selected == activeSettingsDialog.lines[i].lineID) {
         ctx.fillStyle = activeSettingsDialog.lines[i].colour;
       }
       ctx.arc(stop.x, stop.y-(i+1)*K.SETTINGSHEIGHT, stopSz, 0, K.PI*2);
@@ -639,8 +647,10 @@ function populateStops() {
       handlePassenger(pass);
       stops[stopAdded].waiting.push(pass);
       let stop = stops[stopAdded]
-      if (stop.waiting.length > stop.capacity && stop.failureTimer < 0)
-        stop.failureTimer = Date.now();
+      if (stop.waiting.length > stop.capacity && !stop.failing) {
+        stop.failing = true;
+        stop.failureTimer=0;
+      }
 
     }
   }
@@ -718,8 +728,8 @@ function preLoad() {
   //////
   // setInterval(animLoop, 1000/60);
   requestAnimationFrame(animLoop);
-  startTime = Date.now();
-  setTimeout(stopPopulationLoop, 5000);
+  startTime = timeNow();
+  setTimeout(stopPopulationLoop, 5000/currSpeed);
 }
 
 function nearestConnection(x, y) {
@@ -775,22 +785,23 @@ function pDist(x, y, x1, y1, x2, y2) { // dist between line SEGMENT and pt
 }
 
 function animLoop() {
+  globalTicks += 16.66667*currSpeed; // 60fps default
   for (let i = 0; i < trains.length; i++) {
     let currTrain = trains[i];
     let distTotal = distBtw(trains[i].to, trains[i].from);
     // distToCover = s * px/s / px
-    let distTravelled = (Date.now() - currTrain.startT) * trainSpeed;
+    let distTravelled = (timeNow() - currTrain.startT) * trainSpeed;
     let percentCovered = distTravelled / distTotal;
     if (percentCovered < 0) continue;
     if (percentCovered >= 1) { // at a stop. 
-      let startT = Date.now();
+      let startT = timeNow();
       percentCovered = 0;
       // let applicable = [];
       let currentTo = trains[i].to;//trains[i].revDir?trains[i].from:trains[i].to;
       let currStop = nearestStop(currentTo, 1);
       // currTrain.onCompletion = currTrain.passengers.length;
       // how many people to drop off here?
-      let delay = dropOff(currTrain, currentTo) * K.DELAYPERPASSENGER;
+      let delay = dropOff(currTrain, currentTo) * K.DELAYPERPASSENGER/currSpeed;
       // figure out if the train is due to reverse first.
       let reverseQ = true;
       let nextStop = null;
@@ -832,7 +843,7 @@ function animLoop() {
           pass.stop = currStop;
           pass.train = currTrain;
           pass.route.shift();
-          delay += K.DELAYPERPASSENGER;
+          delay += K.DELAYPERPASSENGER/currSpeed;
         }
       }
       // 2. pick up people who need transfers (they typically wait very long)
@@ -860,7 +871,7 @@ function animLoop() {
           // currTrain.onCompletion++;
           // currTrain.toAdd.push({stop:currStop,pass:pass});
           // pass.status = K.ONTHEWAY;
-          delay += K.DELAYPERPASSENGER;
+          delay += K.DELAYPERPASSENGER/currSpeed;
         }
       }
 
@@ -880,7 +891,7 @@ function animLoop() {
           // currTrain.toAdd.push({stop:currStop,pass:adding});
           // k--;
         }
-        delay += K.DELAYPERPASSENGER;
+        delay += K.DELAYPERPASSENGER/currSpeed;
         // }
       }
       // if (currTrain.revDir) {
@@ -894,24 +905,29 @@ function animLoop() {
       
 
       // }
-      if (Date.now() - startT > 25) 
-        console.log("WARNING: StopHandler took ", Date.now() - startT+"ms");
+      if (timeNow() - startT > 25) 
+        console.log("WARNING: StopHandler took ", timeNow() - startT+"ms");
     } // if percentcoered = 1
     currTrain.x = currTrain.from.x + (currTrain.to.x - currTrain.from.x) * percentCovered;
     currTrain.y = currTrain.from.y + (currTrain.to.y - currTrain.from.y) * percentCovered;
   }
   for (let i=0; i<stops.length; i++) {
-    if (stops[i].failureTimer < 0) continue;
-    let pctRemaining = (Date.now() - stops[i].failureTimer)/K.FAILTIME;
-    if (pctRemaining > 1.1) {
-      alertDialog("loser!", ()=>{
-        location.reload();
-      });
-      return;
+    if (stops[i].failurePct < 0) continue;
+    let pctRemaining = stops[i].failurePct;
+    if (pctRemaining > 1) {
+      currSpeed*=0.99;
+      // alertDialog("loser!", ()=>{
+      //   location.reload();
+      // });
+      // return;
     }
   }
-  let delta = Date.now() - startTime;
-  startTime = Date.now();
+  let delta = timeNow() - startTime;
+  startTime = timeNow();
+  for (let stop of stops) {
+    if (stop.failing) stop.failurePct+=K.PCTPERTICK*delta;
+    else stop.failurePct= Math.max(0, stop.failurePct-K.PCTPERTICK*delta)
+  }
   redraw(delta);
   requestAnimationFrame(animLoop);
 }
@@ -935,8 +951,9 @@ function handleAwaiting(currTrain, currStop) {
           currTrain.passengers.push(pass);
           break;
         }
-      if (currStop.waiting.length < currStop.capacity)
-        currStop.failureTimer = -1;
+      if (currStop.waiting.length < currStop.capacity) {
+        currStop.failing = false;
+      }
       pass.status = K.ONTHEWAY;
       pass.actionStatus = K.NOACTION;
       handled = true;
@@ -951,7 +968,7 @@ function handleAwaiting(currTrain, currStop) {
         }
       pass.status = K.WAITING;
       if (currStop.waiting.length < currStop.capacity)
-        currStop.failureTimer = -1;
+        currStop.failing =false;
       pass.actionStatus = K.NOACTION;
       handled = true;
       break;
@@ -967,16 +984,16 @@ function handleAwaiting(currTrain, currStop) {
       pass.status = K.WAITING;
       pass.actionStatus = K.NOACTION;
       let stop = currStop;
-      if (stop.waiting.length > stop.capacity && stop.failureTimer < 0)
-        stop.failureTimer = Date.now();
+      if (stop.waiting.length > stop.capacity && stop.failurePct < 1)
+        stop.failing=true;
       handled = true;
       break;
     }
     else throw("invalid actionStatus!");
   }
-  if (handled) setTimeout(()=>{handleAwaiting(currTrain, currStop)}, K.DELAYPERPASSENGER);
+  if (handled) setTimeout(()=>{handleAwaiting(currTrain, currStop)}, K.DELAYPERPASSENGER/currSpeed);
   else {
-    currTrain.startT = Date.now();
+    currTrain.startT = timeNow();
     for (const affectedConn of connections) {
       if (affectedConn.pendingRemove) {
         let canUpdate = true;
@@ -1015,7 +1032,7 @@ function dropOff(currTrain, pt) {
 function stopPopulationLoop() {
   populateStops();
   redraw();
-  setTimeout(stopPopulationLoop, 5000 + Math.random() * 7000);
+  setTimeout(stopPopulationLoop, (5000 + Math.random() * 7000)/currSpeed);
 }
 
 function updateMinScl(newVal = minSclFac) {
@@ -1047,7 +1064,8 @@ function addNewStop(type = -1) {
   newPt.linesServed = new Set();
   newPt.type = type;
   newPt.toAdd = [];
-  newPt.failureTimer = -1;
+  newPt.failing = false;
+  newPt.failurePct = 0;
   newPt.capacity = 6;
   redraw();
 }
@@ -1158,6 +1176,8 @@ function onmove(ev) {
       else currLine.path.splice(0, 0, nStop)
       if (currLine.path[0] == currLine.path[currLine.path.length-1]) currLine.loopingQ = true;
       extendInfo = null;
+      for (let pass of passengers)
+        handlePassenger(pass);
       holdState = K.NOHOLD;
       routeConfirm();
       
@@ -1167,7 +1187,7 @@ function onmove(ev) {
     let terms = terminals(nStop);
     if (terms && holdState == K.NOHOLD && (!activeSettingsDialog || activeSettingsDialog.stop != nStop)) {
       activeSettingsDialog = {
-        stop:nStop, time:Date.now()+50,
+        stop:nStop, time:timeNow()+50,
         hgt:K.SETTINGSHEIGHT*terms.length, lines:terms, selected:null};
       redraw();
     }
@@ -1222,7 +1242,7 @@ function updateToNow(currLine, conn) {
   // conn.to = nStop; 
   let idx = connections.indexOf(conn);
   connections.splice(idx, 1);
-  recentlyRemoved.push({conn:conn, time:Date.now()});
+  recentlyRemoved.push({conn:conn, time:timeNow()});
   // connections.push(newConn);
 }
 
@@ -1319,14 +1339,14 @@ function routeConfirm(ev) {
     let t1 = {
         x: currPath[0].x, y: currPath[0].y,
         from: currPath[0], to: currPath[1],
-        lineID: lineCt, colour: currCol, startT: Date.now(),
+        lineID: lineCt, colour: currCol, startT: timeNow(),
         status: K.MOVING, passengers: [], cap:6, revDir:false, 
         //toAdd:[], toRemove:[], onCompletion:0
       };
     let t2 = {
         x: currPath[0].x, y: currPath[0].y,
         from: currPath[currPath.length-1], to: currPath[currPath.length-2],
-        lineID: lineCt, colour: currCol, startT: Date.now(),
+        lineID: lineCt, colour: currCol, startT: timeNow(),
         status: K.MOVING, passengers: [], cap:6, revDir:true,//, toAdd:[], toRemove:[], 
         //onCompletion:0
       };
@@ -1340,11 +1360,11 @@ function routeConfirm(ev) {
   if (!ev || !downPt || distBtw({ x: ev.clientX, y: ev.clientY }, downPt) > 10) return;
   // check for is it actually a click ^
   ctx.beginPath();
-  let actualPos = fromCanvPos(ev.clientX, ev.clientY);
-  ctx.moveTo(actualPos.x - 0.5, actualPos.y - 0.5);
-  ctx.lineTo(actualPos.x + 0.5, actualPos.y + 0.5);
-  ctx.stroke();
-  ctx.fillText(actualPos.x.toFixed(2) + ", " + actualPos.y.toFixed(2), actualPos.x, actualPos.y);
+  // let actualPos = fromCanvPos(ev.clientX, ev.clientY);
+  // ctx.moveTo(actualPos.x - 0.5, actualPos.y - 0.5);
+  // ctx.lineTo(actualPos.x + 0.5, actualPos.y + 0.5);
+  // ctx.stroke();
+  // ctx.fillText(actualPos.x.toFixed(2) + ", " + actualPos.y.toFixed(2), actualPos.x, actualPos.y);
 }
 
 function samePt(pt1, pt2) {

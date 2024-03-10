@@ -4,7 +4,8 @@ import {initServer} from './server';
 import {DBMaintenance, connectDB, client} from './database';
 import {supportHandler, Room, BridgeHandler} from './supportRooms'
 import {log} from './logging';
-const fs = require('fs');
+import {WebSocket} from 'ws';
+// let ws = require("ws");
 import {uDB} from './consts';
 import {WS} from './betautilities/wsHandler';
 import {WebH} from './betautilities/webHandler';
@@ -34,6 +35,7 @@ export let UPSINCESTR = "";
 export let botsStarted = false;
 try {
   // mail();
+  
   // let fs = 
   if (connectionSuccess)
   connectDB().then((err:any)=>{
@@ -88,6 +90,14 @@ try {
 
 async function init(startBots:boolean) 
 {
+  const wsock = new WebSocket('ws://localhost:8765');
+
+  wsock.on('error', console.error);
+  
+  wsock.on('open', function open() {
+    wsock.send('{"type": 0, "server": "betawebsite"}');
+  });
+  
   botsStarted = startBots;
   if (startBots) console.log("Starting EuphBots...");
   initServer();

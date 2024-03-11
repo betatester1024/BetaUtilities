@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="{{mainClass}}">
   <head>
-    <script src='./utils.js'></script>
+    <script src='/utils.js'></script>
     <title>thing</title>
     <script src="game.js">
 
@@ -38,13 +38,16 @@
   </head>
   <body onload = "globalOnload(onLoad); preLoad()">
     <div class="main_content">
-
+      
       <canvas id="canv"></canvas>
       <button onclick="addNewStop()" class="btn blu fssml override">
         Add new stop
       </button>
       <button onclick="populateStops()" class="btn blu fssml override">
         Populate stops
+      </button>
+      <button onclick="togglePause()" class="btn blu fssml override">
+        Pause/resume
       </button>
       <details class="blu ">
         <summary>Footer</summary>

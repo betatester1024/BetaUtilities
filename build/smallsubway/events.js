@@ -91,7 +91,7 @@ function onmove(ev) {
     }
   } else if (holdState == K.HOLD_EXTEND && nStop) {
     let currLine = extendInfo.line;
-    if (!currLine.stops.has(nStop) || (nStop == currLine.path[0] && extendInfo.stop == currLine.path[currLine.path.length - 1] || nStop == currLine.path[currLine.path.length - 1] && extendInfo.stop == currLine.path[0]) && currLine.path.length > 2) {
+    if (!currLine.stops.has(nStop) || (nStop == currLine.path[0] && extendInfo.stop == currLine.path[currLine.path.length - 1] || nStop == currLine.path[currLine.path.length - 1] && extendInfo.stop == currLine.path[0]) && currLine.path.length > 2 && !currLine.loopingQ) {
       let newConn = {
         from: extendInfo.stop,
         to: nStop,
@@ -106,13 +106,15 @@ function onmove(ev) {
         currLine.path.push(nStop);
       else
         currLine.path.splice(0, 0, nStop);
-      if (currLine.path[0] == currLine.path[currLine.path.length - 1])
+      if (currLine.path[0] == currLine.path[currLine.path.length - 1]) {
         currLine.loopingQ = true;
-      extendInfo = null;
+        extendInfo = null;
+        routeConfirm();
+      }
       for (let pass2 of passengers)
         handlePassenger(pass2);
-      holdState = K.NOHOLD;
-      routeConfirm();
+      if (extendInfo)
+        extendInfo.stop = nStop;
     }
   } else if (nStop) {
     let terms = terminals(nStop);

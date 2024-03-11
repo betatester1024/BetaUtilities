@@ -56,7 +56,16 @@ function redraw(delta) {
     ctx.lineTo(-viewportW / 2, viewportH / 2);
     ctx.lineTo(-viewportW / 2, -viewportH / 2);
     ctx.stroke();
+    ctx.save();
+    if (fpsCurr < 40)
+      ctx.fillStyle = getCSSProp("--system-red");
+    else if (fpsCurr < 50)
+      ctx.fillStyle = getCSSProp("--system-yellowtext");
+    else
+      ctx.fillStyle = getCSSProp("--system-green");
     ctx.fillText(fpsCurr.toFixed(2) + "fps", -viewportW / 2 + 30, -viewportH / 2 + 30);
+    ctx.fillRect(-viewportW / 2 + 20, -viewportH / 2 + 25, 5, 5);
+    ctx.restore();
   }
   ctx.beginPath();
   if (hovering && !activeSettingsDialog) {

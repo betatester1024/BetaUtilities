@@ -127,9 +127,9 @@ function getAssociatedConnection(train) {
 }
 function populateStops() {
   for (let i = 0; i < stops.length; i++) {
-    if (Math.random() < 0.4)
+    if (Math.random() < 0.3 || timeNow() - stops[i].timeAdded < 3e3)
       continue;
-    let toAdd = Math.floor(Math.random() * stops.length / 3) + 1;
+    let toAdd = Math.min(5, Math.floor(Math.random() * stops.length / 4) + 1);
     for (let j = 0; j < toAdd; j++) {
       let stopAdded = Math.floor(Math.random() * stops.length);
       let currType = getNextType(stops[stopAdded].type);
@@ -397,7 +397,7 @@ function dropOff(currTrain, pt) {
 function stopPopulationLoop() {
   populateStops();
   redraw();
-  asyncEvents.push({ fcn: stopPopulationLoop, time: timeNow() + (5e3 + Math.random() * 7e3) / currSpeed });
+  asyncEvents.push({ fcn: stopPopulationLoop, time: timeNow() + (2e3 + Math.random() * 3e3) / currSpeed });
 }
 function addNewStop(type = -1) {
   let newPt;

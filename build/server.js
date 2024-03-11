@@ -260,16 +260,25 @@ async function initServer() {
     sendFile(res, getToken(req), import_consts.frontendDir + "support.js");
     (0, import_logging.incrRequests)();
   });
-  app.get("*/utils.js", (req, res) => {
-    res.sendFile(import_consts.jsDir + "utils.js");
-    (0, import_logging.incrRequests)();
-  });
   app.get("/smallsubway/", (req, res) => {
     sendFile(res, getToken(req), import_consts.rootDir + "/smallsubway/index.html");
     (0, import_logging.incrRequests)();
   });
+  const acceptedPaths = [
+    "/drawutils.js",
+    "/events.js",
+    "/game.js",
+    "/redraw.js",
+    "/shapes.js",
+    "/transfm.js",
+    "/uihandler.js",
+    "/utils.js"
+  ];
   app.get("/smallsubway/*.js", (req, res) => {
-    sendFile(res, getToken(req), import_consts.rootDir + req.path);
+    if (acceptedPaths.indexOf(req.path.replace(/\/smallsubway/, "")) >= 0)
+      sendFile(res, getToken(req), import_consts.rootDir + req.path);
+    else
+      sendFile(res, getToken(req), import_consts.frontendDir + "404.html");
     (0, import_logging.incrRequests)();
   });
   app.get("*.svg", (req, res) => {

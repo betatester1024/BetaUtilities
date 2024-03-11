@@ -335,10 +335,10 @@ export async function initServer() {
   //   incrRequests();
   // })
 
-  app.get('*/utils.js', (req:any, res:any) => {
-    res.sendFile(jsDir+"utils.js");
-    incrRequests();
-  })
+  // app.get('*/utils.js', (req:any, res:any) => {
+  //   res.sendFile(jsDir+"utils.js");
+  //   incrRequests();
+  // })
   
   app.get('/smallsubway/', (req:any, res:any) => {
     sendFile(res, getToken(req), rootDir+"/smallsubway/index.html");

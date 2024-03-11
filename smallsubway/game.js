@@ -88,7 +88,8 @@ const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
 
 let globalTicks = 0;
-let currSpeed = 2;
+let currSpeed = 1;
+
 function onLoad() {
 
 }
@@ -165,8 +166,8 @@ function getAssociatedConnection(train) {
 
 function populateStops() {
   for (let i = 0; i < stops.length; i++) {
-    if (Math.random() < 0.4) continue;
-    let toAdd = Math.floor(Math.random() * (stops.length) / 3) + 1;
+    if (Math.random() < 0.3 || timeNow() - stops[i].timeAdded < 3000) continue;
+    let toAdd = Math.min(5, Math.floor(Math.random() * (stops.length) / 4) + 1);
     for (let j = 0; j < toAdd; j++) {
       let stopAdded = Math.floor(Math.random() * stops.length);
       // if (stopAdded >= stops[i].type) stopAdded++;
@@ -185,8 +186,6 @@ function populateStops() {
     }
   }
 }
-
-
 
 function preLoad() {
   vis(()=>{
@@ -236,6 +235,10 @@ function preLoad() {
 function animLoop() {
   let delta = Date.now() - startTime;
   startTime = Date.now();
+  if (paused) {
+    byId("playpause").innerHTML = "resume";
+  }
+  else byId("playpause").innerHTML = "pause";
   redraw(delta);
   requestAnimationFrame(animLoop);
 }
@@ -435,7 +438,7 @@ function handleAwaiting(currTrain, currStop) {
       if (currStop.waiting.length < currStop.capacity)
         currStop.failing =false;
       pass.actionStatus = K.NOACTION;
-      passengersHandled++;
+      passengersServed++;
       handled = true;
       break;
     }
@@ -502,7 +505,7 @@ function dropOff(currTrain, pt) {
 function stopPopulationLoop() {
   populateStops();
   redraw();
-  asyncEvents.push({fcn:stopPopulationLoop, time:timeNow()+(5000 + Math.random() * 7000)/currSpeed});
+  asyncEvents.push({fcn:stopPopulationLoop, time:timeNow()+(2000 + Math.random() * 3000)/currSpeed});
 }
 
 
@@ -527,6 +530,7 @@ function addNewStop(type = -1) {
   newPt.waiting = [];
   newPt.linesServed = new Set();
   newPt.type = type;
+  newPt.addedTime = timeNow();
   newPt.toAdd = [];
   newPt.failing = false;
   newPt.failurePct = 0;

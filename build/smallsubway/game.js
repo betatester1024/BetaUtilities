@@ -62,7 +62,7 @@ let defaultClr = "#555";
 const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
 let globalTicks = 0;
-let currSpeed = 2;
+let currSpeed = 1;
 function onLoad() {
 }
 function timeNow() {
@@ -194,6 +194,10 @@ function preLoad() {
 function animLoop() {
   let delta = Date.now() - startTime;
   startTime = Date.now();
+  if (paused) {
+    byId("playpause").innerHTML = "resume";
+  } else
+    byId("playpause").innerHTML = "pause";
   redraw(delta);
   requestAnimationFrame(animLoop);
 }
@@ -334,7 +338,7 @@ function handleAwaiting(currTrain, currStop) {
       if (currStop.waiting.length < currStop.capacity)
         currStop.failing = false;
       pass.actionStatus = K.NOACTION;
-      passengersHandled++;
+      passengersServed++;
       handled = true;
       break;
     } else if (pass.actionStatus == K.TRANSFERPENDING) {
@@ -414,6 +418,7 @@ function addNewStop(type = -1) {
   newPt.waiting = [];
   newPt.linesServed = /* @__PURE__ */ new Set();
   newPt.type = type;
+  newPt.addedTime = timeNow();
   newPt.toAdd = [];
   newPt.failing = false;
   newPt.failurePct = 0;

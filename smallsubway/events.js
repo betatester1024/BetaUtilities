@@ -107,7 +107,7 @@ function onmove(ev) {
     if (!currLine.stops.has(nStop) 
      || (nStop == currLine.path[0] && extendInfo.stop == currLine.path[currLine.path.length-1]
          || nStop == currLine.path[currLine.path.length-1] && extendInfo.stop == currLine.path[0])
-        && currLine.path.length > 2) {
+        && currLine.path.length > 2 && !currLine.loopingQ) {
       let newConn = {from:extendInfo.stop, to:nStop, 
            lineID:currLine.lineID, 
            colour:currLine.colour};
@@ -118,14 +118,18 @@ function onmove(ev) {
       if (currLine.path[currLine.path.length-1] == extendInfo.stop) 
         currLine.path.push(nStop);
       else currLine.path.splice(0, 0, nStop)
-      if (currLine.path[0] == currLine.path[currLine.path.length-1]) currLine.loopingQ = true;
-      extendInfo = null;
+      if (currLine.path[0] == currLine.path[currLine.path.length-1]) {
+        currLine.loopingQ = true;
+        extendInfo = null;
+        routeConfirm();
+      }
+      // extendInfo = null;
       for (let pass of passengers)
         handlePassenger(pass);
-      holdState = K.NOHOLD;
-      routeConfirm();
+      if (extendInfo) extendInfo.stop = nStop;
+      // routeConfirm();
 
-    } // extend successful    
+    } // extend successful 
   }
   else if (nStop) {
     let terms = terminals(nStop);

@@ -1,4 +1,4 @@
-let types = [triangle, square, circ, star];
+let types = [triangle, square, circ, diamond, star];
 
 function square(scl, x, y, stroke=false) {
   scl *= 0.9;
@@ -38,9 +38,17 @@ function circ(scl, x, y, stroke=false) {
   ctx.beginPath();
 }
 
-function diamond(scl, x, y) {
+function diamond(scl, x, y, stroke=false) {
+  scl *= 1.1;
   ctx.beginPath();
-  ctx.moveTo()
+  ctx.moveTo(x, y-3*scl);
+  ctx.lineTo(x+2*scl, y);
+  ctx.lineTo(x, y+3*scl);
+  ctx.lineTo(x-2*scl, y);
+  ctx.lineTo(x, y-3*scl);
+  ctx.fill();
+  if (stroke) ctx.stroke();
+  ctx.beginPath();
 }
 
 function star(scl,x,y, stroke=false) {

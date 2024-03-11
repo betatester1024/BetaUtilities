@@ -380,7 +380,9 @@ function redraw(delta) {
 function renderStop(stop) {
   ctx.beginPath();
   ctx.fillStyle = defaultClr;
-  types[stop.type](stopSz / 3, stop.x, stop.y);
+  let deltaT = (timeNow() - stop.addedTime) / 1500;
+  let radScl = deltaT >= 1 ? stopSz / 3 : stopSz / 3 * (70 * (deltaT - 0.443) ** 7 + 0.2);
+  types[stop.type](Math.max(0, radScl), stop.x, stop.y);
   ctx.beginPath();
 }
 function drawWaiting(stop) {

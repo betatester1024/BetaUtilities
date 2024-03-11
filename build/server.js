@@ -260,11 +260,15 @@ async function initServer() {
     sendFile(res, getToken(req), import_consts.frontendDir + "support.js");
     (0, import_logging.incrRequests)();
   });
+  app.get("*/utils.js", (req, res) => {
+    res.sendFile(import_consts.jsDir + "utils.js");
+    (0, import_logging.incrRequests)();
+  });
   app.get("/smallsubway/", (req, res) => {
     sendFile(res, getToken(req), import_consts.rootDir + "/smallsubway/index.html");
     (0, import_logging.incrRequests)();
   });
-  app.get("/smallsubway/*", (req, res) => {
+  app.get("/smallsubway/*.js", (req, res) => {
     sendFile(res, getToken(req), import_consts.rootDir + req.path);
     (0, import_logging.incrRequests)();
   });
@@ -282,6 +286,10 @@ async function initServer() {
   });
   app.get("/*.ts", (req, res) => {
     res.sendFile(import_consts.jsDir + req.url);
+    (0, import_logging.incrRequests)();
+  });
+  app.get("*/globalformat.css", (req, res) => {
+    res.sendFile(import_consts.frontendDir + "globalformat.css");
     (0, import_logging.incrRequests)();
   });
   app.get("/*.css", (req, res) => {

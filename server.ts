@@ -334,11 +334,17 @@ export async function initServer() {
   //   sendFile(res, getToken(req), frontendDir+"game.js");
   //   incrRequests();
   // })
+
+  app.get('*/utils.js', (req:any, res:any) => {
+    res.sendFile(jsDir+"utils.js");
+    incrRequests();
+  })
+  
   app.get('/smallsubway/', (req:any, res:any) => {
     sendFile(res, getToken(req), rootDir+"/smallsubway/index.html");
     incrRequests();
   })
-  app.get('/smallsubway/*', (req:any, res:any) => {
+  app.get('/smallsubway/*.js', (req:any, res:any) => {
     sendFile(res, getToken(req), rootDir+(req.path));
     incrRequests();
   })
@@ -351,6 +357,9 @@ export async function initServer() {
     res.sendFile(frontendDir+req.url);
     incrRequests();
   })
+
+
+
   
   app.get('/*.js*', (req:any, res:any) => {
     res.sendFile(jsDir+req.url);
@@ -362,6 +371,12 @@ export async function initServer() {
     res.sendFile(jsDir+req.url);
     incrRequests();
   })
+
+  app.get('*/globalformat.css', (req:any, res:any) => {
+    res.sendFile(frontendDir+"globalformat.css");
+    incrRequests();
+  })
+
 
   app.get('/*.css', (req:any, res:any) => {
     res.sendFile(frontendDir+req.url);

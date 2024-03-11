@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": ["../../smallsubway/uihandler.js"],
-  "sourcesContent": ["K.dialog_TIME = 1;\nlet dialogIDs = [\"time\"]\nfunction opendialog(toOpen) {\n  for (let id of dialogIDs) {\n    let dialog = byId(id);\n    if (dialog == toOpen) {\n    } else {\n      dialog.style.opacity = 0;\n      dialog.style.touchEvents = 'none';\n    }\n    \n    \n  }\n}"],
-  "mappings": ";AAAA,EAAE,cAAc;AAChB,IAAI,YAAY,CAAC,MAAM;AACvB,SAAS,WAAW,QAAQ;AAC1B,WAAS,MAAM,WAAW;AACxB,QAAI,SAAS,KAAK,EAAE;AACpB,QAAI,UAAU,QAAQ;AAAA,IACtB,OAAO;AACL,aAAO,MAAM,UAAU;AACvB,aAAO,MAAM,cAAc;AAAA,IAC7B;AAAA,EAGF;AACF;",
+  "sourcesContent": ["K.dialog_TIME = 1;\nlet dialogIDs = [\"time\"]\nfunction opendialog(toOpen) {\n  for (let id of dialogIDs) {\n    let dialog = byId(id);\n    if (dialog == toOpen) {\n      dialog.style.opacity = 1;\n      dialog.style.touchEvents = '';\n    } else {\n      dialog.style.opacity = 0;\n      dialog.style.touchEvents = 'none';\n    }\n    \n    \n  }\n}"],
+  "mappings": ";AAAA,EAAE,cAAc;AAChB,IAAI,YAAY,CAAC,MAAM;AACvB,SAAS,WAAW,QAAQ;AAC1B,WAAS,MAAM,WAAW;AACxB,QAAI,SAAS,KAAK,EAAE;AACpB,QAAI,UAAU,QAAQ;AACpB,aAAO,MAAM,UAAU;AACvB,aAAO,MAAM,cAAc;AAAA,IAC7B,OAAO;AACL,aAAO,MAAM,UAAU;AACvB,aAAO,MAAM,cAAc;AAAA,IAC7B;AAAA,EAGF;AACF;",
   "names": []
 }

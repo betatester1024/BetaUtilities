@@ -330,12 +330,16 @@ export async function initServer() {
     incrRequests();
   })
 
-  app.get('/game.js', (req:any, res:any) => {
-    sendFile(res, getToken(req), frontendDir+"game.js");
+  // app.get('/game.js', (req:any, res:any) => {
+  //   sendFile(res, getToken(req), frontendDir+"game.js");
+  //   incrRequests();
+  // })
+  app.get('/smallsubway/', (req:any, res:any) => {
+    sendFile(res, getToken(req), rootDir+"/smallsubway/index.html");
     incrRequests();
   })
-  app.get('/thing', (req:any, res:any) => {
-    sendFile(res, getToken(req), frontendDir+"smallsubway.html");
+  app.get('/smallsubway/*', (req:any, res:any) => {
+    sendFile(res, getToken(req), rootDir+(req.path));
     incrRequests();
   })
 

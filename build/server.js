@@ -260,12 +260,12 @@ async function initServer() {
     sendFile(res, getToken(req), import_consts.frontendDir + "support.js");
     (0, import_logging.incrRequests)();
   });
-  app.get("/game.js", (req, res) => {
-    sendFile(res, getToken(req), import_consts.frontendDir + "game.js");
+  app.get("/smallsubway/", (req, res) => {
+    sendFile(res, getToken(req), import_consts.rootDir + "/smallsubway/index.html");
     (0, import_logging.incrRequests)();
   });
-  app.get("/thing", (req, res) => {
-    sendFile(res, getToken(req), import_consts.frontendDir + "smallsubway.html");
+  app.get("/smallsubway/*", (req, res) => {
+    sendFile(res, getToken(req), import_consts.rootDir + req.path);
     (0, import_logging.incrRequests)();
   });
   app.get("*.svg", (req, res) => {

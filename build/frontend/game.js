@@ -29,6 +29,7 @@ let holdState = K.NOHOLD;
 let activeSettingsDialog = null;
 let ctx = null;
 let canv = null;
+let startTick = -1;
 let startTime = -1;
 let totalScaleFac = 1;
 let hovering = null, hoveringConn = null;
@@ -77,8 +78,9 @@ function timeNow() {
 }
 function togglePause() {
   paused = !paused;
+  redraw();
   if (!paused) {
-    requestAnimationFrame(animLoop);
+    requestAnimationFrame(tickLoop);
   }
 }
 function parallelStops(cmp) {
@@ -480,7 +482,7 @@ function redraw(delta) {
   }
   if (activeSettingsDialog) {
     let stop = activeSettingsDialog.stop;
-    let h = -activeSettingsDialog.hgt * Math.min(1, (timeNow() - activeSettingsDialog.time) / K.ANIM_SETTINGSDIALOG);
+    let h = -activeSettingsDialog.hgt * Math.min(1, (Date.now() - activeSettingsDialog.time) / K.ANIM_SETTINGSDIALOG);
     ctx.save();
     ctx.beginPath();
     ctx.fillStyle = getCSSProp("--system-overlay");
@@ -521,6 +523,17 @@ function redraw(delta) {
     }
     ctx.restore();
     ctx.beginPath();
+  }
+  if (paused) {
+    ctx.save();
+    ctx.resetTransform();
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = getCSSProp("--system-blue");
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.font = "30px Noto Sans Display";
+    ctx.fillText("Paused", 50, 50);
+    ctx.restore();
   }
 }
 function renderStop(stop) {
@@ -673,9 +686,17 @@ function preLoad() {
   scale(totalScaleFac);
   translate(canv.width / 2, canv.height / 2);
   redraw();
+  requestAnimationFrame(tickLoop);
   requestAnimationFrame(animLoop);
-  startTime = timeNow();
+  startTick = timeNow();
+  startTime = Date.now();
   asyncEvents.push({ fcn: stopPopulationLoop, time: timeNow() + 5e3 / currSpeed });
+}
+function animLoop() {
+  let delta = Date.now() - startTime;
+  startTime = Date.now();
+  redraw(delta);
+  requestAnimationFrame(animLoop);
 }
 function nearestConnection(x, y) {
   let bestDist = K.INF;
@@ -716,7 +737,7 @@ function pDist(x, y, x1, y1, x2, y2) {
   var dy = y - yy;
   return Math.sqrt(dx * dx + dy * dy);
 }
-function animLoop() {
+function tickLoop() {
   globalTicks += 16.66667 * currSpeed;
   for (let i = 0; i < asyncEvents.length; i++) {
     if (timeNow() > asyncEvents[i].time) {
@@ -806,17 +827,16 @@ function animLoop() {
       currSpeed *= 0.99;
     }
   }
-  let delta = timeNow() - startTime;
-  startTime = timeNow();
+  let delta = timeNow() - startTick;
+  startTick = timeNow();
   for (let stop of stops) {
     if (stop.failing)
       stop.failurePct += K.PCTPERTICK * delta;
     else
       stop.failurePct = Math.max(0, stop.failurePct - K.PCTPERTICK * delta);
   }
-  redraw(delta);
   if (!paused)
-    requestAnimationFrame(animLoop);
+    requestAnimationFrame(tickLoop);
 }
 function handleAwaiting(currTrain, currStop) {
   let handled = false;
@@ -1049,7 +1069,7 @@ function onmove(ev) {
     if (terms && holdState == K.NOHOLD && (!activeSettingsDialog || activeSettingsDialog.stop != nStop)) {
       activeSettingsDialog = {
         stop: nStop,
-        time: timeNow() + 50,
+        time: Date.now() + 50,
         hgt: K.SETTINGSHEIGHT * terms.length,
         lines: terms,
         selected: null
@@ -1086,6 +1106,7 @@ function onmove(ev) {
   if (rmSettings) {
     activeSettingsDialog = null;
   }
+  redraw();
 }
 function terminals(stop) {
   let out = [];

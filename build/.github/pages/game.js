@@ -15,6 +15,7 @@ const K = {
   PI: Math.PI,
   ANIM_SETTINGSDIALOG: 100,
   FAILTIME: 3e4,
+  PCTPERTICK: 1 / 3e4,
   LINEWIDTH: 10,
   LINEACCEPTDIST: 20,
   NOACTION: 0,
@@ -22,15 +23,18 @@ const K = {
   DEBOARDPENDING: 2,
   TRANSFERPENDING: 3
 };
+let paused = false;
 const trainSpeed = 100 / 1e3;
 let holdState = K.NOHOLD;
 let activeSettingsDialog = null;
 let ctx = null;
 let canv = null;
+let startTick = -1;
 let startTime = -1;
 let totalScaleFac = 1;
 let hovering = null, hoveringConn = null;
 let stops = [];
+let asyncEvents = [];
 let modifyingConn = null;
 let recentlyRemoved = [];
 let connections = [];
@@ -51,10 +55,10 @@ let passengersServed = 0;
 let cash = 0;
 let maxUnlockedType = 0;
 const acceptRadius = 30;
-const stopSz = 20;
+const stopSz = 17;
 let adj = [];
 let passengers = [];
-let currPos_canv = null;
+let currPos_canv = { x: 0, y: 0 };
 let lineCt = 0;
 let shiftStatus = false;
 let downPt = null;
@@ -62,10 +66,22 @@ let types = [triangle, square, circ, star];
 let defaultClr = "#555";
 const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
+let globalTicks = 0;
+let currSpeed = 2;
 function onLoad() {
 }
 function bezier(t, p1, p2, p3) {
   return (1 - t) ** 2 * p1 + 2 * (1 - t) * t * p2 + t ** 2 * p3;
+}
+function timeNow() {
+  return globalTicks;
+}
+function togglePause() {
+  paused = !paused;
+  redraw();
+  if (!paused) {
+    requestAnimationFrame(tickLoop);
+  }
 }
 function parallelStops(cmp) {
   let ct = 0;
@@ -164,7 +180,7 @@ function redraw(delta) {
   }
   function clearCircle(pt, rad) {
     ctx.beginPath();
-    ctx.fillStyle = getCSSProp("--system-grey3");
+    ctx.fillStyle = getCSSProp("--system-bg");
     ctx.save();
     ctx.arc(pt.x, pt.y, rad + 2, 0, K.PI * 2);
     ctx.clip();
@@ -176,12 +192,18 @@ function redraw(delta) {
     ctx.restore();
     ctx.beginPath();
   }
+  function clearShape(pt, rad) {
+    ctx.save();
+    ctx.fillStyle = getCSSProp("--system-bg");
+    types[pt.type](rad / 3, pt.x, pt.y);
+    ctx.restore();
+  }
   ctx.strokeStyle = defaultClr;
   updateMinScl();
   ctx.beginPath();
   ctx.save();
   ctx.resetTransform();
-  ctx.fillStyle = getCSSProp("--system-grey3");
+  ctx.fillStyle = getCSSProp("--system-bg");
   ctx.clearRect(0, 0, canv.width, canv.height);
   ctx.fillRect(0, 0, canv.width, canv.height);
   ctx.restore();
@@ -201,9 +223,8 @@ function redraw(delta) {
     ctx.save();
     ctx.fillStyle = getCSSProp("--system-green2");
     ctx.beginPath();
-    ctx.arc(hovering.x, hovering.y, acceptRadius, 0, K.PI * 2);
+    types[hovering.type](acceptRadius / 3, hovering.x, hovering.y);
     ctx.fill();
-    clearCircle({ x: hovering.x, y: hovering.y }, stopSz);
     ctx.beginPath();
     ctx.restore();
   }
@@ -233,10 +254,6 @@ function redraw(delta) {
     ctx.beginPath();
     ctx.restore();
   }
-  for (let i = 0; i < stops.length; i++) {
-    clearCircle(stops[i], stopSz);
-    renderStop(stops[i]);
-  }
   for (let i = 0; i < connections.length; i++) {
     let offset = handleOffset(connections[i]);
     let angBtw = Math.atan2(
@@ -254,35 +271,45 @@ function redraw(delta) {
     let c = Math.cos(angBtw);
     let s = Math.sin(angBtw);
     ctx.moveTo(
-      connections[i].from.x + c * stopSz + offset.x,
-      connections[i].from.y + s * stopSz + offset.y
+      connections[i].from.x + offset.x,
+      connections[i].from.y + offset.y
     );
     ctx.lineTo(
-      connections[i].to.x - c * stopSz + offset.x,
-      connections[i].to.y - s * stopSz + offset.y
+      connections[i].to.x + offset.x,
+      connections[i].to.y + offset.y
     );
     ctx.stroke();
-    ctx.restore();
-  }
-  for (let i = 0; i < recentlyRemoved.length; i++) {
     ctx.beginPath();
-    ctx.save();
-    ctx.strokeStyle = getCSSProp("--system-red");
-    if (Date.now() - recentlyRemoved[i].time > 500) {
-      recentlyRemoved.splice(i, 1);
-      i--;
-      continue;
+    for (let stop of stops) {
+      let dist2 = pDist(stop.x, stop.y, connections[i].from.x, connections[i].from.y, connections[i].to.x, connections[i].to.y);
+      if (!samePt(stop, connections[i].from) && !samePt(stop, connections[i].to) && dist2 < acceptRadius) {
+        let basex = stop.x + dist2 * Math.cos(angBtw + K.PI / 2);
+        let basey = stop.y + dist2 * Math.sin(angBtw + K.PI / 2);
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(basex - c * acceptRadius, basey - s * acceptRadius);
+        ctx.lineTo(basex + c * acceptRadius, basey + s * acceptRadius);
+        ctx.lineWidth = K.LINEWIDTH / 2;
+        console.log("found!");
+        ctx.strokeStyle = getCSSProp("--system-bg");
+        ctx.stroke();
+        ctx.restore();
+        ctx.beginPath();
+      }
     }
-    ctx.globalAlpha = (1 - (Date.now() - recentlyRemoved[i].time) / 500) * 0.5;
-    ctx.lineWidth = K.LINEWIDTH;
-    ctx.moveTo(recentlyRemoved[i].conn.from.x, recentlyRemoved[i].conn.from.y);
-    ctx.lineTo(recentlyRemoved[i].conn.to.x, recentlyRemoved[i].conn.to.y);
-    ctx.stroke();
-    ctx.beginPath();
     ctx.restore();
   }
-  ctx.save();
-  ctx.lineWidth = 4;
+  let lastPt = currPath ? currPath[currPath.length - 1] : null;
+  let nextStop2 = nearestStop(currPos_canv, acceptRadius);
+  if (holdState == K.HOLD_NEWLINE && (!nextStop2 || !samePt(nextStop2, lastPt))) {
+    ctx.moveTo(lastPt.x, lastPt.y);
+    ctx.save();
+    ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
+    ctx.lineWidth = K.LINEWIDTH;
+    ctx.lineTo(currPos_canv.x, currPos_canv.y);
+    ctx.stroke();
+    ctx.restore();
+  }
   ctx.save();
   ctx.beginPath();
   ctx.strokeStyle = defaultClr;
@@ -297,22 +324,45 @@ function redraw(delta) {
     let s = Math.sin(angBtw);
     ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
     ctx.lineWidth = K.LINEWIDTH;
-    ctx.moveTo(currPath[i - 1].x + c * acceptRadius, currPath[i - 1].y + s * acceptRadius);
-    ctx.lineTo(currPath[i].x - c * acceptRadius, currPath[i].y - s * acceptRadius);
+    ctx.moveTo(currPath[i - 1].x, currPath[i - 1].y);
+    ctx.lineTo(currPath[i].x, currPath[i].y);
     ctx.stroke();
     ctx.strokeStyle = defaultClr;
   }
   ctx.lineWidth = 4;
   ctx.beginPath();
-  for (let i = 0; i < connections.length; i++) {
-    clearCircle(connections[i].from, stopSz);
-    clearCircle(connections[i].to, stopSz);
+  for (let i = 0; i < stops.length; i++) {
+    renderStop(stops[i]);
+  }
+  for (let i = 0; i < recentlyRemoved.length; i++) {
     ctx.beginPath();
-    ctx.strokeStyle = defaultClr;
-    ctx.arc(connections[i].from.x, connections[i].from.y, stopSz, 0, K.PI * 2);
+    ctx.save();
+    ctx.strokeStyle = getCSSProp("--system-red");
+    if (timeNow() - recentlyRemoved[i].time > 500) {
+      recentlyRemoved.splice(i, 1);
+      i--;
+      continue;
+    }
+    ctx.globalAlpha = (1 - (timeNow() - recentlyRemoved[i].time) / 500) * 0.5;
+    ctx.lineWidth = K.LINEWIDTH;
+    ctx.moveTo(recentlyRemoved[i].conn.from.x, recentlyRemoved[i].conn.from.y);
+    ctx.lineTo(recentlyRemoved[i].conn.to.x, recentlyRemoved[i].conn.to.y);
     ctx.stroke();
     ctx.beginPath();
-    ctx.arc(connections[i].to.x, connections[i].to.y, stopSz, 0, K.PI * 2);
+    ctx.restore();
+  }
+  ctx.save();
+  ctx.lineWidth = 4;
+  for (let i = 0; i < connections.length; i++) {
+    ctx.beginPath();
+    ctx.fillStyle = getCSSProp("--system-bg");
+    ctx.strokeStyle = defaultClr;
+    ctx.lineWidth = K.LINEWIDTH;
+    ctx.lineJoin = "round";
+    types[connections[i].from.type](stopSz / 3, connections[i].from.x, connections[i].from.y, true);
+    ctx.stroke();
+    ctx.beginPath();
+    types[connections[i].to.type](stopSz / 3, connections[i].to.x, connections[i].to.y, true);
     ctx.stroke();
   }
   ctx.restore();
@@ -320,71 +370,42 @@ function redraw(delta) {
   ctx.restore();
   ctx.beginPath();
   if (holdState == K.HOLD_NEWLINE) {
-    let lastPt = currPath[currPath.length - 1];
     let angBtw = Math.atan2(
       currPos_canv.y - lastPt.y,
       currPos_canv.x - lastPt.x
     );
     let c = Math.cos(angBtw);
     let s = Math.sin(angBtw);
-    let nextStop2 = nearestStop(currPos_canv, acceptRadius);
     if (nextStop2 && samePt(nextStop2, lastPt)) {
-      clearCircle(lastPt, acceptRadius);
+      clearShape(lastPt, acceptRadius);
       ctx.save();
       ctx.beginPath();
-      ctx.lineWidth = 4;
+      ctx.lineWidth = K.LINEWIDTH;
       ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
-      ctx.arc(lastPt.x, lastPt.y, stopSz, 0, K.PI * 2);
-      ctx.stroke();
-      circle(lastPt);
+      ctx.fillStyle = "rgba(0,0,0,0)";
+      ctx.lineJoin = "round";
+      types[lastPt.type](stopSz / 3, lastPt.x, lastPt.y, true);
+      types[lastPt.type](acceptRadius / 3, lastPt.x, lastPt.y, true);
       ctx.restore();
     }
     ctx.beginPath();
-    if (nextStop2 && samePt(nextStop2, lastPt))
-      ;
-    else if (nextStop2) {
-      angBtw = Math.atan2(
-        nextStop2.y - lastPt.y,
-        nextStop2.x - lastPt.x
-      );
-      c = Math.cos(angBtw);
-      s = Math.sin(angBtw);
-      ctx.moveTo(lastPt.x + c * acceptRadius, lastPt.y + s * acceptRadius);
-      ctx.save();
-      ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
-      ctx.lineWidth = K.LINEWIDTH;
-      ctx.lineTo(nextStop2.x - c * acceptRadius, nextStop2.y - s * acceptRadius);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = getCSSProp("--system-red");
-      ctx.arc(nextStop2.x, nextStop2.y, stopSz, 0, K.PI * 2);
-      ctx.stroke();
-      circle(nextStop2);
-      ctx.restore();
-    } else {
-      ctx.moveTo(lastPt.x + c * acceptRadius, lastPt.y + s * acceptRadius);
-      ctx.save();
-      ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
-      ctx.lineWidth = K.LINEWIDTH;
-      ctx.lineTo(currPos_canv.x, currPos_canv.y);
-      ctx.stroke();
-      ctx.restore();
-    }
     for (let i = 0; i < currPath.length; i++) {
       ctx.save();
       ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
-      circle(currPath[i]);
+      ctx.lineJoin = "round";
+      ctx.fillStyle = "rgba(0,0,0,0)";
+      ctx.lineWidth = K.LINEWIDTH;
+      types[currPath[i].type](acceptRadius / 3, currPath[i].x, currPath[i].y, true);
       ctx.restore();
     }
   }
   for (let i = 0; i < stops.length; i++) {
     ctx.save();
     ctx.beginPath();
-    if (stops[i].failureTimer > 0) {
+    if (stops[i].failurePct > 0) {
       ctx.fillStyle = getCSSProp("--system-red2");
-      let pctRemaining = (Date.now() - stops[i].failureTimer) / K.FAILTIME;
-      let pctOneSec = (Date.now() - stops[i].failureTimer) / 300;
+      let pctRemaining = stops[i].failurePct;
+      let pctOneSec = (timeNow() - stops[i].failurePct * K.FAILTIME) / 300;
       let radScl = 0;
       if (pctOneSec < 1)
         radScl = -4 * (pctOneSec - 0.5) ** 2 + 0.5;
@@ -407,8 +428,9 @@ function redraw(delta) {
     }
     ctx.restore();
   }
-  for (let i = 0; i < stops.length; i++)
-    ctx.fillText(stops[i].type, stops[i].x, stops[i].y);
+  for (let stop of stops) {
+    drawWaiting(stop);
+  }
   for (let i = 0; i < trains.length; i++) {
     ctx.beginPath();
     let angBtw = Math.atan2(
@@ -452,14 +474,7 @@ function redraw(delta) {
         y = 1;
       let px = j % (cap / 2) * uSz + uSz / 2 - h / 2;
       let py = y * uSz + uSz / 2 - w / 2;
-      if (trains[i].passengers[j].to == 0)
-        star(1.1, px, py);
-      else if (trains[i].passengers[j].to == 1)
-        square(0.9, px, py);
-      else if (trains[i].passengers[j].to == 2)
-        triangle(1, px, py);
-      else
-        ctx.fillText(trains[i].passengers[j].to, px, py);
+      types[trains[i].passengers[j].to](1, px, py);
     }
     ctx.beginPath();
     ctx.restore();
@@ -483,12 +498,12 @@ function redraw(delta) {
       ctx.beginPath();
       ctx.save();
       ctx.fillStyle = activeSettingsDialog.lines[i].colour + "95";
-      if (activeSettingsDialog.selected == i) {
+      if (activeSettingsDialog.selected == activeSettingsDialog.lines[i].lineID) {
         ctx.fillStyle = activeSettingsDialog.lines[i].colour;
       }
       ctx.arc(stop.x, stop.y - (i + 1) * K.SETTINGSHEIGHT, stopSz, 0, K.PI * 2);
       ctx.fill();
-      if (activeSettingsDialog.selected == i) {
+      if (activeSettingsDialog.selected == activeSettingsDialog.lines[i].lineID) {
         ctx.lineWidth = 4;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -509,20 +524,41 @@ function redraw(delta) {
     ctx.restore();
     ctx.beginPath();
   }
+  if (paused) {
+    ctx.save();
+    ctx.resetTransform();
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = getCSSProp("--system-blue");
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.font = "30px Noto Sans Display";
+    ctx.fillText("Paused", 50, 50);
+    ctx.restore();
+  }
 }
 function renderStop(stop) {
   ctx.beginPath();
-  ctx.arc(stop.x, stop.y, stopSz, 0, K.PI * 2);
-  ctx.stroke();
-  ctx.beginPath();
   ctx.fillStyle = defaultClr;
-  let out = " ";
-  for (let j = 0; j < stop.waiting.length; j++) {
-    out += stop.waiting[j].to.toString();
-  }
-  ctx.fillText(out, stop.x + stopSz, stop.y - stopSz / 2);
-  ctx.fillText(stop.type, stop.x, stop.y);
+  types[stop.type](stopSz / 3, stop.x, stop.y);
   ctx.beginPath();
+}
+function drawWaiting(stop) {
+  let y = 0, x = 0;
+  let dy = 15;
+  ctx.fillStyle = defaultClr;
+  let dx = 15;
+  const maxW = 5;
+  let baseOffset = Math.ceil(stop.waiting.length / maxW) * dy;
+  for (let j = 0; j < stop.waiting.length; j++) {
+    if (x >= maxW) {
+      y++;
+      x = 0;
+    }
+    let adjX = stop.x + stopSz + x % maxW * dx - dx / 2;
+    let adjY = stop.y - baseOffset - stopSz + y * dy - dy / 2;
+    x++;
+    types[stop.waiting[j].to](2, adjX, adjY);
+  }
 }
 function registerMaximisingCanvas(id, widthPc, heightPc, redrawFcn) {
   window.addEventListener("resize", (ev) => {
@@ -531,8 +567,6 @@ function registerMaximisingCanvas(id, widthPc, heightPc, redrawFcn) {
     applyTransfm();
     redrawFcn();
   });
-  canv.style.height = 100 * heightPc + "vh";
-  canv.style.width = 100 * widthPc + "vw";
   canv.width = window.innerWidth * widthPc;
   canv.height = window.innerHeight * heightPc;
   redrawFcn();
@@ -558,12 +592,41 @@ function populateStops() {
       handlePassenger(pass2);
       stops[stopAdded].waiting.push(pass2);
       let stop = stops[stopAdded];
-      if (stop.waiting.length > stop.capacity && stop.failureTimer < 0)
-        stop.failureTimer = Date.now();
+      if (stop.waiting.length > stop.capacity && !stop.failing) {
+        stop.failing = true;
+        stop.failureTimer = 0;
+      }
     }
   }
 }
+var vis = function() {
+  var stateKey, eventKey, keys = {
+    hidden: "visibilitychange",
+    webkitHidden: "webkitvisibilitychange",
+    mozHidden: "mozvisibilitychange",
+    msHidden: "msvisibilitychange"
+  };
+  for (stateKey in keys) {
+    if (stateKey in document) {
+      eventKey = keys[stateKey];
+      break;
+    }
+  }
+  return function(c) {
+    if (c)
+      document.addEventListener(eventKey, c);
+    return !document[stateKey];
+  };
+}();
 function preLoad() {
+  vis(() => {
+    if (vis())
+      document.title = "thing";
+    else {
+      paused = true;
+      document.title = "thing (paused)";
+    }
+  });
   canv = byId("canv");
   ctx = canv.getContext("2d");
   registerMaximisingCanvas("canv", 1, 0.95, redraw);
@@ -623,9 +686,17 @@ function preLoad() {
   scale(totalScaleFac);
   translate(canv.width / 2, canv.height / 2);
   redraw();
+  requestAnimationFrame(tickLoop);
   requestAnimationFrame(animLoop);
+  startTick = timeNow();
   startTime = Date.now();
-  setTimeout(stopPopulationLoop, 5e3);
+  asyncEvents.push({ fcn: stopPopulationLoop, time: timeNow() + 5e3 / currSpeed });
+}
+function animLoop() {
+  let delta = Date.now() - startTime;
+  startTime = Date.now();
+  redraw(delta);
+  requestAnimationFrame(animLoop);
 }
 function nearestConnection(x, y) {
   let bestDist = K.INF;
@@ -666,20 +737,28 @@ function pDist(x, y, x1, y1, x2, y2) {
   var dy = y - yy;
   return Math.sqrt(dx * dx + dy * dy);
 }
-function animLoop() {
+function tickLoop() {
+  globalTicks += 16.66667 * currSpeed;
+  for (let i = 0; i < asyncEvents.length; i++) {
+    if (timeNow() > asyncEvents[i].time) {
+      asyncEvents[i].fcn();
+      asyncEvents.splice(i, 1);
+      i--;
+    }
+  }
   for (let i = 0; i < trains.length; i++) {
     let currTrain = trains[i];
     let distTotal = distBtw(trains[i].to, trains[i].from);
-    let distTravelled = (Date.now() - currTrain.startT) * trainSpeed;
+    let distTravelled = (timeNow() - currTrain.startT) * trainSpeed;
     let percentCovered = distTravelled / distTotal;
     if (percentCovered < 0)
       continue;
     if (percentCovered >= 1) {
-      let startT = Date.now();
+      let startT = timeNow();
       percentCovered = 0;
       let currentTo = trains[i].to;
       let currStop = nearestStop(currentTo, 1);
-      let delay = dropOff(currTrain, currentTo) * K.DELAYPERPASSENGER;
+      let delay = dropOff(currTrain, currentTo) * K.DELAYPERPASSENGER / currSpeed;
       let reverseQ = true;
       let nextStop2 = null;
       let prevStop = currTrain.from;
@@ -693,7 +772,7 @@ function animLoop() {
           pass2.stop = currStop;
           pass2.train = currTrain;
           pass2.route.shift();
-          delay += K.DELAYPERPASSENGER;
+          delay += K.DELAYPERPASSENGER / currSpeed;
         }
       }
       for (let j = 0; j < connections.length; j++) {
@@ -714,7 +793,7 @@ function animLoop() {
           currStop.waiting[j].actionStatus = K.BOARDPENDING;
           currStop.waiting[j].stop = currStop;
           currStop.waiting[j].train = currTrain;
-          delay += K.DELAYPERPASSENGER;
+          delay += K.DELAYPERPASSENGER / currSpeed;
         }
       }
       for (let k = 0; k < currStop.waiting.length; k++) {
@@ -726,7 +805,7 @@ function animLoop() {
           currStop.waiting[k].stop = currStop;
           currStop.waiting[k].train = currTrain;
         }
-        delay += K.DELAYPERPASSENGER;
+        delay += K.DELAYPERPASSENGER / currSpeed;
       }
       if (delay > 0)
         currTrain.startT = K.INF;
@@ -734,27 +813,30 @@ function animLoop() {
       currTrain.from = currTrain.to;
       currTrain.to = nextStop2;
       handleAwaiting(currTrain, currStop);
-      if (Date.now() - startT > 25)
-        console.log("WARNING: StopHandler took ", Date.now() - startT + "ms");
+      if (timeNow() - startT > 25)
+        console.log("WARNING: StopHandler took ", timeNow() - startT + "ms");
     }
     currTrain.x = currTrain.from.x + (currTrain.to.x - currTrain.from.x) * percentCovered;
     currTrain.y = currTrain.from.y + (currTrain.to.y - currTrain.from.y) * percentCovered;
   }
   for (let i = 0; i < stops.length; i++) {
-    if (stops[i].failureTimer < 0)
+    if (stops[i].failurePct < 0)
       continue;
-    let pctRemaining = (Date.now() - stops[i].failureTimer) / K.FAILTIME;
-    if (pctRemaining > 1.1) {
-      alertDialog("loser!", () => {
-        location.reload();
-      });
-      return;
+    let pctRemaining = stops[i].failurePct;
+    if (pctRemaining > 1) {
+      currSpeed *= 0.99;
     }
   }
-  let delta = Date.now() - startTime;
-  startTime = Date.now();
-  redraw(delta);
-  requestAnimationFrame(animLoop);
+  let delta = timeNow() - startTick;
+  startTick = timeNow();
+  for (let stop of stops) {
+    if (stop.failing)
+      stop.failurePct += K.PCTPERTICK * delta;
+    else
+      stop.failurePct = Math.max(0, stop.failurePct - K.PCTPERTICK * delta);
+  }
+  if (!paused)
+    requestAnimationFrame(tickLoop);
 }
 function handleAwaiting(currTrain, currStop) {
   let handled = false;
@@ -774,8 +856,9 @@ function handleAwaiting(currTrain, currStop) {
           currTrain.passengers.push(pass2);
           break;
         }
-      if (currStop.waiting.length < currStop.capacity)
-        currStop.failureTimer = -1;
+      if (currStop.waiting.length < currStop.capacity) {
+        currStop.failing = false;
+      }
       pass2.status = K.ONTHEWAY;
       pass2.actionStatus = K.NOACTION;
       handled = true;
@@ -789,7 +872,7 @@ function handleAwaiting(currTrain, currStop) {
         }
       pass2.status = K.WAITING;
       if (currStop.waiting.length < currStop.capacity)
-        currStop.failureTimer = -1;
+        currStop.failing = false;
       pass2.actionStatus = K.NOACTION;
       handled = true;
       break;
@@ -804,19 +887,20 @@ function handleAwaiting(currTrain, currStop) {
       pass2.status = K.WAITING;
       pass2.actionStatus = K.NOACTION;
       let stop = currStop;
-      if (stop.waiting.length > stop.capacity && stop.failureTimer < 0)
-        stop.failureTimer = Date.now();
+      if (stop.waiting.length > stop.capacity && stop.failurePct < 1)
+        stop.failing = true;
       handled = true;
       break;
     } else
       throw "invalid actionStatus!";
   }
-  if (handled)
-    setTimeout(() => {
+  if (handled) {
+    let toCall = { fcn: () => {
       handleAwaiting(currTrain, currStop);
-    }, K.DELAYPERPASSENGER);
-  else {
-    currTrain.startT = Date.now();
+    }, time: timeNow() + K.DELAYPERPASSENGER / currSpeed };
+    asyncEvents.push(toCall);
+  } else {
+    currTrain.startT = timeNow();
     for (const affectedConn of connections) {
       if (affectedConn.pendingRemove) {
         let canUpdate = true;
@@ -848,7 +932,7 @@ function dropOff(currTrain, pt) {
 function stopPopulationLoop() {
   populateStops();
   redraw();
-  setTimeout(stopPopulationLoop, 5e3 + Math.random() * 7e3);
+  asyncEvents.push({ fcn: stopPopulationLoop, time: timeNow() + (5e3 + Math.random() * 7e3) / currSpeed });
 }
 function updateMinScl(newVal = minSclFac) {
   minSclFac = newVal;
@@ -877,7 +961,8 @@ function addNewStop(type = -1) {
   newPt.linesServed = /* @__PURE__ */ new Set();
   newPt.type = type;
   newPt.toAdd = [];
-  newPt.failureTimer = -1;
+  newPt.failing = false;
+  newPt.failurePct = 0;
   newPt.capacity = 6;
   redraw();
 }
@@ -903,7 +988,10 @@ function onmove(ev) {
         if (samePt(currPath[i], nStop))
           canAdd = false;
       }
-      if (!canAdd && currPath.length > 2 && samePt(nStop, currPath[0]) && !samePt(nStop, lastStop)) {
+      let newConn = { from: lastStop, to: nStop };
+      if (parallelStops(newConn).ct >= 3)
+        canAdd = false;
+      else if (!canAdd && currPath.length > 2 && samePt(nStop, currPath[0]) && !samePt(nStop, lastStop)) {
         currPath.push(nStop);
         routeConfirm();
       }
@@ -971,6 +1059,8 @@ function onmove(ev) {
       if (currLine.path[0] == currLine.path[currLine.path.length - 1])
         currLine.loopingQ = true;
       extendInfo = null;
+      for (let pass2 of passengers)
+        handlePassenger(pass2);
       holdState = K.NOHOLD;
       routeConfirm();
     }
@@ -1007,7 +1097,7 @@ function onmove(ev) {
     }
     if (!setSelected && activeSettingsDialog)
       activeSettingsDialog.selected = null;
-    if (rmSettings && nConn) {
+    if (rmSettings && nConn && holdState == K.NOHOLD) {
       hoveringConn = nConn;
       document.body.style.cursor = "pointer";
     } else if (rmSettings && holdState == K.NOHOLD)
@@ -1016,6 +1106,7 @@ function onmove(ev) {
   if (rmSettings) {
     activeSettingsDialog = null;
   }
+  redraw();
 }
 function terminals(stop) {
   let out = [];
@@ -1027,7 +1118,7 @@ function terminals(stop) {
 function updateToNow(currLine, conn) {
   let idx = connections.indexOf(conn);
   connections.splice(idx, 1);
-  recentlyRemoved.push({ conn, time: Date.now() });
+  recentlyRemoved.push({ conn, time: timeNow() });
 }
 function routeConfirm(ev) {
   holdState = K.NOHOLD;
@@ -1116,7 +1207,7 @@ function routeConfirm(ev) {
       to: currPath[1],
       lineID: lineCt,
       colour: currCol,
-      startT: Date.now(),
+      startT: timeNow(),
       status: K.MOVING,
       passengers: [],
       cap: 6,
@@ -1129,7 +1220,7 @@ function routeConfirm(ev) {
       to: currPath[currPath.length - 2],
       lineID: lineCt,
       colour: currCol,
-      startT: Date.now(),
+      startT: timeNow(),
       status: K.MOVING,
       passengers: [],
       cap: 6,
@@ -1145,11 +1236,6 @@ function routeConfirm(ev) {
   if (!ev || !downPt || distBtw({ x: ev.clientX, y: ev.clientY }, downPt) > 10)
     return;
   ctx.beginPath();
-  let actualPos = fromCanvPos(ev.clientX, ev.clientY);
-  ctx.moveTo(actualPos.x - 0.5, actualPos.y - 0.5);
-  ctx.lineTo(actualPos.x + 0.5, actualPos.y + 0.5);
-  ctx.stroke();
-  ctx.fillText(actualPos.x.toFixed(2) + ", " + actualPos.y.toFixed(2), actualPos.x, actualPos.y);
 }
 function samePt(pt1, pt2) {
   return Math.abs(pt1.x - pt2.x) < 0.1 && Math.abs(pt1.y - pt2.y) < 0.1;
@@ -1212,7 +1298,8 @@ function scale(scl) {
 function applyTransfm() {
   ctx.setTransform(transfm[0], transfm[3], transfm[1], transfm[4], transfm[2], transfm[5]);
 }
-function square(scl, x, y) {
+function square(scl, x, y, stroke = false) {
+  scl *= 0.9;
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(x - 3 * scl, y - 3 * scl);
@@ -1221,23 +1308,39 @@ function square(scl, x, y) {
   ctx.lineTo(x - 3 * scl, y + 3 * scl);
   ctx.lineTo(x - 3 * scl, y - 3 * scl);
   ctx.fill();
+  if (stroke)
+    ctx.stroke();
   ctx.beginPath();
   ctx.restore();
 }
-function triangle(scl, x, y) {
+function triangle(scl, x, y, stroke = false) {
+  scl *= 1.1;
   ctx.save();
   ctx.beginPath();
-  ctx.moveTo(x - 3 * scl, y + 3 * scl);
-  ctx.lineTo(x, y - 3 * scl);
-  ctx.lineTo(x + 3 * scl, y + 3 * scl);
-  ctx.lineTo(x - 3 * scl, y + 3 * scl);
+  ctx.moveTo(x - 3 * scl, y + 2 * scl);
+  ctx.lineTo(x, y - 4 * scl);
+  ctx.lineTo(x + 3 * scl, y + 2 * scl);
+  ctx.lineTo(x - 3 * scl, y + 2 * scl);
   ctx.fill();
+  if (stroke)
+    ctx.stroke();
   ctx.beginPath();
   ctx.restore();
 }
-function circ() {
+function circ(scl, x, y, stroke = false) {
+  ctx.beginPath();
+  ctx.arc(x, y, 3 * scl, 0, K.PI * 2);
+  ctx.fill();
+  if (stroke)
+    ctx.stroke();
+  ctx.beginPath();
 }
-function star(scl, x, y) {
+function diamond(scl, x, y) {
+  ctx.beginPath();
+  ctx.moveTo();
+}
+function star(scl, x, y, stroke = false) {
+  scl *= 1.2;
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(x - 3 * scl, y + 1 * scl);
@@ -1252,6 +1355,8 @@ function star(scl, x, y) {
   ctx.lineTo(x - 1.25 * scl, y - 0.5 * scl);
   ctx.lineTo(x - 3 * scl, y + 1 * scl);
   ctx.fill();
+  if (stroke)
+    ctx.stroke();
   ctx.beginPath();
   ctx.restore();
 }

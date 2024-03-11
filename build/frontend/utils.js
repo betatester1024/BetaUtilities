@@ -188,7 +188,7 @@ function pointerUp(ev) {
   DRAGGING = null;
   origLeft = -1;
   origTop = -1;
-  if (ev.target instanceof HTMLElement)
+  if (ev.target instanceof HTMLDocument)
     return;
   if (ev.target.classList.contains("ALERT_DRAGGER")) {
     if (Date.now() - lastPtrUp < 300) {
@@ -780,7 +780,7 @@ function bSelRegister(id, onChange, defaultVal) {
 function bSelInitialise() {
   console.log("Initialising BetterSelects");
   document.addEventListener("pointerup", (e) => {
-    if (!e.target || e.target instanceof HTMLElement)
+    if (!e.target || e.target instanceof HTMLDocument)
       return;
     if (e.target.closest(".bSel"))
       return;

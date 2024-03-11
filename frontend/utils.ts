@@ -221,7 +221,7 @@ function pointerUp(ev:PointerEvent)
   // if (ev.target.nodeName == "SPAN" && ev.target.parentElement &&
       // ev.target.closest(".ALERT_NONBLOCK") != null)  
     // closeNBD(ev.target.parentElement.parentElement.parentElement, false)
-  if (ev.target instanceof HTMLElement) return; // released outside the doc
+  if (ev.target instanceof HTMLDocument) return; // released outside the doc
   if (ev.target.classList.contains("ALERT_DRAGGER")) {
     if (Date.now() - lastPtrUp < 300) // up-up = doubleclick
     {
@@ -925,7 +925,7 @@ function bSelInitialise() {
   // bSelRegister("selCtn", (value)=>{console.log(value);});
   // <!-- bSelRegister("selCtn2"); -->
   document.addEventListener("pointerup", (e)=>{
-    if (!e.target || e.target instanceof HTMLElement) return; // released outside the doc
+    if (!e.target || e.target instanceof HTMLDocument) return; // released outside the doc
     if (e.target.closest(".bSel")) return;
     // console.log("clicked away");
     for (let i=0; i<registered.length; i++) 

@@ -32,15 +32,19 @@ const K = {
   DEBOARDPENDING:2, // just deboarding
   TRANSFERPENDING:3 // deboarding FOR TRANSFER.
 }
+
+let paused = false;
 const trainSpeed = 100 / 1000; // pixels/ms
 let holdState = K.NOHOLD;
 let activeSettingsDialog = null;
 let ctx = null;
 let canv = null;
+let startTick = -1;
 let startTime = -1;
 let totalScaleFac = 1;
 let hovering = null, hoveringConn = null;
 let stops = [];
+let asyncEvents = [];
 let modifyingConn = null;
 let recentlyRemoved = [];
 let connections = [];
@@ -61,10 +65,10 @@ let passengersServed = 0;
 let cash = 0;
 let maxUnlockedType = 0;
 const acceptRadius = 30;
-const stopSz = 20;
+const stopSz = 17;
 let adj = [];
 let passengers = [];
-let currPos_canv = null;
+let currPos_canv = {x:0,y:0};
 let lineCt = 0;
 let shiftStatus = false;
 let downPt = null;
@@ -84,6 +88,14 @@ return (1-t)**2*p1 + 2*(1-t)*t*p2 + t**2*p3;
 
 function timeNow() {
   return globalTicks;
+}
+
+function togglePause() {
+  paused = !paused;
+  redraw();
+  if (!paused) {
+    requestAnimationFrame(tickLoop);
+  }
 }
 
 function parallelStops(cmp) {
@@ -170,6 +182,7 @@ function getAssociatedConnection(train) {
   return null;
 }
 function redraw(delta) {
+
   let fpsCurr = 1000/delta;
   ctx.lineCap = "round";
   // function connect(currPath, clr) {
@@ -188,7 +201,7 @@ function redraw(delta) {
   }
   function clearCircle(pt, rad) {
     ctx.beginPath();
-    ctx.fillStyle = getCSSProp("--system-grey3");
+    ctx.fillStyle = getCSSProp("--system-bg");
     ctx.save();
     ctx.arc(pt.x, pt.y, rad + 2, 0, K.PI * 2);
     ctx.clip();
@@ -200,12 +213,20 @@ function redraw(delta) {
     ctx.restore();
     ctx.beginPath();
   }
+
+  function clearShape(pt, rad) {
+    ctx.save();
+    ctx.fillStyle = getCSSProp("--system-bg");
+    
+    types[pt.type](rad/3, pt.x, pt.y);
+    ctx.restore();
+  }
   ctx.strokeStyle = defaultClr;
   updateMinScl();
   ctx.beginPath();
   ctx.save();
   ctx.resetTransform();
-  ctx.fillStyle = getCSSProp("--system-grey3");
+  ctx.fillStyle = getCSSProp("--system-bg");
   ctx.clearRect(0, 0, canv.width, canv.height);
   ctx.fillRect(0, 0, canv.width, canv.height);
   ctx.restore();
@@ -229,9 +250,10 @@ function redraw(delta) {
     ctx.fillStyle = getCSSProp("--system-green2");
     // ctx.strokeWidth = acceptRadius - stopSz;
     ctx.beginPath();
-    ctx.arc(hovering.x, hovering.y, acceptRadius, 0, K.PI*2);
+    // ctx.arc(hovering.x, hovering.y, acceptRadius, 0, K.PI*2);
+    types[hovering.type](acceptRadius/3, hovering.x, hovering.y);
     ctx.fill();
-    clearCircle({x:hovering.x,y:hovering.y},stopSz);
+    // clearCircle({x:hovering.x,y:hovering.y},stopSz);
     ctx.beginPath();
     ctx.restore();
   }
@@ -265,12 +287,6 @@ function redraw(delta) {
   }
 
 
-  ////////// little stop circles //////////
-  for (let i = 0; i < stops.length; i++) {
-    clearCircle(stops[i], stopSz);
-    renderStop(stops[i]);
-    // if ()
-  }
   // existing paths///////////
   for (let i = 0; i < connections.length; i++) {
     // if (lines.length > 0) ctx.arc(lines[i][0].x, lines[i][0].y, acceptRadius, 0, K.PI*2);
@@ -296,12 +312,75 @@ function redraw(delta) {
     let c = Math.cos(angBtw);
     let s = Math.sin(angBtw);
     // let newAng = angBtw;
-    ctx.moveTo(connections[i].from.x + c * stopSz + offset.x,
-      connections[i].from.y + s * stopSz          + offset.y);
-    ctx.lineTo(connections[i].to.x - c * stopSz   + offset.x,
-      connections[i].to.y - s * stopSz            + offset.y)
+    ctx.moveTo(connections[i].from.x + offset.x,
+      connections[i].from.y         + offset.y);
+    ctx.lineTo(connections[i].to.x   + offset.x,
+      connections[i].to.y          + offset.y)
     ctx.stroke();
+    ctx.beginPath();
+    for (let stop of stops) {
+      let dist =pDist(stop.x, stop.y, connections[i].from.x, connections[i].from.y, connections[i].to.x, connections[i].to.y);
+      if (!samePt(stop, connections[i].from) && !samePt(stop, connections[i].to) && 
+          dist < acceptRadius) {
+        let basex = stop.x + dist*Math.cos(angBtw+K.PI/2);
+        let basey = stop.y + dist*Math.sin(angBtw+K.PI/2);
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(basex-c*acceptRadius, basey-s*acceptRadius);
+        ctx.lineTo(basex+c*acceptRadius, basey+s*acceptRadius);
+        ctx.lineWidth = K.LINEWIDTH/2;
+        console.log("found!");
+        // ctx.globalCompositeOperation = "destination-out";
+        ctx.strokeStyle = getCSSProp("--system-bg");
+        ctx.stroke();
+        ctx.restore();
+        ctx.beginPath();
+      }
+    }
     ctx.restore();
+  }
+
+
+  let lastPt = currPath?currPath[currPath.length - 1]:null;
+  let nextStop = nearestStop(currPos_canv, acceptRadius);
+  if (holdState == K.HOLD_NEWLINE && (!nextStop || !samePt(nextStop, lastPt))){
+      ctx.moveTo(lastPt.x, lastPt.y);
+      ctx.save();
+      ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
+      ctx.lineWidth = K.LINEWIDTH;
+      ctx.lineTo(currPos_canv.x, currPos_canv.y);
+      ctx.stroke();
+      ctx.restore();
+  }
+
+  //////// current path /////////
+  // connect(currPath, getCSSProp("--system-green"));
+  ctx.save();
+  ctx.beginPath();
+  ctx.strokeStyle = defaultClr;
+  ctx.stroke();
+  for (let i = 1; i < currPath.length; i++) {
+    let angBtw = Math.atan2(currPath[i].y - currPath[i - 1].y,
+      currPath[i].x - currPath[i - 1].x);
+    ctx.beginPath();
+    let c = Math.cos(angBtw);
+    let s = Math.sin(angBtw);
+    ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
+    ctx.lineWidth = K.LINEWIDTH;
+    ctx.moveTo(currPath[i - 1].x, currPath[i - 1].y);
+    ctx.lineTo(currPath[i].x, currPath[i].y)
+    ctx.stroke();
+    ctx.strokeStyle = defaultClr;
+  }
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+
+
+  ////////// little stop circles //////////
+  for (let i = 0; i < stops.length; i++) {
+    // clearCircle(stops[i], stopSz);
+    renderStop(stops[i]);
+    // if ()
   }
 
   for (let i=0; i<recentlyRemoved.length; i++) {
@@ -325,45 +404,31 @@ function redraw(delta) {
 
   ctx.save();
   ctx.lineWidth = 4;
-  //////// current path /////////
-  // connect(currPath, getCSSProp("--system-green"));
-  ctx.save();
-  ctx.beginPath();
-  ctx.strokeStyle = defaultClr;
-  ctx.stroke();
-  for (let i = 1; i < currPath.length; i++) {
-    let angBtw = Math.atan2(currPath[i].y - currPath[i - 1].y,
-      currPath[i].x - currPath[i - 1].x);
-    ctx.beginPath();
-    let c = Math.cos(angBtw);
-    let s = Math.sin(angBtw);
-    ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
-    ctx.lineWidth = K.LINEWIDTH;
-    ctx.moveTo(currPath[i - 1].x + c * acceptRadius, currPath[i - 1].y + s * acceptRadius);
-    ctx.lineTo(currPath[i].x - c * acceptRadius, currPath[i].y - s * acceptRadius)
-    ctx.stroke();
-    ctx.strokeStyle = defaultClr;
-  }
-  ctx.lineWidth = 4;
-  ctx.beginPath();
 
 
   //////////////// existing path line circles ////////////////////
   for (let i = 0; i < connections.length; i++) {
     // ctx.strokeStyle = getCSSProp("--")
-    clearCircle(connections[i].from, stopSz);
-    clearCircle(connections[i].to, stopSz);
+    // clearCircle(connections[i].from, stopSz);
+    // clearCircle(connections[i].to, stopSz);
     ctx.beginPath();
-    // ctx.lineWidth = K.LINEWIDTH;      
+    // ctx.lineWidth = K.LINEWIDTH;    
+    ctx.fillStyle = getCSSProp("--system-bg");  
     ctx.strokeStyle = defaultClr;
-    ctx.arc(connections[i].from.x, connections[i].from.y, stopSz, 0, K.PI * 2);
+    // ctx.fillStyle = getCSSProp("--system-bg" );
+    ctx.lineWidth = K.LINEWIDTH;
+    ctx.lineJoin = "round";
+    types[connections[i].from.type](stopSz/3, connections[i].from.x, connections[i].from.y, true)
+    // ctx.arc(connections[i].from.x, connections[i].from.y, stopSz, 0, K.PI * 2);
     ctx.stroke();
     ctx.beginPath();
-    ctx.arc(connections[i].to.x, connections[i].to.y, stopSz, 0, K.PI * 2);
+    types[connections[i].to.type](stopSz/3, connections[i].to.x, connections[i].to.y, true)
     ctx.stroke();
     // circle(connections[i].from)//, connections[i].colour);
     // circle(connections[i].to) //, connections[i].colour);
   }
+
+
   
   ctx.restore();
   ctx.beginPath();
@@ -372,65 +437,67 @@ function redraw(delta) {
   ctx.beginPath();
   if (holdState == K.HOLD_NEWLINE) {
     // must have a starting poibt
-    let lastPt = currPath[currPath.length - 1];
+    
     let angBtw = Math.atan2(currPos_canv.y - lastPt.y,
       currPos_canv.x - lastPt.x);
     let c = Math.cos(angBtw);
     let s = Math.sin(angBtw);
-    let nextStop = nearestStop(currPos_canv, acceptRadius);
+    // let nextStop = nearestStop(currPos_canv, acceptRadius);
     if (nextStop && samePt(nextStop, lastPt)) { // accepted new stop
-      clearCircle(lastPt, acceptRadius);
+      clearShape(lastPt, acceptRadius);
       ctx.save();
       ctx.beginPath();
-      ctx.lineWidth = 4;
+      ctx.lineWidth = K.LINEWIDTH;
       ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
-      ctx.arc(lastPt.x, lastPt.y, stopSz, 0, K.PI * 2);
-      ctx.stroke();
-      circle(lastPt);
+      // ctx.arc(lastPt.x, lastPt.y, stopSz, 0, K.PI * 2);
+      ctx.fillStyle = "rgba(0,0,0,0)";
+      ctx.lineJoin = "round";
+      // ctx.stroke();
+      // circle(lastPt);
+      types[lastPt.type](stopSz/3, lastPt.x, lastPt.y, true)
+      types[lastPt.type](acceptRadius/3, lastPt.x, lastPt.y, true)
       ctx.restore();
 
     }
     ctx.beginPath();
     // else if (!nextStop) {
-    if (nextStop && samePt(nextStop, lastPt)); // return;
+    
     // THERE'S A PROBLEM.
-    else if (nextStop) {
+    // else if (nextStop) {
 
-      angBtw = Math.atan2(nextStop.y - lastPt.y,
-        nextStop.x - lastPt.x);
-      c = Math.cos(angBtw);
-      s = Math.sin(angBtw);
-      ctx.moveTo(lastPt.x + c * acceptRadius, lastPt.y + s * acceptRadius);
+    //   angBtw = Math.atan2(nextStop.y - lastPt.y,
+    //     nextStop.x - lastPt.x);
+    //   c = Math.cos(angBtw);
+    //   s = Math.sin(angBtw);
+    //   ctx.moveTo(lastPt.x + c * acceptRadius, lastPt.y + s * acceptRadius);
 
-      ctx.save();
-      ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
-      ctx.lineWidth = K.LINEWIDTH;
-      ctx.lineTo(nextStop.x - c * acceptRadius, nextStop.y - s * acceptRadius);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = getCSSProp("--system-red");
-      ctx.arc(nextStop.x, nextStop.y, stopSz, 0, K.PI * 2);
-      ctx.stroke();
-      circle(nextStop);
-      ctx.restore();
-    }
+    //   ctx.save();
+    //   ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
+    //   ctx.lineWidth = K.LINEWIDTH;
+    //   ctx.lineTo(nextStop.x - c * acceptRadius, nextStop.y - s * acceptRadius);
+    //   ctx.stroke();
+    //   ctx.beginPath();
+    //   ctx.lineWidth = 4;
+    //   ctx.strokeStyle = getCSSProp("--system-red");
+    //   ctx.arc(nextStop.x, nextStop.y, stopSz, 0, K.PI * 2);
+    //   ctx.stroke();
+    //   circle(nextStop);
+    //   ctx.restore();
+    // }
     // just not connected yet.
-    else {
-      ctx.moveTo(lastPt.x + c * acceptRadius, lastPt.y + s * acceptRadius);
-      ctx.save();
-      ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
-      ctx.lineWidth = K.LINEWIDTH;
-      ctx.lineTo(currPos_canv.x, currPos_canv.y);
-      ctx.stroke();
-      ctx.restore();
-    }
+   
 
     //////////////// then put the current path large circles /////////
     for (let i = 0; i < currPath.length; i++) {
       ctx.save();
       ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
-      circle(currPath[i]);
+      // circle(currPath[i]);
+      ctx.lineJoin = "round";
+      ctx.fillStyle = "rgba(0,0,0,0)";
+      // ctx.strokeS
+      // types[currPath[i].type](stopSz/3, currPath[i].x, currPath[i].y, true);
+      ctx.lineWidth = K.LINEWIDTH;
+      types[currPath[i].type](acceptRadius/3, currPath[i].x, currPath[i].y, true);
       ctx.restore();
     }
     // if (!samePt(nextStop, lastPt)) 
@@ -478,9 +545,12 @@ function redraw(delta) {
     }
     ctx.restore();
   }
+
+  for (let stop of stops) {
+    drawWaiting(stop);
+  }
   
-  for (let i = 0; i < stops.length; i++)
-    ctx.fillText(stops[i].type, stops[i].x, stops[i].y)
+  // for (let i = 0; i < stops.length; i++)
   // now we draw the trains!
   for (let i = 0; i < trains.length; i++) {
     ctx.beginPath();
@@ -530,10 +600,7 @@ function redraw(delta) {
       if (j>=cap/2) y = 1;
       let px = j%(cap/2)*uSz+uSz/2-h/2;
       let py = y*uSz+uSz/2-w/2;
-      if (trains[i].passengers[j].to == 0) star(1.2, px, py);
-      else if (trains[i].passengers[j].to == 1) square(0.9, px, py);
-        else if (trains[i].passengers[j].to == 2) triangle(1, px, py);
-      else ctx.fillText(trains[i].passengers[j].to, px, py);
+      types[trains[i].passengers[j].to](1, px, py);
 
     }
     // ctx.moveTo(-w/2, -h/2);
@@ -541,7 +608,6 @@ function redraw(delta) {
     // ctx.stroke();
     ctx.beginPath();
     ctx.restore();
-    // ctx.fillText(str, center.x, center.y)
     // ctx.fillRect(center.x - 8, center.y-2.5, 16, 5);
     ctx.restore();
   }
@@ -549,7 +615,7 @@ function redraw(delta) {
   if (activeSettingsDialog) {
     let stop = activeSettingsDialog.stop;
     let h = -activeSettingsDialog.hgt*
-      Math.min(1, (timeNow()-activeSettingsDialog.time)/K.ANIM_SETTINGSDIALOG);
+      Math.min(1, (Date.now()-activeSettingsDialog.time)/K.ANIM_SETTINGSDIALOG);
     ctx.save();
     ctx.beginPath();
     ctx.fillStyle = getCSSProp("--system-overlay");
@@ -600,21 +666,54 @@ function redraw(delta) {
 
   }
 
+  if (paused) {
+    
+    ctx.save();
+    ctx.resetTransform();
+    // ctx.fillRect(0,0, canv.width, canv.height);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = getCSSProp("--system-blue");
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.font = "30px Noto Sans Display";
+
+    ctx.fillText("Paused", 50, 50);
+    ctx.restore();
+  }
+
 } // redraw()
 
 function renderStop(stop) {
-  ctx.beginPath();
-  ctx.arc(stop.x, stop.y, stopSz, 0, K.PI * 2);
-  ctx.stroke();
+  // ctx.arc(stop.x, stop.y, stopSz, 0, K.PI * 2);
+  // ctx.stroke();
   ctx.beginPath();
   ctx.fillStyle = defaultClr;
-  let out = " ";
-  for (let j = 0; j < stop.waiting.length; j++) {
-    out += stop.waiting[j].to.toString();
-  }
-  ctx.fillText(out, stop.x + stopSz, stop.y - stopSz / 2);
-  ctx.fillText(stop.type, stop.x, stop.y)
+  
+  
+
+  types[stop.type](stopSz/3, stop.x, stop.y);
   ctx.beginPath();
+}
+
+function drawWaiting(stop) {
+  let y = 0, x=0;
+  let dy = 15;
+  ctx.fillStyle = defaultClr;
+  let dx = 15;
+  const maxW = 5; // # waiting per line before linebreak
+  let baseOffset = Math.ceil(stop.waiting.length/maxW)*dy
+  for (let j = 0; j < stop.waiting.length; j++) {
+    if (x >= maxW) {
+      y++;
+      x=0;
+    }
+    let adjX = stop.x+stopSz+(x%maxW)*dx-dx/2;
+    let adjY = (stop.y-baseOffset)-stopSz+y*dy-dy/2;
+    x++;
+    types[stop.waiting[j].to](2, adjX, adjY);
+    // triangle(1.1, adjX, adjY)
+    // out += stop.waiting[j].to.toString();
+  }
 }
 
 function registerMaximisingCanvas(id, widthPc, heightPc, redrawFcn) { // (id:string, widthPc:number, heightPc:number, redrawFcn:()=>any) {
@@ -626,8 +725,8 @@ function registerMaximisingCanvas(id, widthPc, heightPc, redrawFcn) { // (id:str
     applyTransfm();
     redrawFcn();
   })
-  canv.style.height = 100 * heightPc + "vh";
-  canv.style.width = 100 * widthPc + "vw";
+  // canv.style.height = 100 * heightPc + "vh";
+  // canv.style.width = 100 * widthPc + "vw";
   canv.width = window.innerWidth * widthPc;
   canv.height = window.innerHeight * heightPc;
   redrawFcn();
@@ -656,7 +755,34 @@ function populateStops() {
   }
 }
 
+// https://stackoverflow.com/questions/19519535/detect-if-browser-tab-is-active-or-user-has-switched-away
+var vis = (function(){
+    var stateKey, eventKey, keys = {
+        hidden: "visibilitychange",
+        webkitHidden: "webkitvisibilitychange",
+        mozHidden: "mozvisibilitychange",
+        msHidden: "msvisibilitychange"
+    };
+    for (stateKey in keys) {
+        if (stateKey in document) {
+            eventKey = keys[stateKey];
+            break;
+        }
+    }
+    return function(c) {
+        if (c) document.addEventListener(eventKey, c);
+        return !document[stateKey];
+    }
+})();
+
 function preLoad() {
+  vis(()=>{
+    if (vis()) document.title = "thing";
+    else {
+      paused = true;
+      document.title = "thing (paused)"
+    }
+  })
   canv = byId("canv");
   ctx = canv.getContext("2d");
   registerMaximisingCanvas("canv", 1, 0.95, redraw);
@@ -665,6 +791,7 @@ function preLoad() {
   }
   canv.addEventListener("pointermove", onmove);
   canv.addEventListener("pointerdown", (ev) => {
+    // if (paused) return;
     if (event.button != 0) return;
     holdState = K.HOLD;
     downPt = { x: ev.clientX, y: ev.clientY };
@@ -693,7 +820,13 @@ function preLoad() {
   });
   window.addEventListener("keydown", keyUpdate);
   window.addEventListener("keyup", keyUpdate);
-  window.addEventListener("pointerup", (e)=>{routeConfirm(e); onmove(e);});
+  window.addEventListener("pointerup", (e)=>{
+    // if (paused) {
+    //   togglePause();
+    //   return;
+    // }
+    routeConfirm(e); onmove(e);
+  });
   canv.addEventListener("wheel", (ev) => {
     // larger -ve deltaY: 
     // ctx.
@@ -726,10 +859,19 @@ function preLoad() {
   translate(canv.width / 2, canv.height / 2);
   redraw();
   //////
-  // setInterval(animLoop, 1000/60);
+  // setInterval(tickLoop, 1000/60);
+  requestAnimationFrame(tickLoop);
   requestAnimationFrame(animLoop);
-  startTime = timeNow();
-  setTimeout(stopPopulationLoop, 5000/currSpeed);
+  startTick = timeNow();
+  startTime = Date.now();
+  asyncEvents.push({fcn:stopPopulationLoop, time:timeNow()+5000/currSpeed});
+}
+
+function animLoop() {
+  let delta = Date.now() - startTime;
+  startTime = Date.now();
+  redraw(delta);
+  requestAnimationFrame(animLoop);
 }
 
 function nearestConnection(x, y) {
@@ -784,8 +926,15 @@ function pDist(x, y, x1, y1, x2, y2) { // dist between line SEGMENT and pt
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-function animLoop() {
+function tickLoop() {
   globalTicks += 16.66667*currSpeed; // 60fps default
+  for (let i=0; i<asyncEvents.length; i++) {
+    if (timeNow() > asyncEvents[i].time) {
+      asyncEvents[i].fcn();
+      asyncEvents.splice(i, 1);
+      i--;
+    } 
+  }
   for (let i = 0; i < trains.length; i++) {
     let currTrain = trains[i];
     let distTotal = distBtw(trains[i].to, trains[i].from);
@@ -922,14 +1071,14 @@ function animLoop() {
       // return;
     }
   }
-  let delta = timeNow() - startTime;
-  startTime = timeNow();
+  let delta = timeNow() - startTick;
+  startTick = timeNow();
   for (let stop of stops) {
     if (stop.failing) stop.failurePct+=K.PCTPERTICK*delta;
     else stop.failurePct= Math.max(0, stop.failurePct-K.PCTPERTICK*delta)
   }
-  redraw(delta);
-  requestAnimationFrame(animLoop);
+  // redraw(delta);
+  if (!paused) requestAnimationFrame(tickLoop);
 }
 
 function handleAwaiting(currTrain, currStop) {
@@ -991,7 +1140,11 @@ function handleAwaiting(currTrain, currStop) {
     }
     else throw("invalid actionStatus!");
   }
-  if (handled) setTimeout(()=>{handleAwaiting(currTrain, currStop)}, K.DELAYPERPASSENGER/currSpeed);
+  if (handled) {
+    
+    let toCall = {fcn:()=>{handleAwaiting(currTrain, currStop)}, time:timeNow()+K.DELAYPERPASSENGER/currSpeed};
+    asyncEvents.push(toCall);
+  }
   else {
     currTrain.startT = timeNow();
     for (const affectedConn of connections) {
@@ -1032,7 +1185,7 @@ function dropOff(currTrain, pt) {
 function stopPopulationLoop() {
   populateStops();
   redraw();
-  setTimeout(stopPopulationLoop, (5000 + Math.random() * 7000)/currSpeed);
+  asyncEvents.push({fcn:stopPopulationLoop, time:timeNow()+(5000 + Math.random() * 7000)/currSpeed});
 }
 
 function updateMinScl(newVal = minSclFac) {
@@ -1082,6 +1235,7 @@ function onmove(ev) {
   // if (ev.shiftKey) {
   //   document.body.style.cursor = "grabbing";
   // }
+  // if (paused) return;
   hovering = null;
   let rmSettings = true;
   hoveringConn = null;
@@ -1104,7 +1258,9 @@ function onmove(ev) {
       for (let i = 0; i < currPath.length && canAdd; i++) {
         if (samePt(currPath[i], nStop)) canAdd = false;
       }
-      if (!canAdd && currPath.length > 2
+      let newConn = {from:lastStop, to:nStop};
+      if (parallelStops(newConn).ct >= 3) canAdd = false;
+      else if (!canAdd && currPath.length > 2
         && samePt(nStop, currPath[0]) && !samePt(nStop, lastStop)) {
         currPath.push(nStop);
         routeConfirm();
@@ -1187,7 +1343,7 @@ function onmove(ev) {
     let terms = terminals(nStop);
     if (terms && holdState == K.NOHOLD && (!activeSettingsDialog || activeSettingsDialog.stop != nStop)) {
       activeSettingsDialog = {
-        stop:nStop, time:timeNow()+50,
+        stop:nStop, time:Date.now()+50,
         hgt:K.SETTINGSHEIGHT*terms.length, lines:terms, selected:null};
       redraw();
     }
@@ -1215,7 +1371,7 @@ function onmove(ev) {
     }
     if (!setSelected && activeSettingsDialog) activeSettingsDialog.selected = null;
     // else if (activeSettingsDialog && currPos_canv.x < )
-    if (rmSettings && nConn) {
+    if (rmSettings && nConn && holdState == K.NOHOLD) {
       hoveringConn = nConn;
       document.body.style.cursor = "pointer";
     }
@@ -1224,6 +1380,7 @@ function onmove(ev) {
   if (rmSettings) {
     activeSettingsDialog = null;
   }
+  redraw();
 }
 
 function terminals(stop) {
@@ -1364,7 +1521,6 @@ function routeConfirm(ev) {
   // ctx.moveTo(actualPos.x - 0.5, actualPos.y - 0.5);
   // ctx.lineTo(actualPos.x + 0.5, actualPos.y + 0.5);
   // ctx.stroke();
-  // ctx.fillText(actualPos.x.toFixed(2) + ", " + actualPos.y.toFixed(2), actualPos.x, actualPos.y);
 }
 
 function samePt(pt1, pt2) {
@@ -1426,7 +1582,8 @@ function applyTransfm() {
   ctx.setTransform(transfm[0], transfm[3], transfm[1], transfm[4], transfm[2], transfm[5]);
 }
 
-function square(scl, x, y) {
+function square(scl, x, y, stroke=false) {
+  scl *= 0.9;
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(x-3*scl, y-3*scl);
@@ -1435,25 +1592,37 @@ function square(scl, x, y) {
   ctx.lineTo(x-3*scl, y+3*scl);
   ctx.lineTo(x-3*scl, y-3*scl);
   ctx.fill();
+  if (stroke) ctx.stroke();
   ctx.beginPath();
   ctx.restore();
 }
-function triangle(scl, x, y) {
+function triangle(scl, x, y, stroke=false) {
+  scl *= 1.1;
   ctx.save();
   ctx.beginPath();
-  ctx.moveTo(x-3*scl, y+3*scl);
+  ctx.moveTo(x-3*scl, y+2*scl);
   // ctx.lineTo(x+3*scl, y-3*scl);
-  ctx.lineTo(x, y-3*scl);
-  ctx.lineTo(x+3*scl, y+3*scl);
-  ctx.lineTo(x-3*scl, y+3*scl);
+  ctx.lineTo(x, y-4*scl);
+  ctx.lineTo(x+3*scl, y+2*scl);
+  ctx.lineTo(x-3*scl, y+2*scl);
   ctx.fill();
+  if (stroke) ctx.stroke();
   ctx.beginPath();
   ctx.restore();
 }
-function circ() {
-
+function circ(scl, x, y, stroke=false) {
+  ctx.beginPath();
+  ctx.arc(x, y, 3*scl, 0, K.PI*2);
+  ctx.fill();
+  if (stroke) ctx.stroke();
+  ctx.beginPath();
 }
-function star(scl,x,y) {
+function diamond(scl, x, y) {
+  ctx.beginPath();
+  ctx.moveTo()
+}
+function star(scl,x,y, stroke=false) {
+  scl *= 1.2;
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(x-3*scl,y+1*scl);
@@ -1468,6 +1637,7 @@ function star(scl,x,y) {
   ctx.lineTo(x-1.25*scl, y-0.5*scl);
   ctx.lineTo(x-3*scl, y+1*scl);
   ctx.fill();
+  if (stroke) ctx.stroke();
   ctx.beginPath();
   ctx.restore();
 }

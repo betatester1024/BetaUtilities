@@ -45,7 +45,7 @@ let canv = null;
 let startTick = -1;
 let startTime = -1;
 
-let basePopulationPool = 5;
+let basePopulationPool = 7;
 let currPopulationPool = 3;
 
 let totalScaleFac = 1;
@@ -91,6 +91,7 @@ let adj = [];
 
 
 let defaultClr = "#555";
+let linesAvailable = 3;
 const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
 
@@ -110,8 +111,8 @@ function timeNow() {
 
 function ingametime() {
   // 2s real-time, base ticks = 15 minutes in-game
-  let sec = Math.floor(globalTicks/1000*(15/2)*60);
-  let mins = Math.floor(globalTicks/1000*(15/2));
+  // let sec = Math.floor(globalTicks/1000*(15/2)*60);
+  let mins = Math.floor(globalTicks/1000*(20/2));
   let hrs = Math.floor(mins/60);
   let days = Math.floor(hrs/24);
   return {m:mins%60, h:hrs%60, d:days%365, y:Math.floor(days/365)};
@@ -182,7 +183,6 @@ function getAssociatedConnection(train) {
 }
 
 function populateStops() {
-  console.log("populated");
   for (let n = 0; n<currPopulationPool; n++) {
     let stopAdded = Math.floor(Math.random() * stops.length);
     // if (stopAdded >= stops[i].type) stopAdded++;
@@ -278,6 +278,11 @@ function tickLoop() {
   }
   for (let i = 0; i < trains.length; i++) {
     if (trains[i].pendingMove) continue;
+    if (trains[i].pendingRemove && trains[i].passengers.length == 0) {
+      trains.splice(i, 1);
+      i--;
+      continue;
+    }
     let currTrain = trains[i];
     let distTotal = distBtw(trains[i].to, trains[i].from);
     // distToCover = s * px/s / px
@@ -586,7 +591,7 @@ function addNewStop(type = -1) {
   newPt.waiting = [];
   newPt.linesServed = new Set();
   newPt.type = type;
-  newPt.addedTime = timeNow();
+  newPt.addedTime = Date.now();
   newPt.toAdd = [];
   newPt.failing = false;
   newPt.failurePct = 0;

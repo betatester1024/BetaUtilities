@@ -141,7 +141,7 @@ function onmove(ev) {
   else if (holdState == K.HOLD_TRAIN) {
     modifyingTrain.x = currPos_canv.x;
     modifyingTrain.y = currPos_canv.y;
-    if (nConn) {
+    if (nConn && !nConn.pendingRemove) {
       let dist = pDist(currPos_canv.x, currPos_canv.y, nConn.from.x, nConn.from.y, nConn.to.x, nConn.to.y);
       let angBtw = Math.atan2(nConn.from.y - nConn.to.y, nConn.from.x - nConn.to.x);
       modifyingTrain.x += Math.cos(angBtw+K.PI/2)*dist;
@@ -150,7 +150,16 @@ function onmove(ev) {
          modifyingTrain.x = currPos_canv.x + Math.cos(angBtw-K.PI/2)*dist;
          modifyingTrain.y = currPos_canv.y + Math.sin(angBtw-K.PI/2)*dist;
       }
+      let currLine = lines[modifyingTrain.lineID]
+      for (let i=0; i<currLine.trains.length; i++) {
+        if (currLine.trains[i] == modifyingTrain) {
+          currLine.trains.splice(i, 1);
+          break;
+        }
+      }
+      lines[nConn.lineID].trains.push(modifyingTrain);
       modifyingTrain.lineID = nConn.lineID;
+      
       modifyingTrain.from = nConn.from;
       modifyingTrain.to = nConn.to;
       // modifyingTrain.pendingRemove = false;
@@ -267,27 +276,30 @@ function routeConfirm(ev) {
         percentCovered:0, pendingMove:false
         //toAdd:[], toRemove:[], onCompletion:0
       };
-    let t2 = {
-        x: currPath[0].x, y: currPath[0].y,
-        from: currPath[currPath.length-1], to: currPath[currPath.length-2],
-        lineID: lineCt, colour: currCol, startT: timeNow(),
-        status: K.MOVING, passengers: [], cap:6, revDir:true,//, toAdd:[], toRemove:[], 
-        percentCovered: 0, pendingMove:false
-        //onCompletion:0
-      };
+    // let t2 = {
+    //     x: currPath[0].x, y: currPath[0].y,
+    //     from: currPath[currPath.length-1], to: currPath[currPath.length-2],
+    //     lineID: lineCt, colour: currCol, startT: timeNow(),
+    //     status: K.MOVING, passengers: [], cap:6, revDir:true,//, toAdd:[], toRemove:[], 
+    //     percentCovered: 0, pendingMove:false
+    //     //onCompletion:0
+    //   };
     trains.push(t1);
-    trains.push(t2);
-    currLine2.trains = [t1, t2];
+    // trains.push(t2);
+    currLine2.trains = [t1];
     lineCt++;
   }
   if (holdState == K.HOLD_TRAIN) {
-    
+    if (!nearestConnection(currPos_canv.x, currPos_canv.y)) {
+      modifyingTrain.pendingRemove = true;
+    }
     for (let pass of modifyingTrain.passengers) {
       pass.stop = modifyingTrain.dropOffLocation;
       pass.actionStatus = K.REBOARDREQUIRED;
     }
     modifyingTrain.moving = false;
     handleAwaiting(modifyingTrain, modifyingTrain.dropOffLocation);
+    modifyingTrain = null;
     holdState = K.NOHOLD;
   }
   holdState = K.NOHOLD;
@@ -329,7 +341,7 @@ function pointerdown(ev) {
   let nConn = nearestConnection(actualPos.x, actualPos.y);
   let nTrain = nearestTrain(actualPos.x, actualPos.y, K.LINEACCEPTDIST);
   
-  if (nStop && colours.length > 0) {
+  if (nStop && lines.length < linesAvailable) {
     holdState = K.HOLD_NEWLINE;
     activeSettingsDialog = null;
     currPath = [nStop];

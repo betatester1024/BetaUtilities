@@ -33,7 +33,7 @@ let ctx = null;
 let canv = null;
 let startTick = -1;
 let startTime = -1;
-let basePopulationPool = 5;
+let basePopulationPool = 7;
 let currPopulationPool = 3;
 let totalScaleFac = 1;
 let minSclFac = 0.5;
@@ -65,6 +65,7 @@ const stopSz = 17;
 let nextMilestone = 20;
 let adj = [];
 let defaultClr = "#555";
+let linesAvailable = 3;
 const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
 let globalTicks = 0;
@@ -76,8 +77,7 @@ function timeNow() {
   return globalTicks;
 }
 function ingametime() {
-  let sec = Math.floor(globalTicks / 1e3 * (15 / 2) * 60);
-  let mins = Math.floor(globalTicks / 1e3 * (15 / 2));
+  let mins = Math.floor(globalTicks / 1e3 * (20 / 2));
   let hrs = Math.floor(mins / 60);
   let days = Math.floor(hrs / 24);
   return { m: mins % 60, h: hrs % 60, d: days % 365, y: Math.floor(days / 365) };
@@ -140,7 +140,6 @@ function getAssociatedConnection(train) {
   return null;
 }
 function populateStops() {
-  console.log("populated");
   for (let n = 0; n < currPopulationPool; n++) {
     let stopAdded = Math.floor(Math.random() * stops.length);
     let currType = getNextType(stops[stopAdded].type);
@@ -232,6 +231,11 @@ function tickLoop() {
   for (let i = 0; i < trains.length; i++) {
     if (trains[i].pendingMove)
       continue;
+    if (trains[i].pendingRemove && trains[i].passengers.length == 0) {
+      trains.splice(i, 1);
+      i--;
+      continue;
+    }
     let currTrain = trains[i];
     let distTotal = distBtw(trains[i].to, trains[i].from);
     let distTravelled = (timeNow() - currTrain.startT) * trainSpeed;
@@ -322,7 +326,7 @@ function tickLoop() {
       stop.failurePct = Math.max(0, stop.failurePct - K.PCTPERTICK * delta);
   }
   for (let train of trains) {
-    if (train.pendingMove && train.passengers.length == 0) {
+    if (train.pendingMove && train.passengers.length == 0 && !train.moving) {
       train.pendingMove = false;
       train.startTime = timeNow();
     }
@@ -467,7 +471,7 @@ function addNewStop(type = -1) {
   newPt.waiting = [];
   newPt.linesServed = /* @__PURE__ */ new Set();
   newPt.type = type;
-  newPt.addedTime = timeNow();
+  newPt.addedTime = Date.now();
   newPt.toAdd = [];
   newPt.failing = false;
   newPt.failurePct = 0;

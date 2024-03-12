@@ -57,9 +57,9 @@ function redraw(delta) {
     ctx.lineTo(-viewportW / 2, -viewportH / 2);
     ctx.stroke();
     ctx.save();
-    if (fpsCurr < 40)
+    if (fpsCurr < 25)
       ctx.fillStyle = getCSSProp("--system-red");
-    else if (fpsCurr < 50)
+    else if (fpsCurr < 40)
       ctx.fillStyle = getCSSProp("--system-yellowtext");
     else
       ctx.fillStyle = getCSSProp("--system-green");
@@ -135,7 +135,6 @@ function redraw(delta) {
         let basex = stop.x + dist * Math.cos(angBtw + K.PI / 2);
         let basey = stop.y + dist * Math.sin(angBtw + K.PI / 2);
         if (pDist(basex, basey, connections[i].from.x, connections[i].from.y, connections[i].to.x, connections[i].to.y) > 1) {
-          console.log("moved");
           basex = stop.x + dist * Math.cos(angBtw - K.PI / 2);
           basey = stop.y + dist * Math.sin(angBtw - K.PI / 2);
         }
@@ -144,7 +143,6 @@ function redraw(delta) {
         ctx.moveTo(basex - c * acceptRadius, basey - s * acceptRadius);
         ctx.lineTo(basex + c * acceptRadius, basey + s * acceptRadius);
         ctx.lineWidth = K.LINEWIDTH / 2;
-        console.log("found!");
         ctx.strokeStyle = getCSSProp("--system-bg");
         ctx.stroke();
         ctx.restore();
@@ -311,7 +309,7 @@ function redraw(delta) {
     ctx.fillStyle = associatedConnection.colour;
     if (trains[i].pendingMove) {
       ctx.globalAlpha = 1;
-      ctx.fillStyle = getCSSProp("--system-grey3");
+      ctx.fillStyle = getCSSProp("--system-grey");
     }
     ctx.moveTo(center.x + c * h / 2 + c2 * w / 2, center.y + s * h / 2 + s2 * w / 2);
     ctx.lineTo(center.x + c * h / 2 - c2 * w / 2, center.y + s * h / 2 - s2 * w / 2);
@@ -394,7 +392,7 @@ function redraw(delta) {
 function renderStop(stop) {
   ctx.beginPath();
   ctx.fillStyle = defaultClr;
-  let deltaT = (timeNow() - stop.addedTime) / 1500;
+  let deltaT = (Date.now() - stop.addedTime) / 1500;
   let radScl = deltaT >= 1 ? stopSz / 3 : stopSz / 3 * (70 * (deltaT - 0.443) ** 7 + 0.2);
   types[stop.type](Math.max(0, radScl), stop.x, stop.y);
   ctx.beginPath();

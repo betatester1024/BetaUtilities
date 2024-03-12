@@ -88,13 +88,17 @@ function onmove(ev) {
           modifyingConn.pendingRemove = true;
            updateToNow(currLine, modifyingConn); 
         }
-        typesOnLine[modifyingConn.lineID].add(nStop.type)
+        typesOnLine[modifyingConn.lineID].add(nStop.type);
+        
         nStop.linesServed.add(modifyingConn.lineID);
-        for (let pass of passengers)
-          handlePassenger(pass);
+        
+        
         let idx = currLine.path.indexOf(modifyingConn.from);
         currLine.path.splice(idx+1, 0, nStop);
-
+        recalculateLineConnections();
+        
+        for (let pass of passengers)
+          handlePassenger(pass);
         // if (!modifyingConn.pendingRemoval) 
         holdState = K.NOHOLD;
         routeConfirm(); 
@@ -121,9 +125,11 @@ function onmove(ev) {
       if (currLine.path[0] == currLine.path[currLine.path.length-1]) {
         currLine.loopingQ = true;
         extendInfo = null;
+        recalculateLineConnections();
         routeConfirm();
       }
       // extendInfo = null;
+      recalculateLineConnections();
       for (let pass of passengers)
         handlePassenger(pass);
       if (extendInfo) extendInfo.stop = nStop;
@@ -218,50 +224,8 @@ function routeConfirm(ev) {
     /// now every passenger route will be affected
     // for (let currP of passengers) {
     // if (currP.status != K.WAITING) continue;
-    adj = [];
-    for (let i = 0; i < typesOnLine.length; i++) {
-      let row = [];
-      for (let j = 0; j < typesOnLine.length; j++) {
-        row.push({ route:[], val: K.INF });
-      }
-      adj.push(row);
-    }
-    for (let i = 0; i < stops.length; i++) {
-      let served = Array.from(stops[i].linesServed);
-      for (let j = 0; j < served.length; j++) {
-        for (let k = 0; k < served.length; k++) {
-          adj[served[j]][served[k]].val = 1;
-          adj[served[j]][served[k]].route = [served[k]];
-          adj[served[k]][served[j]].val = 1;
-          adj[served[k]][served[j]].route = [served[j]];
-        }
-      }
-      for (let j=0; j<served.length; j++) {
-        adj[served[j]][served[j]].val = 0;
-        adj[served[j]][served[j]].route = [];
-      }
-    }
-    for (let k = 0; k < adj.length; k++) {
-      for (let j = 0; j < adj.length; j++) {
-        for (let i = 0; i < adj.length; i++) {
-          if (i == k || j == k) continue;
-          let newCost = adj[i][k].val+adj[k][j].val;
-          if (newCost < adj[i][j].val) {
-            adj[i][j].val = newCost;
-            adj[i][j].route = [];
-
-            // let replaceIdx = adj[i][j].indexOf(i);
-            for (let n=0; n<adj[i][k].route.length; n++) 
-              adj[i][j].route.push(adj[i][k].route[n])
-            for (let n=0; n<adj[k][j].route.length; n++) 
-              adj[i][j].route.push(adj[k][j].route[n])
-          }
-          // adj[i][j].val = Math.min(adj[i][j].val, adj[i][k].val + adj[k][j].val);
-        }
-      }
-
-    }
-    console.log("==== RECALCULATION SUCCESS ====")
+    recalculateLineConnections();
+    
     for (pass of passengers) {
       handlePassenger(pass);
     }

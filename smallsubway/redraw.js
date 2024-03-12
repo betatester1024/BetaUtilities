@@ -149,8 +149,14 @@ function redraw(delta) {
       let dist =pDist(stop.x, stop.y, connections[i].from.x, connections[i].from.y, connections[i].to.x, connections[i].to.y);
       if (!samePt(stop, connections[i].from) && !samePt(stop, connections[i].to) && 
           dist < acceptRadius) {
+        
         let basex = stop.x + dist*Math.cos(angBtw+K.PI/2);
         let basey = stop.y + dist*Math.sin(angBtw+K.PI/2);
+        if (pDist(basex, basey, connections[i].from.x, connections[i].from.y, connections[i].to.x, connections[i].to.y) > 1) {
+          console.log('moved');
+          basex = stop.x + dist*Math.cos(angBtw-K.PI/2);
+          basey = stop.y + dist*Math.sin(angBtw-K.PI/2);
+        } 
         ctx.save();
         ctx.beginPath();
         ctx.moveTo(basex-c*acceptRadius, basey-s*acceptRadius);
@@ -201,6 +207,44 @@ function redraw(delta) {
   }
   ctx.lineWidth = 4;
   ctx.beginPath();
+
+  for (let i=0; i<stops.length; i++) {
+    ctx.save();
+    ctx.beginPath();
+    if (stops[i].failurePct > 0) {
+      ctx.fillStyle = getCSSProp("--system-red2");
+      // let pctRemaining = (timeNow() - stops[i].failureTimer)/K.FAILTIME;
+      let pctRemaining = stops[i].failurePct;
+      let pctOneSec = (timeNow() - stops[i].failurePct*K.FAILTIME)/300;
+      let radScl = 0;
+      if (pctOneSec < 1) 
+        radScl = (-4*(pctOneSec-0.5)**2)+0.5;
+      if (pctRemaining > 1 && pctRemaining < 2) {
+        radScl = pctRemaining**120;
+      }
+      let currRad = stopSz+(acceptRadius-stopSz)*2+10*radScl;
+
+      // let radiusFcn = 
+      // cubic-bezier( 0.175, 0.885, 0.32, 1.275 )
+
+      ctx.beginPath();
+      ctx.moveTo(stops[i].x, stops[i].y);
+      // ctx.strokeStyle = getCSSProp("--system-transp");
+      ctx.arc(stops[i].x, stops[i].y, currRad, 0, Math.PI*pctRemaining*2);
+      // ctx.stroke();
+      ctx.fill();
+      ctx.fill();
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(stops[i].x+currRad, stops[i].y);
+      ctx.arc(stops[i].x, stops[i].y, currRad, 0, Math.PI*pctRemaining*2);
+      ctx.strokeStyle = getCSSProp("--system-red");
+      // ctx.lineTo(stops[i].x, stops[i].y);
+      ctx.stroke();
+      ctx.beginPath();
+    }
+    ctx.restore();
+  }
 
 
   ////////// little stop circles //////////
@@ -336,43 +380,7 @@ function redraw(delta) {
     // }
   }
 
-  for (let i=0; i<stops.length; i++) {
-    ctx.save();
-    ctx.beginPath();
-    if (stops[i].failurePct > 0) {
-      ctx.fillStyle = getCSSProp("--system-red2");
-      // let pctRemaining = (timeNow() - stops[i].failureTimer)/K.FAILTIME;
-      let pctRemaining = stops[i].failurePct;
-      let pctOneSec = (timeNow() - stops[i].failurePct*K.FAILTIME)/300;
-      let radScl = 0;
-      if (pctOneSec < 1) 
-        radScl = (-4*(pctOneSec-0.5)**2)+0.5;
-      if (pctRemaining > 1 && pctRemaining < 2) {
-        radScl = pctRemaining**120;
-      }
-      let currRad = stopSz+(acceptRadius-stopSz)*2+10*radScl;
 
-      // let radiusFcn = 
-      // cubic-bezier( 0.175, 0.885, 0.32, 1.275 )
-
-      ctx.beginPath();
-      ctx.moveTo(stops[i].x, stops[i].y);
-      // ctx.strokeStyle = getCSSProp("--system-transp");
-      ctx.arc(stops[i].x, stops[i].y, currRad, 0, Math.PI*pctRemaining*2);
-      // ctx.stroke();
-      ctx.fill();
-      ctx.fill();
-      ctx.lineCap = "round";
-      ctx.beginPath();
-      ctx.moveTo(stops[i].x+currRad, stops[i].y);
-      ctx.arc(stops[i].x, stops[i].y, currRad, 0, Math.PI*pctRemaining*2);
-      ctx.strokeStyle = getCSSProp("--system-red");
-      // ctx.lineTo(stops[i].x, stops[i].y);
-      ctx.stroke();
-      ctx.beginPath();
-    }
-    ctx.restore();
-  }
 
   for (let stop of stops) {
     drawWaiting(stop);
@@ -392,7 +400,7 @@ function redraw(delta) {
     let center = { x: trains[i].x+offset.x, y: trains[i].y+offset.y };
 
     const w = 15;
-    const h = 30;
+    const h = 5*trains[i].cap;
     const c = Math.cos(angBtw);
     const c2 = Math.cos(angBtw + K.PI / 2)
     const s = Math.sin(angBtw);
@@ -494,10 +502,24 @@ function redraw(delta) {
 
   }
 
+
+  ctx.save();
+  ctx.resetTransform();
+  ctx.fillStyle = getCSSProp("--system-grey3");
+  ctx.fillRect(0, 0, canv.width, 60);
+  ctx.strokeStyle = defaultClr;
+  ctx.moveTo(0, 60);
+  ctx.lineTo(canv.width, 60);
+  ctx.stroke();
+  ctx.fillStyle = defaultClr;
+
+  drawSVG("passengersServed", 30, 30, canv.width-200, 25)
+  ctx.font = "30px Noto Sans Display";
+  ctx.textBaseline = "top";
+  ctx.fillText(passengersServed, canv.width-165, 30);
+
   if (paused) {
 
-    ctx.save();
-    ctx.resetTransform();
     // ctx.fillRect(0,0, canv.width, canv.height);
     ctx.globalAlpha = 1;
     ctx.fillStyle = getCSSProp("--system-blue");
@@ -505,9 +527,9 @@ function redraw(delta) {
     ctx.textBaseline = "top";
     ctx.font = "30px Noto Sans Display";
 
-    ctx.fillText("Paused", 50, 50);
-    ctx.restore();
+    ctx.fillText("Paused", 40, 30);
   }
+  ctx.restore();
 
 } // redraw()
 

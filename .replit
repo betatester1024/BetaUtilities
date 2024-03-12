@@ -35,3 +35,7 @@ buttonEnabled = false
 [[ports]]
 localPort = 3000
 externalPort = 80
+
+[[ports]]
+localPort = 8765
+externalPort = 8080

@@ -62,7 +62,7 @@ let defaultClr = "#555";
 const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
 let globalTicks = 0;
-let currSpeed = 1;
+let currSpeed = 5;
 function onLoad() {
 }
 function timeNow() {
@@ -129,7 +129,7 @@ function populateStops() {
   for (let i = 0; i < stops.length; i++) {
     if (Math.random() < 0.3 || timeNow() - stops[i].timeAdded < 3e3)
       continue;
-    let toAdd = Math.min(5, Math.floor(Math.random() * stops.length / 4) + 1);
+    let toAdd = Math.min(5, Math.floor(Math.random() * stops.length / 10) + 1);
     for (let j = 0; j < toAdd; j++) {
       let stopAdded = Math.floor(Math.random() * stops.length);
       let currType = getNextType(stops[stopAdded].type);
@@ -164,6 +164,7 @@ function preLoad() {
   });
   canv = byId("canv");
   ctx = canv.getContext("2d");
+  prepSVG("passengersServed", defaultClr);
   registerMaximisingCanvas("canv", 1, 0.95, redraw);
   if ((docURL.searchParams.get("debug") ?? "yesplease").match(/false|no|beans/)) {
     DEBUG = false;

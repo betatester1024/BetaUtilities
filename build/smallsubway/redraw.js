@@ -374,6 +374,19 @@ function redraw(delta) {
     ctx.restore();
     ctx.beginPath();
   }
+  ctx.save();
+  ctx.fillStyle = defaultClr;
+  drawSVG(
+    "passengersServed",
+    30,
+    30,
+    canv.width / 2 - 105,
+    -canv.height / 2 + 55
+  );
+  ctx.font = "30px Noto Sans Display";
+  ctx.textBaseline = "top";
+  ctx.fillText(passengersServed, canv.width / 2 - 75, -canv.height / 2 + 60);
+  ctx.restore();
   if (paused) {
     ctx.save();
     ctx.resetTransform();

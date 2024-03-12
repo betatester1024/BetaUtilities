@@ -22,8 +22,8 @@ const K = {
   ANIM_SETTINGSDIALOG: 100,
 
   // stop over-capacity timeout
-  FAILTIME: 30000, // in ticks (scalable ms)
-  PCTPERTICK: 1/30000,
+  FAILTIME: 40000, // in ticks (scalable ms)
+  PCTPERTICK: 1/40000,
   LINEWIDTH:10, // width of one line in base-size pixels 
   LINEACCEPTDIST: 20, // base-size pixels under which line dragging will be accepted
   // actionStatuses: 
@@ -42,6 +42,8 @@ let canv = null;
 
 let startTick = -1;
 let startTime = -1;
+
+let populationPool = 3;
 
 let totalScaleFac = 1;
 let minSclFac = 0.5;
@@ -78,6 +80,7 @@ let maxUnlockedType = 0;
 const acceptRadius = 30;
 const stopSz = 17;
 
+let nextMilestone = 20;
 
 let adj = [];
 
@@ -165,25 +168,22 @@ function getAssociatedConnection(train) {
 }
 
 function populateStops() {
-  for (let i = 0; i < stops.length; i++) {
-    if (Math.random() < 0.3 || timeNow() - stops[i].timeAdded < 3000) continue;
-    let toAdd = Math.min(5, Math.floor(Math.random() * (stops.length) / 4) + 1);
-    for (let j = 0; j < toAdd; j++) {
-      let stopAdded = Math.floor(Math.random() * stops.length);
-      // if (stopAdded >= stops[i].type) stopAdded++;
-      let currType = getNextType(stops[stopAdded].type);
-      let pass = { from: stops[stopAdded], to: currType, route: [], 
-                  status: K.WAITING, actionStatus: K.NOACTION, train:null, stop:null};
-      passengers.push(pass);
-      handlePassenger(pass);
-      stops[stopAdded].waiting.push(pass);
-      let stop = stops[stopAdded]
-      if (stop.waiting.length > stop.capacity && !stop.failing) {
-        stop.failing = true;
-        stop.failureTimer=0;
-      }
-
+  console.log("populated");
+  for (let n = 0; n<populationPool; n++) {
+    let stopAdded = Math.floor(Math.random() * stops.length);
+    // if (stopAdded >= stops[i].type) stopAdded++;
+    let currType = getNextType(stops[stopAdded].type);
+    let pass = { from: stops[stopAdded], to: currType, route: [], 
+                status: K.WAITING, actionStatus: K.NOACTION, train:null, stop:null};
+    passengers.push(pass);
+    handlePassenger(pass);
+    stops[stopAdded].waiting.push(pass);
+    let stop = stops[stopAdded]
+    if (stop.waiting.length > stop.capacity && !stop.failing) {
+      stop.failing = true;
+      stop.failureTimer=0;
     }
+
   }
 }
 
@@ -197,6 +197,7 @@ function preLoad() {
   })
   canv = byId("canv");
   ctx = canv.getContext("2d");
+  prepSVG("passengersServed", defaultClr);
   registerMaximisingCanvas("canv", 1, 0.95, redraw);
   if ((docURL.searchParams.get("debug")??"yesplease").match(/false|no|beans/)) {
     DEBUG = false;
@@ -229,7 +230,7 @@ function preLoad() {
   requestAnimationFrame(animLoop);
   startTick = timeNow();
   startTime = Date.now();
-  asyncEvents.push({fcn:stopPopulationLoop, time:timeNow()+5000/currSpeed});
+  asyncEvents.push({fcn:stopPopulationLoop, time:timeNow()+10000});
 }
 
 function animLoop() {
@@ -248,7 +249,7 @@ function animLoop() {
 function tickLoop() {
   globalTicks += 16.66667*currSpeed; // 60fps default
   for (let i=0; i<asyncEvents.length; i++) {
-    if (timeNow() > asyncEvents[i].time) {
+    if (timeNow() >= asyncEvents[i].time) {
       asyncEvents[i].fcn();
       asyncEvents.splice(i, 1);
       i--;
@@ -269,7 +270,7 @@ function tickLoop() {
       let currStop = nearestStop(currentTo, 1);
       // currTrain.onCompletion = currTrain.passengers.length;
       // how many people to drop off here?
-      let delay = dropOff(currTrain, currentTo) * K.DELAYPERPASSENGER/currSpeed;
+      let delay = dropOff(currTrain, currentTo) * K.DELAYPERPASSENGER;
       // figure out if the train is due to reverse first.
       let reverseQ = true;
       let nextStop = null;
@@ -311,7 +312,7 @@ function tickLoop() {
           pass.stop = currStop;
           pass.train = currTrain;
           pass.route.shift();
-          delay += K.DELAYPERPASSENGER/currSpeed;
+          delay += K.DELAYPERPASSENGER;
         }
       }
       // 2. pick up people who need transfers (they typically wait very long)
@@ -339,7 +340,7 @@ function tickLoop() {
           // currTrain.onCompletion++;
           // currTrain.toAdd.push({stop:currStop,pass:pass});
           // pass.status = K.ONTHEWAY;
-          delay += K.DELAYPERPASSENGER/currSpeed;
+          delay += K.DELAYPERPASSENGER;
         }
       }
 
@@ -359,7 +360,7 @@ function tickLoop() {
           // currTrain.toAdd.push({stop:currStop,pass:adding});
           // k--;
         }
-        delay += K.DELAYPERPASSENGER/currSpeed;
+        delay += K.DELAYPERPASSENGER;
         // }
       }
       // if (currTrain.revDir) {
@@ -462,7 +463,7 @@ function handleAwaiting(currTrain, currStop) {
   }
   if (handled) {
 
-    let toCall = {fcn:()=>{handleAwaiting(currTrain, currStop)}, time:timeNow()+K.DELAYPERPASSENGER/currSpeed};
+    let toCall = {fcn:()=>{handleAwaiting(currTrain, currStop)}, time:timeNow()+K.DELAYPERPASSENGER};
     asyncEvents.push(toCall);
   }
   else {
@@ -482,6 +483,11 @@ function handleAwaiting(currTrain, currStop) {
       }
     }
 
+  }
+  if (passengersServed > nextMilestone) {
+    nextMilestone*=1.3;
+    addNewStop();
+    populationPool *= 1.1;
   }
 }
 
@@ -505,7 +511,7 @@ function dropOff(currTrain, pt) {
 function stopPopulationLoop() {
   populateStops();
   redraw();
-  asyncEvents.push({fcn:stopPopulationLoop, time:timeNow()+(2000 + Math.random() * 3000)/currSpeed});
+  asyncEvents.push({fcn:stopPopulationLoop, time:timeNow()+(5000 + Math.random() * 7000)});
 }
 
 
@@ -595,8 +601,55 @@ function distBtw(pt1, pt2) {
 
 
 function getNextType(exclude = -1) {
-  let type = Math.floor(Math.random() * (exclude < 0 ? types.length : maxUnlockedType));
+  let type = Math.floor(Math.random() * (exclude < 0 ? Math.min(maxUnlockedType+2, types.length) : maxUnlockedType));
   if (type >= exclude && exclude >= 0) return type + 1;
   return type;
   // if ()
+}
+
+function recalculateLineConnections() {
+  adj = [];
+  for (let i = 0; i < typesOnLine.length; i++) {
+    let row = [];
+    for (let j = 0; j < typesOnLine.length; j++) {
+      row.push({ route:[], val: K.INF });
+    }
+    adj.push(row);
+  }
+  for (let i = 0; i < stops.length; i++) {
+    let served = Array.from(stops[i].linesServed);
+    for (let j = 0; j < served.length; j++) {
+      for (let k = 0; k < served.length; k++) {
+        adj[served[j]][served[k]].val = 1;
+        adj[served[j]][served[k]].route = [served[k]];
+        adj[served[k]][served[j]].val = 1;
+        adj[served[k]][served[j]].route = [served[j]];
+      }
+    }
+    for (let j=0; j<served.length; j++) {
+      adj[served[j]][served[j]].val = 0;
+      adj[served[j]][served[j]].route = [];
+    }
+  }
+  for (let k = 0; k < adj.length; k++) {
+    for (let j = 0; j < adj.length; j++) {
+      for (let i = 0; i < adj.length; i++) {
+        if (i == k || j == k) continue;
+        let newCost = adj[i][k].val+adj[k][j].val;
+        if (newCost < adj[i][j].val) {
+          adj[i][j].val = newCost;
+          adj[i][j].route = [];
+
+          // let replaceIdx = adj[i][j].indexOf(i);
+          for (let n=0; n<adj[i][k].route.length; n++) 
+            adj[i][j].route.push(adj[i][k].route[n])
+          for (let n=0; n<adj[k][j].route.length; n++) 
+            adj[i][j].route.push(adj[k][j].route[n])
+        }
+        // adj[i][j].val = Math.min(adj[i][j].val, adj[i][k].val + adj[k][j].val);
+      }
+    }
+
+  }
+  console.log("==== RECALCULATION SUCCESS ====")
 }

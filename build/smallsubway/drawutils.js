@@ -1,4 +1,25 @@
 "use strict";
+let imagesReady = /* @__PURE__ */ new Set();
+function drawSVG(imageID, hgt, width, x, y) {
+  if (imagesReady.has(imageID))
+    ctx.drawImage(byId(imageID + "svg_betaosreserved"), x, y, width, hgt);
+}
+function prepSVG(imageID, clr) {
+  let img = document.createElement("img");
+  img.id = imageID + "svg_betaosreserved";
+  img.style.display = "none";
+  document.body.appendChild(img);
+  let svg = byId(imageID);
+  svg.querySelector("path").setAttribute("fill", clr);
+  var xml = new XMLSerializer().serializeToString(svg);
+  var svg64 = btoa(xml);
+  var b64Start = "data:image/svg+xml;base64,";
+  var image64 = b64Start + svg64;
+  img.onload = function() {
+    imagesReady.add(imageID);
+  };
+  img.src = image64;
+}
 function handleOffset(connection) {
   let angBtw = Math.atan2(
     connection.to.y - connection.from.y,

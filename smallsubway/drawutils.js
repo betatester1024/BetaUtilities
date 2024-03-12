@@ -1,3 +1,39 @@
+// https://stackoverflow.com/questions/3768565/drawing-an-svg-file-on-a-html5-canvas
+
+let imagesReady = new Set();
+
+function drawSVG(imageID, hgt, width, x, y) {
+  if (imagesReady.has(imageID)) 
+    ctx.drawImage(byId(imageID+"svg_betaosreserved"), x, y, width, hgt)
+}
+function prepSVG(imageID, clr) {
+  let img = document.createElement("img");
+  img.id = imageID+"svg_betaosreserved";
+  img.style.display="none";
+  document.body.appendChild(img);
+  let svg = byId(imageID);
+  svg.querySelector("path").setAttribute("fill",clr);
+  // svg.height = hgt;
+  // svg.width = width;
+  var xml = new XMLSerializer().serializeToString(svg);
+
+  // make it base64
+  var svg64 = btoa(xml);
+  var b64Start = 'data:image/svg+xml;base64,';
+
+  // prepend a "header"
+  var image64 = b64Start + svg64;
+
+  // set it as the source of the img element
+  img.onload = function() {
+      // draw the image onto the canvas
+    imagesReady.add(imageID);
+    // ctx.drawImage(img, x, y);
+  }
+  img.src = image64;
+}
+
+
 function handleOffset(connection) {
   let angBtw = Math.atan2(connection.to.y - connection.from.y,
     connection.to.x - connection.from.x);

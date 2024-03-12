@@ -7,6 +7,7 @@ const K = {
   HOLD_NEWLINE: 2,
   HOLD_CONNECTION: 3,
   HOLD_EXTEND: 4,
+  HOLD_TRAIN: 5,
   WAITING: 0,
   ONTHEWAY: 1,
   SETTINGSHEIGHT: 50,
@@ -14,14 +15,15 @@ const K = {
   INF: 9e99,
   PI: Math.PI,
   ANIM_SETTINGSDIALOG: 100,
-  FAILTIME: 3e4,
-  PCTPERTICK: 1 / 3e4,
+  FAILTIME: 4e4,
+  PCTPERTICK: 1 / 4e4,
   LINEWIDTH: 10,
-  LINEACCEPTDIST: 20,
+  LINEACCEPTDIST: 30,
   NOACTION: 0,
   BOARDPENDING: 1,
   DEBOARDPENDING: 2,
-  TRANSFERPENDING: 3
+  TRANSFERPENDING: 3,
+  REBOARDREQUIRED: 4
 };
 let paused = false;
 const trainSpeed = 100 / 1e3;
@@ -31,11 +33,14 @@ let ctx = null;
 let canv = null;
 let startTick = -1;
 let startTime = -1;
+let basePopulationPool = 5;
+let currPopulationPool = 3;
 let totalScaleFac = 1;
 let minSclFac = 0.5;
 const maxSclFac = 3;
 let hovering = null, hoveringConn = null;
-let modifyingConn = null;
+let modifyingConn = null, modifyingTrain = null;
+let hoveringTrain = null;
 let stops = [];
 let recentlyRemoved = [];
 let connections = [];
@@ -57,16 +62,25 @@ let currPos_canv = { x: 0, y: 0 };
 let maxUnlockedType = 0;
 const acceptRadius = 30;
 const stopSz = 17;
+let nextMilestone = 20;
 let adj = [];
 let defaultClr = "#555";
 const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
 let globalTicks = 0;
-let currSpeed = 5;
+let currSpeed = 1;
+let offsetDelta = 0;
 function onLoad() {
 }
 function timeNow() {
   return globalTicks;
+}
+function ingametime() {
+  let sec = Math.floor(globalTicks / 1e3 * (15 / 2) * 60);
+  let mins = Math.floor(globalTicks / 1e3 * (15 / 2));
+  let hrs = Math.floor(mins / 60);
+  let days = Math.floor(hrs / 24);
+  return { m: mins % 60, h: hrs % 60, d: days % 365, y: Math.floor(days / 365) };
 }
 function togglePause() {
   paused = !paused;
@@ -126,30 +140,26 @@ function getAssociatedConnection(train) {
   return null;
 }
 function populateStops() {
-  for (let i = 0; i < stops.length; i++) {
-    if (Math.random() < 0.3 || timeNow() - stops[i].timeAdded < 3e3)
-      continue;
-    let toAdd = Math.min(5, Math.floor(Math.random() * stops.length / 10) + 1);
-    for (let j = 0; j < toAdd; j++) {
-      let stopAdded = Math.floor(Math.random() * stops.length);
-      let currType = getNextType(stops[stopAdded].type);
-      let pass = {
-        from: stops[stopAdded],
-        to: currType,
-        route: [],
-        status: K.WAITING,
-        actionStatus: K.NOACTION,
-        train: null,
-        stop: null
-      };
-      passengers.push(pass);
-      handlePassenger(pass);
-      stops[stopAdded].waiting.push(pass);
-      let stop = stops[stopAdded];
-      if (stop.waiting.length > stop.capacity && !stop.failing) {
-        stop.failing = true;
-        stop.failureTimer = 0;
-      }
+  console.log("populated");
+  for (let n = 0; n < currPopulationPool; n++) {
+    let stopAdded = Math.floor(Math.random() * stops.length);
+    let currType = getNextType(stops[stopAdded].type);
+    let pass = {
+      from: stops[stopAdded],
+      to: currType,
+      route: [],
+      status: K.WAITING,
+      actionStatus: K.NOACTION,
+      train: null,
+      stop: null
+    };
+    passengers.push(pass);
+    handlePassenger(pass);
+    stops[stopAdded].waiting.push(pass);
+    let stop = stops[stopAdded];
+    if (stop.waiting.length > stop.capacity && !stop.failing) {
+      stop.failing = true;
+      stop.failureTimer = 0;
     }
   }
 }
@@ -187,10 +197,11 @@ function preLoad() {
   translate(canv.width / 2, canv.height / 2);
   redraw();
   requestAnimationFrame(tickLoop);
+  HTMLActions();
   requestAnimationFrame(animLoop);
   startTick = timeNow();
   startTime = Date.now();
-  asyncEvents.push({ fcn: stopPopulationLoop, time: timeNow() + 5e3 / currSpeed });
+  asyncEvents.push({ fcn: stopPopulationLoop, time: timeNow() + 1e4 });
 }
 function animLoop() {
   let delta = Date.now() - startTime;
@@ -204,18 +215,28 @@ function animLoop() {
 }
 function tickLoop() {
   globalTicks += 16.66667 * currSpeed;
+  let igt = ingametime();
+  if (igt.h < 6 || igt.h > 22)
+    currPopulationPool = basePopulationPool * 0.3;
+  else if (igt.h >= 6 && igt.h <= 8 || igt.h >= 5 && igt.h <= 7)
+    currPopulationPool = basePopulationPool * 1.5;
+  else
+    currPopulationPool = basePopulationPool;
   for (let i = 0; i < asyncEvents.length; i++) {
-    if (timeNow() > asyncEvents[i].time) {
+    if (timeNow() >= asyncEvents[i].time) {
       asyncEvents[i].fcn();
       asyncEvents.splice(i, 1);
       i--;
     }
   }
   for (let i = 0; i < trains.length; i++) {
+    if (trains[i].pendingMove)
+      continue;
     let currTrain = trains[i];
     let distTotal = distBtw(trains[i].to, trains[i].from);
     let distTravelled = (timeNow() - currTrain.startT) * trainSpeed;
     let percentCovered = distTravelled / distTotal;
+    trains[i].percentCovered = percentCovered;
     if (percentCovered < 0)
       continue;
     if (percentCovered >= 1) {
@@ -223,7 +244,7 @@ function tickLoop() {
       percentCovered = 0;
       let currentTo = trains[i].to;
       let currStop = nearestStop(currentTo, 1);
-      let delay = dropOff(currTrain, currentTo) * K.DELAYPERPASSENGER / currSpeed;
+      let delay = dropOff(currTrain, currentTo) * K.DELAYPERPASSENGER;
       let reverseQ = true;
       let nextStop2 = null;
       let prevStop = currTrain.from;
@@ -237,7 +258,7 @@ function tickLoop() {
           pass.stop = currStop;
           pass.train = currTrain;
           pass.route.shift();
-          delay += K.DELAYPERPASSENGER / currSpeed;
+          delay += K.DELAYPERPASSENGER;
         }
       }
       for (let j = 0; j < connections.length; j++) {
@@ -258,7 +279,7 @@ function tickLoop() {
           currStop.waiting[j].actionStatus = K.BOARDPENDING;
           currStop.waiting[j].stop = currStop;
           currStop.waiting[j].train = currTrain;
-          delay += K.DELAYPERPASSENGER / currSpeed;
+          delay += K.DELAYPERPASSENGER;
         }
       }
       for (let k = 0; k < currStop.waiting.length; k++) {
@@ -270,7 +291,7 @@ function tickLoop() {
           currStop.waiting[k].stop = currStop;
           currStop.waiting[k].train = currTrain;
         }
-        delay += K.DELAYPERPASSENGER / currSpeed;
+        delay += K.DELAYPERPASSENGER;
       }
       if (delay > 0)
         currTrain.startT = K.INF;
@@ -300,6 +321,12 @@ function tickLoop() {
     else
       stop.failurePct = Math.max(0, stop.failurePct - K.PCTPERTICK * delta);
   }
+  for (let train of trains) {
+    if (train.pendingMove && train.passengers.length == 0) {
+      train.pendingMove = false;
+      train.startTime = timeNow();
+    }
+  }
   if (!paused)
     requestAnimationFrame(tickLoop);
 }
@@ -308,9 +335,9 @@ function handleAwaiting(currTrain, currStop) {
   for (const pass of passengers) {
     if (pass.train != currTrain || pass.stop != currStop)
       continue;
-    else if (pass.actionStatus == K.NOACTION)
+    else if (pass.actionStatus == K.NOACTION) {
       continue;
-    else if (currTrain.passengers.length >= currTrain.cap && pass.actionStatus == K.BOARDPENDING) {
+    } else if (currTrain.passengers.length >= currTrain.cap && pass.actionStatus == K.BOARDPENDING) {
       pass.actionStatus = K.NOACTION;
       continue;
     } else if (pass.actionStatus == K.BOARDPENDING) {
@@ -339,11 +366,27 @@ function handleAwaiting(currTrain, currStop) {
       if (currStop.waiting.length < currStop.capacity)
         currStop.failing = false;
       pass.actionStatus = K.NOACTION;
-      passengersServed++;
+      passengersServed += 1;
       handled = true;
       break;
     } else if (pass.actionStatus == K.TRANSFERPENDING) {
       pass.actionStatus = K.NOACTION;
+      for (let i = 0; i < currTrain.passengers.length; i++)
+        if (currTrain.passengers[i] == pass) {
+          currTrain.passengers.splice(i, 1);
+          currStop.waiting.push(pass);
+          break;
+        }
+      pass.status = K.WAITING;
+      pass.actionStatus = K.NOACTION;
+      let stop = currStop;
+      if (stop.waiting.length > stop.capacity && stop.failurePct < 1)
+        stop.failing = true;
+      handled = true;
+      break;
+    } else if (pass.actionStatus == K.REBOARDREQUIRED) {
+      console.log("handling");
+      pass.route.splice(0, 0, currTrain.lineID);
       for (let i = 0; i < currTrain.passengers.length; i++)
         if (currTrain.passengers[i] == pass) {
           currTrain.passengers.splice(i, 1);
@@ -363,7 +406,7 @@ function handleAwaiting(currTrain, currStop) {
   if (handled) {
     let toCall = { fcn: () => {
       handleAwaiting(currTrain, currStop);
-    }, time: timeNow() + K.DELAYPERPASSENGER / currSpeed };
+    }, time: timeNow() + K.DELAYPERPASSENGER };
     asyncEvents.push(toCall);
   } else {
     currTrain.startT = timeNow();
@@ -382,6 +425,11 @@ function handleAwaiting(currTrain, currStop) {
       }
     }
   }
+  if (passengersServed > nextMilestone) {
+    nextMilestone *= 1.2;
+    addNewStop();
+    basePopulationPool *= 1.1;
+  }
 }
 function dropOff(currTrain, pt) {
   let stop = nearestStop(pt, 1);
@@ -398,7 +446,7 @@ function dropOff(currTrain, pt) {
 function stopPopulationLoop() {
   populateStops();
   redraw();
-  asyncEvents.push({ fcn: stopPopulationLoop, time: timeNow() + (2e3 + Math.random() * 3e3) / currSpeed });
+  asyncEvents.push({ fcn: stopPopulationLoop, time: timeNow() + (5e3 + Math.random() * 7e3) });
 }
 function addNewStop(type = -1) {
   let newPt;
@@ -467,9 +515,52 @@ function distBtw(pt1, pt2) {
   return Math.sqrt(sq(pt1.x - pt2.x) + sq(pt1.y - pt2.y));
 }
 function getNextType(exclude = -1) {
-  let type = Math.floor(Math.random() * (exclude < 0 ? types.length : maxUnlockedType));
+  let type = Math.floor(Math.random() * (exclude < 0 ? Math.min(maxUnlockedType + 2, types.length) : maxUnlockedType));
   if (type >= exclude && exclude >= 0)
     return type + 1;
   return type;
+}
+function recalculateLineConnections() {
+  adj = [];
+  for (let i = 0; i < typesOnLine.length; i++) {
+    let row = [];
+    for (let j = 0; j < typesOnLine.length; j++) {
+      row.push({ route: [], val: K.INF });
+    }
+    adj.push(row);
+  }
+  for (let i = 0; i < stops.length; i++) {
+    let served = Array.from(stops[i].linesServed);
+    for (let j = 0; j < served.length; j++) {
+      for (let k = 0; k < served.length; k++) {
+        adj[served[j]][served[k]].val = 1;
+        adj[served[j]][served[k]].route = [served[k]];
+        adj[served[k]][served[j]].val = 1;
+        adj[served[k]][served[j]].route = [served[j]];
+      }
+    }
+    for (let j = 0; j < served.length; j++) {
+      adj[served[j]][served[j]].val = 0;
+      adj[served[j]][served[j]].route = [];
+    }
+  }
+  for (let k = 0; k < adj.length; k++) {
+    for (let j = 0; j < adj.length; j++) {
+      for (let i = 0; i < adj.length; i++) {
+        if (i == k || j == k)
+          continue;
+        let newCost = adj[i][k].val + adj[k][j].val;
+        if (newCost < adj[i][j].val) {
+          adj[i][j].val = newCost;
+          adj[i][j].route = [];
+          for (let n = 0; n < adj[i][k].route.length; n++)
+            adj[i][j].route.push(adj[i][k].route[n]);
+          for (let n = 0; n < adj[k][j].route.length; n++)
+            adj[i][j].route.push(adj[k][j].route[n]);
+        }
+      }
+    }
+  }
+  console.log("==== RECALCULATION SUCCESS ====");
 }
 //# sourceMappingURL=game.js.map

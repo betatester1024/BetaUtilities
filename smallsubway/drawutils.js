@@ -131,3 +131,17 @@ function pDist(x, y, x1, y1, x2, y2) { // dist between line SEGMENT and pt
   var dy = y - yy;
   return Math.sqrt(dx * dx + dy * dy);
 }
+
+function nearestTrain(x, y, rad) {
+  let minRad = K.INF;
+  let tr = null;
+  for (let train of trains) {
+    let dist = distBtw({x:x, y:y}, train);
+    if (dist < minRad) {
+      minRad = dist;
+      tr = train;
+    }
+  }
+  if (minRad > rad) return null;
+  else return tr;
+}

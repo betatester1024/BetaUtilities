@@ -22,6 +22,7 @@ function onmove(ev) {
   hovering = null;
   let rmSettings = true;
   hoveringConn = null;
+  hoveringTrain = null;
   currPos_canv = fromCanvPos(ev.clientX, ev.clientY);
   if (holdState == K.HOLD) {
     translate(ev.movementX, ev.movementY);
@@ -81,10 +82,11 @@ function onmove(ev) {
         }
         typesOnLine[modifyingConn.lineID].add(nStop.type);
         nStop.linesServed.add(modifyingConn.lineID);
-        for (let pass2 of passengers)
-          handlePassenger(pass2);
         let idx = currLine.path.indexOf(modifyingConn.from);
         currLine.path.splice(idx + 1, 0, nStop);
+        recalculateLineConnections();
+        for (let pass2 of passengers)
+          handlePassenger(pass2);
         holdState = K.NOHOLD;
         routeConfirm();
       }
@@ -109,13 +111,34 @@ function onmove(ev) {
       if (currLine.path[0] == currLine.path[currLine.path.length - 1]) {
         currLine.loopingQ = true;
         extendInfo = null;
+        recalculateLineConnections();
         routeConfirm();
       }
+      recalculateLineConnections();
       for (let pass2 of passengers)
         handlePassenger(pass2);
       if (extendInfo)
         extendInfo.stop = nStop;
     }
+  } else if (holdState == K.HOLD_TRAIN) {
+    modifyingTrain.x = currPos_canv.x;
+    modifyingTrain.y = currPos_canv.y;
+    if (nConn) {
+      let dist = pDist(currPos_canv.x, currPos_canv.y, nConn.from.x, nConn.from.y, nConn.to.x, nConn.to.y);
+      let angBtw = Math.atan2(nConn.from.y - nConn.to.y, nConn.from.x - nConn.to.x);
+      modifyingTrain.x += Math.cos(angBtw + K.PI / 2) * dist;
+      modifyingTrain.y += Math.sin(angBtw + K.PI / 2) * dist;
+      if (pDist(modifyingTrain.x, modifyingTrain.y, nConn.from.x, nConn.from.y, nConn.to.x, nConn.to.y) > 1) {
+        modifyingTrain.x = currPos_canv.x + Math.cos(angBtw - K.PI / 2) * dist;
+        modifyingTrain.y = currPos_canv.y + Math.sin(angBtw - K.PI / 2) * dist;
+      }
+      modifyingTrain.lineID = nConn.lineID;
+      modifyingTrain.from = nConn.from;
+      modifyingTrain.to = nConn.to;
+      modifyingTrain.startTime = timeNow();
+    } else
+      modifyingTrain.pendingMove = true;
+    redraw();
   } else if (nStop) {
     let terms = terminals(nStop);
     if (terms && holdState == K.NOHOLD && (!activeSettingsDialog || activeSettingsDialog.stop != nStop)) {
@@ -149,10 +172,15 @@ function onmove(ev) {
     }
     if (!setSelected && activeSettingsDialog)
       activeSettingsDialog.selected = null;
+    let nTrain = nearestTrain(currPos_canv.x, currPos_canv.y, K.LINEACCEPTDIST);
+    if (holdState == K.NOHOLD && rmSettings && nTrain) {
+      hoveringTrain = nTrain;
+      document.body.style.cursor = "pointer";
+    }
     if (rmSettings && nConn && holdState == K.NOHOLD) {
       hoveringConn = nConn;
       document.body.style.cursor = "pointer";
-    } else if (rmSettings && holdState == K.NOHOLD)
+    } else if (rmSettings && holdState == K.NOHOLD && !hoveringTrain)
       document.body.style.cursor = "";
   }
   if (rmSettings) {
@@ -161,7 +189,6 @@ function onmove(ev) {
   redraw();
 }
 function routeConfirm(ev) {
-  holdState = K.NOHOLD;
   extendInfo = null;
   document.body.style.cursor = holdState == K.HOLD ? "grab" : "";
   if (currPath.length > 1) {
@@ -196,47 +223,7 @@ function routeConfirm(ev) {
       currPath[i].linesServed.add(lineCt);
     }
     typesOnLine.push(supportedTypes);
-    adj = [];
-    for (let i = 0; i < typesOnLine.length; i++) {
-      let row = [];
-      for (let j = 0; j < typesOnLine.length; j++) {
-        row.push({ route: [], val: K.INF });
-      }
-      adj.push(row);
-    }
-    for (let i = 0; i < stops.length; i++) {
-      let served = Array.from(stops[i].linesServed);
-      for (let j = 0; j < served.length; j++) {
-        for (let k = 0; k < served.length; k++) {
-          adj[served[j]][served[k]].val = 1;
-          adj[served[j]][served[k]].route = [served[k]];
-          adj[served[k]][served[j]].val = 1;
-          adj[served[k]][served[j]].route = [served[j]];
-        }
-      }
-      for (let j = 0; j < served.length; j++) {
-        adj[served[j]][served[j]].val = 0;
-        adj[served[j]][served[j]].route = [];
-      }
-    }
-    for (let k = 0; k < adj.length; k++) {
-      for (let j = 0; j < adj.length; j++) {
-        for (let i = 0; i < adj.length; i++) {
-          if (i == k || j == k)
-            continue;
-          let newCost = adj[i][k].val + adj[k][j].val;
-          if (newCost < adj[i][j].val) {
-            adj[i][j].val = newCost;
-            adj[i][j].route = [];
-            for (let n = 0; n < adj[i][k].route.length; n++)
-              adj[i][j].route.push(adj[i][k].route[n]);
-            for (let n = 0; n < adj[k][j].route.length; n++)
-              adj[i][j].route.push(adj[k][j].route[n]);
-          }
-        }
-      }
-    }
-    console.log("==== RECALCULATION SUCCESS ====");
+    recalculateLineConnections();
     for (pass of passengers) {
       handlePassenger(pass);
     }
@@ -251,7 +238,9 @@ function routeConfirm(ev) {
       status: K.MOVING,
       passengers: [],
       cap: 6,
-      revDir: false
+      revDir: false,
+      percentCovered: 0,
+      pendingMove: false
     };
     let t2 = {
       x: currPath[0].x,
@@ -264,13 +253,24 @@ function routeConfirm(ev) {
       status: K.MOVING,
       passengers: [],
       cap: 6,
-      revDir: true
+      revDir: true,
+      percentCovered: 0,
+      pendingMove: false
     };
     trains.push(t1);
     trains.push(t2);
     currLine2.trains = [t1, t2];
     lineCt++;
   }
+  if (holdState == K.HOLD_TRAIN) {
+    for (let pass2 of modifyingTrain.passengers) {
+      pass2.stop = modifyingTrain.dropOffLocation;
+      pass2.actionStatus = K.REBOARDREQUIRED;
+    }
+    handleAwaiting(modifyingTrain, modifyingTrain.dropOffLocation);
+    holdState = K.NOHOLD;
+  }
+  holdState = K.NOHOLD;
   currPath = [];
   redraw();
   if (!ev || !downPt || distBtw({ x: ev.clientX, y: ev.clientY }, downPt) > 10)
@@ -290,13 +290,14 @@ function onWheel(ev) {
   redraw();
 }
 function pointerdown(ev) {
-  if (event.button != 0)
+  if (ev.button != 0)
     return;
   holdState = K.HOLD;
   downPt = { x: ev.clientX, y: ev.clientY };
   let actualPos = fromCanvPos(ev.clientX, ev.clientY);
   let nStop = nearestStop(actualPos, acceptRadius);
   let nConn = nearestConnection(actualPos.x, actualPos.y);
+  let nTrain = nearestTrain(actualPos.x, actualPos.y, K.LINEACCEPTDIST);
   if (nStop && colours.length > 0) {
     holdState = K.HOLD_NEWLINE;
     activeSettingsDialog = null;
@@ -307,6 +308,12 @@ function pointerdown(ev) {
     holdState = K.HOLD_EXTEND;
     extendInfo = { line: lines[sel], stop: activeSettingsDialog.stop };
     activeSettingsDialog = null;
+  } else if (nTrain) {
+    holdState = K.HOLD_TRAIN;
+    modifyingTrain = nTrain;
+    nTrain.pendingMove = true;
+    document.body.style.cursor = "grabbing";
+    nTrain.dropOffLocation = nTrain.percentCovered < 0.5 ? nTrain.from : nTrain.to;
   } else if (nConn) {
     holdState = K.HOLD_CONNECTION;
     modifyingConn = nConn;

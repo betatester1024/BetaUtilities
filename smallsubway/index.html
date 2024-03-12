@@ -37,6 +37,25 @@
         touch-action: none;
         /* pointer-events: none; */
       }
+      div#topBar {
+        display: flex;
+        position: absolute !important;
+        top: 0px;
+        width: 100%;
+        background-color: var(--system-grey3);
+        justify-content: center;
+        align-items: baseline;
+      }
+      #time, #pServed {
+        font-family:'Noto Sans Mono', monospace;
+        font-size: 30px;
+        margin-right: 10px;
+      }
+      span.material-symbols-outlined.sz30 {
+        font-size: 30px !important;
+        top: 0px;
+        color: var(--system-blue);
+      }
     </style>
   </head>
   <body onload="
@@ -51,9 +70,24 @@
       <button onclick="populateStops()" class="btn blu fssml override">
         Populate stops
       </button>
-      --><button onclick="togglePause()"id="playpause" class="btn blu fssml override">
-        Pause/resume
-      </button>
+      d
+      -->
+      <div id="topBar">
+        <span id="paused"></span>
+        <div class="metreOuter nobreak">
+          <div class="metreInner nobreak">
+            
+          </div>
+        </div>
+        <span class="blu nohover" id="time">0d 00:00</span>
+        <span class="material-symbols-outlined sz30">
+        directions_walk
+        </span>
+        <span class="blu nohover" id="pServed">0</span>
+        <button onclick="togglePause()"id="playpause" class="btn blu fssml override">
+          Pause/resume
+        </button>
+      </div>
       <details class="blu ">
         <summary>Footer</summary>
         <footer id="ftrOverride"></footer>

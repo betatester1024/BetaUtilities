@@ -8,6 +8,7 @@ const K = {
   HOLD_NEWLINE: 2,
   HOLD_CONNECTION:3,
   HOLD_EXTEND: 4,
+  HOLD_TRAIN: 5,
   // passenger status 
   WAITING: 0,
   ONTHEWAY: 1,
@@ -25,12 +26,13 @@ const K = {
   FAILTIME: 40000, // in ticks (scalable ms)
   PCTPERTICK: 1/40000,
   LINEWIDTH:10, // width of one line in base-size pixels 
-  LINEACCEPTDIST: 20, // base-size pixels under which line dragging will be accepted
+  LINEACCEPTDIST: 30, // base-size pixels under which line dragging will be accepted
   // actionStatuses: 
   NOACTION:0,
   BOARDPENDING:1, // just boarding 
   DEBOARDPENDING:2, // just deboarding
-  TRANSFERPENDING:3 // deboarding FOR TRANSFER.
+  TRANSFERPENDING:3, // deboarding FOR TRANSFER.
+  REBOARDREQUIRED:4, // train has been removed, wait for next train
 }
 
 let paused = false;
@@ -43,14 +45,16 @@ let canv = null;
 let startTick = -1;
 let startTime = -1;
 
-let populationPool = 3;
+let basePopulationPool = 5;
+let currPopulationPool = 3;
 
 let totalScaleFac = 1;
 let minSclFac = 0.5;
 const maxSclFac = 3;
 
 let hovering = null, hoveringConn = null;
-let modifyingConn = null;
+let modifyingConn = null, modifyingTrain = null;
+let hoveringTrain = null;
 
 let stops = [];
 let recentlyRemoved = [];
@@ -92,6 +96,7 @@ let DEBUG = true;
 
 let globalTicks = 0;
 let currSpeed = 1;
+let offsetDelta = 0; // from saved time
 
 function onLoad() {
 
@@ -101,6 +106,15 @@ function onLoad() {
 
 function timeNow() {
   return globalTicks;
+}
+
+function ingametime() {
+  // 2s real-time, base ticks = 15 minutes in-game
+  let sec = Math.floor(globalTicks/1000*(15/2)*60);
+  let mins = Math.floor(globalTicks/1000*(15/2));
+  let hrs = Math.floor(mins/60);
+  let days = Math.floor(hrs/24);
+  return {m:mins%60, h:hrs%60, d:days%365, y:Math.floor(days/365)};
 }
 
 function togglePause() {
@@ -169,7 +183,7 @@ function getAssociatedConnection(train) {
 
 function populateStops() {
   console.log("populated");
-  for (let n = 0; n<populationPool; n++) {
+  for (let n = 0; n<currPopulationPool; n++) {
     let stopAdded = Math.floor(Math.random() * stops.length);
     // if (stopAdded >= stops[i].type) stopAdded++;
     let currType = getNextType(stops[stopAdded].type);
@@ -227,6 +241,7 @@ function preLoad() {
   //////
   // setInterval(tickLoop, 1000/60);
   requestAnimationFrame(tickLoop);
+  HTMLActions();
   requestAnimationFrame(animLoop);
   startTick = timeNow();
   startTime = Date.now();
@@ -248,6 +263,12 @@ function animLoop() {
 
 function tickLoop() {
   globalTicks += 16.66667*currSpeed; // 60fps default
+  let igt = ingametime();
+  if (igt.h < 6 || igt.h > 22) 
+    currPopulationPool = basePopulationPool*0.3;
+  else if (igt.h >= 6 && igt.h<=8
+     || igt.h >= 5 && igt.h <= 7) currPopulationPool = basePopulationPool*1.5;
+  else currPopulationPool = basePopulationPool;
   for (let i=0; i<asyncEvents.length; i++) {
     if (timeNow() >= asyncEvents[i].time) {
       asyncEvents[i].fcn();
@@ -256,11 +277,13 @@ function tickLoop() {
     } 
   }
   for (let i = 0; i < trains.length; i++) {
+    if (trains[i].pendingMove) continue;
     let currTrain = trains[i];
     let distTotal = distBtw(trains[i].to, trains[i].from);
     // distToCover = s * px/s / px
     let distTravelled = (timeNow() - currTrain.startT) * trainSpeed;
     let percentCovered = distTravelled / distTotal;
+    trains[i].percentCovered = percentCovered;
     if (percentCovered < 0) continue;
     if (percentCovered >= 1) { // at a stop. 
       let startT = timeNow();
@@ -397,6 +420,12 @@ function tickLoop() {
     if (stop.failing) stop.failurePct+=K.PCTPERTICK*delta;
     else stop.failurePct= Math.max(0, stop.failurePct-K.PCTPERTICK*delta)
   }
+  for (let train of trains) {
+    if (train.pendingMove && train.passengers.length == 0 && !train.moving) {
+      train.pendingMove = false;
+      train.startTime = timeNow();
+    }
+  }
   // redraw(delta);
   if (!paused) requestAnimationFrame(tickLoop);
 }
@@ -405,7 +434,9 @@ function handleAwaiting(currTrain, currStop) {
   let handled = false;
   for (const pass of passengers) {
     if (pass.train != currTrain || pass.stop != currStop) continue;
-    else if (pass.actionStatus == K.NOACTION) continue;
+    else if (pass.actionStatus == K.NOACTION) {
+      continue;
+    }
     // if people are trying to get on the train but unable to do so - abandon the action and wait for next recalculation
     else if (currTrain.passengers.length >= currTrain.cap && 
              pass.actionStatus == K.BOARDPENDING) {
@@ -439,7 +470,7 @@ function handleAwaiting(currTrain, currStop) {
       if (currStop.waiting.length < currStop.capacity)
         currStop.failing =false;
       pass.actionStatus = K.NOACTION;
-      passengersServed++;
+      passengersServed+= 1;
       handled = true;
       break;
     }
@@ -451,6 +482,25 @@ function handleAwaiting(currTrain, currStop) {
           currStop.waiting.push(pass);
           break;
         }
+      pass.status = K.WAITING;
+      pass.actionStatus = K.NOACTION;
+      let stop = currStop;
+      if (stop.waiting.length > stop.capacity && stop.failurePct < 1)
+        stop.failing=true;
+      handled = true;
+      break;
+    }
+       // train gone, need to catch the next train
+    else if (pass.actionStatus == K.REBOARDREQUIRED) {
+      console.log("handling");
+      pass.route.splice(0, 0, currTrain.lineID);
+      // let stop = currTrain.dropOffLocation;
+      for (let i=0; i<currTrain.passengers.length; i++) 
+      if (currTrain.passengers[i] == pass) {
+        currTrain.passengers.splice(i,1);
+        currStop.waiting.push(pass);
+        break;
+      }
       pass.status = K.WAITING;
       pass.actionStatus = K.NOACTION;
       let stop = currStop;
@@ -485,9 +535,9 @@ function handleAwaiting(currTrain, currStop) {
 
   }
   if (passengersServed > nextMilestone) {
-    nextMilestone*=1.3;
+    nextMilestone*=1.2;
     addNewStop();
-    populationPool *= 1.1;
+    basePopulationPool *= 1.1;
   }
 }
 

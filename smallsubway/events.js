@@ -27,6 +27,7 @@ function onmove(ev) {
   hovering = null;
   let rmSettings = true;
   hoveringConn = null;
+  hoveringTrain = null;
   currPos_canv = fromCanvPos(ev.clientX, ev.clientY);
   // let 
   if (holdState == K.HOLD) {// && ev.shiftKey) {
@@ -137,6 +138,30 @@ function onmove(ev) {
 
     } // extend successful 
   }
+  else if (holdState == K.HOLD_TRAIN) {
+    modifyingTrain.x = currPos_canv.x;
+    modifyingTrain.y = currPos_canv.y;
+    if (nConn) {
+      let dist = pDist(currPos_canv.x, currPos_canv.y, nConn.from.x, nConn.from.y, nConn.to.x, nConn.to.y);
+      let angBtw = Math.atan2(nConn.from.y - nConn.to.y, nConn.from.x - nConn.to.x);
+      modifyingTrain.x += Math.cos(angBtw+K.PI/2)*dist;
+      modifyingTrain.y += Math.sin(angBtw+K.PI/2)*dist;
+      if (pDist(modifyingTrain.x, modifyingTrain.y, nConn.from.x, nConn.from.y, nConn.to.x, nConn.to.y) > 1) {
+         modifyingTrain.x = currPos_canv.x + Math.cos(angBtw-K.PI/2)*dist;
+         modifyingTrain.y = currPos_canv.y + Math.sin(angBtw-K.PI/2)*dist;
+      }
+      modifyingTrain.lineID = nConn.lineID;
+      modifyingTrain.from = nConn.from;
+      modifyingTrain.to = nConn.to;
+      // modifyingTrain.pendingRemove = false;
+      modifyingTrain.startTime = timeNow();
+      // for (pass of modifyingTrain.passengers) {
+        
+      // }
+    }
+    else modifyingTrain.pendingMove = true;
+    redraw();
+  }
   else if (nStop) {
     let terms = terminals(nStop);
     if (terms && holdState == K.NOHOLD && (!activeSettingsDialog || activeSettingsDialog.stop != nStop)) {
@@ -169,11 +194,17 @@ function onmove(ev) {
     }
     if (!setSelected && activeSettingsDialog) activeSettingsDialog.selected = null;
     // else if (activeSettingsDialog && currPos_canv.x < )
-    if (rmSettings && nConn && holdState == K.NOHOLD) {
+    let nTrain = nearestTrain(currPos_canv.x, currPos_canv.y, K.LINEACCEPTDIST);
+    if (holdState == K.NOHOLD && rmSettings && nTrain) {
+      hoveringTrain = nTrain;
+      document.body.style.cursor = "pointer";
+    }
+    if (rmSettings && (nConn) && holdState == K.NOHOLD) {
       hoveringConn = nConn;
       document.body.style.cursor = "pointer";
     }
-    else if (rmSettings && holdState == K.NOHOLD) document.body.style.cursor = "";
+    else if (rmSettings && holdState == K.NOHOLD && !hoveringTrain) 
+      document.body.style.cursor = "";
   }
   if (rmSettings) {
     activeSettingsDialog = null;
@@ -182,7 +213,6 @@ function onmove(ev) {
 } //onmove
 
 function routeConfirm(ev) {
-  holdState = K.NOHOLD;
   extendInfo = null;
   document.body.style.cursor = holdState == K.HOLD ? "grab" : "";
   if (currPath.length > 1) {
@@ -233,7 +263,8 @@ function routeConfirm(ev) {
         x: currPath[0].x, y: currPath[0].y,
         from: currPath[0], to: currPath[1],
         lineID: lineCt, colour: currCol, startT: timeNow(),
-        status: K.MOVING, passengers: [], cap:6, revDir:false, 
+        status: K.MOVING, passengers: [], cap:6, revDir:false,
+        percentCovered:0, pendingMove:false
         //toAdd:[], toRemove:[], onCompletion:0
       };
     let t2 = {
@@ -241,6 +272,7 @@ function routeConfirm(ev) {
         from: currPath[currPath.length-1], to: currPath[currPath.length-2],
         lineID: lineCt, colour: currCol, startT: timeNow(),
         status: K.MOVING, passengers: [], cap:6, revDir:true,//, toAdd:[], toRemove:[], 
+        percentCovered: 0, pendingMove:false
         //onCompletion:0
       };
     trains.push(t1);
@@ -248,6 +280,17 @@ function routeConfirm(ev) {
     currLine2.trains = [t1, t2];
     lineCt++;
   }
+  if (holdState == K.HOLD_TRAIN) {
+    
+    for (let pass of modifyingTrain.passengers) {
+      pass.stop = modifyingTrain.dropOffLocation;
+      pass.actionStatus = K.REBOARDREQUIRED;
+    }
+    modifyingTrain.moving = false;
+    handleAwaiting(modifyingTrain, modifyingTrain.dropOffLocation);
+    holdState = K.NOHOLD;
+  }
+  holdState = K.NOHOLD;
   currPath = [];
   redraw();
   if (!ev || !downPt || distBtw({ x: ev.clientX, y: ev.clientY }, downPt) > 10) return;
@@ -278,12 +321,14 @@ function onWheel(ev) {
 
 function pointerdown(ev) {
   // if (paused) return;
-  if (event.button != 0) return;
+  if (ev.button != 0) return;
   holdState = K.HOLD;
   downPt = { x: ev.clientX, y: ev.clientY };
   let actualPos = fromCanvPos(ev.clientX, ev.clientY);
   let nStop = nearestStop(actualPos, acceptRadius);
   let nConn = nearestConnection(actualPos.x, actualPos.y);
+  let nTrain = nearestTrain(actualPos.x, actualPos.y, K.LINEACCEPTDIST);
+  
   if (nStop && colours.length > 0) {
     holdState = K.HOLD_NEWLINE;
     activeSettingsDialog = null;
@@ -295,6 +340,14 @@ function pointerdown(ev) {
     holdState = K.HOLD_EXTEND;
     extendInfo = {line:lines[sel], stop: activeSettingsDialog.stop};
     activeSettingsDialog = null;
+  }
+  else if (nTrain) {
+    holdState = K.HOLD_TRAIN;
+    modifyingTrain = nTrain;
+    nTrain.pendingMove = true;
+    nTrain.moving = true;
+    document.body.style.cursor = "grabbing";
+    nTrain.dropOffLocation = nTrain.from;
   }
   else if (nConn) {
     holdState = K.HOLD_CONNECTION;

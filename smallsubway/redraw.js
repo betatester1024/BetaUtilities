@@ -410,8 +410,16 @@ function redraw(delta) {
     // ctx.translate(-center.x, -center.y)
     // ctx.rotate(angBtw);
     // ctx.translate(center.x, center.y);
+    if (hoveringTrain == trains[i]) {
+      ctx.shadowColor = "#000";
+      ctx.shadowBlur = 15;
+    }
     ctx.globalAlpha = 0.6;
     ctx.fillStyle = associatedConnection.colour;
+    if (trains[i].pendingMove) {
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = getCSSProp("--system-grey3");
+    }
     ctx.moveTo(center.x + c * h / 2 + c2 * w / 2, center.y + s * h / 2 + s2 * w / 2);
     ctx.lineTo(center.x + c * h / 2 - c2 * w / 2, center.y + s * h / 2 - s2 * w / 2);
     ctx.lineTo(center.x - c * h / 2 - c2 * w / 2, center.y - s * h / 2 - s2 * w / 2);
@@ -503,31 +511,31 @@ function redraw(delta) {
   }
 
 
-  ctx.save();
-  ctx.resetTransform();
-  ctx.fillStyle = getCSSProp("--system-grey3");
-  ctx.fillRect(0, 0, canv.width, 60);
-  ctx.strokeStyle = defaultClr;
-  ctx.moveTo(0, 60);
-  ctx.lineTo(canv.width, 60);
-  ctx.stroke();
-  ctx.fillStyle = defaultClr;
+  // ctx.save();
+  // ctx.resetTransform();
+  // ctx.fillStyle = getCSSProp("--system-grey3");
+  // ctx.fillRect(0, 0, canv.width, 60);
+  // ctx.strokeStyle = defaultClr;
+  // ctx.moveTo(0, 60);
+  // ctx.lineTo(canv.width, 60);
+  // ctx.stroke();
+  // ctx.fillStyle = defaultClr;
 
-  drawSVG("passengersServed", 30, 30, canv.width-200, 25)
-  ctx.font = "30px Noto Sans Display";
-  ctx.textBaseline = "top";
-  ctx.fillText(passengersServed, canv.width-165, 30);
-
+  // drawSVG("passengersServed", 30, 30, canv.width-200, 25)
+  // ctx.font = "30px Noto Sans Display";
+  // ctx.textBaseline = "top";
+  // ctx.fillText(passengersServed, canv.width-165, 30);
+  
   if (paused) {
 
     // ctx.fillRect(0,0, canv.width, canv.height);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = getCSSProp("--system-blue");
-    ctx.textAlign = "left";
-    ctx.textBaseline = "top";
-    ctx.font = "30px Noto Sans Display";
+    // ctx.globalAlpha = 1;
+    // ctx.fillStyle = getCSSProp("--system-blue");
+    // ctx.textAlign = "left";
+    // ctx.textBaseline = "top";
+    // ctx.font = "30px Noto Sans Display";
 
-    ctx.fillText("Paused", 40, 30);
+    // ctx.fillText("Paused", 40, 30);
   }
   ctx.restore();
 
@@ -543,6 +551,13 @@ function renderStop(stop) {
   let radScl = deltaT>=1?stopSz/3:stopSz/3*(70*(deltaT-0.443)**7+0.2)
   types[stop.type](Math.max(0,radScl), stop.x, stop.y);
   ctx.beginPath();
+}
+
+function HTMLActions() {
+  byId("pServed").innerText = passengersServed;
+  let time = ingametime();
+  byId("time").innerText = `${padWithZero(time.d)}d ${padWithZero(time.h)}:${padWithZero(time.m)} (year ${time.y})`;
+  setTimeout(HTMLActions, 100);
 }
 
 function drawWaiting(stop) {

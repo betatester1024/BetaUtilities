@@ -9,6 +9,7 @@
     <script src="./redraw.js"> </script>
     <script src="./shapes.js"> </script>
     <script src="./transfm.js"> </script>
+    <script src="./uihandler.js"> </script>
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
@@ -74,12 +75,14 @@
       -->
       <div id="topBar">
         <span id="paused"></span>
+        <span class="material-symbols-outlined sz30" onpointerdown="addTrain(event)">train</span>
+        <span class="sz30" id="trainsAvailable">+5</span>
         <div class="metreOuter nobreak">
           <div class="metreInner nobreak">
             
           </div>
         </div>
-        <span class="blu nohover" id="time">0d 00:00</span>
+        <span class="blu nohover" id="time" onclick="openDialog(K.DIALOG_TIME);">0d 00:00</span>
         <span class="material-symbols-outlined sz30">
         directions_walk
         </span>

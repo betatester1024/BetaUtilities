@@ -37,6 +37,19 @@ function onmove(ev) {
   let actualPos = fromCanvPos(ev.clientX, ev.clientY);
   let nConn = nearestConnection(actualPos.x, actualPos.y);
   let nStop = nearestStop(actualPos, acceptRadius);
+  if (holdState == K.HOLD_ADDTRAIN) {
+    let newTrain = {
+      x: actualPos.x, y: actualPos.y,
+      from: null, to:null,
+      lineID: -1, colour: defaultClr, startT: timeNow(),
+      status: K.MOVING, passengers: [], cap:6, revDir:false,
+      percentCovered:0, pendingMove:true, moving:true
+      //toAdd:[], toRemove:[], onCompletion:0
+    };
+    trains.push(newTrain);
+    holdState = K.HOLD_TRAIN;
+    modifyingTrain = newTrain;
+  }
   if (holdState == K.HOLD_NEWLINE) {
 
     let lastStop = currPath[currPath.length - 1];
@@ -150,11 +163,13 @@ function onmove(ev) {
          modifyingTrain.x = currPos_canv.x + Math.cos(angBtw-K.PI/2)*dist;
          modifyingTrain.y = currPos_canv.y + Math.sin(angBtw-K.PI/2)*dist;
       }
-      let currLine = lines[modifyingTrain.lineID]
-      for (let i=0; i<currLine.trains.length; i++) {
-        if (currLine.trains[i] == modifyingTrain) {
-          currLine.trains.splice(i, 1);
-          break;
+      if (modifyingTrain.lineID>=0) {
+        let currLine = lines[modifyingTrain.lineID]
+        for (let i=0; i<currLine.trains.length; i++) {
+          if (currLine.trains[i] == modifyingTrain) {
+            currLine.trains.splice(i, 1);
+            break;
+          }
         }
       }
       lines[nConn.lineID].trains.push(modifyingTrain);
@@ -292,6 +307,9 @@ function routeConfirm(ev) {
   if (holdState == K.HOLD_TRAIN) {
     if (!nearestConnection(currPos_canv.x, currPos_canv.y)) {
       modifyingTrain.pendingRemove = true;
+      if (modifyingTrain.passengers.length == 0) {
+        trains.splice(trains.indexOf(modifyingTrain), 1);
+      }
     }
     for (let pass of modifyingTrain.passengers) {
       pass.stop = modifyingTrain.dropOffLocation;
@@ -369,3 +387,9 @@ function pointerdown(ev) {
     document.body.style.cursor = "grabbing";
   }
 } // pointerDown
+
+function addTrain(ev) {
+  holdState = K.HOLD_ADDTRAIN; 
+  onmove(ev);
+  ev.preventDefault();
+}

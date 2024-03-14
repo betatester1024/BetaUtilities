@@ -1,4 +1,4 @@
-K.dialog_TIME = 1;
+K.DIALOG_TIME = 0;
 let dialogIDs = ["time"]
 function opendialog(toOpen) {
   for (let id of dialogIDs) {
@@ -13,4 +13,15 @@ function opendialog(toOpen) {
     
     
   }
+}
+
+function HTMLActions() {
+  byId("pServed").innerText = passengersServed;
+  let time = ingametime();
+  byId("time").innerText = `${padWithZero(time.d)}d ${padWithZero(time.h)}:${padWithZero(time.m)} (year ${time.y})`;
+  if (paused) {
+    byId("playpause").innerHTML = "resume";
+  }
+  else byId("playpause").innerHTML = "pause";
+  setTimeout(HTMLActions, 100);
 }

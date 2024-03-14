@@ -8,6 +8,7 @@ const K = {
   HOLD_CONNECTION: 3,
   HOLD_EXTEND: 4,
   HOLD_TRAIN: 5,
+  HOLD_ADDTRAIN: 6,
   WAITING: 0,
   ONTHEWAY: 1,
   SETTINGSHEIGHT: 50,
@@ -131,6 +132,8 @@ function handlePassenger(pass) {
   }
 }
 function getAssociatedConnection(train) {
+  if (!train.to || !train.from)
+    return null;
   for (let cn of connections) {
     if (samePt(cn.to, train.to) && samePt(cn.from, train.from) || samePt(cn.from, train.to) && samePt(cn.to, train.from)) {
       if (cn.lineID == train.lineID)
@@ -205,10 +208,6 @@ function preLoad() {
 function animLoop() {
   let delta = Date.now() - startTime;
   startTime = Date.now();
-  if (paused) {
-    byId("playpause").innerHTML = "resume";
-  } else
-    byId("playpause").innerHTML = "pause";
   redraw(delta);
   requestAnimationFrame(animLoop);
 }

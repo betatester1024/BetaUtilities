@@ -9,7 +9,7 @@ function redraw(delta) {
   // function connect(currPath, clr) {
   function circle(pt, clear=true) {
     ctx.save();
-    if (clear) clearCircle(pt, acceptRadius);
+    if (clear) clearCircle(pt, acceptRadius);tr
     ctx.beginPath();
     ctx.arc(pt.x, pt.y, stopSz, 0, K.PI * 2);
     ctx.stroke();
@@ -388,13 +388,17 @@ function redraw(delta) {
   // now we draw the trains!
   for (let i = 0; i < trains.length; i++) {
     ctx.beginPath();
-    let angBtw = Math.atan2(trains[i].to.y - trains[i].from.y,
-      trains[i].to.x - trains[i].from.x);
+    let angBtw = 0;
+    if (trains[i].from && trains[i].to)
+      angBtw = Math.atan2(trains[i].to.y - trains[i].from.y,
+        trains[i].to.x - trains[i].from.x);
     let nStop = nearestStop(trains[i], stopSz);
     // if (!nStop) nStop = nearestStop(trains[i].from, stopSz);
 // angBtw = 0;
     let associatedConnection = getAssociatedConnection(trains[i]);
-    let offset = handleOffset(associatedConnection);
+    let offset = {x:0, y:0};
+    if (associatedConnection) offset = handleOffset(associatedConnection);
+    
     let center = { x: trains[i].x+offset.x, y: trains[i].y+offset.y };
 
     const w = 15;
@@ -413,7 +417,7 @@ function redraw(delta) {
       ctx.shadowBlur = 15;
     }
     ctx.globalAlpha = 0.6;
-    ctx.fillStyle = associatedConnection.colour;
+    ctx.fillStyle = associatedConnection?associatedConnection.colour:defaultClr;
     if (trains[i].pendingMove) {
       ctx.globalAlpha = 1;
       ctx.fillStyle = getCSSProp("--system-grey");
@@ -551,12 +555,7 @@ function renderStop(stop) {
   ctx.beginPath();
 }
 
-function HTMLActions() {
-  byId("pServed").innerText = passengersServed;
-  let time = ingametime();
-  byId("time").innerText = `${padWithZero(time.d)}d ${padWithZero(time.h)}:${padWithZero(time.m)} (year ${time.y})`;
-  setTimeout(HTMLActions, 100);
-}
+
 
 function drawWaiting(stop) {
   let y = 0, x=0;

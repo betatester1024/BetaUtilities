@@ -23,5 +23,11 @@ function HTMLActions() {
     byId("playpause").innerHTML = "resume";
   }
   else byId("playpause").innerHTML = "pause";
+  let mInner = byId("popInner");
+  mInner.style.width = (currPopulationPool/basePopulationPool)*50+"%"; // 0% to 200%
+  mInner.innerText = Math.floor(currPopulationPool)+" passengers";
+  if (currPopulationPool > basePopulationPool) mInner.style.backgroundColor = "var(--system-red)";
+  else mInner.style.backgroundColor = "var(--system-green)";
+  
   setTimeout(HTMLActions, 100);
 }

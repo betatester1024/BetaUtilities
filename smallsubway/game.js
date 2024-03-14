@@ -46,7 +46,7 @@ let canv = null;
 let startTick = -1;
 let startTime = -1;
 
-let basePopulationPool = 7;
+let basePopulationPool = 4;
 let currPopulationPool = 3;
 
 let totalScaleFac = 1;
@@ -97,7 +97,7 @@ const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
 
 let globalTicks = 0;
-let currSpeed = 1;
+let currSpeed = 2;
 let offsetDelta = 0; // from saved time
 
 function onLoad() {
@@ -264,7 +264,7 @@ function tickLoop() {
   globalTicks += 16.66667*currSpeed; // 60fps default
   let igt = ingametime();
   if (igt.h < 6 || igt.h > 22) 
-    currPopulationPool = basePopulationPool*0.3;
+    currPopulationPool = basePopulationPool*0.5;
   else if (igt.h >= 6 && igt.h<=8
      || igt.h >= 5 && igt.h <= 7) currPopulationPool = basePopulationPool*1.5;
   else currPopulationPool = basePopulationPool;
@@ -594,7 +594,7 @@ function addNewStop(type = -1) {
   newPt.toAdd = [];
   newPt.failing = false;
   newPt.failurePct = 0;
-  newPt.capacity = 6;
+  newPt.capacity = 10;
   redraw();
 }
 

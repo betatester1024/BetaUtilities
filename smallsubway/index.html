@@ -40,6 +40,8 @@
       }
       div#topBar {
         display: flex;
+        padding-top: 5px;
+        flex-wrap: wrap;
         position: absolute !important;
         top: 0px;
         width: 100%;
@@ -56,6 +58,19 @@
         font-size: 30px !important;
         top: 0px;
         color: var(--system-blue);
+      }
+      #popOuter {
+        width: 200px;
+        background-color: var(--system-blue2);
+        text-align: left;
+      }
+      #popInner {
+        background-color: var(--system-blue);
+        transition: width 0.5s;
+        white-space: nowrap;
+      }
+      #trainsAvailable {
+        margin-right: 10px;
       }
     </style>
   </head>
@@ -77,10 +92,11 @@
         <span id="paused"></span>
         <span class="material-symbols-outlined sz30" onpointerdown="addTrain(event)">train</span>
         <span class="sz30" id="trainsAvailable">+5</span>
-        <div class="metreOuter nobreak">
-          <div class="metreInner nobreak">
-            
+        <div id="popOuter" class="nobreak">
+          <div id="popInner" class="nobreak">
+            Population  
           </div>
+          
         </div>
         <span class="blu nohover" id="time" onclick="openDialog(K.DIALOG_TIME);">0d 00:00</span>
         <span class="material-symbols-outlined sz30">

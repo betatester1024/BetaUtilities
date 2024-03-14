@@ -16,62 +16,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="./globalformat.css">
+    <link rel="stylesheet" href="./game.css">
     <style>
-      details {
-        position: absolute;
-        bottom:0px;
-        height: 20px;
-        transition: height 0.3s;
-        width: calc(100% - 30px);
-        margin: 5px auto;
-        left: 5px;
-        background-color: var(--system-bg) !important;
-      }
-      details[open] {
-        height:20%;
-        /* bottom: */
-      }
-      canvas {
-        position: absolute;
-        top:0px;
-        left: 0px;
-        touch-action: none;
-        /* pointer-events: none; */
-      }
-      div#topBar {
-        display: flex;
-        padding-top: 5px;
-        flex-wrap: wrap;
-        position: absolute !important;
-        top: 0px;
-        width: 100%;
-        background-color: var(--system-grey3);
-        justify-content: center;
-        align-items: baseline;
-      }
-      #time, #pServed {
-        font-family:'Noto Sans Mono', monospace;
-        font-size: 30px;
-        margin-right: 10px;
-      }
-      span.material-symbols-outlined.sz30 {
-        font-size: 30px !important;
-        top: 0px;
-        color: var(--system-blue);
-      }
-      #popOuter {
-        width: 200px;
-        background-color: var(--system-blue2);
-        text-align: left;
-      }
-      #popInner {
-        background-color: var(--system-blue);
-        transition: width 0.5s;
-        white-space: nowrap;
-      }
-      #trainsAvailable {
-        margin-right: 10px;
-      }
+
     </style>
   </head>
   <body onload="
@@ -98,15 +45,24 @@
           </div>
           
         </div>
-        <span class="blu nohover" id="time" onclick="openDialog(K.DIALOG_TIME);">0d 00:00</span>
+        <span>Your balance: </span>
+        <span id="balance"></span>
+        <span class="blu nohover" id="time" onclick="toggleDialog(K.DIALOG_TIME);">0d 00:00</span>
         <span class="material-symbols-outlined sz30">
         directions_walk
         </span>
         <span class="blu nohover" id="pServed">0</span>
-        <button onclick="togglePause()"id="playpause" class="btn blu fssml override">
-          Pause/resume
-        </button>
+        <div class="menu" id="timeMenu" >
+          <button onclick="togglePause()"id="playpause" class="btn blu fssml override">
+            Pause/resume
+          </button>
+          <button onclick="toggleSpeed()" id="speed" class="btn blu fssml override">
+            Current speed: 1x
+          </button>
+        </div>
+        
       </div>
+      
       <details class="blu ">
         <summary>Footer</summary>
         <footer id="ftrOverride"></footer>

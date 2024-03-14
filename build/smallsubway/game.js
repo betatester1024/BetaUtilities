@@ -34,7 +34,13 @@ let ctx = null;
 let canv = null;
 let startTick = -1;
 let startTime = -1;
-let basePopulationPool = 7;
+shapeNames = ["triangle", "square", "circ", "diamond", "star"];
+function prtLine() {
+  logData.push(lines[0].path.map((x) => {
+    return shapeNames[x.type];
+  }).join(","));
+}
+let basePopulationPool = 4;
 let currPopulationPool = 3;
 let totalScaleFac = 1;
 let minSclFac = 0.5;
@@ -52,11 +58,14 @@ let lineCt = 0;
 let trains = [];
 let typesOnLine = [];
 let passengersServed = 0;
+let balance = 2e4;
+let scaledTime = 0;
 let extendInfo = null;
 let asyncEvents = [];
 let viewportW = 0;
 let viewportH = 0;
 let viewportMax, viewportMin;
+let logData = [];
 let currPath = [];
 let downPt = null;
 let currPos_canv = { x: 0, y: 0 };
@@ -70,7 +79,7 @@ let linesAvailable = 3;
 const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
 let globalTicks = 0;
-let currSpeed = 1;
+let currSpeed = 2;
 let offsetDelta = 0;
 function onLoad() {
 }
@@ -80,8 +89,8 @@ function timeNow() {
 function ingametime() {
   let mins = Math.floor(globalTicks / 1e3 * (20 / 2));
   let hrs = Math.floor(mins / 60);
-  let days = Math.floor(hrs / 24);
-  return { m: mins % 60, h: hrs % 60, d: days % 365, y: Math.floor(days / 365) };
+  let days = Math.floor(mins * 3);
+  return { m: mins % 60, h: hrs % 24, d: days % 365, y: Math.floor(days / 365) };
 }
 function togglePause() {
   paused = !paused;
@@ -92,7 +101,7 @@ function togglePause() {
 }
 function getNextStop(currTrain, actQ = true) {
   let line = lines[currTrain.lineID];
-  let currToIdx = line.path.indexOf(nearestStop(currTrain.to, 1));
+  let currToIdx = line.path.indexOf(currTrain.to);
   if (currTrain.revDir && currToIdx == 0) {
     if (line.loopingQ) {
       nextStop = line.path[line.path.length - 2];
@@ -215,7 +224,7 @@ function tickLoop() {
   globalTicks += 16.66667 * currSpeed;
   let igt = ingametime();
   if (igt.h < 6 || igt.h > 22)
-    currPopulationPool = basePopulationPool * 0.3;
+    currPopulationPool = basePopulationPool * 0.5;
   else if (igt.h >= 6 && igt.h <= 8 || igt.h >= 5 && igt.h <= 7)
     currPopulationPool = basePopulationPool * 1.5;
   else
@@ -472,9 +481,10 @@ function addNewStop(type = -1) {
   newPt.type = type;
   newPt.addedTime = Date.now();
   newPt.toAdd = [];
+  newPt.stopID = stops.length;
   newPt.failing = false;
   newPt.failurePct = 0;
-  newPt.capacity = 6;
+  newPt.capacity = 10;
   redraw();
 }
 function keyUpdate(ev) {

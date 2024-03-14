@@ -1,24 +1,29 @@
 K.DIALOG_TIME = 0;
-let dialogIDs = ["time"]
-function opendialog(toOpen) {
+let dialogIDs = ["timeMenu"]
+function toggleDialog(toOpen) {
   for (let id of dialogIDs) {
     let dialog = byId(id);
-    if (dialog == toOpen) {
-      dialog.style.opacity = 1;
-      dialog.style.touchEvents = '';
+    if (id == dialogIDs[toOpen]) {
+      if (dialog.classList.contains("open")) 
+        dialog.classList.remove("open");
+      else dialog.classList.add("open");
     } else {
-      dialog.style.opacity = 0;
-      dialog.style.touchEvents = 'none';
+      dialog.classList.remove("open");
     }
     
     
   }
 }
 
+function toggleSpeed() {
+  currSpeed = currSpeed == 1?2:1;
+  byId("speed").innerHTML = `Current speed: ${currSpeed}x`;
+}
+
 function HTMLActions() {
   byId("pServed").innerText = passengersServed;
   let time = ingametime();
-  byId("time").innerText = `${padWithZero(time.d)}d ${padWithZero(time.h)}:${padWithZero(time.m)} (year ${time.y})`;
+  byId("time").innerText = `${padWithZero(time.d)}d ${padWithZero(time.h)}:${padWithZero(time.m)} (year ${time.y+1})`;
   if (paused) {
     byId("playpause").innerHTML = "resume";
   }

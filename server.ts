@@ -345,8 +345,8 @@ export async function initServer() {
     incrRequests();
   })
   const acceptedPaths = ["/drawutils.js", "/events.js", "/game.js", "/redraw.js", "/shapes.js",
-                        "/transfm.js", "/uihandler.js", "/utils.js"];
-  app.get('/smallsubway/*.js', (req:any, res:any) => {
+                        "/transfm.js", "/uihandler.js", "/utils.js", "/game.css", "/globalformat.css"];
+  app.get('/smallsubway/*', (req:any, res:any) => {
     if (acceptedPaths.indexOf(req.path.replace(/\/smallsubway/, ""))>=0)
       sendFile(res, getToken(req), rootDir+(req.path));
     else sendFile(res, getToken(req), frontendDir+"404.html");

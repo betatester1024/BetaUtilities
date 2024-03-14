@@ -46,6 +46,11 @@ let canv = null;
 let startTick = -1;
 let startTime = -1;
 
+shapeNames = ['triangle', 'square', 'circ', 'diamond', "star"]; 
+function prtLine() {
+  logData.push(lines[0].path.map((x)=>{return shapeNames[x.type]}).join(","));
+}
+
 let basePopulationPool = 4;
 let currPopulationPool = 3;
 
@@ -68,6 +73,9 @@ let trains = [];
 let typesOnLine = [];
 let passengersServed = 0;
 
+let balance = 20000 // usually in millions
+let scaledTime = 0; // 
+
 let extendInfo = null;
 
 let asyncEvents = [];
@@ -75,6 +83,8 @@ let asyncEvents = [];
 let viewportW = 0;
 let viewportH = 0;
 let viewportMax, viewportMin;
+
+let logData = [];
 
 let currPath = [];
 let downPt = null;
@@ -115,8 +125,8 @@ function ingametime() {
   // let sec = Math.floor(globalTicks/1000*(15/2)*60);
   let mins = Math.floor(globalTicks/1000*(20/2));
   let hrs = Math.floor(mins/60);
-  let days = Math.floor(hrs/24);
-  return {m:mins%60, h:hrs%60, d:days%365, y:Math.floor(days/365)};
+  let days = Math.floor(mins*3);
+  return {m:mins%60, h:hrs%24, d:days%365, y:Math.floor(days/365)};
 }
 
 function togglePause() {
@@ -129,7 +139,7 @@ function togglePause() {
 
 function getNextStop(currTrain, actQ=true) {
   let line = lines[currTrain.lineID]
-  let currToIdx = line.path.indexOf(nearestStop(currTrain.to,1));
+  let currToIdx = line.path.indexOf(currTrain.to);
   if (currTrain.revDir && currToIdx == 0)
   {
     if (line.loopingQ) {
@@ -592,6 +602,7 @@ function addNewStop(type = -1) {
   newPt.type = type;
   newPt.addedTime = Date.now();
   newPt.toAdd = [];
+  newPt.stopID = stops.length;
   newPt.failing = false;
   newPt.failurePct = 0;
   newPt.capacity = 10;

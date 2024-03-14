@@ -272,9 +272,11 @@ async function initServer() {
     "/shapes.js",
     "/transfm.js",
     "/uihandler.js",
-    "/utils.js"
+    "/utils.js",
+    "/game.css",
+    "/globalformat.css"
   ];
-  app.get("/smallsubway/*.js", (req, res) => {
+  app.get("/smallsubway/*", (req, res) => {
     if (acceptedPaths.indexOf(req.path.replace(/\/smallsubway/, "")) >= 0)
       sendFile(res, getToken(req), import_consts.rootDir + req.path);
     else

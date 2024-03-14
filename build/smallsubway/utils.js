@@ -31,6 +31,10 @@ async function globalOnload(cbk, networkLess = false, link = "/server") {
     script.src = "/nodemodules/dialog-polyfill/dist/dialog-polyfill.js";
     document.head.appendChild(script);
   }
+  let ftr = byId("ftrOverride");
+  if (ftr) {
+    ftr.innerHTML = `SmallSubway, by BetaOS. This footer should contain links to the rest of my site, but there's no server hosting here.`;
+  }
   HASNETWORK = !networkLess;
   document.onkeydown = keydown;
   document.onpointerup = pointerUp;
@@ -41,142 +45,9 @@ async function globalOnload(cbk, networkLess = false, link = "/server") {
     ovr.id = "overlay";
     document.body.appendChild(ovr);
   }
-  if (!networkLess) {
-    send(JSON.stringify({ action: "startupData" }), (res) => {
-      if (res.data.branch)
-        branch = res.data.branch;
-      let startupData = res.data;
-      send(
-        JSON.stringify({ action: "userRequest" }),
-        (res2) => {
-          userData = res2.data;
-          if (branch == "unstable" && link == "/server") {
-            let mainContent = byClass("main_content");
-            mainContent.style.width = "calc(100% - 30px)";
-            mainContent.style.margin = "0px";
-            let box = document.createElement("p");
-            box.className = "sidebar-unstable";
-            box.innerHTML = `<span class="material-symbols-outlined">warning</span>            Unstable version. Features may be unfinished or broken. 
-            <a class="grn" href="${startupData.domain}">Switch to stable branch</a>`;
-            document.body.appendChild(box);
-          }
-          let maincontent = document.getElementsByClassName("main_content").item(0);
-          let ftr = byId("ftrOverride") ?? document.createElement("footer");
-          if (!byId("ftrOverride"))
-            maincontent.appendChild(ftr);
-          let ele = document.createElement("p");
-          ele.id = "footer";
-          let urlEle = new URL(location.href);
-          let redirector = urlEle.pathname + "?" + urlEle.searchParams.toString();
-          if (link != "/server" && res2.status != "SUCCESS")
-            ele.innerHTML = `<a href="${startupData.domain}">BetaOS Services site</a> | 
-                          <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
-                            <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
-                            <div class="anim"></div>
-                          </form> |
-            BetaOS Systems V3, 2024`;
-          else if (res2.status != "SUCCESS") {
-            ele.innerHTML = `<a href="/login?redirect=${encodeURIComponent(redirector)}" onclick="login_v2(event)">Login</a> | 
-                          <a href='/signup?redirect=${encodeURIComponent(redirector)}' onclick="login_v2(event, true)">Sign-up</a> | 
-                          <a href='/status'>Status</a> | 
-                          <a href='${branch == "unstable" ? startupData.domain : startupData.unstableDomain}'>
-                          Switch to ${branch == "unstable" ? "stable" : "unstable"} branch</a> | 
-                          <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
-                            <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
-                            <div class="anim"></div>
-                          </form> |
-                          BetaOS Systems V3, 2024`;
-          } else if (res2.status == "SUCCESS" && link == "/server") {
-            resetExpiry(res2);
-            ele.innerHTML = `Logged in as <kbd>${res2.data.user}</kbd> |
-                          <a href='/logout' onclick='logout_v2(event)'>Logout</a> | 
-                          <a href='/config'>Account</a> | 
-                          <a href='/status'>Status</a> | 
-                          <a href='${branch == "unstable" ? startupData.domain : startupData.unstableDomain}'>
-                          Switch to ${branch == "unstable" ? "stable" : "unstable"} branch</a> | 
-                          <a onclick='event.preventDefault();
-                          send(JSON.stringify({action:"toggleTheme"}), (res)=>{
-                            if (res.status != "SUCCESS") 
-                            ephemeralDialog("Error: "+res.data.error);
-                            else {
-                              ephemeralDialog("Theme updated!");
-                              location.reload();
-                            }
-                          })' href="javascript:void;">Theme</a> |
-                          <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
-                            <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
-                            <div class="anim"></div>
-                          </form> |
-                          BetaOS Systems V3, 2024`;
-          } else {
-            ele.innerHTML = `Logged in as <kbd>${res2.data.user}</kbd> |
-                          <a href='${startupData.domain}/logout'>Logout</a> | 
-                          <a href="${startupData.domain}">BetaOS Services site</a> | 
-                          <form class="inpContainer szThird nobreak" action="javascript:location.href='/'+byId('ftrNav').value" style="margin: 2px;">
-                            <input type="text" id="ftrNav" class="fssml sz100 ftrInput" placeholder="Navigate... (/)">
-                            <div class="anim"></div>
-                          </form> |
-                          BetaOS Systems V3, 2024`;
-          }
-          ftr.appendChild(ele);
-          let ephDiv = byId("ephemerals") ?? document.createElement("div");
-          if (!ephDiv.id) {
-            ephDiv.id = "ephemerals";
-            document.body.appendChild(ephDiv);
-          }
-          send(
-            JSON.stringify({ action: "visits" }),
-            (res3) => {
-              if (res3.status != "SUCCESS") {
-                alertDialog("Database connection failure. Please contact BetaOS. Error: " + res3.data.error, () => {
-                });
-                ele.innerHTML = `<kbd class="red nohover">Database connection failure.</kbd>`;
-              } else
-                document.getElementById("footer").innerHTML += " | <kbd>Total requests made: " + res3.data.data + "</kbd>";
-              send(JSON.stringify({ action: "cookieRequest" }), (res4) => {
-                if (res4.data.toString() == "false") {
-                  let cpl = document.getElementById("compliance");
-                  cpl.style.opacity = "1";
-                  cpl.style.height = "auto";
-                  cpl.style.pointerEvents = "auto";
-                } else {
-                  let cpl = document.getElementById("compliance");
-                  cpl.style.opacity = "0";
-                  cpl.style.pointerEvents = "none";
-                }
-                if (cbk)
-                  cbk();
-              }, true, link);
-            },
-            true,
-            link
-          );
-        },
-        true,
-        link
-      );
-    }, true, link);
-  }
   let ele2 = document.getElementById("overlay");
   if (ele2)
     ele2.innerHTML = `<div class="internal" style="opacity: 0; text-align: center !important"> </div>`;
-  document.body.innerHTML += `
-  <div id="compliance" style="display:none">
-    <h2 class="blu nohover fssml"><span class="material-symbols-outlined">cookie </span> BetaOS Services uses cookies to operate.</h2>
-    <p style="font-size: 10px">We use only <kbd>strictly necessary cookies</kbd> to verify and persist 
-    your login session, and to confirm your acceptance of these cookies. <br>
-    By continuing to use this site, you consent to our use of these cookies.</p>
-    <button class='blu btn fssml' onclick="acceptCookies('${link}')">
-    <span class="material-symbols-outlined" style="font-size: 20pt !important">check</span>
-    I understand
-    <div class="anim"></div>
-    </button>
-  </div>`;
-  if (networkLess) {
-    let cpl = document.getElementById("compliance");
-    cpl.style.opacity = "1";
-    cpl.style.height = "auto";
-  }
 }
 let DRAGGING = null;
 let origLeft = -1;

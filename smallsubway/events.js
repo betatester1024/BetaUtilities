@@ -65,10 +65,12 @@ function onmove(ev) {
       else if (!canAdd && currPath.length > 2
         && samePt(nStop, currPath[0]) && !samePt(nStop, lastStop)) {
         currPath.push(nStop);
+        logData.push("added stop forming loop (type",nStop.type+")");
         routeConfirm();
         // holdState = K.NOHOLD;
       }
       if (canAdd) {
+        logData.push("added stop (type",nStop.type+")");
         currPath.push(nStop);
       }
     }
@@ -107,8 +109,16 @@ function onmove(ev) {
         nStop.linesServed.add(modifyingConn.lineID);
         
         
-        let idx = currLine.path.indexOf(modifyingConn.from);
-        currLine.path.splice(idx+1, 0, nStop);
+        let fIdx = currLine.path.indexOf(modifyingConn.from);
+        let tIdx = currLine.path.indexOf(modifyingConn.to);
+        // special cases: end. 
+        if (fIdx == tIdx+1) // the thing in between is to be added at 
+          currLine.path.splice(tIdx+1, 0, nStop);
+        else if (tIdx == fIdx+1)
+          currLine.path.splice(fIdx+1, 0, nStop);
+        else {
+          currLine.path.splice(currLine.path.length-1, 0, nStop);
+        }
         recalculateLineConnections();
         
         for (let pass of passengers)
@@ -133,9 +143,15 @@ function onmove(ev) {
       typesOnLine[currLine.lineID].add(nStop.type);
       nStop.linesServed.add(currLine.lineID);
       currLine.stops.add(nStop);
-      if (currLine.path[currLine.path.length-1] == extendInfo.stop) 
+      // if the stop that we're extending is the at the end, then add at the end
+      if (currLine.path[currLine.path.length-1] == extendInfo.stop) {
         currLine.path.push(nStop);
+        logData.push("line extension #0 (type",nStop.type+")");
+        prtLine();
+      }
+      // otherwise the line we're extending must be the first stop
       else currLine.path.splice(0, 0, nStop)
+      // is it looping?
       if (currLine.path[0] == currLine.path[currLine.path.length-1]) {
         currLine.loopingQ = true;
         extendInfo = null;

@@ -291,7 +291,8 @@ function redraw(delta) {
     // ctx.arc(connections[i].from.x, connections[i].from.y, stopSz, 0, K.PI * 2);
     ctx.stroke();
     ctx.beginPath();
-    types[connections[i].to.type](stopSz/3, connections[i].to.x, connections[i].to.y, true)
+    types[connections[i].to.type](stopSz/3, connections[i].to.x, connections[i].to.y, true);
+    ctx.fillText(connections[i].to.type, connections[i].to.x, connections[i].to.y);
     ctx.stroke();
     // circle(connections[i].from)//, connections[i].colour);
     // circle(connections[i].to) //, connections[i].colour);
@@ -548,10 +549,12 @@ function renderStop(stop) {
   // ctx.stroke();
   ctx.beginPath();
   ctx.fillStyle = defaultClr;
-
+  
   let deltaT = (Date.now() -stop.addedTime)/1500;
   let radScl = deltaT>=1?stopSz/3:stopSz/3*(70*(deltaT-0.443)**7+0.2)
   types[stop.type](Math.max(0,radScl), stop.x, stop.y);
+  ctx.fillStyle = getCSSProp("--system-red");
+  ctx.fillText(stop.stopID, stop.x, stop.y);
   ctx.beginPath();
 }
 

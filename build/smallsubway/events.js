@@ -65,9 +65,11 @@ function onmove(ev) {
         canAdd = false;
       else if (!canAdd && currPath.length > 2 && samePt(nStop, currPath[0]) && !samePt(nStop, lastStop)) {
         currPath.push(nStop);
+        logData.push("added stop forming loop (type", nStop.type + ")");
         routeConfirm();
       }
       if (canAdd) {
+        logData.push("added stop (type", nStop.type + ")");
         currPath.push(nStop);
       }
     }
@@ -125,9 +127,11 @@ function onmove(ev) {
       typesOnLine[currLine.lineID].add(nStop.type);
       nStop.linesServed.add(currLine.lineID);
       currLine.stops.add(nStop);
-      if (currLine.path[currLine.path.length - 1] == extendInfo.stop)
+      if (currLine.path[currLine.path.length - 1] == extendInfo.stop) {
         currLine.path.push(nStop);
-      else
+        logData.push("line extension #0 (type", nStop.type + ")");
+        prtLine();
+      } else
         currLine.path.splice(0, 0, nStop);
       if (currLine.path[0] == currLine.path[currLine.path.length - 1]) {
         currLine.loopingQ = true;

@@ -15,6 +15,19 @@ function toggleDialog(toOpen) {
   }
 }
 
+function openDialog(toOpen) {
+  for (let id of dialogIDs) {
+    let dialog = byId(id);
+    if (id == dialogIDs[toOpen]) {
+      dialog.classList.add("open");
+    } else {
+      dialog.classList.remove("open");
+    }
+
+
+  }
+}
+
 function toggleSpeed() {
   currSpeed = currSpeed == 1?2:1;
   byId("speed").innerHTML = `Current speed: ${currSpeed}x`;
@@ -23,16 +36,29 @@ function toggleSpeed() {
 function HTMLActions() {
   byId("pServed").innerText = passengersServed;
   let time = ingametime();
-  byId("time").innerText = `${padWithZero(time.d)}d ${padWithZero(time.h)}:${padWithZero(time.m)} (year ${time.y+1})`;
-  if (paused) {
-    byId("playpause").innerHTML = "resume";
-  }
+  byId("time").innerText = (paused?'(Paused) ':"")+`${padWithZero(time.h)}:${padWithZero(time.m)}`;
+  byId("date").innerText = `Day ${padWithZero(time.d)} (year ${time.y+1})`
+  if (paused)
+  byId("playpause").innerHTML = "resume";
   else byId("playpause").innerHTML = "pause";
+  byId("trainsAvailable").innerText = trainsAvailable;
   let mInner = byId("popInner");
+  byId("balance").innerHTML = (balance/1000).toFixed(3);
   mInner.style.width = (currPopulationPool/basePopulationPool)*50+"%"; // 0% to 200%
   mInner.innerText = Math.floor(currPopulationPool)+" passengers";
+  byId("linesAvailable").innerText = linesAvailable - lines.length;
   if (currPopulationPool > basePopulationPool) mInner.style.backgroundColor = "var(--system-red)";
   else mInner.style.backgroundColor = "var(--system-green)";
+  if (currCost > 0) {
+    let costEle =  byId("currCost");
+    costEle.classList.remove("displayNone")
+    costEle.innerText = currCost.toFixed(2).toLocaleString();
+    costEle.style.left = currPos_abs.x+10+"px";
+    costEle.style.top = currPos_abs.y+"px";
+    if (overCost) costEle.classList.add("overCost");
+    else costEle.classList.remove("overCost");
+  }
+  else byId("currCost").classList.add("displayNone");
   
   setTimeout(HTMLActions, 100);
 }

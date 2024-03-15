@@ -14,6 +14,16 @@ function toggleDialog(toOpen) {
     }
   }
 }
+function openDialog(toOpen) {
+  for (let id of dialogIDs) {
+    let dialog = byId(id);
+    if (id == dialogIDs[toOpen]) {
+      dialog.classList.add("open");
+    } else {
+      dialog.classList.remove("open");
+    }
+  }
+}
 function toggleSpeed() {
   currSpeed = currSpeed == 1 ? 2 : 1;
   byId("speed").innerHTML = `Current speed: ${currSpeed}x`;
@@ -21,18 +31,26 @@ function toggleSpeed() {
 function HTMLActions() {
   byId("pServed").innerText = passengersServed;
   let time = ingametime();
-  byId("time").innerText = `${padWithZero(time.d)}d ${padWithZero(time.h)}:${padWithZero(time.m)} (year ${time.y + 1})`;
-  if (paused) {
+  byId("time").innerText = (paused ? "(Paused) " : "") + `${padWithZero(time.h)}:${padWithZero(time.m)}`;
+  byId("date").innerText = `Day ${padWithZero(time.d)} (year ${time.y + 1})`;
+  if (paused)
     byId("playpause").innerHTML = "resume";
-  } else
+  else
     byId("playpause").innerHTML = "pause";
+  byId("trainsAvailable").innerText = trainsAvailable;
   let mInner = byId("popInner");
+  byId("balance").innerHTML = (balance / 1e3).toFixed(3);
   mInner.style.width = currPopulationPool / basePopulationPool * 50 + "%";
   mInner.innerText = Math.floor(currPopulationPool) + " passengers";
+  byId("linesAvailable").innerText = linesAvailable - lines.length;
   if (currPopulationPool > basePopulationPool)
     mInner.style.backgroundColor = "var(--system-red)";
   else
     mInner.style.backgroundColor = "var(--system-green)";
+  if (currCost > 0) {
+    let costEle = byId("currCost");
+    costEle.innerText = currCost;
+  }
   setTimeout(HTMLActions, 100);
 }
 //# sourceMappingURL=uihandler.js.map

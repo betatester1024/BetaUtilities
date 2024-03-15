@@ -32,30 +32,48 @@ function onmove(ev) {
   let nConn = nearestConnection(actualPos.x, actualPos.y);
   let nStop = nearestStop(actualPos, acceptRadius);
   if (holdState == K.HOLD_ADDTRAIN) {
-    let newTrain = {
-      x: actualPos.x,
-      y: actualPos.y,
-      from: null,
-      to: null,
-      lineID: -1,
-      colour: defaultClr,
-      startT: timeNow(),
-      status: K.MOVING,
-      passengers: [],
-      cap: 6,
-      revDir: false,
-      percentCovered: 0,
-      pendingMove: true,
-      moving: true
-    };
-    trains.push(newTrain);
-    holdState = K.HOLD_TRAIN;
-    modifyingTrain = newTrain;
+    if (trainsAvailable == 0) {
+      holdState = K.NOHOLD;
+    } else {
+      trainsAvailable--;
+      let newTrain = {
+        x: actualPos.x,
+        y: actualPos.y,
+        from: null,
+        to: null,
+        lineID: -1,
+        colour: defaultClr,
+        startT: timeNow(),
+        status: K.MOVING,
+        passengers: [],
+        cap: 6,
+        revDir: false,
+        percentCovered: 0,
+        pendingMove: true,
+        moving: true
+      };
+      trains.push(newTrain);
+      holdState = K.HOLD_TRAIN;
+      modifyingTrain = newTrain;
+    }
   }
   if (holdState == K.HOLD_NEWLINE) {
     let lastStop = currPath[currPath.length - 1];
+    let dist = distBtw(lastStop, currPos_canv);
+    currCost = dist * costPerPx + currCost_existing;
+    if (currCost > balance) {
+      overCost = true;
+    } else
+      overCost = false;
     if (nStop) {
       let canAdd = true;
+      if (nStop.linesServed.size == 0) {
+        currCost += costPerStation;
+      }
+      if (currCost > balance) {
+        overCost = true;
+        canAdd = false;
+      }
       for (let i = 0; i < currPath.length && canAdd; i++) {
         if (samePt(currPath[i], nStop))
           canAdd = false;
@@ -65,17 +83,28 @@ function onmove(ev) {
         canAdd = false;
       else if (!canAdd && currPath.length > 2 && samePt(nStop, currPath[0]) && !samePt(nStop, lastStop)) {
         currPath.push(nStop);
-        logData.push("added stop forming loop (type", nStop.type + ")");
+        logData.push("added stop forming loop (ID " + nStop.stopID + ")");
         routeConfirm();
       }
       if (canAdd) {
-        logData.push("added stop (type", nStop.type + ")");
+        logData.push("added stop " + nStop.stopID + " to line " + nStop.lineID);
+        currCost_existing = currCost;
         currPath.push(nStop);
       }
     }
     redraw();
   } else if (holdState == K.HOLD_CONNECTION) {
-    if (nStop) {
+    let origDist = distBtw(modifyingConn.from, modifyingConn.to);
+    let nowDist = distBtw(modifyingConn.from, currPos_canv) + distBtw(modifyingConn.to, currPos_canv);
+    currCost = modifCost + nowDist - origDist;
+    if (currCost > balance) {
+      overCost = true;
+    }
+    if (nStop && (nStop.linesServed.size == 0 && balance > currCost + costPerStation || nStop.linesServed.size > 0 && balance > currCost)) {
+      balance -= currCost;
+      if (nStop.linesServed.size == 0)
+        balance -= costPerStation;
+      resetCosts();
       let currLine = lines[modifyingConn.lineID];
       let newConn = {
         from: modifyingConn.from,
@@ -105,6 +134,7 @@ function onmove(ev) {
         }
         typesOnLine[modifyingConn.lineID].add(nStop.type);
         nStop.linesServed.add(modifyingConn.lineID);
+        logData.push("Connection added between stopID");
         let fIdx = currLine.path.indexOf(modifyingConn.from);
         let tIdx = currLine.path.indexOf(modifyingConn.to);
         if (fIdx == tIdx + 1)
@@ -120,37 +150,47 @@ function onmove(ev) {
         holdState = K.NOHOLD;
         routeConfirm();
       }
+    } else if (nStop && balance > currCost) {
+      overCost = true;
     }
-  } else if (holdState == K.HOLD_EXTEND && nStop) {
+  } else if (holdState == K.HOLD_EXTEND) {
     let currLine = extendInfo.line;
-    if (!currLine.stops.has(nStop) || (nStop == currLine.path[0] && extendInfo.stop == currLine.path[currLine.path.length - 1] || nStop == currLine.path[currLine.path.length - 1] && extendInfo.stop == currLine.path[0]) && currLine.path.length > 2 && !currLine.loopingQ) {
-      let newConn = {
-        from: extendInfo.stop,
-        to: nStop,
-        lineID: currLine.lineID,
-        colour: currLine.colour
-      };
-      connections.push(newConn);
-      typesOnLine[currLine.lineID].add(nStop.type);
-      nStop.linesServed.add(currLine.lineID);
-      currLine.stops.add(nStop);
-      if (currLine.path[currLine.path.length - 1] == extendInfo.stop) {
-        currLine.path.push(nStop);
-        logData.push("line extension #0 (type", nStop.type + ")");
-        prtLine();
-      } else
-        currLine.path.splice(0, 0, nStop);
-      if (currLine.path[0] == currLine.path[currLine.path.length - 1]) {
-        currLine.loopingQ = true;
-        extendInfo = null;
+    let delta = distBtw(extendInfo.stop, currPos_canv);
+    currCost = currCost_existing + delta * costPerPx;
+    if (currCost > balance)
+      overCost = true;
+    if (nStop && balance > currCost) {
+      balance -= currCost;
+      resetCosts();
+      if (!currLine.stops.has(nStop) || (nStop == currLine.path[0] && extendInfo.stop == currLine.path[currLine.path.length - 1] || nStop == currLine.path[currLine.path.length - 1] && extendInfo.stop == currLine.path[0]) && currLine.path.length > 2 && !currLine.loopingQ) {
+        let newConn = {
+          from: extendInfo.stop,
+          to: nStop,
+          lineID: currLine.lineID,
+          colour: currLine.colour
+        };
+        connections.push(newConn);
+        typesOnLine[currLine.lineID].add(nStop.type);
+        nStop.linesServed.add(currLine.lineID);
+        currLine.stops.add(nStop);
+        if (currLine.path[currLine.path.length - 1] == extendInfo.stop) {
+          currLine.path.push(nStop);
+          logData.push("line extension #0 (type", nStop.type + ")");
+          prtLine();
+        } else
+          currLine.path.splice(0, 0, nStop);
+        if (currLine.path[0] == currLine.path[currLine.path.length - 1]) {
+          currLine.loopingQ = true;
+          extendInfo = null;
+          recalculateLineConnections();
+          routeConfirm();
+        }
         recalculateLineConnections();
-        routeConfirm();
+        for (let pass2 of passengers)
+          handlePassenger(pass2);
+        if (extendInfo)
+          extendInfo.stop = nStop;
       }
-      recalculateLineConnections();
-      for (let pass2 of passengers)
-        handlePassenger(pass2);
-      if (extendInfo)
-        extendInfo.stop = nStop;
     }
   } else if (holdState == K.HOLD_TRAIN) {
     modifyingTrain.x = currPos_canv.x;
@@ -230,10 +270,17 @@ function onmove(ev) {
   }
   redraw();
 }
+function resetCosts() {
+  currCost = 0;
+  currCost_existing = 0;
+  overCost = false;
+}
 function routeConfirm(ev) {
   extendInfo = null;
   document.body.style.cursor = holdState == K.HOLD ? "grab" : "";
-  if (currPath.length > 1) {
+  if (currPath.length > 1 && balance >= currCost) {
+    trainsAvailable--;
+    balance -= currCost;
     let currCol = getCSSProp("--system-" + colours[0]);
     colours.shift();
     for (let i = 1; i < currPath.length; i++) {
@@ -293,6 +340,7 @@ function routeConfirm(ev) {
       modifyingTrain.pendingRemove = true;
       if (modifyingTrain.passengers.length == 0) {
         trains.splice(trains.indexOf(modifyingTrain), 1);
+        trainsAvailable++;
       }
     }
     for (let pass2 of modifyingTrain.passengers) {
@@ -304,6 +352,7 @@ function routeConfirm(ev) {
     modifyingTrain = null;
     holdState = K.NOHOLD;
   }
+  resetCosts();
   holdState = K.NOHOLD;
   currPath = [];
   redraw();
@@ -332,14 +381,22 @@ function pointerdown(ev) {
   let nStop = nearestStop(actualPos, acceptRadius);
   let nConn = nearestConnection(actualPos.x, actualPos.y);
   let nTrain = nearestTrain(actualPos.x, actualPos.y, K.LINEACCEPTDIST);
-  if (nStop && lines.length < linesAvailable) {
-    holdState = K.HOLD_NEWLINE;
-    activeSettingsDialog = null;
-    currPath = [nStop];
-    redraw();
+  if (nStop && lines.length < linesAvailable && trainsAvailable > 0) {
+    if (lines.length == linesAvailable)
+      nonBlockingDialog("You have no more lines available!");
+    else if (trainsAvailable == 0)
+      nonBlockingDialog("You have no more trains!");
+    else {
+      holdState = K.HOLD_NEWLINE;
+      currCost_existing = trainCost + costPerStation;
+      activeSettingsDialog = null;
+      currPath = [nStop];
+      redraw();
+    }
   } else if (activeSettingsDialog && activeSettingsDialog.selected != null) {
     let sel = activeSettingsDialog.selected;
     holdState = K.HOLD_EXTEND;
+    currCost_existing = modifCost;
     extendInfo = { line: lines[sel], stop: activeSettingsDialog.stop };
     activeSettingsDialog = null;
   } else if (nTrain) {

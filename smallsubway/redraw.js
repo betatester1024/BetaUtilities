@@ -88,7 +88,7 @@ function redraw(delta) {
   if (holdState == K.HOLD_CONNECTION) {
     ctx.save();
     ctx.beginPath();
-    ctx.strokeStyle = modifyingConn.colour;
+    ctx.strokeStyle = overCost?getCSSProp("--system-red"):modifyingConn.colour;
     ctx.lineWidth = K.LINEWIDTH;
     ctx.moveTo(modifyingConn.from.x, modifyingConn.from.y);
     ctx.lineTo(currPos_canv.x, currPos_canv.y);
@@ -104,7 +104,7 @@ function redraw(delta) {
     ctx.beginPath();
     let line = extendInfo.line;
     let stop = extendInfo.stop;
-    ctx.strokeStyle = line.colour;
+    ctx.strokeStyle = overCost?getCSSProp("--system-red"):line.colour;
     ctx.lineWidth = K.LINEWIDTH;
     ctx.moveTo(stop.x, stop.y);
     ctx.lineTo(currPos_canv.x, currPos_canv.y);
@@ -177,7 +177,7 @@ function redraw(delta) {
   if (holdState == K.HOLD_NEWLINE && (!nextStop || !samePt(nextStop, lastPt))){
       ctx.moveTo(lastPt.x, lastPt.y);
       ctx.save();
-      ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
+      ctx.strokeStyle = overCost?getCSSProp("--system-red"):getCSSProp("--system-" + colours[0]);
       ctx.lineWidth = K.LINEWIDTH;
       ctx.lineTo(currPos_canv.x, currPos_canv.y);
       ctx.stroke();
@@ -196,7 +196,7 @@ function redraw(delta) {
     ctx.beginPath();
     let c = Math.cos(angBtw);
     let s = Math.sin(angBtw);
-    ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
+    ctx.strokeStyle = ctx.strokeStyle = overCost?getCSSProp("--system-red"):getCSSProp("--system-" + colours[0]);
     ctx.lineWidth = K.LINEWIDTH;
     ctx.moveTo(currPath[i - 1].x, currPath[i - 1].y);
     ctx.lineTo(currPath[i].x, currPath[i].y)
@@ -292,7 +292,7 @@ function redraw(delta) {
     ctx.stroke();
     ctx.beginPath();
     types[connections[i].to.type](stopSz/3, connections[i].to.x, connections[i].to.y, true);
-    ctx.fillText(connections[i].to.type, connections[i].to.x, connections[i].to.y);
+    // ctx.fillText(connections[i].to.type, connections[i].to.x, connections[i].to.y);
     ctx.stroke();
     // circle(connections[i].from)//, connections[i].colour);
     // circle(connections[i].to) //, connections[i].colour);
@@ -317,7 +317,7 @@ function redraw(delta) {
       clearShape(lastPt, acceptRadius);
       ctx.save();
       ctx.beginPath();
-      ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
+      ctx.strokeStyle = ctx.strokeStyle = overCost?getCSSProp("--system-red"):getCSSProp("--system-" + colours[0]);
       // ctx.arc(lastPt.x, lastPt.y, stopSz, 0, K.PI * 2);
       ctx.fillStyle = "rgba(0,0,0,0)";
       ctx.lineJoin = "round";
@@ -361,7 +361,7 @@ function redraw(delta) {
     //////////////// then put the current path large circles /////////
     for (let i = 0; i < currPath.length; i++) {
       ctx.save();
-      ctx.strokeStyle = getCSSProp("--system-" + colours[0]);
+      ctx.strokeStyle = ctx.strokeStyle = overCost?getCSSProp("--system-red"):getCSSProp("--system-" + colours[0]);
       // circle(currPath[i]);
       ctx.lineJoin = "round";
       ctx.fillStyle = "rgba(0,0,0,0)";
@@ -554,7 +554,7 @@ function renderStop(stop) {
   let radScl = deltaT>=1?stopSz/3:stopSz/3*(70*(deltaT-0.443)**7+0.2)
   types[stop.type](Math.max(0,radScl), stop.x, stop.y);
   ctx.fillStyle = getCSSProp("--system-red");
-  ctx.fillText(stop.stopID, stop.x, stop.y);
+  // ctx.fillText(stop.stopID, stop.x, stop.y);
   ctx.beginPath();
 }
 

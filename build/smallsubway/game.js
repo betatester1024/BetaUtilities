@@ -59,6 +59,10 @@ let trains = [];
 let typesOnLine = [];
 let passengersServed = 0;
 let balance = 2e4;
+let lineCost = 1e4;
+let currCost_existing = 0;
+let currCost = 0;
+let overCost = false;
 let scaledTime = 0;
 let extendInfo = null;
 let asyncEvents = [];
@@ -69,6 +73,12 @@ let logData = [];
 let currPath = [];
 let downPt = null;
 let currPos_canv = { x: 0, y: 0 };
+let trainsAvailable = 5;
+let trainCost = 4e3;
+let costPerPx = 5;
+let modifCost = 500;
+let costPerStation = 500;
+let yearlyBudget = 1e5;
 let maxUnlockedType = 0;
 const acceptRadius = 30;
 const stopSz = 17;
@@ -79,7 +89,7 @@ let linesAvailable = 3;
 const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
 let globalTicks = 0;
-let currSpeed = 2;
+let currSpeed = 1;
 let offsetDelta = 0;
 function onLoad() {
 }
@@ -180,6 +190,7 @@ function preLoad() {
       document.title = "thing";
     else {
       paused = true;
+      openDialog(K.DIALOG_TIME);
       document.title = "thing (paused)";
     }
   });

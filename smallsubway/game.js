@@ -73,8 +73,11 @@ let trains = [];
 let typesOnLine = [];
 let passengersServed = 0;
 
-let balance = 20000 // usually in millions
-let scaledTime = 0; // 
+let balance = 20000; // in thousands
+let lineCost = 10000;  // 10M for your first line, x1.5 every time
+let currCost_existing = 0;
+let currCost = 0;
+let overCost = false;
 
 let extendInfo = null;
 
@@ -89,6 +92,15 @@ let logData = [];
 let currPath = [];
 let downPt = null;
 let currPos_canv = {x:0,y:0};
+let currPos_abs = {x:0,y:0};
+
+let trainsAvailable = 5;
+let trainCost = 4000; // million dollar train
+let costPerPx = 5; // in k
+let modifCost = 500; // 500k base to modify
+// let extendCost = 500;
+let costPerStation = 500; // 500k a station
+let yearlyBudget = 10000; // 10000k = 10m
 
 let maxUnlockedType = 0;
 
@@ -106,8 +118,9 @@ let linesAvailable = 3;
 const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
 
+let prevYear = 1;
 let globalTicks = 0;
-let currSpeed = 2;
+let currSpeed = 1;
 let offsetDelta = 0; // from saved time
 
 function onLoad() {
@@ -125,7 +138,7 @@ function ingametime() {
   // let sec = Math.floor(globalTicks/1000*(15/2)*60);
   let mins = Math.floor(globalTicks/1000*(20/2));
   let hrs = Math.floor(mins/60);
-  let days = Math.floor(mins*3);
+  let days = Math.floor(mins*1.8);
   return {m:mins%60, h:hrs%24, d:days%365, y:Math.floor(days/365)};
 }
 
@@ -218,6 +231,7 @@ function preLoad() {
     if (vis()) document.title = "thing";
     else {
       paused = true;
+      openDialog(K.DIALOG_TIME);
       document.title = "thing (paused)"
     }
   })
@@ -273,10 +287,14 @@ function animLoop() {
 function tickLoop() {
   globalTicks += 16.66667*currSpeed; // 60fps default
   let igt = ingametime();
+  if (igt.y > prevYear) {
+    balance += yearlyBudget;
+    prevYear = igt.y;
+  }
   if (igt.h < 6 || igt.h > 22) 
     currPopulationPool = basePopulationPool*0.5;
   else if (igt.h >= 6 && igt.h<=8
-     || igt.h >= 5 && igt.h <= 7) currPopulationPool = basePopulationPool*1.5;
+     || igt.h >= 17 && igt.h <= 19) currPopulationPool = basePopulationPool*1.5;
   else currPopulationPool = basePopulationPool;
   for (let i=0; i<asyncEvents.length; i++) {
     if (timeNow() >= asyncEvents[i].time) {

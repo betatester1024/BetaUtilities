@@ -37,32 +37,42 @@
       -->
       <div id="topBar">
         <span id="paused"></span>
-        <span class="material-symbols-outlined sz30" onpointerdown="addTrain(event)">train</span>
-        <span class="sz30" id="trainsAvailable">+5</span>
+        <div id="addTrain" onpointerdown="addTrain(event)">
+          <span class="material-symbols-outlined sz30" id="addTop" >train</span>
+          <span class="sz30" id="trainsAvailable">5</span>
+        </div>
+        <span id="linesAvailable">3</span>
         <div id="popOuter" class="nobreak">
           <div id="popInner" class="nobreak">
             Population  
           </div>
           
         </div>
-        <span>Your balance: </span>
-        <span id="balance">Alas. You are poor. </span>
-        <span class="blu nohover" id="time" onclick="toggleDialog(K.DIALOG_TIME);">0d 00:00</span>
-        <span class="material-symbols-outlined sz30">
-        directions_walk
-        </span>
-        <span class="blu nohover" id="pServed">0</span>
-        <div class="menu" id="timeMenu" >
-          <button onclick="togglePause()"id="playpause" class="btn blu fssml override">
-            Pause/resume
-          </button>
-          <button onclick="toggleSpeed()" id="speed" class="btn blu fssml override">
-            Current speed: 1x
-          </button>
+        <span id="balance">0.000</span>
+        <span class="blu nohover timedate" id="time" onclick="toggleDialog(K.DIALOG_TIME);">0d 00:00</span>
+        <span class="blu nohover timedate" id="date" onclick="toggleDialog(K.DIALOG_TIME);">0d 00:00</span>
+        <div>
+          <span class="material-symbols-outlined sz30">
+            directions_walk
+          </span>
+          <span class="blu nohover" id="pServed">0</span>
         </div>
         
+        
       </div>
-      
+      <div class="menu" id="timeMenu" >
+        <button onclick="toggleDialog(K.DIALOG_TIME)" class="btn gry override">
+          Close
+        </button>
+        <button onclick="togglePause()"id="playpause" class="btn blu fssml override">
+          Pause/resume
+        </button>
+        <button onclick="toggleSpeed()" id="speed" class="btn blu fssml override">
+          Current speed: 1x
+        </button>
+      </div>
+
+      <div id="currCost"></div>
       <details class="blu ">
         <summary>Footer</summary>
         <footer id="ftrOverride"></footer>

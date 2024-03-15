@@ -142,6 +142,7 @@ html, ::backdrop {
     margin: 5px;
     text-decoration: none;
   }
+*/
   .btn.disabled {
     cursor: default !important;
   }

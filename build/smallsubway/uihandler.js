@@ -49,8 +49,16 @@ function HTMLActions() {
     mInner.style.backgroundColor = "var(--system-green)";
   if (currCost > 0) {
     let costEle = byId("currCost");
-    costEle.innerText = currCost;
-  }
+    costEle.classList.remove("displayNone");
+    costEle.innerText = currCost.toFixed(2).toLocaleString();
+    costEle.style.left = currPos_abs.x + 10 + "px";
+    costEle.style.top = currPos_abs.y + "px";
+    if (overCost)
+      costEle.classList.add("overCost");
+    else
+      costEle.classList.remove("overCost");
+  } else
+    byId("currCost").classList.add("displayNone");
   setTimeout(HTMLActions, 100);
 }
 //# sourceMappingURL=uihandler.js.map

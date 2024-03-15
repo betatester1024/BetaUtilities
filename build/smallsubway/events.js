@@ -24,6 +24,7 @@ function onmove(ev) {
   hoveringConn = null;
   hoveringTrain = null;
   currPos_canv = fromCanvPos(ev.clientX, ev.clientY);
+  currPos_abs = { x: ev.clientX, y: ev.clientY };
   if (holdState == K.HOLD) {
     translate(ev.movementX, ev.movementY);
     redraw();
@@ -99,7 +100,8 @@ function onmove(ev) {
     currCost = modifCost + nowDist - origDist;
     if (currCost > balance) {
       overCost = true;
-    }
+    } else
+      overCost = false;
     if (nStop && (nStop.linesServed.size == 0 && balance > currCost + costPerStation || nStop.linesServed.size > 0 && balance > currCost)) {
       balance -= currCost;
       if (nStop.linesServed.size == 0)
@@ -159,6 +161,8 @@ function onmove(ev) {
     currCost = currCost_existing + delta * costPerPx;
     if (currCost > balance)
       overCost = true;
+    else
+      overCost = false;
     if (nStop && balance > currCost) {
       balance -= currCost;
       resetCosts();
@@ -259,7 +263,7 @@ function onmove(ev) {
       hoveringTrain = nTrain;
       document.body.style.cursor = "pointer";
     }
-    if (rmSettings && nConn && holdState == K.NOHOLD) {
+    if (rmSettings && (nConn && !nConn.pendingRemove) && holdState == K.NOHOLD) {
       hoveringConn = nConn;
       document.body.style.cursor = "pointer";
     } else if (rmSettings && holdState == K.NOHOLD && !hoveringTrain)
@@ -274,6 +278,7 @@ function resetCosts() {
   currCost = 0;
   currCost_existing = 0;
   overCost = false;
+  console.log("reset!");
 }
 function routeConfirm(ev) {
   extendInfo = null;
@@ -406,7 +411,7 @@ function pointerdown(ev) {
     nTrain.moving = true;
     document.body.style.cursor = "grabbing";
     nTrain.dropOffLocation = nTrain.from;
-  } else if (nConn) {
+  } else if (nConn && !nConn.pendingRemove) {
     holdState = K.HOLD_CONNECTION;
     modifyingConn = nConn;
   }

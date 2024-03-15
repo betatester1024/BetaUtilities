@@ -63,7 +63,6 @@ let lineCost = 1e4;
 let currCost_existing = 0;
 let currCost = 0;
 let overCost = false;
-let scaledTime = 0;
 let extendInfo = null;
 let asyncEvents = [];
 let viewportW = 0;
@@ -73,12 +72,13 @@ let logData = [];
 let currPath = [];
 let downPt = null;
 let currPos_canv = { x: 0, y: 0 };
+let currPos_abs = { x: 0, y: 0 };
 let trainsAvailable = 5;
 let trainCost = 4e3;
 let costPerPx = 5;
 let modifCost = 500;
 let costPerStation = 500;
-let yearlyBudget = 1e5;
+let yearlyBudget = 1e4;
 let maxUnlockedType = 0;
 const acceptRadius = 30;
 const stopSz = 17;
@@ -88,6 +88,7 @@ let defaultClr = "#555";
 let linesAvailable = 3;
 const colours = ["green", "yellow", "blue", "orange", "purple", "grey"];
 let DEBUG = true;
+let prevYear = 1;
 let globalTicks = 0;
 let currSpeed = 1;
 let offsetDelta = 0;
@@ -99,7 +100,7 @@ function timeNow() {
 function ingametime() {
   let mins = Math.floor(globalTicks / 1e3 * (20 / 2));
   let hrs = Math.floor(mins / 60);
-  let days = Math.floor(mins * 3);
+  let days = Math.floor(mins * 1.3);
   return { m: mins % 60, h: hrs % 24, d: days % 365, y: Math.floor(days / 365) };
 }
 function togglePause() {
@@ -234,9 +235,13 @@ function animLoop() {
 function tickLoop() {
   globalTicks += 16.66667 * currSpeed;
   let igt = ingametime();
+  if (igt.y > prevYear) {
+    balance += yearlyBudget;
+    prevYear = igt.y;
+  }
   if (igt.h < 6 || igt.h > 22)
     currPopulationPool = basePopulationPool * 0.5;
-  else if (igt.h >= 6 && igt.h <= 8 || igt.h >= 5 && igt.h <= 7)
+  else if (igt.h >= 6 && igt.h <= 8 || igt.h >= 17 && igt.h <= 19)
     currPopulationPool = basePopulationPool * 1.5;
   else
     currPopulationPool = basePopulationPool;

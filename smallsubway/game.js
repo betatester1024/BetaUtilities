@@ -138,7 +138,7 @@ function ingametime() {
   // let sec = Math.floor(globalTicks/1000*(15/2)*60);
   let mins = Math.floor(globalTicks/1000*(20/2));
   let hrs = Math.floor(mins/60);
-  let days = Math.floor(mins*1.8);
+  let days = Math.floor(mins*1.3);
   return {m:mins%60, h:hrs%24, d:days%365, y:Math.floor(days/365)};
 }
 

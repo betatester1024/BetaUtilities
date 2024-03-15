@@ -166,6 +166,10 @@ span.material-symbols-outlined.sz30, span {
   pointer-events: none;
 }
 
+h2 {
+  font-size: 32px;
+}
+
 #currCost.overCost {
   color: var(--system-red);
   animation: blinkingRed 1s infinite;

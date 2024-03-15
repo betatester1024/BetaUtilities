@@ -58,10 +58,10 @@ let lineCt = 0;
 let trains = [];
 let typesOnLine = [];
 let passengersServed = 0;
-let balance = 2e4;
-let lineCost = 1e4;
+let balance = 1e5;
 let currCost_existing = 0;
 let currCost = 0;
+let balanceCap = 1e5;
 let overCost = false;
 let extendInfo = null;
 let asyncEvents = [];
@@ -73,12 +73,13 @@ let currPath = [];
 let downPt = null;
 let currPos_canv = { x: 0, y: 0 };
 let currPos_abs = { x: 0, y: 0 };
-let trainsAvailable = 5;
-let trainCost = 4e3;
-let costPerPx = 5;
-let modifCost = 500;
-let costPerStation = 500;
-let yearlyBudget = 1e4;
+let trainsAvailable = 3;
+let trainCost = 5e3;
+let costPerPx = 10;
+let modifCost = 2e4;
+let costPerStation = 1e4;
+let yearlyBudget = 5e4;
+let lineCost = 2e5;
 let maxUnlockedType = 0;
 const acceptRadius = 30;
 const stopSz = 17;
@@ -93,6 +94,18 @@ let globalTicks = 0;
 let currSpeed = 1;
 let offsetDelta = 0;
 function onLoad() {
+}
+function purchaseLine() {
+  if (balance > lineCost) {
+    balance -= lineCost;
+    linesAvailable++;
+  }
+}
+function purchaseTrain() {
+  if (balance > trainCost) {
+    balance -= trainCost;
+    trainsAvailable++;
+  }
 }
 function timeNow() {
   return globalTicks;
@@ -227,6 +240,9 @@ function preLoad() {
   asyncEvents.push({ fcn: stopPopulationLoop, time: timeNow() + 1e4 });
 }
 function animLoop() {
+  if (currSpeed < 0.05)
+    alertDialog("You lost!", () => {
+    });
   let delta = Date.now() - startTime;
   startTime = Date.now();
   redraw(delta);
@@ -237,6 +253,7 @@ function tickLoop() {
   let igt = ingametime();
   if (igt.y > prevYear) {
     balance += yearlyBudget;
+    balance = Math.min(balanceCap, balance);
     prevYear = igt.y;
   }
   if (igt.h < 6 || igt.h > 22)
@@ -454,7 +471,7 @@ function handleAwaiting(currTrain, currStop) {
     }
   }
   if (passengersServed > nextMilestone) {
-    nextMilestone *= 1.2;
+    nextMilestone *= 1.3;
     addNewStop();
     basePopulationPool *= 1.1;
   }

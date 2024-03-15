@@ -48,7 +48,7 @@ function onmove(ev) {
         x: actualPos.x, y: actualPos.y,
         from: null, to:null,
         lineID: -1, colour: defaultClr, startT: timeNow(),
-        status: K.MOVING, passengers: [], cap:6, revDir:false,
+        status: K.MOVING, passengers: [], cap:trainLength, revDir:false,
         percentCovered:0, pendingMove:true, moving:true
         //toAdd:[], toRemove:[], onCompletion:0
       };
@@ -355,7 +355,7 @@ function routeConfirm(ev) {
         x: currPath[0].x, y: currPath[0].y,
         from: currPath[0], to: currPath[1],
         lineID: lineCt, colour: currCol, startT: timeNow(),
-        status: K.MOVING, passengers: [], cap:6, revDir:false,
+        status: K.MOVING, passengers: [], cap:trainLength, revDir:false,
         percentCovered:0, pendingMove:false
         //toAdd:[], toRemove:[], onCompletion:0
       };

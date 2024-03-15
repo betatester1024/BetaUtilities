@@ -1,6 +1,7 @@
 "use strict";
 K.DIALOG_TIME = 0;
-let dialogIDs = ["timeMenu"];
+K.DIALOG_SHOP = 1;
+let dialogIDs = ["timeMenu", "upgrades"];
 function toggleDialog(toOpen) {
   for (let id of dialogIDs) {
     let dialog = byId(id);
@@ -31,6 +32,10 @@ function toggleSpeed() {
 function HTMLActions() {
   byId("pServed").innerText = passengersServed;
   let time = ingametime();
+  if (holdState == K.HOLD_TRAIN) {
+    byId("topBar").style.pointerEvents = "none";
+  } else
+    byId("topBar").style.pointerEvents = "all";
   byId("time").innerText = (paused ? "(Paused) " : "") + `${padWithZero(time.h)}:${padWithZero(time.m)}`;
   byId("date").innerText = `Day ${padWithZero(time.d)} (year ${time.y + 1})`;
   if (paused)
@@ -50,7 +55,7 @@ function HTMLActions() {
   if (currCost > 0) {
     let costEle = byId("currCost");
     costEle.classList.remove("displayNone");
-    costEle.innerText = currCost.toFixed(2).toLocaleString();
+    costEle.innerText = (currCost / 1e3).toFixed(2).toLocaleString();
     costEle.style.left = currPos_abs.x + 10 + "px";
     costEle.style.top = currPos_abs.y + "px";
     if (overCost)

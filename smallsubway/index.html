@@ -41,16 +41,20 @@
           <span class="material-symbols-outlined sz30" id="addTop" >train</span>
           <span class="sz30" id="trainsAvailable">5</span>
         </div>
-        <span id="linesAvailable">3</span>
+        <div id="addLine">
+          <span class="material-symbols-outlined sz30" id="addTop" >cable</span>
+          <span id="linesAvailable">3</span>
+        </div>
+        
         <div id="popOuter" class="nobreak">
           <div id="popInner" class="nobreak">
             Population  
           </div>
           
         </div>
-        <span id="balance">0.000</span>
-        <span class="blu nohover timedate" id="time" onclick="toggleDialog(K.DIALOG_TIME);">0d 00:00</span>
-        <span class="blu nohover timedate" id="date" onclick="toggleDialog(K.DIALOG_TIME);">0d 00:00</span>
+        <span id="balance" onclick="toggleDialog(K.DIALOG_SHOP)">0.000</span>
+        <span class="blu timedate" id="time" onclick="toggleDialog(K.DIALOG_TIME);">0d 00:00</span>
+        <span class="blu timedate" id="date" onclick="toggleDialog(K.DIALOG_TIME);">0d 00:00</span>
         <div>
           <span class="material-symbols-outlined sz30">
             directions_walk
@@ -60,8 +64,24 @@
         
         
       </div>
-      <div class="menu" id="balanceMenu">
-        Balance breakdown: 
+      <div class="menu" id="upgrades">
+        <h2 class="span2"><span class="material-symbols-outlined">keyboard_double_arrow_up</span>Orders</h2>
+        <button onclick="toggleDialog(K.DIALOG_SHOP)" class="span2 fssml btn gry override">
+          Close
+        </button>
+        <span id="budget" class="span2"></span>
+        <span id="lines2" class="cost"></span>
+        <button onclick="purchaseLine()" id="line" class="btn blu override">Add line</button>
+        <span id="trains2" class="cost"></span>
+        <button onclick="purchaseTrain()" id="train" class="btn blu override">Add train</button>
+        <span id="upgrade0" class="cost"></span>
+        <button onclick="purchaseUpgrade(0)" id="purchase0" class="btn blu override">Faster trains</button>
+        <span id="upgrade1" class="cost"></span>
+        <button onclick="purchaseUpgrade(1)" id="purchase1" class="btn blu override">Longer trains</button>
+        <span id="upgrade2" class="cost"></span>
+        <button onclick="purchaseUpgrade(2)" id="purchase2" class="btn blu override">Larger stations</button>
+        <span id="upgrade3" class="cost"></span>
+        <button onclick="purchaseUpgrade(3)" id="purchase3" class="btn blu override">Increase balance cap</button>
       </div>
       <div class="menu" id="timeMenu" >
         <h2><span class="material-symbols-outlined">schedule </span>Timing</h2>

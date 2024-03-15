@@ -37,7 +37,7 @@ const K = {
 }
 
 let paused = false;
-const trainSpeed = 100 / 1000; // pixels/ms
+let trainSpeed = 100 / 1000; // pixels/ms
 let holdState = K.NOHOLD;
 let activeSettingsDialog = null;
 let ctx = null;
@@ -73,10 +73,15 @@ let trains = [];
 let typesOnLine = [];
 let passengersServed = 0;
 
-let balance = 20000; // in thousands
-let lineCost = 10000;  // 10M for your first line, x1.5 every time
+let trainLength = 6;
+let stationCap = 8;
+
+let lostQ = false;
+
+let balance = 100000; // in thousands
 let currCost_existing = 0;
 let currCost = 0;
+let balanceCap = 100000;
 let overCost = false;
 
 let extendInfo = null;
@@ -94,13 +99,16 @@ let downPt = null;
 let currPos_canv = {x:0,y:0};
 let currPos_abs = {x:0,y:0};
 
-let trainsAvailable = 5;
-let trainCost = 4000; // million dollar train
-let costPerPx = 5; // in k
-let modifCost = 500; // 500k base to modify
+let trainsAvailable = 3;
+let trainCost = 5000; // 5 million dollar train
+let costPerPx = 10; // in k
+let modifCost = 20000; // 20M base to modify
 // let extendCost = 500;
-let costPerStation = 500; // 500k a station
-let yearlyBudget = 10000; // 10000k = 10m
+let costPerStation = 10000; // 50M a station
+let yearlyBudget = 50000; // 10000k = 200m
+
+let lineCost = 200000; // 200M!
+// let train
 
 let maxUnlockedType = 0;
 
@@ -127,6 +135,21 @@ function onLoad() {
 
 }
 
+function purchaseLine() {
+  if (balance >= lineCost) {
+    balance -= lineCost;
+    lineCost *= 1.5;
+    linesAvailable++;
+  }
+}
+
+function purchaseTrain() {
+  if (balance >= trainCost) {
+    balance -= trainCost;
+    trainCost *= 1.3;
+    trainsAvailable++;
+  }
+}
 
 
 function timeNow() {
@@ -275,6 +298,10 @@ function preLoad() {
 }
 
 function animLoop() {
+  if (currSpeed < 0.05 && !lostQ) {
+    lostQ = true;
+    alertDialog("You lost!", ()=>{});
+  }
   let delta = Date.now() - startTime;
   startTime = Date.now();
   
@@ -289,6 +316,7 @@ function tickLoop() {
   let igt = ingametime();
   if (igt.y > prevYear) {
     balance += yearlyBudget;
+    balance = Math.min(balanceCap, balance);
     prevYear = igt.y;
   }
   if (igt.h < 6 || igt.h > 22) 
@@ -502,7 +530,7 @@ function handleAwaiting(currTrain, currStop) {
       if (currStop.waiting.length < currStop.capacity)
         currStop.failing =false;
       pass.actionStatus = K.NOACTION;
-      passengersServed+= 1;
+      passengersServed+= Math.floor(7+Math.random()*3);
       handled = true;
       break;
     }
@@ -567,7 +595,7 @@ function handleAwaiting(currTrain, currStop) {
 
   }
   if (passengersServed > nextMilestone) {
-    nextMilestone*=1.2;
+    nextMilestone*=1.3;
     addNewStop();
     basePopulationPool *= 1.1;
   }
@@ -623,7 +651,7 @@ function addNewStop(type = -1) {
   newPt.stopID = stops.length;
   newPt.failing = false;
   newPt.failurePct = 0;
-  newPt.capacity = 10;
+  newPt.capacity = stationCap;
   redraw();
 }
 

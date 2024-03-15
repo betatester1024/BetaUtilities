@@ -245,6 +245,7 @@ function redraw(delta) {
     ctx.stroke();
     ctx.beginPath();
     types[connections[i].to.type](stopSz / 3, connections[i].to.x, connections[i].to.y, true);
+    ctx.fillText(connections[i].to.type, connections[i].to.x, connections[i].to.y);
     ctx.stroke();
   }
   ctx.restore();

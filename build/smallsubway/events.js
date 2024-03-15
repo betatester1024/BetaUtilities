@@ -105,8 +105,15 @@ function onmove(ev) {
         }
         typesOnLine[modifyingConn.lineID].add(nStop.type);
         nStop.linesServed.add(modifyingConn.lineID);
-        let idx = currLine.path.indexOf(modifyingConn.from);
-        currLine.path.splice(idx + 1, 0, nStop);
+        let fIdx = currLine.path.indexOf(modifyingConn.from);
+        let tIdx = currLine.path.indexOf(modifyingConn.to);
+        if (fIdx == tIdx + 1)
+          currLine.path.splice(tIdx + 1, 0, nStop);
+        else if (tIdx == fIdx + 1)
+          currLine.path.splice(fIdx + 1, 0, nStop);
+        else {
+          currLine.path.splice(currLine.path.length - 1, 0, nStop);
+        }
         recalculateLineConnections();
         for (let pass2 of passengers)
           handlePassenger(pass2);

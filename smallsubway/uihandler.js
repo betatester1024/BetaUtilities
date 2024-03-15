@@ -71,7 +71,7 @@ function HTMLActions() {
     byId("upgrade"+i).innerText = (upgradeInfo[i].cost/1000).toFixed(2);
   }
   byId("purchase0").innerHTML = "Improve train speed ("+trainSpeed*500+"kph)"
-  byId("purchase1").innerHTML = "Lengthen existing trains ("+trainLength*10+ "passengers)";
+  byId("purchase1").innerHTML = "Lengthen existing trains ("+trainLength*10+ " passengers)";
   byId("purchase2").innerHTML = "Improve station capacity ("+stationCap*10+ " people)";
   byId("purchase3").innerHTML = "Petition for a larger budget cap ($"+(balanceCap/1000).toFixed(2)+"m)";
   setTimeout(HTMLActions, 100);

@@ -154,7 +154,7 @@ span.material-symbols-outlined.sz30, span {
 }
 
 #currCost::before {
-  content:"Cost: "
+  content:"Estimated cost: "
 }
 
 #currCost::after {

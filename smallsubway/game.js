@@ -100,11 +100,11 @@ let currPos_canv = {x:0,y:0};
 let currPos_abs = {x:0,y:0};
 
 let trainsAvailable = 3;
-let trainCost = 5000; // 5 million dollar train
+let trainCost = 3000; // 5 million dollar train
 let costPerPx = 10; // in k
-let modifCost = 20000; // 20M base to modify
+let modifCost = 3000; // 3M base to modify
 // let extendCost = 500;
-let costPerStation = 10000; // 50M a station
+let costPerStation = 5000; // 5M a station
 let yearlyBudget = 50000; // 10000k = 200m
 
 let lineCost = 200000; // 200M!

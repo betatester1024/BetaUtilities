@@ -79,9 +79,9 @@ function HTMLActions() {
 }
 
 let upgradeInfo = [
-  {cost:3000, mult:2, action:()=>{trainSpeed *= 1.25;}},
+  {cost:10000, mult:2, action:()=>{trainSpeed *= 1.25;}},
   {cost:9000, mult:3, action:()=>{for (train of trains) {train.cap+=2;}; trainLength+=2;}},
-  {cost:5000, mult:1.5, action:()=>{for (stop of stops) {stop.cap+=3;}; stationCap+=3;}},
+  {cost:12000, mult:1.5, action:()=>{for (stop of stops) {stop.cap+=3;}; stationCap+=3;}},
   {cost:100000, mult:1.5, action:()=>{balanceCap *= 1.5;}},
 ]
 

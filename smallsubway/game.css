@@ -1,0 +1,242 @@
+details {
+  position: absolute;
+  bottom:0px;
+  height: 20px;
+  transition: height 0.3s;
+  width: calc(100% - 30px);
+  margin: 5px auto;
+  left: 5px;
+  background-color: var(--system-bg) !important;
+}
+
+#balance::before {
+  content:"$"
+}
+#balance::after {
+  content:"m"
+}
+
+#linesAvailable::before {
+  content: "+"
+}
+
+
+
+.btn .TOOLTIP {
+  display: none;
+}
+.btn {
+  --btn-colour: var(--system-blue);
+  --btn-light: var(--system-blue2);
+  border-radius: 10px;
+  width: fit-content;
+  padding: 15px;
+  display: inline-flex;
+  font-weight: 500;
+  position: relative;
+  font-size: 30px;
+  margin: 15px;
+  color: var(--btn-colour);
+  outline: 3px solid var(--btn-colour);
+  background-color: var(--btn-light);
+  text-decoration: none;
+  top: 0px;
+  left: 0px;
+  box-shadow: none;
+  max-width: 90%;
+  word-wrap: anywhere;
+  align-items: center;
+  transition: all 0.5s;
+} 
+.btn:hover {
+  box-shadow: 3px 3px 3px;
+}
+.menu {
+  position:relative;
+  margin: 0px auto;
+  top: 50px;
+  width: fit-content;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: var(--system-overlay);
+  transition: opacity 0.2s;
+  opacity: 0;
+  height: 0px;
+  pointer-events: none;
+}
+
+.timedate, #balance, #addTrain {
+  outline: 3px solid var(--system-blue);
+  border-radius: 5px;
+  padding: 5px;
+  cursor: pointer;
+}
+
+/* #addTrain {
+  cursor:pointer;
+  
+  transition: all 0.3s;
+  border-radius: 5px;
+  padding: 3px;
+} */
+
+/* #addTrain:active {
+  
+} */
+
+#addTrain:hover, #balance:hover, .timedate:hover {
+  background-color: var(--system-blue2);
+}
+
+#addTop {
+  top: 5px;
+}
+
+#time::before {
+  content:"Simulator time: "
+}
+
+#date::before {
+}
+
+.menu.open {
+  opacity: 1;
+  height: fit-content;
+  pointer-events:all;
+}
+
+details[open] {
+  height:20%;
+  /* bottom: */
+}
+canvas {
+  position: absolute;
+  top:0px;
+  left: 0px;
+  touch-action: none;
+  /* pointer-events: none; */
+}
+div#topBar {
+  display: flex;
+  padding: 10px;
+  flex-wrap: wrap;
+  position: absolute !important;
+  top: 0px;
+  width: calc(100% - 20px);
+  background-color: var(--system-grey3);
+  justify-content: center;
+  align-items: baseline;
+  row-gap: 7px;
+  column-gap: 10px;
+}
+.timedate, #pServed, #balance {
+  font-family:'Noto Sans Mono', monospace;
+  font-size: 30px;
+}
+span.material-symbols-outlined.sz30, span {
+  font-size: 30px !important;
+  top: 0px;
+  color: var(--system-blue);
+}
+
+#currCost {
+  font-size: 30px;
+  color: var(--system-blue);
+  border-radius: 5px;
+  padding: 5px;
+  position:absolute;
+  transition: all 0.2s;
+  /* top: 100px; */
+  /* left: 30px; */
+  width: fit-content;
+  pointer-events: none;
+  background-color: var(--system-overlay);
+}
+
+#currCost::before {
+  content:"Estimated cost: "
+}
+
+#currCost::after {
+  content:"m"
+}
+
+.displayNone {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#budget::before {
+  content:'Budget: $'
+}
+#budget::after {
+  content:'m/year'
+}
+.span2 {
+  grid-column: 1 / span 2
+}
+
+/* .fssml {
+  font-size: 15px;
+} */
+
+#upgrades {
+  display: grid;
+  grid-template-columns: auto auto;
+  /* flex-wrap: wrap; */
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  max-width: 90%;
+  max-height: 80%;
+  overflow-y: scroll;
+  /* white-space: pre-line; */
+}
+h2 {
+  font-size: 32px;
+}
+
+#currCost.overCost {
+  color: var(--system-red);
+  animation: blinkingRed 1s infinite;
+}
+
+@keyframes blinkingRed {
+  0% {background-color: var(--system-red2);}
+  50% {background-color: var(--system-overlay);}
+  100% {background-color: var(--system-red2);}
+}
+
+#popOuter::before {
+  content: "Rush hour indicator";
+  font-size: 13px;
+  font-variant-caps: small-caps;
+  position: absolute;
+  color: var(--system-blue);
+  top: 2px;
+}
+
+#lines2::after, #trains2::after, .cost::after {
+  content:"m"
+}
+#lines2::before, #trains2::before, .cost::before {
+  content:"$"
+}
+#popOuter {
+  width: 200px;
+  height: 30px;
+  background-color: var(--system-blue2);
+  text-align: left;
+  border-radius: 3px;
+}
+#popInner {
+  background-color: var(--system-blue);
+  transition: width 0.5s;
+  white-space: nowrap;
+  height: 30px;
+  border-radius: 3px;
+  padding-left: 5px;
+  vertical-align: bottom;
+  font-size: 20px;
+  color: var(--system-black);
+}

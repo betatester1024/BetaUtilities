@@ -151,7 +151,7 @@ export async function initServer() {
           break;
         case "updateAlias":
           // console.log("here");
-          bridgeH.updateAlias(dat.data.alias, req.cookies.accountID);
+          let resp = bridgeH.updateAlias(dat.data.alias, req.cookies.accountID);
       }
       // ws.send("reply:"+msg);
     });
@@ -330,6 +330,29 @@ export async function initServer() {
     incrRequests();
   })
 
+  // app.get('/game.js', (req:any, res:any) => {
+  //   sendFile(res, getToken(req), frontendDir+"game.js");
+  //   incrRequests();
+  // })
+
+  // app.get('*/utils.js', (req:any, res:any) => {
+  //   res.sendFile(jsDir+"utils.js");
+  //   incrRequests();
+  // })
+  
+  app.get('/smallsubway/', (req:any, res:any) => {
+    sendFile(res, getToken(req), rootDir+"/smallsubway/index.html");
+    incrRequests();
+  })
+  const acceptedPaths = ["/drawutils.js", "/events.js", "/game.js", "/redraw.js", "/shapes.js",
+                        "/transfm.js", "/uihandler.js", "/utils.js", "/game.css", "/globalformat.css"];
+  app.get('/smallsubway/*', (req:any, res:any) => {
+    if (acceptedPaths.indexOf(req.path.replace(/\/smallsubway/, ""))>=0)
+      sendFile(res, getToken(req), rootDir+(req.path));
+    else sendFile(res, getToken(req), frontendDir+"404.html");
+    incrRequests();
+  })
+
   app.get('*.svg', (req:any, res:any) => {
     const date = new Date();
     date.setFullYear(date.getFullYear() + 1);
@@ -338,6 +361,9 @@ export async function initServer() {
     res.sendFile(frontendDir+req.url);
     incrRequests();
   })
+
+
+
   
   app.get('/*.js*', (req:any, res:any) => {
     res.sendFile(jsDir+req.url);
@@ -349,6 +375,12 @@ export async function initServer() {
     res.sendFile(jsDir+req.url);
     incrRequests();
   })
+
+  app.get('*/globalformat.css', (req:any, res:any) => {
+    res.sendFile(frontendDir+"globalformat.css");
+    incrRequests();
+  })
+
 
   app.get('/*.css', (req:any, res:any) => {
     res.sendFile(frontendDir+req.url);
@@ -396,7 +428,7 @@ export async function initServer() {
   
 
   const banList= [];
-  app.post('/server', urlencodedParser, async (req:any, res:any) => {
+  app.post('/server', urlencodedParser, async (req:any, res:any) => {try {
     incrRequests();
     if (req.headers['content-length'] > 60000) {
       res.set("Connection", "close");
@@ -451,7 +483,7 @@ export async function initServer() {
       res.cookie('accountID', ret.token??"", {httpOnly: true, secure:true, sameSite:"None", maxAge:9e12});
       res.end(JSON.stringify({status:ret.status, data:ret.data}));
     });
-  });
+  } catch(e) {}});
   
   if (process.env.localhost) 
     app.listen(port, 'localhost', function() {
@@ -559,7 +591,7 @@ async function makeRequest(action:string|null, token:string, data:any|null, sess
         break;
       case "delMsg":
         obj = await delMsg(data.id, data.room, token||sessID)
-        break
+        break;
       case "updateDefaultLoad":
         obj = await updateDefaultLoad(data.new, token)
         break;
@@ -699,7 +731,7 @@ const validPages = ["/commands", '/contact', '/EEdit', '/todo', '/status', '/log
                     "/timer", "/newpaste", "/pastesearch", '/clickit', '/capsdle', '/sweepthatmine',
                    "/stopwatch", "/testbed", '/credits', '/atomicmoose', '/issuetracker', '/graphIt', 
                     '/betterselect', '/redirect', '/betterselect.js', "/minimalLogin", "/minimalSignup",
-                    "/8192", "/imgedit", "/leaderboard", "/eval"];
+                    "/8192", "/imgedit", "/leaderboard", "/eval", "/smallsubway"];
 
 const ignoreLog = ["getEE", "userRequest", 'getLogs', 'loadLogs', 'visits', 
                    'roomRequest', 'sendMsg', 'clickIt', 'leaderboard',

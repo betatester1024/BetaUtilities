@@ -243,9 +243,13 @@ export class BridgeSocket
     }));
   
     // console.log("here we are");
-    // if (updateAliasRes.status != "SUCCESS") {
-      // return;
-    // }
+    if (updateAliasRes.status != "SUCCESS") {
+      this.client.send(JSON.stringify({
+        action:"yourAlias",
+        data:{alias:"AnonymousBridgeUser", error:true}
+      }))
+      return;
+    }
     // screw it, we realias it anyways!
     // console.log("alias update was a success");
     this.client.send(JSON.stringify({

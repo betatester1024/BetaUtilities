@@ -1,7 +1,7 @@
 const { MongoClient } = require("mongodb");
 import {authDB, msgDB, uDB} from './consts';
 import {WS} from './betautilities/wsHandler';
-
+import {botsStarted} from './index';
 // Replace the uri string with your connection string.
 const uri = 
   `mongodb+srv://SystemLogin:${process.env['dbPwd']}@betaos-datacluster00.d8o7x8n.mongodb.net/?retryWrites=true&w=majority`
@@ -51,19 +51,21 @@ export async function DBMaintenance() {
       // console.log("New msgMin in room",items2[i].room, ":"+items2[i].msgID);
     }
   };
-  uDB.find({fieldName:"TIMER"}).toArray().then(
-  (objs:{expiry:number, notifyingUser:string, msg:string}[])=>{
-    for (let i=0; i<objs.length; i++) {
-      if (Date.now()>objs[i].expiry || objs[i].expiry == null) {
-        console.log("NOTIFYING", objs[i]);
-        uDB.deleteOne({fieldName:"TIMER",expiry:objs[i].expiry})
-        
-        WS.notifRoom.socket.send(
-          WS.toSendInfo("!tell @"+objs[i].notifyingUser+" You are reminded of: "+
-                        objs[i].msg.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, "\\\"")+
-                       ". This reminder sent by "+(objs[i].author??"yourself, probably.")));
+  if (botsStarted) {
+    uDB.find({fieldName:"TIMER"}).toArray().then(
+    (objs:{expiry:number, notifyingUser:string, msg:string}[])=>{
+      for (let i=0; i<objs.length; i++) {
+        if (Date.now()>objs[i].expiry || objs[i].expiry == null) {
+          console.log("NOTIFYING", objs[i]);
+          uDB.deleteOne({fieldName:"TIMER",expiry:objs[i].expiry})
+          
+          WS.notifRoom.socket.send(
+            WS.toSendInfo("!tell "+objs[i].notifyingUser+" You are reminded of: "+
+                          objs[i].msg.replaceAll(/\\/gm, "\\\\").replaceAll(/"/gm, "\\\"")+
+                         ". This reminder sent by "+(objs[i].author??"yourself, probably.")));
+        }
       }
-    }
-  });
+    });
+  }
   setTimeout(DBMaintenance, 1000);
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2023 BetaOS
+// Copyright (c) 2024 BetaOS
 import {WebSocket} from 'ws';
 import {uDB} from '../consts';
 import {replyMessage} from './messageHandle';
@@ -329,7 +329,11 @@ export class WS
   
   constructor(url:string, nick:string, roomName:string, transferQ:boolean, isBridgeQ:boolean=false) {
     this.nick = nick;
-    if (roomName == "test") WS.notifRoom = this;
+    // console.log("loaded room", roomName)
+    if (roomName == "test") {
+      WS.notifRoom = this;
+      // console.log("notifroom has been set");
+    }
     WS.sockets.push(this);
     // console.log(WS.sockets);
     this.url=url;

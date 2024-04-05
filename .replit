@@ -1,7 +1,8 @@
-compile = "./.config/build.sh"
-run = "node --enable-source-maps .build/index.js"
+compile = "./.config/build.sh;"
+run = "npm run start"
 entrypoint = "index.ts"
 hidden = [".build", ".config"]
+modules = ["python-3.10:v25-20230920-d4ad2e4"]
 
 [packager]
 language = "nodejs"
@@ -31,3 +32,11 @@ start = "typescript-language-server --stdio"
 [auth]
 pageEnabled = false
 buttonEnabled = false
+
+[[ports]]
+localPort = 3000
+externalPort = 80
+
+[[ports]]
+localPort = 8765
+externalPort = 8080

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html class="{{mainClass}}">
+  <head>
+    <script src='./utils.js'></script>
+    <title>thing</title>
+    <script src="./game.js"> </script>
+    <script src="./events.js"> </script>
+    <script src="./drawutils.js"> </script>
+    <script src="./redraw.js"> </script>
+    <script src="./shapes.js"> </script>
+    <script src="./transfm.js"> </script>
+    <script src="./uihandler.js"> </script>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Display:wght@100;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="./globalformat.css">
+    <link rel="stylesheet" href="./game.css">
+    <style>
+
+    </style>
+  </head>
+  <body onload="
+    if (document.URL.at(-1) != '/') location.href+= '/';
+    globalOnload(onLoad); preLoad()">
+    <div class="main_content">
+
+      <canvas id="canv"></canvas>
+      <!-- <button onclick="addNewStop()" class="btn blu fssml override">
+        Add new stop
+      </button>
+      <button onclick="populateStops()" class="btn blu fssml override">
+        Populate stops
+      </button>
+      d
+      -->
+      <div id="topBar">
+        <span id="paused"></span>
+        <div id="addTrain" onpointerdown="addTrain(event)">
+          <span class="material-symbols-outlined sz30" id="addTop" >train</span>
+          <span class="sz30" id="trainsAvailable">5</span>
+        </div>
+        <div id="addLine">
+          <span class="material-symbols-outlined sz30" id="addTop" >cable</span>
+          <span id="linesAvailable">3</span>
+        </div>
+        
+        <div id="popOuter" class="nobreak">
+          <div id="popInner" class="nobreak">
+            Population  
+          </div>
+          
+        </div>
+        <span id="balance" onclick="toggleDialog(K.DIALOG_SHOP)">0.000</span>
+        <span class="blu timedate" id="time" onclick="toggleDialog(K.DIALOG_TIME);">0d 00:00</span>
+        <span class="blu timedate" id="date" onclick="toggleDialog(K.DIALOG_TIME);">0d 00:00</span>
+        <div>
+          <span class="material-symbols-outlined sz30">
+            directions_walk
+          </span>
+          <span class="blu nohover" id="pServed">0</span>
+        </div>
+        
+        
+      </div>
+      <div class="menu" id="upgrades">
+        <h2 class="span2"><span class="material-symbols-outlined">keyboard_double_arrow_up</span>Orders</h2>
+        <button onclick="toggleDialog(K.DIALOG_SHOP)" class="span2 fssml btn gry override">
+          Close
+        </button>
+        <span id="budget" class="span2"></span>
+        <span id="lines2" class="cost"></span>
+        <button onclick="purchaseLine()" id="line" class="btn blu override">Add line</button>
+        <span id="trains2" class="cost"></span>
+        <button onclick="purchaseTrain()" id="train" class="btn blu override">Add train</button>
+        <span id="upgrade0" class="cost"></span>
+        <button onclick="purchaseUpgrade(0)" id="purchase0" class="btn blu override">Faster trains</button>
+        <span id="upgrade1" class="cost"></span>
+        <button onclick="purchaseUpgrade(1)" id="purchase1" class="btn blu override">Longer trains</button>
+        <span id="upgrade2" class="cost"></span>
+        <button onclick="purchaseUpgrade(2)" id="purchase2" class="btn blu override">Larger stations</button>
+        <span id="upgrade3" class="cost"></span>
+        <button onclick="purchaseUpgrade(3)" id="purchase3" class="btn blu override">Increase balance cap</button>
+      </div>
+      <div class="menu" id="timeMenu" >
+        <h2><span class="material-symbols-outlined">schedule </span>Timing</h2>
+        <button onclick="toggleDialog(K.DIALOG_TIME)" class="btn gry override">
+          Close
+        </button>
+        <button onclick="togglePause()"id="playpause" class="btn blu fssml override">
+          Pause/resume
+        </button>
+        <button onclick="toggleSpeed()" id="speed" class="btn blu fssml override">
+          Current speed: 1x
+        </button>
+      </div>
+
+      <div id="currCost"></div>
+      <details class="blu ">
+        <summary>Footer</summary>
+        <footer id="ftrOverride"></footer>
+      </details>
+    </div>
+    <div style="display:none">
+      <svg id="passengersServed" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+        <path d="m280-40 112-564-72 28v136h-80v-188l202-86q14-6 29.5-7t29.5 4q14 5 26.5 14t20.5 23l40 64q26 42 70.5 69T760-520v80q-70 0-125-29t-94-74l-25 123 84 80v300h-80v-260l-84-64-72 324h-84Zm260-700q-33 0-56.5-23.5T460-820q0-33 23.5-56.5T540-900q33 0 56.5 23.5T620-820q0 33-23.5 56.5T540-740Z"/></svg>
+    </div>
+    <div class="overlay" id="overlay">
+      <div class="internal">
+        <p class="fsmed" id="alerttext">Hey, some text here</p>
+        <button class="btn szTwoThirds" onclick="closeAlert()">
+          Continue
+          <span class="material-symbols-outlined">arrow_forward_ios</span>
+          <div class="anim"></div>
+        </button>
+      </div>
+    </div>
+  </body>
+</html>

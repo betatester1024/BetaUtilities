@@ -4,7 +4,8 @@ import {initServer} from './server';
 import {DBMaintenance, connectDB, client} from './database';
 import {supportHandler, Room, BridgeHandler} from './supportRooms'
 import {log} from './logging';
-const fs = require('fs');
+import {WebSocket} from 'ws';
+// let ws = require("ws");
 import {uDB} from './consts';
 import {WS} from './betautilities/wsHandler';
 import {WebH} from './betautilities/webHandler';
@@ -31,8 +32,10 @@ const { exec } = require("child_process");
 
 let timedOutQ = false;
 export let UPSINCESTR = "";
+export let botsStarted = false;
 try {
   // mail();
+  
   // let fs = 
   if (connectionSuccess)
   connectDB().then((err:any)=>{
@@ -87,9 +90,18 @@ try {
 
 async function init(startBots:boolean) 
 {
+  // const wsock = new WebSocket('ws://localhost:8765');
+
+  // wsock.on('error', console.error);
+  
+  // wsock.on('open', function open() {
+    // wsock.send('{"type": 0, "server": "betawebsite"}');
+  // });
+  
+  botsStarted = startBots;
   if (startBots) console.log("Starting EuphBots...");
   initServer();
-  DBMaintenance();
+  setTimeout(DBMaintenance, 1000);
   serverUpdate();
   let now = new Date(Date.now());
   UPSINCESTR = "----------------------Systems restarted at "+now.toLocaleString("en-US", {timeZone: "America/New_York"})+"-------------------";
@@ -108,7 +120,7 @@ async function init(startBots:boolean)
              !(obj.euphRooms[i]=="test" || obj.euphRooms[i]=="bots"))
 
       // log("Connected euph_room")+obj.euphRooms[i];
-      console.log("Connected euph_room", obj.euphRooms[i]);
+      console.log("Connecting euph_room", obj.euphRooms[i]);
     }
     // for (let i=0; i<localEuphRooms.length; i++) {
     //   supportHandler.addRoom(new Room("EUPH_ROOM", localEuphRooms[i]));

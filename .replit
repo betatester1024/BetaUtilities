@@ -1,4 +1,4 @@
-compile = "./.config/build.sh; npm run build"
+compile = "./.config/build.sh;"
 run = "npm run start"
 entrypoint = "index.ts"
 hidden = [".build", ".config"]

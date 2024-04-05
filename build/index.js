@@ -28,7 +28,6 @@ var import_server = require("./server");
 var import_database = require("./database");
 var import_supportRooms = require("./supportRooms");
 var import_logging = require("./logging");
-var import_ws = require("ws");
 var import_consts = require("./consts");
 var import_wsHandler = require("./betautilities/wsHandler");
 var import_webHandler = require("./betautilities/webHandler");
@@ -84,11 +83,6 @@ try {
   console.log(e);
 }
 async function init(startBots) {
-  const wsock = new import_ws.WebSocket("ws://localhost:8765");
-  wsock.on("error", console.error);
-  wsock.on("open", function open() {
-    wsock.send('{"type": 0, "server": "betawebsite"}');
-  });
   botsStarted = startBots;
   if (startBots)
     console.log("Starting EuphBots...");

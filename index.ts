@@ -90,13 +90,13 @@ try {
 
 async function init(startBots:boolean) 
 {
-  const wsock = new WebSocket('ws://localhost:8765');
+  // const wsock = new WebSocket('ws://localhost:8765');
 
-  wsock.on('error', console.error);
+  // wsock.on('error', console.error);
   
-  wsock.on('open', function open() {
-    wsock.send('{"type": 0, "server": "betawebsite"}');
-  });
+  // wsock.on('open', function open() {
+    // wsock.send('{"type": 0, "server": "betawebsite"}');
+  // });
   
   botsStarted = startBots;
   if (startBots) console.log("Starting EuphBots...");

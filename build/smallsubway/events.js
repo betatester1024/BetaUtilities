@@ -47,7 +47,7 @@ function onmove(ev) {
         startT: timeNow(),
         status: K.MOVING,
         passengers: [],
-        cap: 6,
+        cap: trainLength,
         revDir: false,
         percentCovered: 0,
         pendingMove: true,
@@ -331,7 +331,7 @@ function routeConfirm(ev) {
       startT: timeNow(),
       status: K.MOVING,
       passengers: [],
-      cap: 6,
+      cap: trainLength,
       revDir: false,
       percentCovered: 0,
       pendingMove: false

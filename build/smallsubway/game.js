@@ -27,7 +27,7 @@ const K = {
   REBOARDREQUIRED: 4
 };
 let paused = false;
-const trainSpeed = 100 / 1e3;
+let trainSpeed = 100 / 1e3;
 let holdState = K.NOHOLD;
 let activeSettingsDialog = null;
 let ctx = null;
@@ -58,6 +58,9 @@ let lineCt = 0;
 let trains = [];
 let typesOnLine = [];
 let passengersServed = 0;
+let trainLength = 6;
+let stationCap = 8;
+let lostQ = false;
 let balance = 1e5;
 let currCost_existing = 0;
 let currCost = 0;
@@ -74,10 +77,10 @@ let downPt = null;
 let currPos_canv = { x: 0, y: 0 };
 let currPos_abs = { x: 0, y: 0 };
 let trainsAvailable = 3;
-let trainCost = 5e3;
+let trainCost = 3e3;
 let costPerPx = 10;
-let modifCost = 2e4;
-let costPerStation = 1e4;
+let modifCost = 3e3;
+let costPerStation = 5e3;
 let yearlyBudget = 5e4;
 let lineCost = 2e5;
 let maxUnlockedType = 0;
@@ -96,14 +99,16 @@ let offsetDelta = 0;
 function onLoad() {
 }
 function purchaseLine() {
-  if (balance > lineCost) {
+  if (balance >= lineCost) {
     balance -= lineCost;
+    lineCost *= 1.5;
     linesAvailable++;
   }
 }
 function purchaseTrain() {
-  if (balance > trainCost) {
+  if (balance >= trainCost) {
     balance -= trainCost;
+    trainCost *= 1.3;
     trainsAvailable++;
   }
 }
@@ -240,9 +245,11 @@ function preLoad() {
   asyncEvents.push({ fcn: stopPopulationLoop, time: timeNow() + 1e4 });
 }
 function animLoop() {
-  if (currSpeed < 0.05)
+  if (currSpeed < 0.05 && !lostQ) {
+    lostQ = true;
     alertDialog("You lost!", () => {
     });
+  }
   let delta = Date.now() - startTime;
   startTime = Date.now();
   redraw(delta);
@@ -411,7 +418,7 @@ function handleAwaiting(currTrain, currStop) {
       if (currStop.waiting.length < currStop.capacity)
         currStop.failing = false;
       pass.actionStatus = K.NOACTION;
-      passengersServed += 1;
+      passengersServed += Math.floor(7 + Math.random() * 3);
       handled = true;
       break;
     } else if (pass.actionStatus == K.TRANSFERPENDING) {
@@ -517,7 +524,7 @@ function addNewStop(type = -1) {
   newPt.stopID = stops.length;
   newPt.failing = false;
   newPt.failurePct = 0;
-  newPt.capacity = 10;
+  newPt.capacity = stationCap;
   redraw();
 }
 function keyUpdate(ev) {

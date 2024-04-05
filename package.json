@@ -4,7 +4,8 @@
   "description": "BetaOS Systems home-page and BetaUtilities on euphoria.leet.nu",
   "main": ".build/index.js",
   "scripts": {
-    "start": "node --enable-source-maps build/index.js"
+    "start": "node --enable-source-maps build/index.js;",
+    "build": "npm i; npm install argon2 --ignore-script; npm install -g node-pre-gyp; node-pre-gyp rebuild -C ./node_modules/argon2; npm install;"
   },
   "keywords": [],
   "author": "",

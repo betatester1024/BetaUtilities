@@ -5,7 +5,7 @@
   "main": ".build/index.js",
   "scripts": {
     "start": "node --enable-source-maps build/index.js;",
-    "build": "npm ci; ls -a /opt/render/project/src/node_modules/argon2/"
+    "build": "npm ci;"
   },
   "keywords": [],
   "author": "",

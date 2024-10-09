@@ -22,7 +22,7 @@
     "@trycourier/courier": "^6.2.3",
     "argon2": "^0.41.1",
     "body-parser": "^1.20.3",
-    "co-body": "^6.1.0",
+    "co-body": "^6.2.0",
     "cookie": "^1.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
